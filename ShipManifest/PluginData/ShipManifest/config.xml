@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <bool name="EnablePermaDeath">0</bool>
+  <bool name="ShowDebugger">0</bool>
+  <bool name="AllowRespawn">0</bool>
+  <rect name="ManifestPosition">
+    <xmin>4</xmin>
+    <xmax>323</xmax>
+    <ymin>39</ymin>
+    <ymax>541</ymax>
+  </rect>
+  <rect name="TransferPosition">
+    <xmin>331</xmin>
+    <xmax>953</xmax>
+    <ymin>39</ymin>
+    <ymax>541</ymax>
+  </rect>
+  <rect name="RosterPosition">
+    <xmin>329</xmin>
+    <xmax>645</xmax>
+    <ymin>39</ymin>
+    <ymax>309</ymax>
+  </rect>
+  <rect name="ButtonPosition">
+    <xmin>189</xmin>
+    <xmax>221</xmax>
+    <ymin>0</ymin>
+    <ymax>32</ymax>
+  </rect>
+  <rect name="ResourceManifestPosition">
+    <xmin>4</xmin>
+    <xmax>323</xmax>
+    <ymin>39</ymin>
+    <ymax>341</ymax>
+  </rect>
+  <rect name="ResourceTransferPosition">
+    <xmin>331</xmin>
+    <xmax>953</xmax>
+    <ymin>39</ymin>
+    <ymax>341</ymax>
+  </rect>
+  <rect name="ResourceDebuggerPosition">
+    <xmin>4</xmin>
+    <xmax>323</xmax>
+    <ymin>39</ymin>
+    <ymax>239</ymax>
+  </rect>
+</config>
