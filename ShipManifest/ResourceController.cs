@@ -255,6 +255,30 @@ namespace ShipManifest
                     // This routine assumes that a resource has been selected on the Resource manifest window.
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(string.Format("{0}, ({1}/{2})", resource.info.name, resource.amount, resource.maxAmount), GUILayout.Width(300), GUILayout.Height(20));
+                    string flowtext = "Off";
+                    bool flowbool = SelectedPartSource.Resources[SelectedResource].flowState;
+                    if (flowbool)
+                    {
+                        flowtext = "On";
+                    }
+                    else
+                    {
+                        flowtext = "Off";
+                    }
+                    if (GUILayout.Button("Flow", GUILayout.Width(50), GUILayout.Height(20)))
+                    {
+                        if (flowbool)
+                        {
+                                SelectedPartSource.Resources[SelectedResource].flowState = false;
+                                flowtext = "Off";
+                        }
+                        else
+                        {
+                            SelectedPartSource.Resources[SelectedResource].flowState = true;
+                            flowtext = "On";
+                        }
+                    }
+                    GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(40), GUILayout.Height(20));
                     if (SelectedPartTarget != null && (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
                     {
                         if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
