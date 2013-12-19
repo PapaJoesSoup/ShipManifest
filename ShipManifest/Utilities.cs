@@ -1,4 +1,4 @@
-﻿using KSP.IO;
+using KSP.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,16 +62,21 @@ namespace ShipManifest
             ButtonToggledStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledStyle.normal.textColor = Color.green;
             ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
+            ButtonToggledStyle.fontSize = 14;
+            ButtonToggledStyle.fontStyle = FontStyle.Normal;
 
             ButtonToggledRedStyle = new GUIStyle(ButtonToggledStyle);
             ButtonToggledRedStyle.normal.textColor = Color.red;
+            ButtonToggledRedStyle.fontSize = 14;
+            ButtonToggledRedStyle.fontStyle = FontStyle.Normal;
 
             ButtonStyle = new GUIStyle(GUI.skin.button);
             ButtonStyle.normal.textColor = Color.white;
+            ButtonStyle.fontSize = 14;
+            ButtonStyle.fontStyle = FontStyle.Normal;
 
             ErrorLabelRedStyle = new GUIStyle(GUI.skin.label);
             ErrorLabelRedStyle.normal.textColor = Color.red;
-            ErrorLabelRedStyle.fontSize = 10;
 
             LabelStyle = new GUIStyle(GUI.skin.label);
 
@@ -88,16 +93,16 @@ namespace ShipManifest
 
     public class SettingsManager
     {
-        public Rect ManifestPosition;
-        public Rect TransferPosition;
-        public Rect RosterPosition;
+        //public Rect ManifestPosition;
+        //public Rect TransferPosition;
+        //public Rect RosterPosition;
         
         public Rect ResourceManifestPosition;
         public Rect ResourceTransferPosition;
 
         public Rect SettingsPosition;
 
-        public Rect DebuggerPosition;
+        //public Rect DebuggerPosition;
         public Rect ResourceDebuggerPosition;
         public bool ShowDebugger;
 
@@ -107,27 +112,30 @@ namespace ShipManifest
 
             try
             {
-                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<CrewManifestModule>();
+                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ResourceManifestModule>();
                 configfile.load();
 
                 ResourceManifestPosition = configfile.GetValue<Rect>("ResourceManifestPosition");
                 ResourceTransferPosition = configfile.GetValue<Rect>("ResourceTransferPosition");
-                ManifestPosition = configfile.GetValue<Rect>("ManifestPosition");
-                TransferPosition = configfile.GetValue<Rect>("TransferPosition");
-                RosterPosition = configfile.GetValue<Rect>("RosterPosition");
+                ResourceDebuggerPosition = configfile.GetValue<Rect>("ResourceDebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
-                DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");
-                DebuggerPosition = configfile.GetValue<Rect>("ResourceDebuggerPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
+
+                //DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");                
+                //ManifestPosition = configfile.GetValue<Rect>("ManifestPosition");
+                //TransferPosition = configfile.GetValue<Rect>("TransferPosition");
+                //RosterPosition = configfile.GetValue<Rect>("RosterPosition");
 
                 ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Loaded: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Loaded: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
+                ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", ResourceDebuggerPosition.xMin, ResourceDebuggerPosition.xMax, ResourceDebuggerPosition.yMin, ResourceDebuggerPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("DebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info");
+
+                //ManifestUtilities.LogMessage(string.Format("DebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
             }
             catch(Exception e)
             {
@@ -139,29 +147,32 @@ namespace ShipManifest
         {
             try
             {
-                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<CrewManifestModule>();
+                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ResourceManifestModule>();
 
                 configfile.SetValue("ResourceManifestPosition", ResourceManifestPosition);
                 configfile.SetValue("ResourceTransferPosition", ResourceTransferPosition);
-                configfile.SetValue("ManifestPosition", ManifestPosition);
-                configfile.SetValue("TransferPosition", TransferPosition);
-                configfile.SetValue("RosterPosition", RosterPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
-                configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ResourceDebuggerPosition", ResourceDebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
 
+                //configfile.SetValue("ManifestPosition", ManifestPosition);
+                //configfile.SetValue("TransferPosition", TransferPosition);
+                //configfile.SetValue("RosterPosition", RosterPosition);
+                //configfile.SetValue("DebuggerPosition", DebuggerPosition);
+
                 configfile.save();
 
-                ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
+                ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Saved: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
+                ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Saved: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
-                ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
+                ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Saved: {0}, {1}, {2}, {3}", ResourceDebuggerPosition.xMin, ResourceDebuggerPosition.xMax, ResourceDebuggerPosition.yMin, ResourceDebuggerPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info");
-                ManifestUtilities.LogMessage(string.Format("AllowRespawn Saved: {0}", ShowDebugger.ToString()), "Info");
+
+                //ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
+                //ManifestUtilities.LogMessage(string.Format("AllowRespawn Saved: {0}", ShowDebugger.ToString()), "Info");
             }
             catch (Exception e)
             {
