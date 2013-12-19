@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -74,7 +74,7 @@ namespace ShipManifest
             Resources.SetupGUI();
 
             if (ResourceSettings.ShowDebugger)
-                ResourceSettings.DebuggerPosition = GUILayout.Window(398646, ResourceSettings.DebuggerPosition, DrawDebugger, " Resource Manifest Debug Console", GUILayout.MinHeight(20));
+                ResourceSettings.ResourceDebuggerPosition = GUILayout.Window(398646, ResourceSettings.ResourceDebuggerPosition, DrawDebugger, " Resource Manifest Debug Console", GUILayout.MinHeight(20));
         }
         
         public void Update()
