@@ -153,21 +153,6 @@ namespace ShipManifest
 
             if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
             {
-                if (_showRosterWindow)
-                {
-                    CrewManifestBehaviour.CrewSettings.RosterPosition = GUILayout.Window(398543, CrewManifestBehaviour.CrewSettings.RosterPosition, RosterWindow, "Crew Roster", GUILayout.MinHeight(20));
-                }
-
-                if (ShowCrewManifest)
-                {
-                    CrewManifestBehaviour.CrewSettings.ManifestPosition = GUILayout.Window(398541, CrewManifestBehaviour.CrewSettings.ManifestPosition, CrewManifestWindow, "Crew Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
-                }
-
-                if (_showTransferWindow)
-                {
-                    CrewManifestBehaviour.CrewSettings.TransferPosition = GUILayout.Window(398542, CrewManifestBehaviour.CrewSettings.TransferPosition, CrewTransferWindow, "Crew Transfer - " + Vessel.vesselName, GUILayout.MinHeight(20));
-                }
-
                 if (ShowResourceManifest)
                 {
                     ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition = GUILayout.Window(398544, ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition, ResourceManifestWindow, "Resource Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
@@ -177,13 +162,28 @@ namespace ShipManifest
                 {
                     ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition = GUILayout.Window(398545, ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition, ResourceTransferWindow, "Resource Transfer - " + Vessel.vesselName, GUILayout.MinHeight(20));
                 }
+                //if (_showRosterWindow)
+                //{
+                    //CrewManifestBehaviour.CrewSettings.RosterPosition = GUILayout.Window(398543, CrewManifestBehaviour.CrewSettings.RosterPosition, RosterWindow, "Crew Roster", GUILayout.MinHeight(20));
+                //}
+
+                //if (ShowCrewManifest)
+                //{
+                    //CrewManifestBehaviour.CrewSettings.ManifestPosition = GUILayout.Window(398541, CrewManifestBehaviour.CrewSettings.ManifestPosition, CrewManifestWindow, "Crew Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                //}
+
+                //if (_showTransferWindow)
+                //{
+                    //CrewManifestBehaviour.CrewSettings.TransferPosition = GUILayout.Window(398542, CrewManifestBehaviour.CrewSettings.TransferPosition, CrewTransferWindow, "Crew Transfer - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                //}
+
             }
         }
 
         public void HideAllWindows()
         {
-            _showRosterWindow = false;
-            _showTransferWindow = false;
+            //_showRosterWindow = false;
+            //_showTransferWindow = false;
             _showResourceTransferWindow = false;
             ClearHighlight(_selectedPart);
             ClearHighlight(_selectedPartSource);
