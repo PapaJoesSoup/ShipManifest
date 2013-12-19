@@ -45,8 +45,6 @@
   <ItemGroup>
     <Compile Include="ResourceManifestModule.cs" />
     <Compile Include="ResourceController.cs" />
-    <Compile Include="CrewController.cs" />
-    <Compile Include="CrewManifestModule.cs" />
     <Compile Include="ManifestController.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
