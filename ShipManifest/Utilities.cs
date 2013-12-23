@@ -93,16 +93,11 @@ namespace ShipManifest
 
     public class SettingsManager
     {
-        //public Rect ManifestPosition;
-        //public Rect TransferPosition;
-        //public Rect RosterPosition;
-        
         public Rect ResourceManifestPosition;
         public Rect ResourceTransferPosition;
 
         public Rect SettingsPosition;
 
-        //public Rect DebuggerPosition;
         public Rect ResourceDebuggerPosition;
         public bool ShowDebugger;
 
@@ -120,22 +115,11 @@ namespace ShipManifest
                 ResourceDebuggerPosition = configfile.GetValue<Rect>("ResourceDebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
-
-                //DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");                
-                //ManifestPosition = configfile.GetValue<Rect>("ManifestPosition");
-                //TransferPosition = configfile.GetValue<Rect>("TransferPosition");
-                //RosterPosition = configfile.GetValue<Rect>("RosterPosition");
-
                 ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Loaded: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Loaded: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", ResourceDebuggerPosition.xMin, ResourceDebuggerPosition.xMax, ResourceDebuggerPosition.yMin, ResourceDebuggerPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info");
-
-                //ManifestUtilities.LogMessage(string.Format("DebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
             }
             catch(Exception e)
             {
@@ -154,12 +138,6 @@ namespace ShipManifest
                 configfile.SetValue("SettingsPosition", SettingsPosition);
                 configfile.SetValue("ResourceDebuggerPosition", ResourceDebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
-
-                //configfile.SetValue("ManifestPosition", ManifestPosition);
-                //configfile.SetValue("TransferPosition", TransferPosition);
-                //configfile.SetValue("RosterPosition", RosterPosition);
-                //configfile.SetValue("DebuggerPosition", DebuggerPosition);
-
                 configfile.save();
 
                 ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Saved: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
@@ -167,12 +145,6 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Saved: {0}, {1}, {2}, {3}", ResourceDebuggerPosition.xMin, ResourceDebuggerPosition.xMax, ResourceDebuggerPosition.yMin, ResourceDebuggerPosition.yMax), "Info");
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info");
-
-                //ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
-                //ManifestUtilities.LogMessage(string.Format("AllowRespawn Saved: {0}", ShowDebugger.ToString()), "Info");
             }
             catch (Exception e)
             {
