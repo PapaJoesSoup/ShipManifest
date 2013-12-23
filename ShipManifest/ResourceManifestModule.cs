@@ -36,6 +36,7 @@ namespace ShipManifest
         //Game object that keeps us running
         public static GameObject GameObjectInstance;
         public static SettingsManager ResourceSettings = new SettingsManager();
+
         private float interval = 30F;
 
         private IButton button;
@@ -75,6 +76,7 @@ namespace ShipManifest
 
             if (ResourceSettings.ShowDebugger)
                 ResourceSettings.ResourceDebuggerPosition = GUILayout.Window(398646, ResourceSettings.ResourceDebuggerPosition, DrawDebugger, " Resource Manifest Debug Console", GUILayout.MinHeight(20));
+
         }
         
         public void Update()
