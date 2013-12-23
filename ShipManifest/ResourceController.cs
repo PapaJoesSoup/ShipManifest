@@ -55,7 +55,6 @@ namespace ShipManifest
 
         // DataSource for Resources by Part  Used in Transfer window.  
         // I may change this to the partlist above.
-
         private List<Part> _resourcesByPart;
         private List<Part> ResourcesByPart
         {
@@ -64,12 +63,20 @@ namespace ShipManifest
                 if (_resourcesByPart == null)
                     _resourcesByPart = new List<Part>();
                 else
+                {
+                    foreach (Part part in _resourcesByPart)
+                    {
+                        _resourcesByPart.Add(part);
+                    }
                     _resourcesByPart.Clear();
+                }
 
                 foreach (Part part in Vessel.Parts)
                 {
                     if (part.Resources.Count > 0)
+                    {
                         _resourcesByPart.Add(part);
+                    }
                 }
 
                 return _resourcesByPart;
@@ -87,7 +94,20 @@ namespace ShipManifest
             }
             set
             {
+                if (_selectedResourceParts != null)
+                foreach (Part part in _selectedResourceParts)
+                {
+                    Part.OnActionDelegate OnMouseExit = MouseExit;
+                    part.RemoveOnMouseExit(OnMouseExit);
+                }
+
                 _selectedResourceParts = value;
+
+                foreach (Part part in _selectedResourceParts)
+                {
+                    Part.OnActionDelegate OnMouseExit = MouseExit;
+                    part.AddOnMouseExit(OnMouseExit);
+                }
             }
         }
 
@@ -108,11 +128,50 @@ namespace ShipManifest
             }
         }
 
+        private Part _selectedPartSource;
+        private Part SelectedPartSource
+        {
+            get
+            {
+                if (_selectedPartSource != null && !Vessel.Parts.Contains(_selectedPartSource))
+                    _selectedPartSource = null;
+
+                return _selectedPartSource;
+            }
+            set
+            {
+                if ((value != null && _selectedPartTarget != null) && value.uid == _selectedPartTarget.uid)
+                    SelectedPartTarget = null;
+
+                SetPartHighlight(_selectedPartSource, Color.yellow);
+                _selectedPartSource = value;
+                SetPartHighlight(_selectedPartSource, Color.green);
+            }
+        }
+
+        private Part _selectedPartTarget;
+        private Part SelectedPartTarget
+        {
+            get
+            {
+                if (_selectedPartTarget != null && !Vessel.Parts.Contains(_selectedPartTarget))
+                    _selectedPartTarget = null;
+                return _selectedPartTarget;
+            }
+            set
+            {
+                SetPartHighlight(_selectedPartTarget, Color.yellow);
+                _selectedPartTarget = value;
+                SetPartHighlight(_selectedPartTarget, Color.red);
+            }
+        }
+
         #endregion
 
         #region GUI Stuff
 
-        private bool _showResourceTransferWindow { get; set; }
+        // Flags to show and windows
+        public bool ShowResourceTransferWindow { get; set; }
         public bool ShowResourceManifest { get; set; }
 
 
@@ -150,9 +209,29 @@ namespace ShipManifest
                 {
                     ClearHighlight(_selectedPartSource);
                     ClearHighlight(_selectedPartTarget);
+
+                    // Let's clear all highlighting
+                    if (SelectedResourceParts != null)
+                    {
+                        foreach (Part oldPart in SelectedResourceParts)
+                        {
+                             ClearHighlight(oldPart);
+                        }
+                    }
+
+                    // Now let's update our lists...
                     _selectedPartSource = _selectedPartTarget = null;
                     SelectedResource = resourceName;
                     SelectedResourceParts = PartsByResource[SelectedResource];
+
+                    // Finally, set highlights on parts with selected resource.
+                    if (SelectedResourceParts != null)
+                    {
+                        foreach (Part newPart in SelectedResourceParts)
+                        {
+                            SetPartHighlight(newPart, Color.yellow);
+                        }
+                    }
                 }
             }
 
@@ -181,14 +260,14 @@ namespace ShipManifest
 
             GUILayout.BeginHorizontal();
 
-            var transferStyle = _showResourceTransferWindow ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
+            var transferStyle = ShowResourceTransferWindow ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
 
             if (GUILayout.Button("Transfer Resource", transferStyle, GUILayout.Width(150), GUILayout.Height(20)))
             {
                 if (SelectedResource != null)
                 {
-                    _showResourceTransferWindow = !_showResourceTransferWindow;
-                    if (!_showResourceTransferWindow)
+                    ShowResourceTransferWindow = !ShowResourceTransferWindow;
+                    if (!ShowResourceTransferWindow)
                     {
                         ClearHighlight(_selectedPartSource);
                         ClearHighlight(_selectedPartTarget);
@@ -345,6 +424,47 @@ namespace ShipManifest
 
         #region Methods
 
+        public static void ClearHighlight(Part part)
+        {
+            if (part != null)
+            {
+                part.SetHighlightDefault();
+                part.SetHighlight(false);
+            }
+        }
+
+        public static void SetPartHighlight(Part part, Color color)
+        {
+            if (part != null)
+            {
+                part.SetHighlightColor(color);
+                part.SetHighlight(true);
+            }
+        }
+
+        public void SetPartHighlights()
+        {
+            if (SelectedResourceParts != null)
+            {
+                foreach (Part currPart in SelectedResourceParts)
+                {
+                    if (currPart != SelectedPartSource && currPart != SelectedPartTarget)
+                    {
+                        SetPartHighlight(currPart, Color.yellow);
+                    }
+                    else if (currPart == SelectedPartSource)
+                    {
+                        SetPartHighlight(currPart, Color.green);
+                    }
+                    else if (currPart == SelectedPartTarget)
+                    {
+                        SetPartHighlight(currPart, Color.red);
+                    }
+                }
+            }
+
+        }
+
         private void TransferResource(Part source, Part target, double XferAmount)
         {
             if (source.Resources.Contains(SelectedResource) && target.Resources.Contains(SelectedResource))
@@ -394,6 +514,14 @@ namespace ShipManifest
         }
 
         #endregion
+
+
+        extern Part.OnActionDelegate OnMouseExit(Part part);
+
+        void MouseExit(Part part)
+        {
+            SetPartHighlights();
+        }
 
     }
 }
