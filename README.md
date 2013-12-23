@@ -1,5 +1,7 @@
 ShipManifest
 ============
+Version 0.23.1.2 22 Dec 2013 - Bug Fix
+ - When selecting a resource, parts illuminate.  Close manifest window.  Parts stay illuminated.
 Version 0.23.1.1 22 Dec 2013 - Revision
  - Changes
    - Added Selected part highlighting support. 
