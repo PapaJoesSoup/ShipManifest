@@ -4,6 +4,7 @@ Version 0.23.1.3 23 Dec 2013 - Bug Fix
  - post bug fix regression bug.   source part and target part highlighting failing.
 Version 0.23.1.2 22 Dec 2013 - Bug Fix
  - When selecting a resource, parts illuminate.  Close manifest window.  Parts stay illuminated.
+ - Figured out releases in Github.   This is the initial release on Github.
 
 Version 0.23.1.1 22 Dec 2013 - Revision
  - Changes
