@@ -77,10 +77,24 @@ namespace ShipManifest
             {
                 if (ShowResourceManifest)
                 {
+                    // Let's set all highlighting
+                    SetPartHighlights();
                     ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition = GUILayout.Window(398544, ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition, ResourceManifestWindow, "Resource Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                 }
+                else
+                {
+                    // Let's clear all highlighting
+                    if (SelectedResourceParts != null)
+                    {
+                        foreach (Part oldPart in SelectedResourceParts)
+                        {
+                            ClearHighlight(oldPart);
+                        }
+                        SelectedResourceParts = null;
+                    }
+                }
 
-                if (ShowResourceTransferWindow)
+                if (ShowResourceManifest && ShowResourceTransferWindow)
                 {
                     ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition = GUILayout.Window(398545, ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition, ResourceTransferWindow, "Resource Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                 }
@@ -92,9 +106,7 @@ namespace ShipManifest
             ShowResourceTransferWindow = false;
             ClearHighlight(_selectedPartSource);
             ClearHighlight(_selectedPartTarget);
-
             _selectedPartSource = _selectedPartTarget = null; //clear selections
-            _selectedResource = "";
         }
 
     }
