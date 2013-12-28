@@ -8,8 +8,8 @@ namespace ShipManifest
 {
     public partial class ManifestController
     {
-        // Resource Controller
-        // This module contains Resource Manifest specific code.  I made it a partial class to allow file level segregation of functionality
+        // Resource Controller.  This module contains Resource Manifest specific code. 
+        // I made id a partial class to allow file level segregation of resource and crew functionality
         // for improved readability and management by coders.
 
         #region Datasource properties
@@ -90,23 +90,34 @@ namespace ShipManifest
         {
             get
             {
+                if (_selectedResourceParts == null)
+                    _selectedResourceParts = new List<Part>();
                 return _selectedResourceParts;
             }
             set
             {
+                // This removes the event handler from the currently selected parts, 
+                // since we are going to be selecting different parts.
                 if (_selectedResourceParts != null)
-                foreach (Part part in _selectedResourceParts)
                 {
-                    Part.OnActionDelegate OnMouseExit = MouseExit;
-                    part.RemoveOnMouseExit(OnMouseExit);
+                    foreach (Part part in _selectedResourceParts)
+                    {
+                        Part.OnActionDelegate OnMouseExit = MouseExit;
+                        part.RemoveOnMouseExit(OnMouseExit);
+                    }
                 }
 
                 _selectedResourceParts = value;
 
-                foreach (Part part in _selectedResourceParts)
+                // This adds an event handler to each newly selected part,
+                // to manage mouse exit events and preserve highlighting.
+                if (_selectedResourceParts != null)
                 {
-                    Part.OnActionDelegate OnMouseExit = MouseExit;
-                    part.AddOnMouseExit(OnMouseExit);
+                    foreach (Part part in _selectedResourceParts)
+                    {
+                         Part.OnActionDelegate OnMouseExit = MouseExit;
+                        part.AddOnMouseExit(OnMouseExit);
+                    }
                 }
             }
         }
@@ -267,12 +278,6 @@ namespace ShipManifest
                 if (SelectedResource != null)
                 {
                     ShowResourceTransferWindow = !ShowResourceTransferWindow;
-                    if (!ShowResourceTransferWindow)
-                    {
-                        ClearHighlight(_selectedPartSource);
-                        ClearHighlight(_selectedPartTarget);
-                        _selectedPartSource = _selectedPartTarget = null;
-                    }
                 }
             }
 
@@ -319,7 +324,7 @@ namespace ShipManifest
             GUILayout.Label(SelectedPartSource != null ? string.Format("{0}", SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
 
             // Source Part List
-            // this Scroll viewer is for the details of the button selected above.
+            // this Scroll viewer is for the details of the part button selected above.
             SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(50), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
@@ -444,25 +449,36 @@ namespace ShipManifest
 
         public void SetPartHighlights()
         {
-            if (SelectedResourceParts != null)
+            if (ShowResourceManifest && SelectedResourceParts != null)
             {
-                foreach (Part currPart in SelectedResourceParts)
+                foreach (Part thispart in SelectedResourceParts)
                 {
-                    if (currPart != SelectedPartSource && currPart != SelectedPartTarget)
+                    if (thispart != SelectedPartSource && thispart != SelectedPartTarget)
                     {
-                        SetPartHighlight(currPart, Color.yellow);
-                    }
-                    else if (currPart == SelectedPartSource)
-                    {
-                        SetPartHighlight(currPart, Color.green);
-                    }
-                    else if (currPart == SelectedPartTarget)
-                    {
-                        SetPartHighlight(currPart, Color.red);
+                        SetPartHighlight(thispart, Color.yellow);
                     }
                 }
+                if (ShowResourceTransferWindow)
+                {
+                    SetPartHighlight(SelectedPartSource, Color.green);
+                    SetPartHighlight(SelectedPartTarget, Color.red);
+                }
+                else
+                {
+                    SetPartHighlight(SelectedPartSource, Color.yellow);
+                    SetPartHighlight(SelectedPartTarget, Color.yellow);
+                }
             }
+        }
 
+        // this is the delagate needed to support the part envent hadlers
+        // extern is needed, as the addon is considered external to KSP, and is expected by the part delagate call.
+        extern Part.OnActionDelegate OnMouseExit(Part part);
+
+        // this is the method used with the delagate
+        void MouseExit(Part part)
+        {
+            SetPartHighlights();
         }
 
         private void TransferResource(Part source, Part target, double XferAmount)
@@ -493,18 +509,19 @@ namespace ShipManifest
 
         private void FillVesselResources()
         {
-            foreach (var part in ResourcesByPart)
+            foreach (Part part in ResourcesByPart)
             {
                 foreach (PartResource resource in part.Resources)
                 {
-                    resource.amount = resource.maxAmount;
+                    double fillAmount = resource.maxAmount;
+                    resource.amount += fillAmount;
                 }
              }
         }
 
         private void EmptyVesselResources()
         {
-            foreach (var part in ResourcesByPart)
+            foreach (Part part in ResourcesByPart)
             {
                 foreach (PartResource resource in part.Resources)
                 {
@@ -514,14 +531,6 @@ namespace ShipManifest
         }
 
         #endregion
-
-
-        extern Part.OnActionDelegate OnMouseExit(Part part);
-
-        void MouseExit(Part part)
-        {
-            SetPartHighlights();
-        }
 
     }
 }
