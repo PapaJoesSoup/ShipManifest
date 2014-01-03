@@ -12,6 +12,14 @@ namespace ShipManifest
         // I made id a partial class to allow file level segregation of resource and crew functionality
         // for improved readability and management by coders.
 
+        // variables used for moving resources.  set to a negative to allow slider to function.
+        public float XferAmount = -1f;
+
+        // Flags to show windows
+        public bool ShowResourceTransferWindow { get; set; }
+        public bool ShowResourceManifest { get; set; }
+
+
         #region Datasource properties
 
         // dataSource for Resource manifest and Resourcetransfer windows
@@ -28,23 +36,27 @@ namespace ShipManifest
 
                 foreach (Part part in Vessel.Parts)
                 {
-                    // Part has Resources, now where to put it...  (may be more than one place... :)
+                    // Part has Resources, now where to put them...  (may be more than one place... :)
                     foreach (PartResource resource in part.Resources)
                     {
-                        bool vFound = false;
-                        if (_partsByResource.Keys.Contains(resource.info.name))
+                        // Realism Mode.  we want to exclude solid fuels...
+                        if (!ResourceManifestBehaviour.ResourceSettings.RealismMode || (ResourceManifestBehaviour.ResourceSettings.RealismMode && resource.info.name.ToLower() != "solidfuel"))
                         {
+                            bool vFound = false;
+                            // is resource in the list yet?.
+                            if (_partsByResource.Keys.Contains(resource.info.name))
+                            {
                                 vFound = true;
                                 List<Part> eParts = _partsByResource[resource.info.name];
                                 eParts.Add(part);
-                        }
-                        // if we iterate all the way thru _vesselResources we end up with vFound = false.
-                        if (!vFound)
-                        {
-                            // found a new one.  lets add it to the list of resources.
-                            List<Part> parts = new List<Part>();
-                            parts.Add(part);
-                            _partsByResource.Add(resource.info.name, parts);
+                            }
+                            if (!vFound)
+                            {
+                                // found a new resource.  lets add it to the list of resources.
+                                List<Part> nParts = new List<Part>();
+                                nParts.Add(part);
+                                _partsByResource.Add(resource.info.name, nParts);
+                            }
                         }
                     }
                  }
@@ -56,7 +68,7 @@ namespace ShipManifest
         // DataSource for Resources by Part  Used in Transfer window.  
         // I may change this to the partlist above.
         private List<Part> _resourcesByPart;
-        private List<Part> ResourcesByPart
+        public List<Part> ResourcesByPart
         {
             get
             {
@@ -122,7 +134,6 @@ namespace ShipManifest
             }
         }
 
-
         // dataSource for Resource manifest and ResourceTransfer windows
         // Holds the Resource.info.name selected in the Resource Manifest Window.
         private string _selectedResource;
@@ -140,7 +151,7 @@ namespace ShipManifest
         }
 
         private Part _selectedPartSource;
-        private Part SelectedPartSource
+        public Part SelectedPartSource
         {
             get
             {
@@ -157,11 +168,14 @@ namespace ShipManifest
                 SetPartHighlight(_selectedPartSource, Color.yellow);
                 _selectedPartSource = value;
                 SetPartHighlight(_selectedPartSource, Color.green);
+                
+                // reset transfer amount (for resource xfer slider control)
+                XferAmount = -1f;
             }
         }
 
         private Part _selectedPartTarget;
-        private Part SelectedPartTarget
+        public Part SelectedPartTarget
         {
             get
             {
@@ -174,17 +188,15 @@ namespace ShipManifest
                 SetPartHighlight(_selectedPartTarget, Color.yellow);
                 _selectedPartTarget = value;
                 SetPartHighlight(_selectedPartTarget, Color.red);
+
+                // reset transfer amount (for resource xfer slider control)
+                XferAmount = -1f;
             }
         }
 
         #endregion
 
         #region GUI Stuff
-
-        // Flags to show and windows
-        public bool ShowResourceTransferWindow { get; set; }
-        public bool ShowResourceManifest { get; set; }
-
 
         // Resource Manifest Window
         // This window displays a list of available resources and the parts containing each resource on the focused vessel.
@@ -214,7 +226,7 @@ namespace ShipManifest
 
             foreach (string resourceName in PartsByResource.Keys)
             {
-                var style = resourceName == SelectedResource ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
+                var style = resourceName == SelectedResource ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
 
                 if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(265), GUILayout.Height(20)))
                 {
@@ -271,8 +283,7 @@ namespace ShipManifest
 
             GUILayout.BeginHorizontal();
 
-            var transferStyle = ShowResourceTransferWindow ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
-
+            var transferStyle = ShowResourceTransferWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
             if (GUILayout.Button("Transfer Resource", transferStyle, GUILayout.Width(150), GUILayout.Height(20)))
             {
                 if (SelectedResource != null)
@@ -281,12 +292,19 @@ namespace ShipManifest
                 }
             }
 
+            var settingsStyle = ResourceManifestBehaviour.ResourceSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Settings", settingsStyle, GUILayout.Width(150), GUILayout.Height(20)))
+            {
+                ResourceManifestBehaviour.ResourceSettings.ShowSettings = !ResourceManifestBehaviour.ResourceSettings.ShowSettings;
+            }
+
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
 
         // Resource Transfer Window
+        // This window allows you some control over the selected resource on a selected source and target part
         private Vector2 SourceScrollViewerTransfer = Vector2.zero;
         private Vector2 SourceScrollViewerTransfer2 = Vector2.zero;
         private Vector2 TargetScrollViewerTransfer = Vector2.zero;
@@ -298,7 +316,7 @@ namespace ShipManifest
             GUILayout.BeginVertical();
 
             // This is a scroll panel (we are using it to make button lists...)
-            SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(100), GUILayout.Width(300));
+            SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
             if (SelectedResource != "")
@@ -309,7 +327,7 @@ namespace ShipManifest
             foreach (Part part in SelectedResourceParts)
             {
                 // set the conditions for a button style change.
-                var style = part == SelectedPartSource ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
+                var style = part == SelectedPartSource ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
 
                 // Draw the button and add action
                 if (GUILayout.Button(string.Format("{0}", part.partInfo.title), style, GUILayout.Width(265), GUILayout.Height(20)))
@@ -323,9 +341,9 @@ namespace ShipManifest
 
             GUILayout.Label(SelectedPartSource != null ? string.Format("{0}", SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
 
-            // Source Part List
-            // this Scroll viewer is for the details of the part button selected above.
-            SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(50), GUILayout.Width(300));
+            // Source Part resource Details
+            // this Scroll viewer is for the details of the part selected above.
+            SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(55), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
             if (SelectedPartSource != null)
@@ -345,8 +363,12 @@ namespace ShipManifest
                         {
                             flowtext = "Off";
                         }
+                        PartResource.FlowMode flowmode = SelectedPartSource.Resources[SelectedResource].flowMode;
+
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(140), GUILayout.Height(20));
+                        GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
+                        GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
+                        //GUILayout.Label(string.Format("{0}", flowmode.ToString()), GUILayout.Width(30), GUILayout.Height(20));
                         if (GUILayout.Button("Flow", GUILayout.Width(50), GUILayout.Height(20)))
                         {
                             if (flowbool)
@@ -360,17 +382,37 @@ namespace ShipManifest
                                 flowtext = "On";
                             }
                         }
-                        GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
-                        if (SelectedPartTarget != null && (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
+                        GUILayout.EndHorizontal();
+                        if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
                         {
+                            // let's determine how much of a resource we can move to the target.
+                            double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
+                            if (maxXferAmount > SelectedPartSource.Resources[resource.info.name].amount)
+                            {
+                                maxXferAmount = SelectedPartSource.Resources[resource.info.name].amount;
+                            }
+
+                            // This is used to set the slider to the max amount by default.  
+                            // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
+                            // We set XferAmount to -1 when we set new source or target parts.
+                            if (XferAmount == -1)
+                            {
+                                XferAmount = (float)maxXferAmount;
+                            }
+
+                            // create xfer slider;
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label(string.Format("Xfer Amt:  {0}", XferAmount.ToString("#######0.####")), GUILayout.Width(125), GUILayout.Height(20));
+                            XferAmount = GUILayout.HorizontalSlider(XferAmount, 0, (float) maxXferAmount, GUILayout.Width(80));
+
                             // set the conditions for a button style change.
-                            var style = SelectedPartSource ? Resources.ButtonToggledStyle : Resources.ButtonStyle;
+                            var style = SelectedPartSource ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                             if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
                             {
-                                TransferResource(SelectedPartSource, SelectedPartTarget, 0);
+                                TransferResource(SelectedPartSource, SelectedPartTarget, (double) XferAmount);
                             }
+                            GUILayout.EndHorizontal();
                         }
-                        GUILayout.EndHorizontal();
                     }
                 }
             }
@@ -384,12 +426,12 @@ namespace ShipManifest
             GUILayout.BeginVertical();
 
             // target part list
-            TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(100), GUILayout.Width(300));
+            TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
             foreach (Part part in SelectedResourceParts)
             {
-                var style = part == SelectedPartTarget ? Resources.ButtonToggledRedStyle : Resources.ButtonStyle;
+                var style = part == SelectedPartTarget ? ManifestStyle.ButtonToggledRedStyle : ManifestStyle.ButtonStyle;
 
                 if (GUILayout.Button(string.Format("{0}", part.partInfo.title), style, GUILayout.Width(265), GUILayout.Height(20)))
                 {
@@ -402,22 +444,44 @@ namespace ShipManifest
 
             GUILayout.Label(SelectedPartTarget != null ? string.Format("{0}", SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
 
-            // Target Selected Part details
-            TargetScrollViewerTransfer2 = GUILayout.BeginScrollView(TargetScrollViewerTransfer2, GUILayout.Height(50), GUILayout.Width(300));
+            // Target Part resource details
+            TargetScrollViewerTransfer2 = GUILayout.BeginScrollView(TargetScrollViewerTransfer2, GUILayout.Height(55), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
+            // --------------------------------------------------------------------------
             if (SelectedPartTarget != null)
             {
                 foreach (PartResource resource in SelectedPartTarget.Resources)
                 {
                     if (resource.info.name == SelectedResource)
                     {
+                        // This routine assumes that a resource has been selected on the Resource manifest window.
+                        string flowtext = "Off";
+                        bool flowbool = SelectedPartTarget.Resources[SelectedResource].flowState;
+                        PartResource.FlowMode flowmode = SelectedPartTarget.Resources[SelectedResource].flowMode;
+
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(265), GUILayout.Height(20));
+                        GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
+                        GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
+                        //GUILayout.Label(string.Format("{0}", flowmode.ToString()), GUILayout.Width(30), GUILayout.Height(20));
+                        if (GUILayout.Button("Flow", GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            if (flowbool)
+                            {
+                                SelectedPartTarget.Resources[SelectedResource].flowState = false;
+                                flowtext = "Off";
+                            }
+                            else
+                            {
+                                SelectedPartTarget.Resources[SelectedResource].flowState = true;
+                                flowtext = "On";
+                            }
+                        }
                         GUILayout.EndHorizontal();
                     }
                 }
             }
+            // --------------------------------------------------------------------------
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
@@ -498,12 +562,23 @@ namespace ShipManifest
                 {
                     XferAmount = sourceAmount;
                 }
+                if (ResourceManifestBehaviour.ResourceSettings.RealismMode)
+                {
+                    // now lets make some noise and slow the process down...
+                    if (ResourceManifestBehaviour.ResourceSettings.VerboseLogging)
+                        ManifestUtilities.LogMessage("Playing pump sound...", "Info");
 
-                // Fill target
-                target.Resources[SelectedResource].amount += XferAmount;
- 
-                // Drain source...
-                source.Resources[SelectedResource].amount -= XferAmount;
+                    // This flag enables the Update handler in ResourceManifestBehaviour
+                    ResourceManifestBehaviour.XferOn = true;
+                }
+                else
+                {
+                    // Fill target
+                    target.Resources[SelectedResource].amount += XferAmount;
+
+                    // Drain source...
+                    source.Resources[SelectedResource].amount -= XferAmount;
+                }
             }
         }
 
@@ -514,6 +589,7 @@ namespace ShipManifest
                 foreach (PartResource resource in part.Resources)
                 {
                     double fillAmount = resource.maxAmount;
+                    resource.amount = 0;
                     resource.amount += fillAmount;
                 }
              }
@@ -531,6 +607,5 @@ namespace ShipManifest
         }
 
         #endregion
-
     }
 }
