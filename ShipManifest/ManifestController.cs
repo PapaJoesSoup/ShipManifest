@@ -71,7 +71,7 @@ namespace ShipManifest
             if (FlightGlobals.ActiveVessel != Vessel)
             { return; }
 
-            Resources.SetupGUI();
+            ManifestStyle.SetupGUI();
 
             if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
             {
@@ -97,6 +97,10 @@ namespace ShipManifest
                 if (ShowResourceManifest && ShowResourceTransferWindow)
                 {
                     ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition = GUILayout.Window(398545, ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition, ResourceTransferWindow, "Resource Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
+                }
+                if (ShowResourceManifest && ResourceManifestBehaviour.ResourceSettings.ShowSettings)
+                {
+                    ResourceManifestBehaviour.ResourceSettings.SettingsPosition = GUILayout.Window(398546, ResourceManifestBehaviour.ResourceSettings.SettingsPosition, ResourceManifestBehaviour.ResourceSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
                 }
             }
         }
