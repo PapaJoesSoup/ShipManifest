@@ -1,5 +1,10 @@
 ShipManifest
 ============
+Version 0.23.2.0 - 03 Jan, 2014 - Add Realism Mode and Redistribution of toolbar 1.4.0
+- Add Realism Mode:  Sounds, Real time resource flow between parts.  Configurable sounds and flow rate.
+- Add Setting Window to allow configuration of various features of Ship Manifest.
+- Updated to Toolbar 1.4.0
+
 Version 0.23.1.3.1 - 27 Dec 2013 - minor bug fix and redistrinbution of toolbar 1.3.0
  - Minor bug fix.  When closing all windows with the toolbar button, attached mouse exit part event handlers were not being released.
  - updated Toolbar 1.3.0 by Blizzy78.
