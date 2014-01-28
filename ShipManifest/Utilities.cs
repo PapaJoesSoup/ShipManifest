@@ -36,9 +36,10 @@ namespace ShipManifest
     {
         public static GUIStyle WindowStyle;
         public static GUIStyle IconStyle;
-        public static GUIStyle ButtonToggledStyle;
-        public static GUIStyle ButtonToggledRedStyle;
+        public static GUIStyle ButtonToggledSourceStyle;
+        public static GUIStyle ButtonToggledTargetStyle;
         public static GUIStyle ButtonStyle;
+        public static GUIStyle ButtonToggledStyle;
         public static GUIStyle ErrorLabelRedStyle;
         public static GUIStyle LabelStyle;
         public static GUIStyle LabelStyleRed;
@@ -50,6 +51,7 @@ namespace ShipManifest
             GUI.skin = HighLogic.Skin;
             if (WindowStyle == null)
             {
+                SettingsManager.LoadColors();
                 SetStyles();
             }
         }
@@ -59,21 +61,26 @@ namespace ShipManifest
             WindowStyle = new GUIStyle(GUI.skin.window);
             IconStyle = new GUIStyle();
 
-            ButtonToggledStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledStyle.normal.textColor = Color.green;
-            ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
-            ButtonToggledStyle.fontSize = 14;
-            ButtonToggledStyle.fontStyle = FontStyle.Normal;
+            ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
+            ButtonToggledSourceStyle.normal.textColor = SettingsManager.Colors[SettingsManager.SourcePartColor];
+            ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
+            ButtonToggledSourceStyle.fontSize = 14;
+            ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
 
-            ButtonToggledRedStyle = new GUIStyle(ButtonToggledStyle);
-            ButtonToggledRedStyle.normal.textColor = Color.red;
-            ButtonToggledRedStyle.fontSize = 14;
-            ButtonToggledRedStyle.fontStyle = FontStyle.Normal;
+            ButtonToggledTargetStyle = new GUIStyle(ButtonToggledSourceStyle);
+            ButtonToggledTargetStyle.normal.textColor = SettingsManager.Colors[SettingsManager.TargetPartColor];
+            ButtonToggledTargetStyle.fontSize = 14;
+            ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
 
             ButtonStyle = new GUIStyle(GUI.skin.button);
             ButtonStyle.normal.textColor = Color.white;
             ButtonStyle.fontSize = 14;
             ButtonStyle.fontStyle = FontStyle.Normal;
+
+            ButtonToggledStyle = new GUIStyle(GUI.skin.button);
+            ButtonToggledStyle.normal.textColor = Color.green;
+            ButtonToggledStyle.fontSize = 14;
+            ButtonToggledStyle.fontStyle = FontStyle.Normal;
 
             ErrorLabelRedStyle = new GUIStyle(GUI.skin.label);
             ErrorLabelRedStyle.normal.textColor = Color.red;
@@ -95,6 +102,8 @@ namespace ShipManifest
     {
         #region Properties
 
+        public static Dictionary<string, Color> Colors;
+
         public Rect ResourceManifestPosition;
         public Rect ResourceTransferPosition;
 
@@ -104,6 +113,9 @@ namespace ShipManifest
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
+        public Rect RosterPosition;
+        public bool ShowRoster { get; set; }
+        
         public bool RealismMode = false;
         public bool PrevRealismMode = false;
 
@@ -114,8 +126,10 @@ namespace ShipManifest
         public bool ShowDebugger = false;
         public bool PrevShowDebugger = false;
 
-        public double FlowRate = 1;
-        public double PrevFlowRate = 1;
+        public float FlowRate = 100;
+        public float PrevFlowRate = 100;
+        public float MaxFlowRate = 100;
+        public float MinFlowRate = 0;
 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
@@ -126,7 +140,8 @@ namespace ShipManifest
         public string PrevPumpSoundStart = "";
         public string PrevPumpSoundRun = "";
         public string PrevPumpSoundStop = "";
-
+        public static string SourcePartColor = "red";
+        public static string TargetPartColor = "green";
 
         #endregion
 
@@ -143,6 +158,7 @@ namespace ShipManifest
             PrevPumpSoundStart = PumpSoundStart;
             PrevPumpSoundRun = PumpSoundRun;
             PrevPumpSoundStop = PumpSoundStop;
+
             string label = "";
 
             GUILayout.BeginVertical();
@@ -175,7 +191,7 @@ namespace ShipManifest
             // create xfer slider;
             GUILayout.BeginHorizontal();
             GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
-            FlowRate = (double) GUILayout.HorizontalSlider((float) FlowRate, 0f, 100f, GUILayout.Width(200));
+            FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(200));
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -215,23 +231,39 @@ namespace ShipManifest
 
             try
             {
-                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ResourceManifestModule>();
+                LoadColors();
+
+                // Interestingly, Floats seem to load fine.   Saves seem to be problematic.  attempts to save float are not persisted in the file...  
+                // So, FlowRate vars now use double and are converted at load
+                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
                 configfile.load();
 
                 ResourceManifestPosition = configfile.GetValue<Rect>("ResourceManifestPosition");
                 ResourceTransferPosition = configfile.GetValue<Rect>("ResourceTransferPosition");
                 DebuggerPosition = configfile.GetValue<Rect>("ResourceDebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
+                RosterPosition = configfile.GetValue<Rect>("RosterPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
                 RealismMode = configfile.GetValue<bool>("RealismMode");
-                FlowRate = configfile.GetValue<double>("FlowRate");
                 VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
+                FlowRate = (float)configfile.GetValue<double>("FlowRate");
+                MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
+                MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
                 PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
                 PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
                 PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
 
-                // Default sound is:
+                SourcePartColor = configfile.GetValue<string>("SourcePartColor");
+                TargetPartColor = configfile.GetValue<string>("TargetPartColor");
 
+                // Default values for Flow rates
+                if (FlowRate == 0)
+                    FlowRate = 100;
+                if (MaxFlowRate == 0)
+                    MaxFlowRate = 100;
+
+                // Default sound license: CC-By-SA
+                // http://www.freesound.org/people/vibe_crc/sounds/59328/
                 if (PumpSoundStart == "")
                     PumpSoundStart = "ShipManifest/Sounds/59328-1";
                 if (PumpSoundRun == "")
@@ -239,19 +271,29 @@ namespace ShipManifest
                 if (PumpSoundStop == "")
                     PumpSoundStop = "ShipManifest/Sounds/59328-3";
 
+                if (!Colors.Keys.Contains(SourcePartColor))
+                        SourcePartColor = "red";
+                if (!Colors.Keys.Contains(TargetPartColor))
+                    SourcePartColor = "green";
+
                 if (VerboseLogging)
                 {
                     ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Loaded: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Loaded: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info");
+                    ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info");
                 }
             }
             catch(Exception e)
@@ -264,19 +306,25 @@ namespace ShipManifest
         {
             try
             {
-                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ResourceManifestModule>();
+                // For some reason, saving floats does not seem to work.  (maybe I just don't know enough, but converted flowrates to doubles and it works.
+                KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
 
                 configfile.SetValue("ResourceManifestPosition", ResourceManifestPosition);
                 configfile.SetValue("ResourceTransferPosition", ResourceTransferPosition);
+                configfile.SetValue("RosterPosition", SettingsPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
-                configfile.SetValue("ResourceDebuggerPosition", DebuggerPosition);
+                configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
                 configfile.SetValue("RealismMode", RealismMode);
-                configfile.SetValue("FlowRate", FlowRate);
                 configfile.SetValue("VerboseLogging", VerboseLogging);
+                configfile.SetValue("FlowRate", (double)FlowRate);
+                configfile.SetValue("MinFlowRate", (double)MinFlowRate);
+                configfile.SetValue("MaxFlowRate", (double)MaxFlowRate);
                 configfile.SetValue("PumpSoundStart", PumpSoundStart);
                 configfile.SetValue("PumpSoundRun", PumpSoundRun);
                 configfile.SetValue("PumpSoundStop", PumpSoundStop);
+                configfile.SetValue("SourcePartColor", SourcePartColor);
+                configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.save();
 
                 if (VerboseLogging)
@@ -284,14 +332,18 @@ namespace ShipManifest
                     ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Saved: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Saved: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info");
+                    ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info");
                 }
             }
             catch (Exception e)
@@ -299,6 +351,22 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("Failed to Save Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception");
             }
         }
+
+        public static void LoadColors()
+        {
+            Colors = new Dictionary<string, Color>();
+
+            Colors.Add("black", Color.black);
+            Colors.Add("blue", Color.blue);
+            Colors.Add("clea", Color.clear);
+            Colors.Add("cyan", Color.cyan);
+            Colors.Add("gray", Color.gray);
+            Colors.Add("green", Color.green);
+            Colors.Add("magenta", Color.magenta);
+            Colors.Add("red", Color.red);
+            Colors.Add("white", Color.white);
+            Colors.Add("yellow", Color.yellow);
+       }
 
         #endregion
 
