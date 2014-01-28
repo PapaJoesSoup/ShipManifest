@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using System.IO;
 
 namespace ShipManifest
 {
@@ -63,6 +64,8 @@ namespace ShipManifest
 
         private string saveMessage = string.Empty;
 
+        private bool ShowRosterWindow { get; set; }
+
         private void drawGui()
         {
             if (FlightGlobals.fetch == null)
@@ -79,7 +82,7 @@ namespace ShipManifest
                 {
                     // Let's set all highlighting
                     SetPartHighlights();
-                    ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition = GUILayout.Window(398544, ResourceManifestBehaviour.ResourceSettings.ResourceManifestPosition, ResourceManifestWindow, "Resource Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                    ShipManifestBehaviour.ShipManifestSettings.ResourceManifestPosition = GUILayout.Window(398544, ShipManifestBehaviour.ShipManifestSettings.ResourceManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                 }
                 else
                 {
@@ -96,22 +99,353 @@ namespace ShipManifest
 
                 if (ShowResourceManifest && ShowResourceTransferWindow)
                 {
-                    ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition = GUILayout.Window(398545, ResourceManifestBehaviour.ResourceSettings.ResourceTransferPosition, ResourceTransferWindow, "Resource Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
+                    ShipManifestBehaviour.ShipManifestSettings.ResourceTransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.ResourceTransferPosition, ResourceTransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                 }
-                if (ShowResourceManifest && ResourceManifestBehaviour.ResourceSettings.ShowSettings)
+                if (ShowResourceManifest && ShipManifestBehaviour.ShipManifestSettings.ShowSettings)
                 {
-                    ResourceManifestBehaviour.ResourceSettings.SettingsPosition = GUILayout.Window(398546, ResourceManifestBehaviour.ResourceSettings.SettingsPosition, ResourceManifestBehaviour.ResourceSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                    ShipManifestBehaviour.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestBehaviour.ShipManifestSettings.SettingsPosition, ShipManifestBehaviour.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                }
+
+                if (resetRosterSize)
+                {
+                    ShipManifestBehaviour.ShipManifestSettings.RosterPosition.height = 100; //reset hight
+                    ShipManifestBehaviour.ShipManifestSettings.RosterPosition.width = 360; //reset width
+                    resetRosterSize = false;
+                }
+
+                if (ShowResourceManifest && ShipManifestBehaviour.ShipManifestSettings.ShowRoster)
+                {
+                    ShipManifestBehaviour.ShipManifestSettings.RosterPosition = GUILayout.Window(398547, ShipManifestBehaviour.ShipManifestSettings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
                 }
             }
         }
 
+        #region GUI code
+
+        // Ship Manifest Window
+        // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
+        private Vector2 ScrollViewerShipManifest = Vector2.zero;
+        private Vector2 ScrollViewerResourceManifest2 = Vector2.zero;
+        private void ShipManifestWindow(int windowId)
+        {
+            GUILayout.BeginVertical();
+
+            ScrollViewerShipManifest = GUILayout.BeginScrollView(ScrollViewerShipManifest, GUILayout.Height(100), GUILayout.Width(300));
+            GUILayout.BeginVertical();
+
+            if (IsPreLaunch)
+            {
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button(string.Format("Fill Vessel"), GUILayout.Width(130), GUILayout.Height(20)))
+                {
+                    FillVesselResources();
+                }
+                if (GUILayout.Button(string.Format("Empty Vessel"), GUILayout.Width(130), GUILayout.Height(20)))
+                {
+                    EmptyVesselResources();
+                }
+                GUILayout.EndHorizontal();
+            }
+
+            foreach (string resourceName in PartsByResource.Keys)
+            {
+                var style = resourceName == SelectedResource ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+
+                if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(265), GUILayout.Height(20)))
+                {
+                    ClearHighlight(_selectedPartSource);
+                    ClearHighlight(_selectedPartTarget);
+
+                    // Let's clear all highlighting
+                    if (SelectedResourceParts != null)
+                    {
+                        foreach (Part oldPart in SelectedResourceParts)
+                        {
+                            ClearHighlight(oldPart);
+                        }
+                    }
+
+                    // Now let's update our lists...
+                    _selectedPartSource = _selectedPartTarget = null;
+                    SelectedResource = resourceName;
+                    SelectedResourceParts = PartsByResource[SelectedResource];
+
+                    // Finally, set highlights on parts with selected resource.
+                    if (SelectedResourceParts != null)
+                    {
+                        foreach (Part newPart in SelectedResourceParts)
+                        {
+                            SetPartHighlight(newPart, Color.yellow);
+                        }
+                    }
+                }
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndScrollView();
+
+            GUILayout.Label(SelectedResource != null ? string.Format("{0}", SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
+
+            ScrollViewerResourceManifest2 = GUILayout.BeginScrollView(ScrollViewerResourceManifest2, GUILayout.Height(100), GUILayout.Width(300));
+            GUILayout.BeginVertical();
+
+            if (SelectedResource != null)
+            {
+                SelectedResourceParts = PartsByResource[SelectedResource];
+                foreach (Part part in SelectedResourceParts)
+                {
+                    string resourcename = "";
+                    if (SelectedResource != "Crew" && SelectedResource != "Science")
+                    {
+                        resourcename = part.Resources[SelectedResource].info.name;
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[SelectedResource].amount.ToString("######0.####"), part.Resources[SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
+                        GUILayout.EndHorizontal();
+                    }
+                    else if (SelectedResource == "Crew")
+                    {
+                        resourcename = SelectedResource;
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265));
+                        GUILayout.EndHorizontal();
+                    }
+                }
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndScrollView();
+
+            GUILayout.BeginHorizontal();
+
+            var transferStyle = ShowResourceTransferWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Transfer...", transferStyle, GUILayout.Width(100), GUILayout.Height(20)))
+            {
+                if (SelectedResource != null)
+                {
+                    ShowResourceTransferWindow = !ShowResourceTransferWindow;
+                }
+            }
+
+            var settingsStyle = ShipManifestBehaviour.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
+            {
+                ShipManifestBehaviour.ShipManifestSettings.ShowSettings = !ShipManifestBehaviour.ShipManifestSettings.ShowSettings;
+            }
+
+            var rosterStyle = ShipManifestBehaviour.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Roster...", rosterStyle, GUILayout.Width(100), GUILayout.Height(20)))
+            {
+                ShipManifestBehaviour.ShipManifestSettings.ShowRoster = !ShipManifestBehaviour.ShipManifestSettings.ShowRoster;
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        }
+
+        private bool resetRosterSize = true;
+        private KerbalModel _selectedKerbal;
+        private KerbalModel SelectedKerbal
+        {
+            get { return _selectedKerbal; }
+            set
+            {
+                _selectedKerbal = value;
+                if (_selectedKerbal == null)
+                {
+                    saveMessage = string.Empty;
+                    resetRosterSize = true;
+                }
+            }
+        }
+        private Vector2 rosterScrollViewer = Vector2.zero;
+        private void RosterWindow(int windowId)
+        {
+            GUIStyle style = GUI.skin.button;
+            var defaultColor = style.normal.textColor;
+            GUILayout.BeginVertical();
+
+            rosterScrollViewer = GUILayout.BeginScrollView(rosterScrollViewer, GUILayout.Height(200), GUILayout.Width(360));
+            GUILayout.BeginVertical();
+
+            foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster)
+            {
+                GUIStyle labelStyle = null;
+                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
+                    labelStyle = ManifestStyle.LabelStyleRed;
+                else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED)
+                    labelStyle = ManifestStyle.LabelStyleYellow;
+                else
+                    labelStyle = ManifestStyle.LabelStyle;
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));
+                string buttonText = string.Empty;
+
+                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE)
+                    GUI.enabled = true;
+                else
+                    GUI.enabled = false;
+
+                if (GUILayout.Button((SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel", GUILayout.Width(60)))
+                {
+                    if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
+                    {
+                        SelectedKerbal = new KerbalModel(kerbal, false);
+                    }
+                    else
+                    {
+                        SelectedKerbal = null;
+                    }
+                }
+
+                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && IsPreLaunch && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
+                {
+                    GUI.enabled = true;
+                    buttonText = "Add";
+                }
+                else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
+                {
+                    GUI.enabled = true;
+                    buttonText = "Respawn";
+                }
+                else
+                {
+                    GUI.enabled = false;
+                    buttonText = "--";
+                }
+
+                if (GUILayout.Button(buttonText, GUILayout.Width(60)))
+                {
+                    if (buttonText == "Add")
+                        AddCrew(SelectedPartSource, kerbal);
+                    else if (buttonText == "Respawn")
+                        RespawnKerbal(kerbal);
+                }
+                GUILayout.EndHorizontal();
+                GUI.enabled = true;
+            }
+
+            GUILayout.EndVertical();
+            GUILayout.EndScrollView();
+
+            if (SelectedKerbal != null)
+            {
+                GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
+                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
+
+                if (!string.IsNullOrEmpty(saveMessage))
+                {
+                    GUILayout.Label(saveMessage, ManifestStyle.ErrorLabelRedStyle);
+                }
+
+                GUILayout.Label("Courage");
+                SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1);
+
+                GUILayout.Label("Stupidity");
+                SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1);
+
+                SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
+
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
+                {
+                    SelectedKerbal = null;
+                }
+                if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
+                {
+                    saveMessage = SelectedKerbal.SubmitChanges();
+                    if (string.IsNullOrEmpty(saveMessage))
+                        SelectedKerbal = null;
+                }
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
+                {
+                    SelectedKerbal = CreateKerbal();
+                }
+            }
+
+            GUILayout.EndVertical();
+            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        }
+
+        #endregion
+
         public void HideAllWindows()
         {
             ShowResourceTransferWindow = false;
+            ShowRosterWindow = false;
             ClearHighlight(_selectedPartSource);
             ClearHighlight(_selectedPartTarget);
             _selectedPartSource = _selectedPartTarget = null; //clear selections
         }
 
+        public void LoadChecklist()
+        {
+            string filepath = Vessel.id.ToString();
+            // Get Checklist for this vessel from file
+            StreamReader myChecklist = System.IO.File.OpenText(filepath);
+
+
+            // Parse into public dictionary
+
+            // Done
+        }
+
+        public void AddCrew(int count, Part part)
+        {
+            if (IsPreLaunch && !PartCrewIsFull(part))
+            {
+                for (int i = 0; i < part.CrewCapacity && i < count; i++)
+                {
+                    ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewCrewMember();
+                    part.AddCrewmember(kerbal);
+
+                    if (kerbal.seat != null)
+                        kerbal.seat.SpawnCrew();
+                }
+            }
+        }
+
+        public void AddCrew(Part part, ProtoCrewMember kerbal)
+        {
+            part.AddCrewmember(kerbal);
+            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.ASSIGNED;
+            if (kerbal.seat != null)
+                kerbal.seat.SpawnCrew();
+        }
+
+        private bool PartCrewIsFull(Part part)
+        {
+            return !(part.protoModuleCrew.Count < part.CrewCapacity);
+        }
+
+        private void RemoveCrew(ProtoCrewMember member, Part part)
+        {
+            part.RemoveCrewmember(member);
+            member.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
+        }
+
+        private void RespawnKerbal(ProtoCrewMember kerbal)
+        {
+            kerbal.SetTimeForRespawn(0);
+            kerbal.Spawn();
+            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
+            HighLogic.CurrentGame.CrewRoster.GetNextAvailableCrewMember();
+        }
+
+        private KerbalModel CreateKerbal()
+        {
+            ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
+            return new KerbalModel(kerbal, true);
+        }
+
+        private void RespawnCrew()
+        {
+            this.Vessel.SpawnCrew();
+        }    
     }
 }
