@@ -4,6 +4,7 @@ Version 0.23.3.0 - 27 Jan, 2014 - Add Crew Transfers and include Toolbar 1.4.4
  - Crew Transfers.  Uses the same interface as resources.   Crew is simply another resource on the ship.
  - Crew Roster.  Manage Crew Attributes. Create Crew members, "Kill" Crew members.
  - Sound file size reduction using .ogg.
+ - Configurable source & target highlighting (via config file for now...)  source = red & target = green by default now.
  - Bug fixes.  minor display errors.  Less than 100% fills were not working correctly.
 
 Version 0.23.2.0 - 03 Jan, 2014 - Add Realism Mode and Redistribution of toolbar 1.4.0
