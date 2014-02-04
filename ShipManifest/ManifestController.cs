@@ -82,7 +82,7 @@ namespace ShipManifest
                 {
                     // Let's set all highlighting
                     SetPartHighlights();
-                    ShipManifestBehaviour.ShipManifestSettings.ResourceManifestPosition = GUILayout.Window(398544, ShipManifestBehaviour.ShipManifestSettings.ResourceManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                    ShipManifestBehaviour.ShipManifestSettings.ManifestPosition = GUILayout.Window(398544, ShipManifestBehaviour.ShipManifestSettings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                 }
                 else
                 {
@@ -99,7 +99,7 @@ namespace ShipManifest
 
                 if (ShowResourceManifest && ShowResourceTransferWindow)
                 {
-                    ShipManifestBehaviour.ShipManifestSettings.ResourceTransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.ResourceTransferPosition, ResourceTransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
+                    ShipManifestBehaviour.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                 }
                 if (ShowResourceManifest && ShipManifestBehaviour.ShipManifestSettings.ShowSettings)
                 {
@@ -209,6 +209,21 @@ namespace ShipManifest
                         GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265));
                         GUILayout.EndHorizontal();
                     }
+                    else if (SelectedResource == "Science")
+                    {
+                        resourcename = SelectedResource;
+                        int ScienceCount = 0;
+                        foreach (PartModule pm in part.Modules)
+                        {
+                            if (pm is ModuleScienceContainer)
+                                ScienceCount += ((ModuleScienceContainer)pm).GetScienceCount();
+                            else if (pm is ModuleScienceExperiment)
+                                ScienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+                        }
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, ScienceCount.ToString()), GUILayout.Width(265));
+                        GUILayout.EndHorizontal();
+                    }
                 }
             }
 
@@ -226,7 +241,7 @@ namespace ShipManifest
                 }
             }
 
-            var settingsStyle = ShipManifestBehaviour.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var settingsStyle = ShipManifestBehaviour.ShipManifestSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
             if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
             {
                 ShipManifestBehaviour.ShipManifestSettings.ShowSettings = !ShipManifestBehaviour.ShipManifestSettings.ShowSettings;
