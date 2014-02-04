@@ -48,13 +48,14 @@
     <Compile Include="ChecklistController.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="ShipManifestModule.cs" />
-    <Compile Include="ResourceController.cs" />
+    <Compile Include="TransferController.cs" />
     <Compile Include="ManifestController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="ChangeLog.txt" />
     <Content Include="PluginData\ShipManifest\config.xml">
       <SubType>Designer</SubType>
     </Content>
