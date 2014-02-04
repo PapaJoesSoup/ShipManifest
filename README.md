@@ -2,7 +2,7 @@ ShipManifest
 ============
 Version 0.23.3.0 - 3 Feb, 2014 - Add Science Xfers and Bug fixes
  - Added Science Transfers. Select source part & modulle, select target part & module, click xfer.
- - Add config switch for Resource.TransferMode = None on resources in realism mode.
+ - Realism Mode now respects Resource.TransferMode = None on resource Xfers.
  - Add config switch for locking Realism Mode.  
    1 = locked in the mode set by RealismMode in config.  Displays Realism Mode in Settings Window.  
    0 = unlocked.  Normal Radio button shows in Settings Window, and Setting can bee changed.
