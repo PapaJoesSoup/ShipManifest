@@ -60,19 +60,14 @@ namespace ShipManifest
 
         public static bool XferOn = false;
 
-        // Crew transfer vars
-        private float interval = 30F;
-        private float intervalCrewCheck = 0.5f;
-
-
         private IButton button;
 
         public void Awake()
         {
             DontDestroyOnLoad(this);
             ShipManifestSettings.Load();
-            InvokeRepeating("RunSave", interval, interval);
-            InvokeRepeating("CrewCheck", intervalCrewCheck, intervalCrewCheck);
+            if (ShipManifestSettings.AutoSave)
+                InvokeRepeating("RunSave", ShipManifestSettings.SaveInterval, ShipManifestSettings.SaveInterval);
 
             button = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
             button.TexturePath = "ShipManifest/Plugins/IconOff_24";
@@ -94,7 +89,6 @@ namespace ShipManifest
         public void OnDestroy()
         {
             CancelInvoke("RunSave");
-            CancelInvoke("CrewCheck");
             button.Destroy();
         }
 
@@ -139,7 +133,6 @@ namespace ShipManifest
         private void DebuggerWindow(int windowId)
         {
             GUILayout.BeginVertical();
-
             ManifestUtilities.DebugScrollPosition = GUILayout.BeginScrollView(ManifestUtilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
             GUILayout.BeginVertical();
 
@@ -148,6 +141,20 @@ namespace ShipManifest
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Clear log", GUILayout.Height(20)))
+            {
+                ManifestUtilities.Errors.Clear();
+                ManifestUtilities.Errors.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString() + " UTC.");
+            }
+            if (GUILayout.Button("Save Log", GUILayout.Height(20)))
+            {
+                // Create log file and save.
+                //ManifestUtilities.Errors.Count;
+                ManifestUtilities.Errors.Add("Info:  Log save not yet implemented.");
+            }
+            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
@@ -205,18 +212,18 @@ namespace ShipManifest
                 }
             }
 
-            if (ShipManifestSettings.VerboseLogging)
+            if (SettingsManager.VerboseLogging)
                 ManifestUtilities.LogMessage("4. XferOn = " + XferOn.ToString() + "...", "Info");
 
             flow_rate = ShipManifestSettings.FlowRate;
 
-            if (ShipManifestSettings.VerboseLogging)
+            if (SettingsManager.VerboseLogging)
                 ManifestUtilities.LogMessage("5. FlowRate = " + flow_rate.ToString(), "Info");
 
             if (flow_rate == 0)
             {
                 XferOn = false;
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("6. XferOn set to False because FlowRate = 0...", "Info");
 
                 // play pump shutdown.
@@ -230,14 +237,14 @@ namespace ShipManifest
             if (ShipManifestBehaviour.timestamp > 0)
             {
                 deltaT = Planetarium.GetUniversalTime() - ShipManifestBehaviour.timestamp;
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("7. deltaT = " + deltaT.ToString() + " timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info");
             }
 
             if (deltaT > 0)
             {
                 ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("8. New timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info");
                 
                 elapsed += deltaT;
@@ -247,12 +254,12 @@ namespace ShipManifest
                 {
                     source2.Play();
                     IsStarted = true;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("8a. Play pump sound (run)...", "Info");
                 }
 
                 double deltaAmt = deltaT * flow_rate;
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("9. DeltaAmt = " + deltaAmt.ToString(), "Info");
 
                 // This adjusts the delta when we get to the end of the xfer.
@@ -261,10 +268,10 @@ namespace ShipManifest
                 {
                     deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
                     XferOn = false;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("10. DeltaAmt = " + deltaAmt.ToString(), "Info");
                 }
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("11. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info");
 
  
@@ -276,17 +283,17 @@ namespace ShipManifest
                 {
                     // Lets increment the AmtXferred....
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred += (float)deltaAmt;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info");
 
                     // Drain source...
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info");
 
                     // Fill target
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info");
                 }
                 if (!XferOn)
@@ -297,20 +304,20 @@ namespace ShipManifest
                     ShipManifestBehaviour.timestamp = elapsed = 0;
                     IsStarted = false;
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred = 0f;
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("14. End Loop. XferOn = " + XferOn.ToString(), "Info");
                 }
                 else
                 {
                     ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                    if (ShipManifestSettings.VerboseLogging)
+                    if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("15. Continue loop. XferOn = " + XferOn.ToString(), "Info");
                 }
             }
             else
             {
                 ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                if (ShipManifestSettings.VerboseLogging)
+                if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("16. Continue loop. XferOn = " + XferOn.ToString(), "Info");
             }
         }
