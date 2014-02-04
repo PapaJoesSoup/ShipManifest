@@ -104,8 +104,8 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public Rect ResourceManifestPosition;
-        public Rect ResourceTransferPosition;
+        public Rect ManifestPosition;
+        public Rect TransferPosition;
 
         public Rect PrevResourceManifestPosition;
         public Rect PrevResourceTransferPosition;
@@ -113,14 +113,20 @@ namespace ShipManifest
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
+        public bool AutoSave;
+        public float SaveInterval = 60f;
+        public bool PrevAutoSave;
+        public float PrevSaveInterval = 60f;
+
         public Rect RosterPosition;
         public bool ShowRoster { get; set; }
         
         public bool RealismMode = false;
         public bool PrevRealismMode = false;
+        public bool LockRealismMode = false;
 
-        public bool VerboseLogging = false;
-        public bool PrevVerboseLogging = false;
+        public static bool VerboseLogging = false;
+        public static bool PrevVerboseLogging = false;
 
         public Rect DebuggerPosition;
         public bool ShowDebugger = false;
@@ -154,24 +160,39 @@ namespace ShipManifest
             PrevRealismMode = RealismMode;
             PrevShowDebugger = ShowDebugger;
             PrevVerboseLogging = VerboseLogging;
+            PrevAutoSave = AutoSave;
+            PrevSaveInterval = SaveInterval;
             PrevFlowRate = FlowRate;
             PrevPumpSoundStart = PumpSoundStart;
             PrevPumpSoundRun = PumpSoundRun;
             PrevPumpSoundStop = PumpSoundStop;
 
             string label = "";
+            string txtSaveInterval = SaveInterval.ToString();
 
             GUILayout.BeginVertical();
-            ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(240), GUILayout.Width(350));
+            ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
-            label = VerboseLogging ? "Verbose Logging Enabled" : "Verbose Logging Disabled";
-            VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
-
             label = ShowDebugger ? "Disable Debug Console" : "Enable Debug Console";
             ShowDebugger = GUILayout.Toggle(ShowDebugger, label, GUILayout.Width(300));
 
             label = RealismMode ? "Realism Mode Enabled" : "Realism Mode Disabled";
-            RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+
+            if (!LockRealismMode)
+                RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+            else
+                GUILayout.Label("Realism Mode:  " + RealismMode.ToString());
+
+            label = VerboseLogging ? "Verbose Logging Enabled" : "Verbose Logging Disabled";
+            VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
+
+            label = AutoSave ? "AutoSave Settings Enabled" : "AutoSave Settings Disabled";
+            AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Save Interval: ", GUILayout.Width(120));
+            txtSaveInterval = GUILayout.TextField(txtSaveInterval, GUILayout.Width(40));
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             GUILayout.Label("Pump Start Sound: ", GUILayout.Width(120));
@@ -200,6 +221,7 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save"))
             {
+                SaveInterval = float.Parse(txtSaveInterval);
                 Save();
                 ShowSettings = false;
             }
@@ -208,6 +230,8 @@ namespace ShipManifest
                 RealismMode = PrevRealismMode;
                 ShowDebugger = PrevShowDebugger;
                 VerboseLogging = PrevVerboseLogging;
+                AutoSave = PrevAutoSave;
+                SaveInterval = PrevSaveInterval;
                 FlowRate = PrevFlowRate;
                 PumpSoundStart = PrevPumpSoundStart;
                 PumpSoundRun = PrevPumpSoundRun;
@@ -238,14 +262,17 @@ namespace ShipManifest
                 KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
                 configfile.load();
 
-                ResourceManifestPosition = configfile.GetValue<Rect>("ResourceManifestPosition");
-                ResourceTransferPosition = configfile.GetValue<Rect>("ResourceTransferPosition");
-                DebuggerPosition = configfile.GetValue<Rect>("ResourceDebuggerPosition");
+                ManifestPosition = configfile.GetValue<Rect>("ManifestPosition");
+                TransferPosition = configfile.GetValue<Rect>("TransferPosition");
+                DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
                 RosterPosition = configfile.GetValue<Rect>("RosterPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
                 RealismMode = configfile.GetValue<bool>("RealismMode");
+                LockRealismMode = configfile.GetValue<bool>("LockRealismMode");
                 VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
+                AutoSave = configfile.GetValue<bool>("AutoSave");
+                SaveInterval = (float)configfile.GetValue<double>("AutoSave");
                 FlowRate = (float)configfile.GetValue<double>("FlowRate");
                 MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
                 MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
@@ -278,14 +305,17 @@ namespace ShipManifest
 
                 if (VerboseLogging)
                 {
-                    ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Loaded: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Loaded: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("LockRealismMode Loaded: {0}", LockRealismMode.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("SaveInterval Loaded: {0}", SaveInterval.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info");
@@ -309,14 +339,17 @@ namespace ShipManifest
                 // For some reason, saving floats does not seem to work.  (maybe I just don't know enough, but converted flowrates to doubles and it works.
                 KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
 
-                configfile.SetValue("ResourceManifestPosition", ResourceManifestPosition);
-                configfile.SetValue("ResourceTransferPosition", ResourceTransferPosition);
+                configfile.SetValue("ManifestPosition", ManifestPosition);
+                configfile.SetValue("TransferPosition", TransferPosition);
                 configfile.SetValue("RosterPosition", SettingsPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
                 configfile.SetValue("RealismMode", RealismMode);
+                configfile.SetValue("LockRealismMode", LockRealismMode);
                 configfile.SetValue("VerboseLogging", VerboseLogging);
+                configfile.SetValue("AutoSave", VerboseLogging);
+                configfile.SetValue("SaveInterval", VerboseLogging);
                 configfile.SetValue("FlowRate", (double)FlowRate);
                 configfile.SetValue("MinFlowRate", (double)MinFlowRate);
                 configfile.SetValue("MaxFlowRate", (double)MaxFlowRate);
@@ -329,13 +362,16 @@ namespace ShipManifest
 
                 if (VerboseLogging)
                 {
-                    ManifestUtilities.LogMessage(string.Format("ResourceManifestPosition Saved: {0}, {1}, {2}, {3}", ResourceManifestPosition.xMin, ResourceManifestPosition.xMax, ResourceManifestPosition.yMin, ResourceManifestPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ResourceTransferPosition Saved: {0}, {1}, {2}, {3}", ResourceTransferPosition.xMin, ResourceTransferPosition.xMax, ResourceTransferPosition.yMin, ResourceTransferPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
+                    ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
                     ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("LockRealismMode Saved: {0}", LockRealismMode.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("SaveInterval Saved: {0}", SaveInterval.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info");
