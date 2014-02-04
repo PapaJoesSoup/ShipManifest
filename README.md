@@ -1,6 +1,6 @@
 ShipManifest
 ============
-Version 0.23.3.0 - 1 Feb, 2014 - Add Science Xfers and Bug fixes
+Version 0.23.3.0 - 3 Feb, 2014 - Add Science Xfers and Bug fixes
  - Added Science Transfers. Select source part & modulle, select target part & module, click xfer.
  - Add config switch for Resource.TransferMode = None on resources in realism mode.
  - Add config switch for locking Realism Mode.  
