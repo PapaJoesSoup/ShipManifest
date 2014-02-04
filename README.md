@@ -1,5 +1,14 @@
 ShipManifest
 ============
+Version 0.23.3.0 - 1 Feb, 2014 - Add Science Xfers and Bug fixes
+ - Added Science Transfers. Select source part & modulle, select target part & module, click xfer.
+ - Add config switch for Resource.TransferMode = None on resources in realism mode.
+ - Add config switch for locking Realism Mode.  
+   1 = locked in the mode set by RealismMode in config.  Displays Realism Mode in Settings Window.  
+   0 = unlocked.  Normal Radio button shows in Settings Window, and Setting can bee changed.
+ - Bug fix. Xfering a crew member frrom target to source would violate the capacity limitation of the part and cause lost kerbals.
+ - Bug fix. xfering crew would sometimes result in no portrait, or missing portrait.  Added Update Portraits button.  Thanks to ATG, for helping me characterize the issue.
+
 Version 0.23.3.0 - 27 Jan, 2014 - Add Crew Transfers and include Toolbar 1.4.4
  - Crew Transfers.  Uses the same interface as resources.   Crew is simply another resource on the ship.
  - Crew Roster.  Manage Crew Attributes. Create Crew members, "Kill" Crew members.
