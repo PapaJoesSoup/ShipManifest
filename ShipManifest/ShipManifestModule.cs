@@ -58,7 +58,8 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         public static double flow_rate = (double)ShipManifestSettings.FlowRate;
 
-        public static bool XferOn = false;
+        public static bool sXferOn = false;
+        public static bool tXferOn = false;
 
         private IButton button;
 
@@ -97,7 +98,7 @@ namespace ShipManifest
             ManifestStyle.SetupGUI();
 
             if (ShipManifestSettings.ShowDebugger)
-                ShipManifestSettings.DebuggerPosition = GUILayout.Window(398648, ShipManifestSettings.DebuggerPosition, DebuggerWindow, " Ship Manifest Debug Console", GUILayout.MinHeight(20));
+                ShipManifestSettings.DebuggerPosition = GUILayout.Window(398648, ShipManifestSettings.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + ShipManifestSettings.CurVersion, GUILayout.MinHeight(20));
         }
         
         public void Update()
@@ -111,7 +112,7 @@ namespace ShipManifest
 
                     // Realism Mode Resource transfer operation (real time)
                     // XferOn is flagged in the Resource Controller
-                    if (XferOn)
+                    if (tXferOn || sXferOn)
                         RealModeXfer();
                 }
             }
@@ -164,6 +165,7 @@ namespace ShipManifest
         {
             // This method is being executed every frame (OnUpdate)
             // if we are just starting this handler load needed config.
+            bool XferOn = true;
             if (ShipManifestBehaviour.timestamp == 0)
             {
                 elapsed = 0;
@@ -264,20 +266,30 @@ namespace ShipManifest
 
                 // This adjusts the delta when we get to the end of the xfer.
                 // Also sets IsStarted = false;
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred + (float)deltaAmt >= ManifestController.GetInstance(FlightGlobals.ActiveVessel).XferAmount)
-                {
-                    deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
-                    XferOn = false;
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("10. DeltaAmt = " + deltaAmt.ToString(), "Info");
-                }
+                float XferAmount = -1f;
+                if (tXferOn)
+                    XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount;
+                else
+                    XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount;
+
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred + (float)deltaAmt >= XferAmount)
+                    {
+                        deltaAmt = XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
+                        XferOn = false;
+                        if (SettingsManager.VerboseLogging)
+                            ManifestUtilities.LogMessage("10. DeltaAmt = " + deltaAmt.ToString(), "Info");
+                    }
                 if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("11. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info");
 
  
                 string SelectedResource = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource;
 
-                double maxAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].maxAmount;
+                double maxAmount = 0;
+                if (tXferOn)
+                    maxAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].maxAmount;
+                else
+                    maxAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].maxAmount;
 
                 if (IsStarted) // Pump Start complete.
                 {
@@ -287,12 +299,20 @@ namespace ShipManifest
                         ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info");
 
                     // Drain source...
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
+                    if (tXferOn)
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].amount -= deltaAmt;
+                    else
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
+
                     if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info");
 
                     // Fill target
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
+                    if (tXferOn)
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].amount += deltaAmt;
+                    else
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
+
                     if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info");
                 }
@@ -306,6 +326,10 @@ namespace ShipManifest
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred = 0f;
                     if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("14. End Loop. XferOn = " + XferOn.ToString(), "Info");
+                    if (tXferOn)
+                        tXferOn = false;
+                    else
+                        sXferOn = false;
                 }
                 else
                 {
