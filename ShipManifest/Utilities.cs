@@ -104,6 +104,8 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
+        public string CurVersion = "0.23.3.1.3";
+
         public Rect ManifestPosition;
         public Rect TransferPosition;
 
