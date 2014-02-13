@@ -1,6 +1,19 @@
 ShipManifest
 ============
-Version 0.23.3.0 - 3 Feb, 2014 - Add Science Xfers and Bug fixes
+Version 0.23.3.1.3 - 12 Feb, 2014 - Add Preflight features and fix preflight fill resources bug.
+ - Add Crew Fill and Crew Empty Buttons to PreFlight.   Now you can fill or empty your vessel on the pad.
+ - Reworked Resource Fill Vessel and Empty Vessel to respect Realism mode. (resourceTransferMode = NONE).
+ - Added Dump Resource buttons to Resource List in Manifest Window.  Now you can dump single resource on the entire vessel.
+   Realism Mode support:  Preflight, you can dump resources.  In Flight, you cannot.
+ - Added mod version to Debug Window.
+
+Version 0.23.3.1.2 - 11 Feb, 2014 - Add Bi-Directional Resource Xfers and Science Xfer Bug fix.
+ - Bi-Directional Resource transfers.   Now you can move a resource from source to target or target to source.
+ - ** Science bug fix.   Sorry about that everyone.   It now works. :D
+ - Improved verbose logging of science, crew, and resource xfers.
+ - Include Toolbar 1.5.2 redistribution
+
+Version 0.23.3.1 - 3 Feb, 2014 - Add Science Xfers and Bug fixes
  - Added Science Transfers. Select source part & modulle, select target part & module, click xfer.
  - Realism Mode now respects Resource.TransferMode = None on resource Xfers.
  - Add config switch for locking Realism Mode.  
