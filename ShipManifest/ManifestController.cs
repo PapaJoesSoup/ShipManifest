@@ -129,18 +129,28 @@ namespace ShipManifest
         private void ShipManifestWindow(int windowId)
         {
             GUILayout.BeginVertical();
-
             ScrollViewerShipManifest = GUILayout.BeginScrollView(ScrollViewerShipManifest, GUILayout.Height(100), GUILayout.Width(300));
             GUILayout.BeginVertical();
 
             if (IsPreLaunch)
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(string.Format("Fill Vessel"), GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Fill Crew"), GUILayout.Width(130), GUILayout.Height(20)))
+                {
+                    FillVesselCrew();
+                }
+                if (GUILayout.Button(string.Format("Empty Crew"), GUILayout.Width(130), GUILayout.Height(20)))
+                {
+                    EmptyVesselCrew();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button(string.Format("Fill Resources"), GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     FillVesselResources();
                 }
-                if (GUILayout.Button(string.Format("Empty Vessel"), GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Empty Resources"), GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     EmptyVesselResources();
                 }
@@ -149,9 +159,13 @@ namespace ShipManifest
 
             foreach (string resourceName in PartsByResource.Keys)
             {
+                int width = 265;
                 var style = resourceName == SelectedResource ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                GUILayout.BeginHorizontal();
+                if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    width = 215;
 
-                if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(265), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(width), GUILayout.Height(20)))
                 {
                     ClearHighlight(_selectedPartSource);
                     ClearHighlight(_selectedPartTarget);
@@ -179,6 +193,14 @@ namespace ShipManifest
                         }
                     }
                 }
+                if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                {
+                    if (GUILayout.Button(string.Format("{0}", "Dump"), GUILayout.Width(45), GUILayout.Height(20)))
+                    {
+                        DumpResource(resourceName);
+                    }
+                }
+                GUILayout.EndHorizontal();
             }
 
             GUILayout.EndVertical();
@@ -461,6 +483,77 @@ namespace ShipManifest
         private void RespawnCrew()
         {
             this.Vessel.SpawnCrew();
-        }    
+        }
+
+        private void FillVesselCrew()
+        {
+            foreach (var part in PartsByResource["Crew"])
+            {
+                AddCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
+            }
+        }
+
+        private void EmptyVesselCrew()
+        {
+            foreach (var part in PartsByResource["Crew"])
+            {
+                for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
+                {
+                    RemoveCrew(part.protoModuleCrew[i], part);
+                }
+            }
+        }
+
+        private void FillVesselResources()
+        {
+            List<string> resources = PartsByResource.Keys.ToList<string>();
+            foreach (string resourceName in resources)
+            {
+                if (resourceName != "Crew" && resourceName != "Science")
+                {
+                    foreach (Part part in PartsByResource[resourceName])
+                    {
+                        foreach (PartResource resource in part.Resources)
+                        {
+                            if (resource.info.name == resourceName)
+                                resource.amount = resource.maxAmount;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void EmptyVesselResources()
+        {
+            List<string> resources = PartsByResource.Keys.ToList<string>();
+            foreach (string resourceName in resources)
+            {                
+                if (resourceName != "Crew" && resourceName != "Science")
+                {
+                    foreach (Part part in PartsByResource[resourceName])
+                    {
+                        foreach (PartResource resource in part.Resources)
+                        {
+                            if (resource.info.name == resourceName)
+                                resource.amount = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void DumpResource(string resourceName)
+        {
+            foreach (Part part in PartsByResource[resourceName])
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.info.name == resourceName)
+                    {
+                        resource.amount = 0;
+                    }
+                }
+            }
+        }
     }
 }
