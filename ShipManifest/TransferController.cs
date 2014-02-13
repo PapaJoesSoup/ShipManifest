@@ -13,7 +13,8 @@ namespace ShipManifest
         // for improved readability and management by coders.
 
         // variables used for moving resources.  set to a negative to allow slider to function.
-        public float XferAmount = -1f;
+        public float sXferAmount = -1f;
+        public float tXferAmount = -1f;
         public float AmtXferred = 0f;
 
         // Flags to show windows
@@ -110,36 +111,6 @@ namespace ShipManifest
             }
         }
 
-        // DataSource for Resources by Part  Used in Transfer window.  
-        // I may change this to the partlist above.
-        private List<Part> _resourcesByPart;
-        public List<Part> ResourcesByPart
-        {
-            get
-            {
-                if (_resourcesByPart == null)
-                    _resourcesByPart = new List<Part>();
-                else
-                {
-                    foreach (Part part in _resourcesByPart)
-                    {
-                        _resourcesByPart.Add(part);
-                    }
-                    _resourcesByPart.Clear();
-                }
-
-                foreach (Part part in Vessel.Parts)
-                {
-                    if (part.Resources.Count > 0)
-                    {
-                        _resourcesByPart.Add(part);
-                    }
-                }
-
-                return _resourcesByPart;
-            }
-        }
-
         // dataSource for Resource manifest and ResourceTransfer windows
         // Provides a list of parts for a given resource.
         private List<Part> _selectedResourceParts;
@@ -215,7 +186,8 @@ namespace ShipManifest
                 SetPartHighlight(_selectedPartSource, SettingsManager.Colors[SettingsManager.SourcePartColor]);
                 
                 // reset transfer amount (for resource xfer slider control)
-                XferAmount = -1f;
+                sXferAmount = -1f;
+                tXferAmount = -1f;
             }
         }
 
@@ -235,7 +207,8 @@ namespace ShipManifest
                 SetPartHighlight(_selectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartColor]);
 
                 // reset transfer amount (for resource xfer slider control)
-                XferAmount = -1f;
+                sXferAmount = -1f;
+                tXferAmount = -1f;
             }
         }
 
@@ -305,8 +278,70 @@ namespace ShipManifest
 
             if (SelectedPartSource != null)
             {
-                if (SelectedResource != "Crew" && SelectedResource != "Science")
+                if (SelectedResource == "Crew")
                 {
+                    foreach (ProtoCrewMember crewMember in SelectedPartSource.protoModuleCrew)
+                    {
+                        // This routine assumes that a resource has been selected on the Resource manifest window.
+                        GUILayout.BeginHorizontal();
+                        if (crewMember.seat != null)
+                        {
+                            if (GUILayout.Button(">>", GUILayout.Width(15), GUILayout.Height(20)))
+                            {
+                                MoveCrewMember(crewMember, SelectedPartSource);
+                            }
+                        }
+                        GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));                        
+                        if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartTarget.protoModuleCrew.Count < SelectedPartTarget.CrewCapacity && SelectedPartSource.protoModuleCrew.Count > 0))
+                        {
+                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                            {
+                                TransferCrewMember(SelectedPartSource, SelectedPartTarget, crewMember);
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                }
+                else if (SelectedResource == "Science")
+                {
+                    foreach (PartModule pm in SelectedPartSource.Modules)
+                    {
+                        // Containers.
+                        int scienceCount = 0;
+                        int capacity = 0;
+                        if (pm is ModuleScienceContainer)
+                        {
+                            scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
+                            capacity = ((ModuleScienceContainer)pm).capacity;
+                        }
+                        else if (pm is ModuleScienceExperiment)
+                        {
+                            scienceCount = ((ModuleScienceExperiment)pm).GetScienceCount();
+                            capacity = 1;
+                        }
+
+                        if (pm is ModuleScienceExperiment || pm is ModuleScienceContainer)
+                        {
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label(string.Format("{0} - ({1}/{2})", pm.moduleName, scienceCount.ToString(), capacity), GUILayout.Width(205), GUILayout.Height(20));
+
+                            // If we have target selected, it is not the same as the source, and there is science to xfer.
+                            if ((SelectedModuleTarget != null && pm != SelectedModuleTarget) && scienceCount > 0)
+                            {
+                                if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                                {
+                                    SelectedModuleSource = pm;
+                                    TransferScience(SelectedModuleSource, SelectedModuleTarget);
+                                    SelectedModuleSource = SelectedModuleTarget = null;
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                    }
+                }
+                else
+                {
+                    // resources are left....
                     foreach (PartResource resource in SelectedPartSource.Resources)
                     {
                         if (resource.info.name == SelectedResource)
@@ -343,85 +378,35 @@ namespace ShipManifest
                             GUILayout.EndHorizontal();
                             if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
                             {
-                                // let's determine how much of a resource we can move to the target.
-                                double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
-                                if (maxXferAmount > SelectedPartSource.Resources[resource.info.name].amount)
+                                if (!ShipManifestBehaviour.tXferOn)
                                 {
-                                    maxXferAmount = SelectedPartSource.Resources[resource.info.name].amount;
-                                }
+                                    // let's determine how much of a resource we can move to the target.
+                                    double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
+                                    if (maxXferAmount > SelectedPartSource.Resources[resource.info.name].amount)
+                                    {
+                                        maxXferAmount = SelectedPartSource.Resources[resource.info.name].amount;
+                                    }
 
-                                // This is used to set the slider to the max amount by default.  
-                                // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
-                                // We set XferAmount to -1 when we set new source or target parts.
-                                if (XferAmount == -1)
-                                {
-                                    XferAmount = (float)maxXferAmount;
-                                }
+                                    // This is used to set the slider to the max amount by default.  
+                                    // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
+                                    // We set XferAmount to -1 when we set new source or target parts.
+                                    if (sXferAmount == -1)
+                                    {
+                                        sXferAmount = (float)maxXferAmount;
+                                    }
 
-                                // create xfer slider;
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label(string.Format("Xfer Amt:  {0}", XferAmount.ToString("#######0.####")), GUILayout.Width(125), GUILayout.Height(20));
-                                XferAmount = GUILayout.HorizontalSlider(XferAmount, 0, (float)maxXferAmount, GUILayout.Width(80));
+                                    // create xfer slider;
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label(string.Format("Xfer Amt:  {0}", sXferAmount.ToString("#######0.####")), GUILayout.Width(125), GUILayout.Height(20));
+                                    sXferAmount = GUILayout.HorizontalSlider(sXferAmount, 0, (float)maxXferAmount, GUILayout.Width(80));
 
-                                 if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                                {
-                                    TransferResource(SelectedPartSource, SelectedPartTarget, (double)XferAmount);
-                                }
-                                GUILayout.EndHorizontal();
-                            }
-                        }
-                    }
-                }
-                else if (SelectedResource == "Crew")
-                {
-                    foreach (ProtoCrewMember crewMember in SelectedPartSource.protoModuleCrew)
-                    {
-                        // This routine assumes that a resource has been selected on the Resource manifest window.
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0}", crewMember.name), GUILayout.Width(205), GUILayout.Height(20));                        
-                        if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartTarget.protoModuleCrew.Count < SelectedPartTarget.CrewCapacity && SelectedPartSource.protoModuleCrew.Count > 0))
-                        {
-                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                            {
-                                TransferCrew(SelectedPartSource, SelectedPartTarget, crewMember);
-                            }
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-                }
-                else if (SelectedResource == "Science")
-                {
-                    foreach (PartModule pm in SelectedPartSource.Modules)
-                    {
-                        // Containers.
-                        int scienceCount = 0;
-                        int capacity = 0;
-                        if (pm is ModuleScienceContainer)
-                        {
-                            scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
-                            capacity = ((ModuleScienceContainer)pm).capacity;
-                        }
-                        else if (pm is ModuleScienceExperiment)
-                        {
-                            scienceCount = ((ModuleScienceExperiment)pm).GetScienceCount();
-                            capacity = 1;
-                        }
-
-                        if (pm is ModuleScienceExperiment || pm is ModuleScienceContainer)
-                        {
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0} - ({1}/{2})", pm.moduleName, scienceCount.ToString(), capacity), GUILayout.Width(205), GUILayout.Height(20));
-
-                            // If we have target selected, it is not the same as the source, and there is science to xfer.
-                            if ((SelectedModuleTarget != null && pm != SelectedModuleTarget) && scienceCount > 0)
-                            {
-                                if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                                {
-                                    TransferScience(SelectedModuleSource, SelectedModuleTarget);
-                                    SelectedModuleSource = SelectedModuleTarget = null;
+                                    if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                                    {
+                                        TransferResource(SelectedPartSource, SelectedPartTarget, (double)sXferAmount);
+                                    }
+                                    GUILayout.EndHorizontal();
                                 }
                             }
-                            GUILayout.EndHorizontal();
                         }
                     }
                 }
@@ -462,8 +447,58 @@ namespace ShipManifest
             // --------------------------------------------------------------------------
             if (SelectedPartTarget != null)
             {
-                if (SelectedResource != "Crew" && SelectedResource != "Science")
+                if (SelectedResource == "Crew")
                 {
+                    foreach (ProtoCrewMember crewMember in SelectedPartTarget.protoModuleCrew)
+                    {
+                        // This routine assumes that a resource has been selected on the Resource manifest window.
+                        GUILayout.BeginHorizontal();
+                        if (crewMember.seat != null)
+                        {
+                            if (GUILayout.Button(">>", GUILayout.Width(15), GUILayout.Height(20)))
+                            {
+                                MoveCrewMember(crewMember, SelectedPartTarget);
+                            }
+                        }
+                        GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
+                        if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartSource.protoModuleCrew.Count < SelectedPartSource.CrewCapacity && SelectedPartTarget.protoModuleCrew.Count > 0))
+                        {
+                            // set the conditions for a button style change.
+                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                            {
+                                TransferCrewMember(SelectedPartTarget, SelectedPartSource, crewMember);
+                            }
+                        }
+                        GUILayout.EndHorizontal();
+                    }
+                }
+                else if (SelectedResource == "Science")
+                {
+                    foreach (PartModule pm in SelectedPartTarget.Modules)
+                    {
+                        // Containers.
+                        int scienceCount = 0;
+                        if (pm is ModuleScienceContainer)
+                        {
+                            scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label(string.Format("{0} - ({1}/{2})", pm.moduleName, scienceCount.ToString(), ((ModuleScienceContainer)pm).capacity), GUILayout.Width(205), GUILayout.Height(20));
+                            // set the conditions for a button style change.
+                            bool ShowReceive = false;
+                            if (pm == SelectedModuleTarget)
+                                ShowReceive = true;
+                            var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
+                            if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
+                            {
+                                SelectedModuleTarget = pm;
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                    }
+                }                        
+                else
+                {
+                    // Resources
                     foreach (PartResource resource in SelectedPartTarget.Resources)
                     {
                         if (resource.info.name == SelectedResource)
@@ -498,51 +533,40 @@ namespace ShipManifest
                                 }
                             }
                             GUILayout.EndHorizontal();
+                            if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartTarget.Resources[resource.info.name].amount > 0 && SelectedPartSource.Resources[resource.info.name].amount < SelectedPartSource.Resources[resource.info.name].maxAmount))
+                            {
+                                // create xfer slider;
+                                if (!ShipManifestBehaviour.sXferOn)
+                                {
+                                    // let's determine how much of a resource we can move to the Source.
+                                    double maxXferAmount = SelectedPartSource.Resources[resource.info.name].maxAmount - SelectedPartSource.Resources[resource.info.name].amount;
+                                    if (maxXferAmount > SelectedPartTarget.Resources[resource.info.name].amount)
+                                    {
+                                        maxXferAmount = SelectedPartTarget.Resources[resource.info.name].amount;
+                                    }
+
+                                    // This is used to set the slider to the max amount by default.  
+                                    // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
+                                    // We set XferAmount to -1 when we set new source or target parts.
+                                    if (tXferAmount == -1)
+                                    {
+                                        tXferAmount = (float)maxXferAmount;
+                                    }
+
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label(string.Format("Xfer Amt:  {0}", tXferAmount.ToString("#######0.####")), GUILayout.Width(125), GUILayout.Height(20));
+                                    tXferAmount = GUILayout.HorizontalSlider(tXferAmount, 0, (float)maxXferAmount, GUILayout.Width(80));
+
+                                    if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                                    {
+                                        TransferResource(SelectedPartTarget, SelectedPartSource, (double)tXferAmount);
+                                    }
+                                    GUILayout.EndHorizontal();
+                                }
+                            }
                         }
                     }
                 }
-                else if (SelectedResource == "Crew")
-                {
-                    foreach (ProtoCrewMember crewMember in SelectedPartTarget.protoModuleCrew)
-                    {
-                        // This routine assumes that a resource has been selected on the Resource manifest window.
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0}", crewMember.name), GUILayout.Width(205), GUILayout.Height(20));
-                        if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartSource.protoModuleCrew.Count < SelectedPartSource.CrewCapacity && SelectedPartTarget.protoModuleCrew.Count > 0))
-                        {
-                            // set the conditions for a button style change.
-                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                            {
-                                TransferCrew(SelectedPartTarget, SelectedPartSource, crewMember);
-                            }
-                        }
-                        GUILayout.EndHorizontal();
-                    }
-                }
-                else if (SelectedResource == "Science")
-                {
-                    foreach (PartModule pm in SelectedPartTarget.Modules)
-                    {
-                        // Containers.
-                        int scienceCount = 0;
-                        if (pm is ModuleScienceContainer)
-                        {
-                            scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0} - ({1}/{2})", pm.moduleName, scienceCount.ToString(), ((ModuleScienceContainer)pm).capacity), GUILayout.Width(205), GUILayout.Height(20));
-                            // set the conditions for a button style change.
-                            bool ShowReceive = false;
-                            if (pm == SelectedModuleTarget)
-                                ShowReceive = true;
-                            var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
-                            if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
-                            {
-                                SelectedModuleTarget = pm;
-                            }
-                            GUILayout.EndHorizontal();
-                        }
-                    }
-                }                        
             }
             // --------------------------------------------------------------------------
             GUILayout.EndVertical();
@@ -612,7 +636,57 @@ namespace ShipManifest
             }
         }
 
-        private void TransferCrew(Part source, Part target, ProtoCrewMember crewMember)
+        private void MoveCrewMember(ProtoCrewMember crewMember, Part part)
+        {
+            // Build source and target seat indexes.
+            int curIdx = crewMember.seatIdx;
+            int newIdx = curIdx;
+            InternalSeat sourceSeat = crewMember.seat;
+            if (newIdx + 1 == part.CrewCapacity)
+                newIdx = -1;
+
+            // get target seat from part's inernal model
+            InternalSeat targetSeat = part.internalModel.seats[newIdx + 1];
+
+            // Do we need to swap places with another Kerbal?
+            if (targetSeat.taken)
+            {
+                // get Kerbal to swap with through his seat...
+                ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
+
+                // Swap places.
+
+                // Remove the crew members from the part...
+                RemoveCrew(crewMember, part);
+                RemoveCrew(targetMember, part);
+
+                // At this point, the kerbals are in the "ether".
+                // this may be why there is an issue with refreshing the internal view.. 
+                // It may allow (or expect) a board call from an (invisible) eva object.   
+                // If I can manage to properly trigger that call... then all should properly refresh...
+                // I'll look into that...
+
+                // Add the crew members back into the part at their new seats.
+                part.AddCrewmemberAt(crewMember, newIdx + 1);
+                part.AddCrewmemberAt(targetMember, curIdx);
+
+                // these lines actually spawn the kerbals in their views, but they do not seem refresh the portraits....  
+                // maybe an eva object will do it.
+                crewMember.seat.SpawnCrew();
+                targetMember.seat.SpawnCrew();
+                Vessel.SpawnCrew();
+            }
+            else
+            {
+                // Just move.
+                RemoveCrew(crewMember, part);
+                part.AddCrewmemberAt(crewMember, newIdx + 1);
+                crewMember.seat.SpawnCrew();
+                Vessel.SpawnCrew();
+            }
+        }
+
+        private void TransferCrewMember(Part source, Part target, ProtoCrewMember crewMember)
         {
             RemoveCrew(crewMember, source);
             crewMember.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
@@ -630,62 +704,103 @@ namespace ShipManifest
         {
             ScienceData[] moduleScience = null;
             int i;
-            if (source is ModuleScienceContainer)
-                moduleScience = ((ModuleScienceContainer)source).GetData();
-            else if (source is ModuleScienceExperiment)
-                moduleScience = ((ModuleScienceExperiment)source).GetData();
-
-            if (moduleScience != null && moduleScience.Length > 0)
+            try
             {
-                for (i = 0; i < moduleScience.Length; i++)
+                if (source is ModuleScienceContainer)
                 {
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage(string.Format("moduleScience has data..."), "Info");
-
-                    if (((ModuleScienceContainer)target).AddData(moduleScience[i]))
+                    if (((ModuleScienceContainer)source) != null)
+                        moduleScience = ((ModuleScienceContainer)source).GetData();
+                    else
+                        moduleScience = null;
+                    //ManifestUtilities.LogMessage("Science Data Count:  " + ((ModuleScienceContainer) source).GetStoredDataCount(), "Info");
+                    //ManifestUtilities.LogMessage("Science Data s Collectable:  " + ((ModuleScienceContainer) source).dataIsCollectable, "Info");
+                }
+                else
+                {
+                    if (((ModuleScienceExperiment)source) != null)
                     {
-                        if (source is ModuleScienceContainer)
-                        {
-                            if (((ModuleScienceContainer)source).IsRerunnable())
-                            {
-                                //((ModuleScienceContainer)source).
-                                if (SettingsManager.VerboseLogging)
-                                    ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source).IsRerunnable() = true..."), "Info");
-                            }
-                            else
-                            {
-                                //((ModuleScienceContainer)source).
-                                if (SettingsManager.VerboseLogging)
-                                    ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source).IsRerunnable() = false..."), "Info");
-                            }
-                            ((ModuleScienceContainer)source).RemoveData(moduleScience[i]);
-                        }
-                        else
-                        {
-                            if (((ModuleScienceExperiment)source).IsRerunnable())
-                            {
-                                if (SettingsManager.VerboseLogging)
-                                    ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)source).IsRerunnable() = true..."), "Info");
-                                ((ModuleScienceExperiment)source).ResetExperiment();
-                            }
-                            else
-                            {
-                                if (SettingsManager.VerboseLogging)
-                                    ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)source).IsRerunnable() = false..."), "Info");
-                                ((ModuleScienceExperiment)source).DumpData(moduleScience[i]);
-                            }
-                        }
+                        moduleScience = ((ModuleScienceExperiment)source).GetData();
+                        if (SettingsManager.VerboseLogging)
+                            ManifestUtilities.LogMessage("moduleScience is collected:  ", "Info");
                     }
                     else
                     {
-                        ManifestUtilities.LogMessage(string.Format("Science Data transfer failed..."), "Info");
+                        moduleScience = null;
+                        if (SettingsManager.VerboseLogging)
+                            ManifestUtilities.LogMessage("moduleScience is null:  ", "Info");
                     }
                 }
+
+                if (moduleScience != null && moduleScience.Length > 0)
+                {
+                    for (i = 0; i < moduleScience.Length; i++)
+                    {
+                        if (SettingsManager.VerboseLogging)
+                            ManifestUtilities.LogMessage(string.Format("moduleScience has data..."), "Info");
+
+                        if (((ModuleScienceContainer)target) != null)
+                        {
+                            if (((ModuleScienceContainer)target).AddData(moduleScience[i]))
+                            {
+                                if (source is ModuleScienceContainer)
+                                {
+                                    if (((ModuleScienceContainer)source) != null)
+                                    {
+                                        //((ModuleScienceContainer)source).
+                                        if (SettingsManager.VerboseLogging)
+                                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source) is not null"), "Info");
+                                        ((ModuleScienceContainer)source).RemoveData(moduleScience[i]);
+                                    }
+                                    else
+                                    {
+                                        //((ModuleScienceContainer)source).
+                                        if (SettingsManager.VerboseLogging)
+                                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source) is null"), "Info");
+                                    }
+                                }
+                                else
+                                {
+                                    if (((ModuleScienceExperiment)source) != null)
+                                    {
+                                        if (SettingsManager.VerboseLogging)
+                                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)source) is not null.  ResetExperiment"), "Info");
+                                        ((ModuleScienceExperiment)source).ResetExperiment();
+                                    }
+                                    else
+                                    {
+                                        if (SettingsManager.VerboseLogging)
+                                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)source) is null."), "Info");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ManifestUtilities.LogMessage(string.Format("Science Data transfer failed..."), "Info");
+                            }
+                        }
+                        else
+                        {
+                            if (SettingsManager.VerboseLogging)
+                                ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)target) is null"), "Info");
+                        }
+                    }
+                    if (SettingsManager.VerboseLogging)
+                        ManifestUtilities.LogMessage(string.Format("Transfer Complete."), "Info");
+                }
+                else if (moduleScience == null)
+                {
+                    if (SettingsManager.VerboseLogging)
+                        ManifestUtilities.LogMessage(string.Format("moduleScience is null..."), "Info");
+                }
+                else  // must be length then...
+                {
+                    if (SettingsManager.VerboseLogging)
+                        ManifestUtilities.LogMessage(string.Format("moduleScience empty (no data)..."), "Info");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage(string.Format("moduleScience is null or empty..."), "Info");
+                ManifestUtilities.LogMessage("Error in Collection:  Error:  " + ex.ToString(), "Info");
             }
         }
         
@@ -712,8 +827,12 @@ namespace ShipManifest
                     if (SettingsManager.VerboseLogging)
                         ManifestUtilities.LogMessage("Playing pump sound...", "Info");
 
+
                     // This flag enables the Update handler in ResourceManifestBehaviour
-                    ShipManifestBehaviour.XferOn = true;
+                    if (source == SelectedPartSource)
+                        ShipManifestBehaviour.sXferOn = true;
+                    else
+                        ShipManifestBehaviour.tXferOn = true;
                 }
                 else
                 {
@@ -722,30 +841,6 @@ namespace ShipManifest
 
                     // Drain source...
                     source.Resources[SelectedResource].amount -= XferAmount;
-                }
-            }
-        }
-
-        private void FillVesselResources()
-        {
-            foreach (Part part in ResourcesByPart)
-            {
-                foreach (PartResource resource in part.Resources)
-                {
-                    double fillAmount = resource.maxAmount;
-                    resource.amount = 0;
-                    resource.amount += fillAmount;
-                }
-             }
-        }
-
-        private void EmptyVesselResources()
-        {
-            foreach (Part part in ResourcesByPart)
-            {
-                foreach (PartResource resource in part.Resources)
-                {
-                    resource.amount = 0;
                 }
             }
         }
