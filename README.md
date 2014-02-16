@@ -1,5 +1,15 @@
 ShipManifest
 ============
+Version 0.23.3.1.4 - 15 Feb, 2014 - General cleanup, configuration & UI enhancements.
+ - Realism Mode:  Science Xfers now render experiments inoperable after xfer.
+ - Changed Science Xfers Target Module selection to Auto select, If the target Part has only 1 target module. Saves a click the majority of the time. 
+ - Added Save Debug Log support.  Save Log button now works.
+ - Added support for tailoring Ship Manifest for your needs:
+	- Config File switch to enable/disable Fill & Empty Resource buttons in PreFlight.  Enabled by default.
+	- Config File switch to enable/disable Crew Transfer Feature.  Enabled by default.
+	- Config File switch to enable/disable Science Transfer Feature.  Enabled by default.
+- Include Toolbar 1.5.3 redistribution
+
 Version 0.23.3.1.3 - 12 Feb, 2014 - Add Preflight features and fix preflight fill resources bug.
  - Add Crew Fill and Crew Empty Buttons to PreFlight.   Now you can fill or empty your vessel on the pad.
  - Reworked Resource Fill Vessel and Empty Vessel to respect Realism mode. (resourceTransferMode = NONE).
