@@ -135,26 +135,29 @@ namespace ShipManifest
             if (IsPreLaunch)
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(string.Format("Fill Crew"), GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Fill Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     FillVesselCrew();
                 }
-                if (GUILayout.Button(string.Format("Empty Crew"), GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Empty Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     EmptyVesselCrew();
                 }
                 GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button(string.Format("Fill Resources"), GUILayout.Width(130), GUILayout.Height(20)))
+                if (ShipManifestBehaviour.ShipManifestSettings.EnablePFResources)
                 {
-                    FillVesselResources();
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                    {
+                        FillVesselResources();
+                    }
+                    if (GUILayout.Button(string.Format("Empty Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                    {
+                        EmptyVesselResources();
+                    }
+                    GUILayout.EndHorizontal();
                 }
-                if (GUILayout.Button(string.Format("Empty Resources"), GUILayout.Width(130), GUILayout.Height(20)))
-                {
-                    EmptyVesselResources();
-                }
-                GUILayout.EndHorizontal();
             }
 
             foreach (string resourceName in PartsByResource.Keys)
@@ -195,7 +198,7 @@ namespace ShipManifest
                 }
                 if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                 {
-                    if (GUILayout.Button(string.Format("{0}", "Dump"), GUILayout.Width(45), GUILayout.Height(20)))
+                    if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                     {
                         DumpResource(resourceName);
                     }
@@ -316,7 +319,7 @@ namespace ShipManifest
                     labelStyle = ManifestStyle.LabelStyle;
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));
+                GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));  // + "  (" + kerbal.seat.vessel.name + ")"
                 string buttonText = string.Empty;
 
                 if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE)
