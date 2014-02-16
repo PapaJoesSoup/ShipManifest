@@ -115,6 +115,8 @@ namespace ShipManifest
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
+        public string DebugLogPath = "\\Plugins\\PluginData\\";
+
         public bool AutoSave;
         public float SaveInterval = 60f;
         public bool PrevAutoSave;
@@ -138,6 +140,11 @@ namespace ShipManifest
         public float PrevFlowRate = 100;
         public float MaxFlowRate = 100;
         public float MinFlowRate = 0;
+
+        // Feature Options
+        public bool EnableScience = true;
+        public bool EnableCrew = true;
+        public bool EnablePFResources = true;
 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
@@ -285,6 +292,12 @@ namespace ShipManifest
                 SourcePartColor = configfile.GetValue<string>("SourcePartColor");
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
 
+                EnableScience = configfile.GetValue<bool>("EnableScience");
+                EnableCrew = configfile.GetValue<bool>("EnableCrew");
+                EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
+
+                DebugLogPath = configfile.GetValue<string>("DebugLogPath");
+
                 // Default values for Flow rates
                 if (FlowRate == 0)
                     FlowRate = 100;
@@ -326,6 +339,8 @@ namespace ShipManifest
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info");
                     ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info");
+                    ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info");
+                    ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info");
                 }
             }
             catch(Exception e)
@@ -360,6 +375,13 @@ namespace ShipManifest
                 configfile.SetValue("PumpSoundStop", PumpSoundStop);
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
+
+                configfile.GetValue("EnableScience", EnableScience);
+                configfile.GetValue("EnableCrew", EnableCrew);
+                configfile.GetValue("EnablePFResources", EnablePFResources);
+
+                configfile.GetValue("DebugLogPath", DebugLogPath);
+
                 configfile.save();
 
                 if (VerboseLogging)
@@ -382,6 +404,10 @@ namespace ShipManifest
                     ManifestUtilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info");
                     ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info");
                     ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info");
+                    ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info");
+                    ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info");
+                    ManifestUtilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info");
+                    ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info");
                 }
             }
             catch (Exception e)
