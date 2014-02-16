@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using Toolbar;
@@ -118,19 +119,6 @@ namespace ShipManifest
             }
         }
 
-        public void RunSave()
-        {
-            Save();
-        }
-
-        private void Save()
-        {
-            if (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
-            {
-                ShipManifestSettings.Save();
-            }
-        }
-
         private void DebuggerWindow(int windowId)
         {
             GUILayout.BeginVertical();
@@ -152,8 +140,8 @@ namespace ShipManifest
             if (GUILayout.Button("Save Log", GUILayout.Height(20)))
             {
                 // Create log file and save.
-                //ManifestUtilities.Errors.Count;
-                ManifestUtilities.Errors.Add("Info:  Log save not yet implemented.");
+                if (ManifestUtilities.Errors.Count > 0);
+                    Savelog();
             }
             GUILayout.EndHorizontal();
 
@@ -343,6 +331,54 @@ namespace ShipManifest
                 ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
                 if (SettingsManager.VerboseLogging)
                     ManifestUtilities.LogMessage("16. Continue loop. XferOn = " + XferOn.ToString(), "Info");
+            }
+        }
+
+        public void RunSave()
+        {
+            Save();
+        }
+
+        private void Save()
+        {
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
+            {
+                ShipManifestSettings.Save();
+            }
+        }
+
+        private void Savelog()
+        {
+            // time to create a file...
+            string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/" , "").Replace(":", "") + ".txt";
+
+            string path = Directory.GetCurrentDirectory() + "\\GameData\\ShipManifest\\";
+            if (ShipManifestSettings.DebugLogPath.StartsWith("\\"))
+                ShipManifestSettings.DebugLogPath = ShipManifestSettings.DebugLogPath.Substring(2, ShipManifestSettings.DebugLogPath.Length - 2);
+
+            if (!ShipManifestSettings.DebugLogPath.EndsWith("\\"))
+                ShipManifestSettings.DebugLogPath += "\\";
+
+            filename = path + ShipManifestSettings.DebugLogPath + filename;
+            if (SettingsManager.VerboseLogging)
+                ManifestUtilities.LogMessage("File Name = " + filename, "Info");
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (string line in ManifestUtilities.Errors)
+                {
+                    sb.AppendLine(line);
+                }
+
+                File.WriteAllText(filename, sb.ToString());
+
+                if (SettingsManager.VerboseLogging)
+                    ManifestUtilities.LogMessage("File written", "Info");
+            }
+            catch (Exception ex)
+            {
+                if (SettingsManager.VerboseLogging)
+                    ManifestUtilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info");
             }
         }
     }
