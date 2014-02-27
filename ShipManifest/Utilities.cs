@@ -12,7 +12,7 @@ namespace ShipManifest
         public static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
         public static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
         public static Vector2 DebugScrollPosition = Vector2.zero;
- 
+
         private static List<string> _errors = new List<string>();
         public static List<string> Errors
         {
@@ -21,14 +21,15 @@ namespace ShipManifest
 
         public static void LoadTexture(ref Texture2D tex, String FileName)
         {
-            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info");
+            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", true);
             WWW img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, FileName));
             img1.LoadImageIntoTexture(tex);
         }
 
-        public static void LogMessage(string error, string type)
+        public static void LogMessage(string error, string type, bool verbose)
         {
-            _errors.Add(type + ": " + error);
+            if (verbose)
+                _errors.Add(type + ": " + error);
         }
     }
 
@@ -104,27 +105,27 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.23.3.1.3";
+        public string CurVersion = "0.23.3.1.5";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
 
         public Rect PrevResourceManifestPosition;
         public Rect PrevResourceTransferPosition;
-        
+
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
         public string DebugLogPath = "\\Plugins\\PluginData\\";
 
         public bool AutoSave;
-        public float SaveInterval = 60f;
+        public float SaveIntervalSec = 60f;
         public bool PrevAutoSave;
-        public float PrevSaveInterval = 60f;
+        public float PrevSaveIntervalSec = 60f;
 
         public Rect RosterPosition;
         public bool ShowRoster { get; set; }
-        
+
         public bool RealismMode = false;
         public bool PrevRealismMode = false;
         public bool LockRealismMode = false;
@@ -146,6 +147,9 @@ namespace ShipManifest
         public bool EnableCrew = true;
         public bool EnablePFResources = true;
 
+        public static double IVATimeDelaySec = 5;
+        public static bool ShowIVAUpdate = false;
+ 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
 
@@ -155,6 +159,14 @@ namespace ShipManifest
         public string PrevPumpSoundStart = "";
         public string PrevPumpSoundRun = "";
         public string PrevPumpSoundStop = "";
+
+        public string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
+        public string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
+        public string CrewSoundStop = "ShipManifest/Sounds/xxxxx-3";
+        public string PrevCrewSoundStart = "";
+        public string PrevCrewSoundRun = "";
+        public string PrevCrewSoundStop = "";
+        
         public static string SourcePartColor = "red";
         public static string TargetPartColor = "green";
 
@@ -170,27 +182,23 @@ namespace ShipManifest
             PrevShowDebugger = ShowDebugger;
             PrevVerboseLogging = VerboseLogging;
             PrevAutoSave = AutoSave;
-            PrevSaveInterval = SaveInterval;
+            PrevSaveIntervalSec = SaveIntervalSec;
             PrevFlowRate = FlowRate;
             PrevPumpSoundStart = PumpSoundStart;
             PrevPumpSoundRun = PumpSoundRun;
             PrevPumpSoundStop = PumpSoundStop;
+            PrevCrewSoundStart = CrewSoundStart;
+            PrevCrewSoundRun = CrewSoundRun;
+            PrevCrewSoundStop = CrewSoundStop;
 
             string label = "";
-            string txtSaveInterval = SaveInterval.ToString();
+            string txtSaveInterval = SaveIntervalSec.ToString();
 
             GUILayout.BeginVertical();
             ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
             label = ShowDebugger ? "Disable Debug Console" : "Enable Debug Console";
             ShowDebugger = GUILayout.Toggle(ShowDebugger, label, GUILayout.Width(300));
-
-            label = RealismMode ? "Realism Mode Enabled" : "Realism Mode Disabled";
-
-            if (!LockRealismMode)
-                RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
-            else
-                GUILayout.Label("Realism Mode:  " + RealismMode.ToString());
 
             label = VerboseLogging ? "Verbose Logging Enabled" : "Verbose Logging Disabled";
             VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
@@ -201,27 +209,62 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             GUILayout.Label("Save Interval: ", GUILayout.Width(120));
             txtSaveInterval = GUILayout.TextField(txtSaveInterval, GUILayout.Width(40));
+            GUILayout.Label("(sec)", GUILayout.Width(40));
             GUILayout.EndHorizontal();
 
+            label = RealismMode ? "Realism Mode Enabled" : "Realism Mode Disabled";
+
+            if (!LockRealismMode)
+            {
+                // Realism Mode
+                RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+            }
+            else
+            {
+                // Just display the mode...  (no cheating... )
+                GUILayout.Label("Realism Mode:  " + RealismMode.ToString());
+            }
+
+            // Pump Start Sound
             GUILayout.BeginHorizontal();
             GUILayout.Label("Pump Start Sound: ", GUILayout.Width(120));
             PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(200));
             GUILayout.EndHorizontal();
 
+            // Pump Run Sound
             GUILayout.BeginHorizontal();
             GUILayout.Label("Pump Run Sound: ", GUILayout.Width(120));
             PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(200));
             GUILayout.EndHorizontal();
 
+            // Pump Stop Sound
             GUILayout.BeginHorizontal();
             GUILayout.Label("Pump Stop Sound: ", GUILayout.Width(120));
             PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(200));
             GUILayout.EndHorizontal();
 
-            // create xfer slider;
+            // create xfer Flow Rate slider;
             GUILayout.BeginHorizontal();
             GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
             FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(200));
+            GUILayout.EndHorizontal();
+
+            // Crew Start Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Exit Sound: ", GUILayout.Width(120));
+            CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(200));
+            GUILayout.EndHorizontal();
+
+            // Crew Run Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Xfer Sound: ", GUILayout.Width(120));
+            CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(200));
+            GUILayout.EndHorizontal();
+
+            // Crew Stop Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Enter Sound: ", GUILayout.Width(120));
+            CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(200));
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -230,7 +273,7 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save"))
             {
-                SaveInterval = float.Parse(txtSaveInterval);
+                SaveIntervalSec = float.Parse(txtSaveInterval);
                 Save();
                 ShowSettings = false;
             }
@@ -240,11 +283,14 @@ namespace ShipManifest
                 ShowDebugger = PrevShowDebugger;
                 VerboseLogging = PrevVerboseLogging;
                 AutoSave = PrevAutoSave;
-                SaveInterval = PrevSaveInterval;
+                SaveIntervalSec = PrevSaveIntervalSec;
                 FlowRate = PrevFlowRate;
                 PumpSoundStart = PrevPumpSoundStart;
                 PumpSoundRun = PrevPumpSoundRun;
                 PumpSoundStop = PrevPumpSoundStop;
+                CrewSoundStart = PrevCrewSoundStart;
+                CrewSoundRun = PrevCrewSoundRun;
+                CrewSoundStop = PrevCrewSoundStop;
 
                 ShowSettings = false;
             }
@@ -253,14 +299,14 @@ namespace ShipManifest
 
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
-        
+
         #endregion
 
         #region Methods
 
         public void Load()
         {
-            ManifestUtilities.LogMessage("Settings load started...", "Info");
+            ManifestUtilities.LogMessage("Settings load started...", "Info", VerboseLogging);
 
             try
             {
@@ -281,13 +327,16 @@ namespace ShipManifest
                 LockRealismMode = configfile.GetValue<bool>("LockRealismMode");
                 VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
                 AutoSave = configfile.GetValue<bool>("AutoSave");
-                SaveInterval = (float)configfile.GetValue<double>("AutoSave");
+                SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
                 FlowRate = (float)configfile.GetValue<double>("FlowRate");
                 MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
                 MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
                 PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
                 PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
                 PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
+                CrewSoundStart = configfile.GetValue<string>("CrewSoundStart");
+                CrewSoundRun = configfile.GetValue<string>("CrewSoundRun");
+                CrewSoundStop = configfile.GetValue<string>("CrewSoundStop");
 
                 SourcePartColor = configfile.GetValue<string>("SourcePartColor");
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
@@ -297,6 +346,9 @@ namespace ShipManifest
                 EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
 
                 DebugLogPath = configfile.GetValue<string>("DebugLogPath");
+
+                IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
+                ShowIVAUpdate = configfile.GetValue<bool>("ShowIVAUpdate");
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -313,39 +365,50 @@ namespace ShipManifest
                 if (PumpSoundStop == "")
                     PumpSoundStop = "ShipManifest/Sounds/59328-3";
 
+                // Default sound license: CC-By-SA
+                // http://www.freesound.org/people/vibe_crc/sounds/14214/
+                if (CrewSoundStart == "")
+                    CrewSoundStart = "ShipManifest/Sounds/14214-1";
+                if (CrewSoundRun == "")
+                    CrewSoundRun = "ShipManifest/Sounds/14214-2";
+                if (CrewSoundStop == "")
+                    CrewSoundStop = "ShipManifest/Sounds/14214-3";
+
                 if (!Colors.Keys.Contains(SourcePartColor))
-                        SourcePartColor = "red";
+                    SourcePartColor = "red";
                 if (!Colors.Keys.Contains(TargetPartColor))
                     SourcePartColor = "green";
 
-                if (VerboseLogging)
-                {
-                    ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("LockRealismMode Loaded: {0}", LockRealismMode.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SaveInterval Loaded: {0}", SaveInterval.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info");
-                    ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info");
-                    ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info");
-                    ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info");
-                }
+                ManifestUtilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("LockRealismMode Loaded: {0}", LockRealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SaveIntervalSec Loaded: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundStart Loaded: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundRun Loaded: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundStop Loaded: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Loaded: {0}", ShowIVAUpdate), "Info", VerboseLogging);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception");
+                ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception", VerboseLogging);
             }
         }
 
@@ -365,54 +428,62 @@ namespace ShipManifest
                 configfile.SetValue("RealismMode", RealismMode);
                 configfile.SetValue("LockRealismMode", LockRealismMode);
                 configfile.SetValue("VerboseLogging", VerboseLogging);
-                configfile.SetValue("AutoSave", VerboseLogging);
-                configfile.SetValue("SaveInterval", VerboseLogging);
+                configfile.SetValue("AutoSave", AutoSave);
+                configfile.SetValue("SaveIntervalSec", (double)SaveIntervalSec);
                 configfile.SetValue("FlowRate", (double)FlowRate);
                 configfile.SetValue("MinFlowRate", (double)MinFlowRate);
                 configfile.SetValue("MaxFlowRate", (double)MaxFlowRate);
                 configfile.SetValue("PumpSoundStart", PumpSoundStart);
                 configfile.SetValue("PumpSoundRun", PumpSoundRun);
                 configfile.SetValue("PumpSoundStop", PumpSoundStop);
+                configfile.SetValue("CrewSoundStart", CrewSoundStart);
+                configfile.SetValue("CrewSoundRun", CrewSoundRun);
+                configfile.SetValue("CrewSoundStop", CrewSoundStop);
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
 
-                configfile.GetValue("EnableScience", EnableScience);
-                configfile.GetValue("EnableCrew", EnableCrew);
-                configfile.GetValue("EnablePFResources", EnablePFResources);
+                configfile.SetValue("EnableScience", EnableScience);
+                configfile.SetValue("EnableCrew", EnableCrew);
+                configfile.SetValue("EnablePFResources", EnablePFResources);
 
-                configfile.GetValue("DebugLogPath", DebugLogPath);
+                configfile.SetValue("DebugLogPath", DebugLogPath);
+
+                configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
+                configfile.SetValue("ShowIVAUpdate", ShowIVAUpdate);                
 
                 configfile.save();
 
-                if (VerboseLogging)
-                {
-                    ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info");
-                    ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("LockRealismMode Saved: {0}", LockRealismMode.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SaveInterval Saved: {0}", SaveInterval.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info");
-                    ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info");
-                    ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info");
-                    ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info");
-                    ManifestUtilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info");
-                    ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info");
-                }
+                ManifestUtilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("LockRealismMode Saved: {0}", LockRealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SaveIntervalSec Saved: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundStart Saved: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundRun Saved: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundStop Saved: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Saved: {0}", ShowIVAUpdate.ToString()), "Info", VerboseLogging);
             }
             catch (Exception e)
             {
-                ManifestUtilities.LogMessage(string.Format("Failed to Save Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception");
+                ManifestUtilities.LogMessage(string.Format("Failed to Save Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception", VerboseLogging);
             }
         }
 
@@ -430,7 +501,7 @@ namespace ShipManifest
             Colors.Add("red", Color.red);
             Colors.Add("white", Color.white);
             Colors.Add("yellow", Color.yellow);
-       }
+        }
 
         #endregion
 
