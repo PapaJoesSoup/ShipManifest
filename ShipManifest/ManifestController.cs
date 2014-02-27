@@ -483,7 +483,7 @@ namespace ShipManifest
             return new KerbalModel(kerbal, true);
         }
 
-        private void RespawnCrew()
+        public void RespawnCrew()
         {
             this.Vessel.SpawnCrew();
         }
@@ -530,7 +530,7 @@ namespace ShipManifest
         {
             List<string> resources = PartsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
-            {                
+            {
                 if (resourceName != "Crew" && resourceName != "Science")
                 {
                     foreach (Part part in PartsByResource[resourceName])
