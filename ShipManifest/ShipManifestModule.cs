@@ -8,7 +8,7 @@ using Toolbar;
 
 namespace ShipManifest
 {
-    
+
     public class ShipManifestModule : PartModule
     {
         [KSPEvent(guiActive = true, guiName = "Destroy Part", active = true)]
@@ -22,14 +22,14 @@ namespace ShipManifest
         {
             base.OnUpdate();
 
-            if(this.part != null && part.name == "resourceManifest")
+            if (this.part != null && part.name == "ShipManifest")
                 Events["DestoryPart"].active = true;
             else
                 Events["DestoryPart"].active = false;
         }
     }
-    
-      
+
+
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class ShipManifestBehaviour : MonoBehaviour
     {
@@ -59,8 +59,15 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         public static double flow_rate = (double)ShipManifestSettings.FlowRate;
 
+        // Resource xfer vars
         public static bool sXferOn = false;
         public static bool tXferOn = false;
+
+        // crew xfer vars
+        public static bool crewXfer = false;
+        public static double crewXferDelaySec = SettingsManager.IVATimeDelaySec;
+        public static bool isSeat2Seat = false;
+        public static double Seat2SeatXferDelaySec = 2;
 
         private IButton button;
 
@@ -69,7 +76,7 @@ namespace ShipManifest
             DontDestroyOnLoad(this);
             ShipManifestSettings.Load();
             if (ShipManifestSettings.AutoSave)
-                InvokeRepeating("RunSave", ShipManifestSettings.SaveInterval, ShipManifestSettings.SaveInterval);
+                InvokeRepeating("RunSave", ShipManifestSettings.SaveIntervalSec, ShipManifestSettings.SaveIntervalSec);
 
             button = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
             button.TexturePath = "ShipManifest/Plugins/IconOff_24";
@@ -77,7 +84,7 @@ namespace ShipManifest
             button.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
             button.OnClick += (e) =>
             {
-                if (!MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying  &&
+                if (!MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying &&
                     FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null &&
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).CanDrawButton
                     )
@@ -101,7 +108,7 @@ namespace ShipManifest
             if (ShipManifestSettings.ShowDebugger)
                 ShipManifestSettings.DebuggerPosition = GUILayout.Window(398648, ShipManifestSettings.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + ShipManifestSettings.CurVersion, GUILayout.MinHeight(20));
         }
-        
+
         public void Update()
         {
             if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
@@ -114,7 +121,14 @@ namespace ShipManifest
                     // Realism Mode Resource transfer operation (real time)
                     // XferOn is flagged in the Resource Controller
                     if (tXferOn || sXferOn)
+                    {
                         RealModeXfer();
+                    }
+
+                    if (crewXfer)
+                    {
+                        RealModeCrewXfer();
+                    }
                 }
             }
         }
@@ -140,8 +154,7 @@ namespace ShipManifest
             if (GUILayout.Button("Save Log", GUILayout.Height(20)))
             {
                 // Create log file and save.
-                if (ManifestUtilities.Errors.Count > 0);
-                    Savelog();
+                Savelog();
             }
             GUILayout.EndHorizontal();
 
@@ -156,65 +169,25 @@ namespace ShipManifest
             bool XferOn = true;
             if (ShipManifestBehaviour.timestamp == 0)
             {
-                elapsed = 0;
-                ManifestUtilities.LogMessage("1. loading Pump sounds...", "Info");
-
                 // Default sound license: CC-By-SA
                 // http://www.freesound.org/people/vibe_crc/sounds/59328/
                 string path1 = ShipManifestSettings.PumpSoundStart; // "ShipManifest/Sounds/59328-1";
                 string path2 = ShipManifestSettings.PumpSoundRun;   // "ShipManifest/Sounds/59328-2";
                 string path3 = ShipManifestSettings.PumpSoundStop;  // "ShipManifest/Sounds/59328-3";
 
-                GameObject go = new GameObject("Audio");
-
-                source1 = go.AddComponent<AudioSource>();
-                source2 = go.AddComponent<AudioSource>();
-                source3 = go.AddComponent<AudioSource>();
-
-                if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) && GameDatabase.Instance.ExistsAudioClip(path3))
-                {
-                    sound1 = GameDatabase.Instance.GetAudioClip(path1);
-                    sound2 = GameDatabase.Instance.GetAudioClip(path2);
-                    sound3 = GameDatabase.Instance.GetAudioClip(path3);
-                    ManifestUtilities.LogMessage("2. Pump sounds loaded...", "Info");
-
-                    // configure sources
-                    source1.clip = sound1; // Start sound
-                    source1.volume = 1f;
-                    source1.pitch = 1f;
-
-                    source2.clip = sound2; // Run sound
-                    source2.loop = true;
-                    source2.volume = 1f;
-                    source2.pitch = 1f;
-
-                    source3.clip = sound3; // Stop Sound
-                    source3.volume = 1f;
-                    source3.pitch = 1f;
-
-                    // now let's play the Pump start sound.
-                    source1.Play();
-                    ManifestUtilities.LogMessage("2a. Play pump sound (start)...", "Info");
-                }
-                else
-                {
-                    ManifestUtilities.LogMessage("3. Pump sound failed to load...", "Info");
-                }
+                LoadSounds("Pump", path1, path2, path3);
             }
 
-            if (SettingsManager.VerboseLogging)
-                ManifestUtilities.LogMessage("4. XferOn = " + XferOn.ToString() + "...", "Info");
+            ManifestUtilities.LogMessage("4. XferOn = " + XferOn.ToString() + "...", "Info", SettingsManager.VerboseLogging);
 
             flow_rate = ShipManifestSettings.FlowRate;
 
-            if (SettingsManager.VerboseLogging)
-                ManifestUtilities.LogMessage("5. FlowRate = " + flow_rate.ToString(), "Info");
+            ManifestUtilities.LogMessage("5. FlowRate = " + flow_rate.ToString(), "Info", SettingsManager.VerboseLogging);
 
             if (flow_rate == 0)
             {
                 XferOn = false;
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("6. XferOn set to False because FlowRate = 0...", "Info");
+                ManifestUtilities.LogMessage("6. XferOn set to False because FlowRate = 0...", "Info", SettingsManager.VerboseLogging);
 
                 // play pump shutdown.
                 source1.Stop();
@@ -227,16 +200,14 @@ namespace ShipManifest
             if (ShipManifestBehaviour.timestamp > 0)
             {
                 deltaT = Planetarium.GetUniversalTime() - ShipManifestBehaviour.timestamp;
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("7. deltaT = " + deltaT.ToString() + " timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info");
+                ManifestUtilities.LogMessage("7. deltaT = " + deltaT.ToString() + " timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info", SettingsManager.VerboseLogging);
             }
 
             if (deltaT > 0)
             {
                 ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("8. New timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info");
-                
+                ManifestUtilities.LogMessage("8. New timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info", SettingsManager.VerboseLogging);
+
                 elapsed += deltaT;
 
                 // Play run sound when start sound is nearly done. (repeats)
@@ -244,13 +215,11 @@ namespace ShipManifest
                 {
                     source2.Play();
                     IsStarted = true;
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("8a. Play pump sound (run)...", "Info");
+                    ManifestUtilities.LogMessage("8a. Play pump sound (run)...", "Info", SettingsManager.VerboseLogging);
                 }
 
                 double deltaAmt = deltaT * flow_rate;
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("9. DeltaAmt = " + deltaAmt.ToString(), "Info");
+                ManifestUtilities.LogMessage("9. DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
 
                 // This adjusts the delta when we get to the end of the xfer.
                 // Also sets IsStarted = false;
@@ -261,16 +230,14 @@ namespace ShipManifest
                     XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount;
 
                 if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred + (float)deltaAmt >= XferAmount)
-                    {
-                        deltaAmt = XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
-                        XferOn = false;
-                        if (SettingsManager.VerboseLogging)
-                            ManifestUtilities.LogMessage("10. DeltaAmt = " + deltaAmt.ToString(), "Info");
-                    }
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("11. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info");
+                {
+                    deltaAmt = XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
+                    XferOn = false;
+                    ManifestUtilities.LogMessage("10. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
+                }
+                ManifestUtilities.LogMessage("11. DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
 
- 
+
                 string SelectedResource = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource;
 
                 double maxAmount = 0;
@@ -283,8 +250,7 @@ namespace ShipManifest
                 {
                     // Lets increment the AmtXferred....
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred += (float)deltaAmt;
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info");
+                    ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info", SettingsManager.VerboseLogging);
 
                     // Drain source...
                     if (tXferOn)
@@ -292,8 +258,7 @@ namespace ShipManifest
                     else
                         ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
 
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info");
+                    ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
 
                     // Fill target
                     if (tXferOn)
@@ -301,8 +266,7 @@ namespace ShipManifest
                     else
                         ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
 
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info");
+                    ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
                 }
                 if (!XferOn)
                 {
@@ -312,8 +276,7 @@ namespace ShipManifest
                     ShipManifestBehaviour.timestamp = elapsed = 0;
                     IsStarted = false;
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred = 0f;
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("14. End Loop. XferOn = " + XferOn.ToString(), "Info");
+                    ManifestUtilities.LogMessage("14. End Loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
                     if (tXferOn)
                         tXferOn = false;
                     else
@@ -322,35 +285,147 @@ namespace ShipManifest
                 else
                 {
                     ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                    if (SettingsManager.VerboseLogging)
-                        ManifestUtilities.LogMessage("15. Continue loop. XferOn = " + XferOn.ToString(), "Info");
+                    ManifestUtilities.LogMessage("15. Continue loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
                 }
             }
             else
             {
                 ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("16. Continue loop. XferOn = " + XferOn.ToString(), "Info");
+                ManifestUtilities.LogMessage("16. Continue loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
+            }
+        }
+
+        private void RealModeCrewXfer()
+        {
+            if (ShipManifestBehaviour.timestamp == 0)
+            {
+                // Default sound license: CC-By-SA
+                // http://www.freesound.org/people/adcbicycle/sounds/14214/
+                string path1 = ShipManifestSettings.CrewSoundStart; // "ShipManifest/Sounds/14214-1";
+                string path2 = ShipManifestSettings.CrewSoundRun;   // "ShipManifest/Sounds/14214-2";
+                string path3 = ShipManifestSettings.CrewSoundStop;  // "ShipManifest/Sounds/14214-3";
+
+                LoadSounds("Crew", path1, path2, path3);
+            }
+
+            // have we waited long enough?
+            if (elapsed >= crewXferDelaySec || (isSeat2Seat && elapsed > Seat2SeatXferDelaySec))
+            {
+                ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
+
+                // Spawn crew in parts and in vessel.
+                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.vessel.SpawnCrew();
+                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.vessel.SpawnCrew();
+                ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
+
+                // Reset State vars
+                crewXfer = false;
+                isSeat2Seat = false;
+            }
+            else
+            {
+                double deltaT = 0;
+
+                // Has timestamp been initiated?
+                if (ShipManifestBehaviour.timestamp > 0)
+                {
+                    deltaT = Planetarium.GetUniversalTime() - ShipManifestBehaviour.timestamp;
+                    ManifestUtilities.LogMessage("7. deltaT = " + deltaT.ToString() + " timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info", SettingsManager.VerboseLogging);
+                }
+                ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
+                if (deltaT > 0)
+                {
+                    elapsed += deltaT;
+
+                    // Play run sound when start sound is nearly done. (repeats)
+                    if (elapsed >= source1.clip.length - 0.25 && !IsStarted)
+                    {
+                        source2.Play();
+                        IsStarted = true;
+                        ManifestUtilities.LogMessage("8a. Play crew sound (run)...", "Info", SettingsManager.VerboseLogging);
+                        ManifestUtilities.LogMessage("Update:  Crew Transfer in progress. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
+                    }
+                }
+             }
+            if (crewXfer)
+            {
+                ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
+            }
+            else
+            {
+                // play crew sit.
+                IsStarted = false;
+                source2.Stop();
+                source3.Play();
+                ShipManifestBehaviour.timestamp = elapsed = 0;
+                ManifestUtilities.LogMessage("14. End Loop. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
+                ManifestUtilities.LogMessage("Update:  Updating Portraits complete. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
+            }
+        }
+
+        private void LoadSounds(string SoundType, string path1, string path2, string path3)
+        {
+            elapsed = 0;
+            ManifestUtilities.LogMessage("1. loading "+ SoundType + " sounds...", "Info", true);
+
+            GameObject go = new GameObject("Audio");
+
+            source1 = go.AddComponent<AudioSource>();
+            source2 = go.AddComponent<AudioSource>();
+            source3 = go.AddComponent<AudioSource>();
+
+            if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) && GameDatabase.Instance.ExistsAudioClip(path3))
+            {
+                sound1 = GameDatabase.Instance.GetAudioClip(path1);
+                sound2 = GameDatabase.Instance.GetAudioClip(path2);
+                sound3 = GameDatabase.Instance.GetAudioClip(path3);
+                ManifestUtilities.LogMessage("2. " + SoundType + " sounds loaded...", "Info", true);
+
+                // configure sources
+                source1.clip = sound1; // Start sound
+                source1.volume = 1f;
+                source1.pitch = 1f;
+
+                source2.clip = sound2; // Run sound
+                source2.loop = true;
+                source2.volume = 1f;
+                source2.pitch = 1f;
+
+                source3.clip = sound3; // Stop Sound
+                source3.volume = 1f;
+                source3.pitch = 1f;
+
+                // now let's play the Pump start sound.
+                source1.Play();
+                ManifestUtilities.LogMessage("2a. Play " + SoundType + " sound (start)...", "Info", true);
+            }
+            else
+            {
+                ManifestUtilities.LogMessage("3. " + SoundType + " sound failed to load...", "Info", true);
             }
         }
 
         public void RunSave()
         {
+            ManifestUtilities.LogMessage("RunSave in progress...", "info", SettingsManager.VerboseLogging);
             Save();
+            ManifestUtilities.LogMessage("RunSave complete.", "info", SettingsManager.VerboseLogging);
         }
 
         private void Save()
         {
             if (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
             {
+                ManifestUtilities.LogMessage("Save in progress...", "info", SettingsManager.VerboseLogging); 
                 ShipManifestSettings.Save();
+                ManifestUtilities.LogMessage("Save comlete.", "info", SettingsManager.VerboseLogging);
             }
         }
 
         private void Savelog()
         {
             // time to create a file...
-            string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/" , "").Replace(":", "") + ".txt";
+            string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
 
             string path = Directory.GetCurrentDirectory() + "\\GameData\\ShipManifest\\";
             if (ShipManifestSettings.DebugLogPath.StartsWith("\\"))
@@ -360,8 +435,8 @@ namespace ShipManifest
                 ShipManifestSettings.DebugLogPath += "\\";
 
             filename = path + ShipManifestSettings.DebugLogPath + filename;
-            if (SettingsManager.VerboseLogging)
-                ManifestUtilities.LogMessage("File Name = " + filename, "Info");
+            ManifestUtilities.LogMessage("File Name = " + filename, "Info", SettingsManager.VerboseLogging);
+
             try
             {
                 StringBuilder sb = new StringBuilder();
@@ -372,13 +447,11 @@ namespace ShipManifest
 
                 File.WriteAllText(filename, sb.ToString());
 
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("File written", "Info");
+                ManifestUtilities.LogMessage("File written", "Info", SettingsManager.VerboseLogging);
             }
             catch (Exception ex)
             {
-                if (SettingsManager.VerboseLogging)
-                    ManifestUtilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info");
+                ManifestUtilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info", true);
             }
         }
     }
