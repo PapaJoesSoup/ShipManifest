@@ -45,7 +45,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChecklistController.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="ShipManifestModule.cs" />
     <Compile Include="TransferController.cs" />
