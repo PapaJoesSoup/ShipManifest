@@ -1,5 +1,14 @@
 ShipManifest
 ============
+Version 0.23.3.1.5 - 26 Feb, 2014 - Add Realism to Crew Transfer.
+ - Realism Mode:  Crew Xfers & Moves now occur in "real" time.  We now have Sounds of crewman moving.  Portrait updates now occur when Kerbals get in thier new seat.
+	- Added Crew sound locations to settings Window.
+	- Added Config for Crew Transfer Duration from part to part.  This is a placeholder for later development.
+	- Added default xfer duration of 2 sec for Seat to Seat Xfers within the same Part.
+ - Resource Xfers enhancements.  Added textbox for entering Exact Xfer Amounts.  Integers can be entered, and fractions can be pasted into box for now...
+ - Rearranged resource xfer details to make it more intuitive after adding text box.
+ - Include Toolbar 1.6.0 redistribution 
+
 Version 0.23.3.1.4 - 15 Feb, 2014 - General cleanup, configuration & UI enhancements.
  - Realism Mode:  Science Xfers now render experiments inoperable after xfer.
  - Changed Science Xfers Target Module selection to Auto select, If the target Part has only 1 target module. Saves a click the majority of the time. 
