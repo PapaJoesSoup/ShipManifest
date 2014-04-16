@@ -1,48 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <config>
-  <bool name="EnablePermaDeath">0</bool>
-  <bool name="ShowDebugger">0</bool>
-  <bool name="AllowRespawn">0</bool>
   <rect name="ManifestPosition">
-    <xmin>4</xmin>
-    <xmax>323</xmax>
-    <ymin>39</ymin>
-    <ymax>541</ymax>
+    <xmin>0</xmin>
+    <xmax>0</xmax>
+    <ymin>0</ymin>
+    <ymax>0</ymax>
   </rect>
   <rect name="TransferPosition">
-    <xmin>331</xmin>
-    <xmax>953</xmax>
-    <ymin>39</ymin>
-    <ymax>541</ymax>
+    <xmin>0</xmin>
+    <xmax>0</xmax>
+    <ymin>0</ymin>
+    <ymax>0</ymax>
   </rect>
   <rect name="RosterPosition">
-    <xmin>329</xmin>
-    <xmax>645</xmax>
-    <ymin>39</ymin>
-    <ymax>309</ymax>
-  </rect>
-  <rect name="ButtonPosition">
-    <xmin>189</xmin>
-    <xmax>221</xmax>
+    <xmin>0</xmin>
+    <xmax>0</xmax>
     <ymin>0</ymin>
-    <ymax>32</ymax>
+    <ymax>0</ymax>
   </rect>
-  <rect name="ResourceManifestPosition">
-    <xmin>4</xmin>
-    <xmax>323</xmax>
-    <ymin>39</ymin>
-    <ymax>341</ymax>
+  <rect name="SettingsPosition">
+    <xmin>0</xmin>
+    <xmax>0</xmax>
+    <ymin>0</ymin>
+    <ymax>0</ymax>
   </rect>
-  <rect name="ResourceTransferPosition">
-    <xmin>331</xmin>
-    <xmax>953</xmax>
-    <ymin>39</ymin>
-    <ymax>341</ymax>
+  <rect name="DebuggerPosition">
+    <xmin>0</xmin>
+    <xmax>0</xmax>
+    <ymin>0</ymin>
+    <ymax>0</ymax>
   </rect>
-  <rect name="ResourceDebuggerPosition">
-    <xmin>4</xmin>
-    <xmax>323</xmax>
-    <ymin>39</ymin>
-    <ymax>239</ymax>
-  </rect>
+  <bool name="ShowDebugger">0</bool>
+  <bool name="RealismMode">1</bool>
+  <bool name="LockRealismMode">0</bool>
+  <bool name="VerboseLogging">0</bool>
+  <bool name="AutoSave">0</bool>
+  <double name="SaveIntervalSec">180</double>
+  <double name="FlowRate">100</double>
+  <double name="MinFlowRate">0</double>
+  <double name="MaxFlowRate">100</double>
+  <string name="PumpSoundStart">ShipManifest/Sounds/59328-1</string>
+  <string name="PumpSoundRun">ShipManifest/Sounds/59328-2</string>
+  <string name="PumpSoundStop">ShipManifest/Sounds/59328-3</string>
+  <string name="CrewSoundStart">ShipManifest/Sounds/14214-1</string>
+  <string name="CrewSoundRun">ShipManifest/Sounds/14214-2</string>
+  <string name="CrewSoundStop">ShipManifest/Sounds/14214-3</string>
+  <string name="SourcePartColor">red</string>
+  <string name="TargetPartColor">green</string>
+  <string name="TargetPartCrewColor">blue</string>
+  <bool name="EnableScience">1</bool>
+  <bool name="EnableCrew">1</bool>
+  <bool name="EnablePFResources">1</bool>
+  <bool name="EnableCLS">1</bool>
+  <string name="DebugLogPath">Plugins\PluginData\</string>
+  <double name="IVATimeDelaySec">5</double>
+  <bool name="ShowIVAUpdate">0</bool>
 </config>
