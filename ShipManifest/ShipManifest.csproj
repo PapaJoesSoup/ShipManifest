@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -11,7 +31,8 @@
     <AssemblyName>ShipManifest</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,7 +55,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\ksp-win-0-23-0\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="ConnectedLivingSpace">
+      <HintPath>..\..\..\..\..\ksp-win-0-23-0\KSP_win\GameData\ConnectedLivingSpace\Plugins\ConnectedLivingSpace.dll</HintPath>
+    </Reference>
     <Reference Include="Toolbar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>E:\KSP\ksp-win-0-23-0\KSP_win\GameData\000_Toolbar\Toolbar.dll</HintPath>
@@ -60,10 +83,15 @@
     </Content>
     <Content Include="PluginData\IconOff_24.png" />
     <Content Include="PluginData\IconOn_24.png" />
+    <Content Include="Sounds\59328-1.wav" />
+    <Content Include="Sounds\59328-2.wav" />
+    <Content Include="Sounds\59328-3.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-0-23-0\KSP_Win\GameData\ShipManifest\Plugins"
+
+copy /Y "$(TargetPath)" "E:\KSP\ksp-win-0-23-5\KSP_Win\GameData\ShipManifest\Plugins"
 
 </PostBuildEvent>
   </PropertyGroup>
