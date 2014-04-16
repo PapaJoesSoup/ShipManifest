@@ -1,5 +1,11 @@
 ShipManifest
 ============
+Version 0.23.5.3.2 - 16 Apr, 2014 - Add ConnectedLivingSpace Integration.
+ - Realism Mode:  Crew Xfers & Moves are now "space" aware.  if the target part is not connected via an internal passageway, then the xfer or move cannot occur.
+ - CLS awareness can be turned off in the config file, for those that want to be able to xfer across living spaces.
+ - General code cleanup and significant reorganization to use fewer frame and memory resources.
+ - Include Toolbar 1.7.1 redistribution 
+
 Version 0.23.3.1.5 - 26 Feb, 2014 - Add Realism to Crew Transfer.
  - Realism Mode:  Crew Xfers & Moves now occur in "real" time.  We now have Sounds of crewman moving.  Portrait updates now occur when Kerbals get in thier new seat.
 	- Added Crew sound locations to settings Window.
