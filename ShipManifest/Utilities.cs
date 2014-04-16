@@ -105,7 +105,7 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.23.3.1.5";
+        public string CurVersion = "0.23.5.3.2";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
@@ -146,10 +146,11 @@ namespace ShipManifest
         public bool EnableScience = true;
         public bool EnableCrew = true;
         public bool EnablePFResources = true;
+        public bool EnableCLS = true;
 
         public static double IVATimeDelaySec = 5;
         public static bool ShowIVAUpdate = false;
- 
+
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
 
@@ -166,10 +167,11 @@ namespace ShipManifest
         public string PrevCrewSoundStart = "";
         public string PrevCrewSoundRun = "";
         public string PrevCrewSoundStop = "";
-        
+
         public static string SourcePartColor = "red";
         public static string TargetPartColor = "green";
-
+        public static string TargetPartCrewColor = "blue";
+        
         #endregion
 
         #region Settings Window (GUI)
@@ -340,10 +342,12 @@ namespace ShipManifest
 
                 SourcePartColor = configfile.GetValue<string>("SourcePartColor");
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
+                TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
 
                 EnableScience = configfile.GetValue<bool>("EnableScience");
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
                 EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
+                EnableCLS = configfile.GetValue<bool>("EnableCLS");
 
                 DebugLogPath = configfile.GetValue<string>("DebugLogPath");
 
@@ -401,8 +405,10 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStop Loaded: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableCLS Loaded: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Loaded: {0}", ShowIVAUpdate), "Info", VerboseLogging);
             }
@@ -441,15 +447,17 @@ namespace ShipManifest
                 configfile.SetValue("CrewSoundStop", CrewSoundStop);
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
+                configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
 
                 configfile.SetValue("EnableScience", EnableScience);
                 configfile.SetValue("EnableCrew", EnableCrew);
                 configfile.SetValue("EnablePFResources", EnablePFResources);
+                configfile.SetValue("EnableCLS", EnableCLS);
 
                 configfile.SetValue("DebugLogPath", DebugLogPath);
 
                 configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
-                configfile.SetValue("ShowIVAUpdate", ShowIVAUpdate);                
+                configfile.SetValue("ShowIVAUpdate", ShowIVAUpdate);
 
                 configfile.save();
 
@@ -474,9 +482,11 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStop Saved: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableCLS Saved: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Saved: {0}", ShowIVAUpdate.ToString()), "Info", VerboseLogging);
