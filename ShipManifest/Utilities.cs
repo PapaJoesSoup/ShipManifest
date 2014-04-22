@@ -30,6 +30,8 @@ namespace ShipManifest
         {
             if (verbose)
                 _errors.Add(type + ": " + error);
+            if (type == "Error" && SettingsManager.AutoDebug)
+                SettingsManager.ShowDebugger = true;
         }
     }
 
@@ -37,6 +39,8 @@ namespace ShipManifest
     {
         public static GUIStyle WindowStyle;
         public static GUIStyle IconStyle;
+        public static GUIStyle ButtonSourceStyle;
+        public static GUIStyle ButtonTargetStyle;
         public static GUIStyle ButtonToggledSourceStyle;
         public static GUIStyle ButtonToggledTargetStyle;
         public static GUIStyle ButtonStyle;
@@ -62,26 +66,48 @@ namespace ShipManifest
             WindowStyle = new GUIStyle(GUI.skin.window);
             IconStyle = new GUIStyle();
 
-            ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledSourceStyle.normal.textColor = SettingsManager.Colors[SettingsManager.SourcePartColor];
-            ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
-            ButtonToggledSourceStyle.fontSize = 14;
-            ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
-
-            ButtonToggledTargetStyle = new GUIStyle(ButtonToggledSourceStyle);
-            ButtonToggledTargetStyle.normal.textColor = SettingsManager.Colors[SettingsManager.TargetPartColor];
-            ButtonToggledTargetStyle.fontSize = 14;
-            ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
-
             ButtonStyle = new GUIStyle(GUI.skin.button);
             ButtonStyle.normal.textColor = Color.white;
+            ButtonStyle.hover.textColor = Color.blue;
             ButtonStyle.fontSize = 14;
             ButtonStyle.fontStyle = FontStyle.Normal;
 
             ButtonToggledStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledStyle.normal.textColor = Color.green;
             ButtonToggledStyle.fontSize = 14;
+            ButtonToggledStyle.hover.textColor = Color.blue;
+            ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
             ButtonToggledStyle.fontStyle = FontStyle.Normal;
+
+            ButtonSourceStyle = new GUIStyle(GUI.skin.button);
+            ButtonSourceStyle.normal.textColor = Color.white;
+            ButtonSourceStyle.fontSize = 14;
+            ButtonSourceStyle.hover.textColor = Color.blue;
+            ButtonSourceStyle.fontStyle = FontStyle.Normal;
+            ButtonSourceStyle.alignment = TextAnchor.UpperLeft;
+
+            ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
+            ButtonToggledSourceStyle.normal.textColor = SettingsManager.Colors[SettingsManager.SourcePartColor];
+            ButtonToggledSourceStyle.fontSize = 14;
+            ButtonToggledSourceStyle.hover.textColor = Color.blue;
+            ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
+            ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
+            ButtonToggledSourceStyle.alignment = TextAnchor.UpperLeft;
+
+            ButtonTargetStyle = new GUIStyle(GUI.skin.button);
+            ButtonTargetStyle.normal.textColor = Color.white;
+            ButtonTargetStyle.fontSize = 14;
+            ButtonTargetStyle.hover.textColor = Color.blue;
+            ButtonTargetStyle.fontStyle = FontStyle.Normal;
+            ButtonTargetStyle.alignment = TextAnchor.UpperLeft;
+
+            ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button);
+            ButtonToggledTargetStyle.normal.textColor = SettingsManager.Colors[SettingsManager.TargetPartColor];
+            ButtonToggledTargetStyle.fontSize = 14;
+            ButtonToggledTargetStyle.hover.textColor = Color.blue;
+            ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
+            ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
+            ButtonToggledTargetStyle.alignment = TextAnchor.UpperLeft;
 
             ErrorLabelRedStyle = new GUIStyle(GUI.skin.label);
             ErrorLabelRedStyle.normal.textColor = Color.red;
@@ -105,7 +131,7 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.23.5.3.2";
+        public string CurVersion = "0.23.5.3.2.1";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
@@ -134,8 +160,9 @@ namespace ShipManifest
         public static bool PrevVerboseLogging = false;
 
         public Rect DebuggerPosition;
-        public bool ShowDebugger = false;
-        public bool PrevShowDebugger = false;
+        public static bool ShowDebugger = false;
+        public static bool PrevShowDebugger = false;
+        public static bool AutoDebug = false;
 
         public float FlowRate = 100;
         public float PrevFlowRate = 100;
@@ -149,7 +176,7 @@ namespace ShipManifest
         public bool EnableCLS = true;
 
         public static double IVATimeDelaySec = 5;
-        public static bool ShowIVAUpdate = false;
+        public static bool ShowIVAUpdateBtn = false;
 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
@@ -160,6 +187,9 @@ namespace ShipManifest
         public string PrevPumpSoundStart = "";
         public string PrevPumpSoundRun = "";
         public string PrevPumpSoundStop = "";
+
+        public double PumpSoundVol = 3;
+        public double CrewSoundVol = 3;
 
         public string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
         public string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
@@ -340,6 +370,9 @@ namespace ShipManifest
                 CrewSoundRun = configfile.GetValue<string>("CrewSoundRun");
                 CrewSoundStop = configfile.GetValue<string>("CrewSoundStop");
 
+                PumpSoundVol = configfile.GetValue<double>("PumpSoundVol");
+                CrewSoundVol = configfile.GetValue<double>("CrewSoundVol");
+
                 SourcePartColor = configfile.GetValue<string>("SourcePartColor");
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
                 TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
@@ -352,7 +385,8 @@ namespace ShipManifest
                 DebugLogPath = configfile.GetValue<string>("DebugLogPath");
 
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
-                ShowIVAUpdate = configfile.GetValue<bool>("ShowIVAUpdate");
+                ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
+                AutoDebug = configfile.GetValue<bool>("AutoDebug");
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -400,9 +434,11 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundVol Loaded: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStart Loaded: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundRun Loaded: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStop Loaded: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundVol Loaded: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
@@ -410,12 +446,51 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCLS Loaded: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Loaded: {0}", ShowIVAUpdate), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
+
+                ValidateLoad();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
+        }
+
+        private void ValidateLoad()
+        {
+
+            //ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
+            //RealismMode = configfile.GetValue<bool>("RealismMode");
+            //LockRealismMode = configfile.GetValue<bool>("LockRealismMode");
+            //VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
+            //AutoSave = configfile.GetValue<bool>("AutoSave");
+            //SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
+            //FlowRate = (float)configfile.GetValue<double>("FlowRate");
+            //MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
+            //MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
+            //PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
+            //PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
+            //PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
+            //CrewSoundStart = configfile.GetValue<string>("CrewSoundStart");
+            //CrewSoundRun = configfile.GetValue<string>("CrewSoundRun");
+            //CrewSoundStop = configfile.GetValue<string>("CrewSoundStop");
+
+            //SourcePartColor = configfile.GetValue<string>("SourcePartColor");
+            //TargetPartColor = configfile.GetValue<string>("TargetPartColor");
+            //TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
+
+            //EnableScience = configfile.GetValue<bool>("EnableScience");
+            //EnableCrew = configfile.GetValue<bool>("EnableCrew");
+            //EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
+            //EnableCLS = configfile.GetValue<bool>("EnableCLS");
+
+            //DebugLogPath = configfile.GetValue<string>("DebugLogPath");
+
+            //IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
+            //ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
+            //AutoDebug = configfile.GetValue<bool>("AutoDebug");
+
         }
 
         public void Save()
@@ -442,9 +517,11 @@ namespace ShipManifest
                 configfile.SetValue("PumpSoundStart", PumpSoundStart);
                 configfile.SetValue("PumpSoundRun", PumpSoundRun);
                 configfile.SetValue("PumpSoundStop", PumpSoundStop);
+                configfile.SetValue("PumpSoundVol", PumpSoundVol);
                 configfile.SetValue("CrewSoundStart", CrewSoundStart);
                 configfile.SetValue("CrewSoundRun", CrewSoundRun);
                 configfile.SetValue("CrewSoundStop", CrewSoundStop);
+                configfile.SetValue("CrewSoundVol", CrewSoundVol);
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
@@ -457,7 +534,8 @@ namespace ShipManifest
                 configfile.SetValue("DebugLogPath", DebugLogPath);
 
                 configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
-                configfile.SetValue("ShowIVAUpdate", ShowIVAUpdate);
+                configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
+                configfile.SetValue("AutoDebug", AutoDebug);
 
                 configfile.save();
 
@@ -477,9 +555,11 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("PumpSoundVol Saved: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStart Saved: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundRun Saved: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("CrewSoundStop Saved: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("CrewSoundVol Saved: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
@@ -489,11 +569,12 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("EnableCLS Saved: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdate Saved: {0}", ShowIVAUpdate.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format("Failed to Save Settings: {0} \r\n\r\n{1}", e.Message, e.StackTrace), "Exception", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("Failed to Save Settings: {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
