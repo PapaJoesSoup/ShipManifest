@@ -117,11 +117,11 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in drawGui.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in drawGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
-        #region Ship Manifest Window Code
+        #region Ship Manifest Window Gui Layout Code
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -165,7 +165,7 @@ namespace ShipManifest
                     }
                     catch (Exception ex)
                     {
-                        ManifestUtilities.LogMessage(" opening Transfer Window.  Error:  " + ex.ToString(), "Error", true);
+                        ManifestUtilities.LogMessage(string.Format(" opening Transfer Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
 
@@ -178,7 +178,7 @@ namespace ShipManifest
                     }
                     catch (Exception ex)
                     {
-                        ManifestUtilities.LogMessage(" opening Settings Window.  Error:  " + ex.ToString(), "Error", true);
+                        ManifestUtilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
 
@@ -191,7 +191,7 @@ namespace ShipManifest
                     }
                     catch (Exception ex)
                     {
-                        ManifestUtilities.LogMessage(" opening Roster Window.  Error:  " + ex.ToString(), "Error", true);
+                        ManifestUtilities.LogMessage(string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
 
@@ -201,7 +201,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -336,7 +336,7 @@ namespace ShipManifest
 
 #endregion
 
-        #region Window components
+        #region Manifest Window Gui components
 
         private void PreLaunchGUI()
         {
@@ -369,7 +369,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in PreLaunchGUI.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in PreLaunchGUI.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -390,12 +390,12 @@ namespace ShipManifest
                         try
                         {
                             // Now let's update our lists...
-                            ShipManifestBehaviour.SelectedPartSource = ShipManifestBehaviour.SelectedPartTarget = null;
                             ShipManifestBehaviour.SelectedResource = resourceName;
+                            ShipManifestBehaviour.SelectedPartSource = ShipManifestBehaviour.SelectedPartTarget = null;
                          }
                         catch (Exception ex)
                         {
-                            ManifestUtilities.LogMessage("Error selecting Resource.  Error:  " + ex.ToString(), "Error", true);
+                            ManifestUtilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
                     if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
@@ -410,7 +410,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in ResourceButtonList.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -463,7 +463,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in ResourceDetailsViewer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
         #endregion
@@ -491,6 +491,7 @@ namespace ShipManifest
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.ASSIGNED;
             if (kerbal.seat != null)
                 kerbal.seat.SpawnCrew();
+            ShipManifestBehaviour.FireEventTriggers();
         }
 
         private bool PartCrewIsFull(Part part)
@@ -521,6 +522,8 @@ namespace ShipManifest
         public void RespawnCrew()
         {
             this.Vessel.SpawnCrew();
+            // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
+            ShipManifestBehaviour.FireEventTriggers();
         }
 
         private void FillVesselCrew()
@@ -529,6 +532,7 @@ namespace ShipManifest
             {
                 AddCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
             }
+            ShipManifestBehaviour.FireEventTriggers();
         }
 
         private void EmptyVesselCrew()
@@ -539,6 +543,7 @@ namespace ShipManifest
                 {
                     RemoveCrew(part.protoModuleCrew[i], part);
                 }
+                ShipManifestBehaviour.FireEventTriggers();
             }
         }
 
