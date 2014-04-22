@@ -1,5 +1,23 @@
 ShipManifest
 ============
+Version 0.23.5.3.2.1 - 22 Apr, 2014 - Bug fixes Edition.
+ - New:  Resource/Part Button Improvements:
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1058979&viewfull=1#post1058979
+		 - General clean up of contrast / formatting for better readability in hover, unselected and selected modes.
+ - New:  Add Auto Popup of Debug console on Error.  Configurable, Off by Default.
+ - Bug:  Highlighting fails for source Part when selecting any resource other than crew.
+         - Internally found, Post relese of 0.23.5.3.2
+ - Bug:  Resource Pump transfers fail wen xferring small amounts.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=950355&viewfull=1#post950355
+ - Bug:  Tanks sometimes go negative.  
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1082740&viewfull=1#post1082740
+ - Bug:  Crew event triggers not firing in Preflight.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1100162&viewfull=1#post1100162
+ - Bug:  Resource Transfer noises too low.
+         - www.youtube.com/watch?v=I_TNxjnW234 
+ - Bug: Crew event triggers causing duplicate life support resources in TAC Life Support.
+        - http://forum.kerbalspaceprogram.com/...=1#post1108035
+
 Version 0.23.5.3.2 - 16 Apr, 2014 - Add ConnectedLivingSpace Integration.
  - Realism Mode:  Crew Xfers & Moves are now "space" aware.  if the target part is not connected via an internal passageway, then the xfer or move cannot occur.
  - CLS awareness can be turned off in the config file, for those that want to be able to xfer across living spaces.
