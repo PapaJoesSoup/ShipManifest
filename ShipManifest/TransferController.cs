@@ -45,7 +45,7 @@ namespace ShipManifest
         }
         #endregion
 
-        #region GUI Layout TransferWindow)
+        #region TransferWindow GUI Layout)
 
         // Resource Transfer Window
         // This window allows you some control over the selected resource on a selected source and target part
@@ -67,7 +67,7 @@ namespace ShipManifest
                 SourceTransferViewer();
 
                 // Text above Source Details. (Between viewers)
-                if (ShipManifestBehaviour.SelectedResource == "Crew" && SettingsManager.ShowIVAUpdate)
+                if (ShipManifestBehaviour.SelectedResource == "Crew" && SettingsManager.ShowIVAUpdateBtn)
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(ShipManifestBehaviour.SelectedPartSource != null ? string.Format("{0}", ShipManifestBehaviour.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
@@ -106,7 +106,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -121,9 +121,25 @@ namespace ShipManifest
 
                 foreach (Part part in ShipManifestBehaviour.SelectedResourceParts)
                 {
+                    // Build the part button title...
+                    string strDescription = "";
+                    switch (ShipManifestBehaviour.SelectedResource)
+                    {
+                        case "Crew":
+                            strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
+                            break;
+                        case "Science":
+                            int cntScience = GetScienceCount(part, false);
+                            strDescription = cntScience.ToString() + " - " + part.partInfo.title;
+                            break;
+                        default:
+                            strDescription = part.Resources[ShipManifestBehaviour.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            break;
+                    }
+
                     // set the conditions for a button style change.
-                    var style = ShipManifestBehaviour.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonStyle;
-                    if (GUILayout.Button(string.Format("{0}", part.partInfo.title), style, GUILayout.Width(265), GUILayout.Height(20)))
+                    var style = ShipManifestBehaviour.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
                     {
                         ShipManifestBehaviour.SelectedModuleSource = null;
                         ShipManifestBehaviour.SelectedPartSource = part;
@@ -136,7 +152,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window - SourceTransferViewer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window - SourceTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -295,7 +311,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window - SourceDetailsViewer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window - SourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -303,14 +319,31 @@ namespace ShipManifest
         {
             try
             {
-                // target part list
+                // This is a scroll panel (we are using it to make button lists...)
                 TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 foreach (Part part in ShipManifestBehaviour.SelectedResourceParts)
                 {
-                    var style = ShipManifestBehaviour.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
-                    if (GUILayout.Button(string.Format("{0}", part.partInfo.title), style, GUILayout.Width(265), GUILayout.Height(20)))
+                    // Build the part button title...
+                    string strDescription = "";
+                    switch (ShipManifestBehaviour.SelectedResource)
+                    {
+                        case "Crew":
+                            strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
+                            break;
+                        case "Science":
+                            int cntScience = GetScienceCount(part, false);
+                            strDescription = cntScience.ToString() + " - " + part.partInfo.title;
+                            break;
+                        default:
+                            strDescription = part.Resources[ShipManifestBehaviour.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            break;
+                    }
+
+                    // set the conditions for a button style change.
+                    var style = ShipManifestBehaviour.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
                     {
                         ShipManifestBehaviour.SelectedPartTarget = part;
                         ManifestUtilities.LogMessage("SelectedPartTarget...", "Info", SettingsManager.VerboseLogging);
@@ -322,7 +355,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window - TargetTransferViewer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window - TargetTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -339,8 +372,9 @@ namespace ShipManifest
                 {
                     if (ShipManifestBehaviour.SelectedResource == "Crew")
                     {
-                        foreach (ProtoCrewMember crewMember in ShipManifestBehaviour.SelectedPartTarget.protoModuleCrew)
+                        for (int x = 0; x < ShipManifestBehaviour.SelectedPartTarget.protoModuleCrew.Count(); x++)
                         {
+                            ProtoCrewMember crewMember = ShipManifestBehaviour.SelectedPartTarget.protoModuleCrew[x];
                             // This routine assumes that a resource has been selected on the Resource manifest window.
                             GUILayout.BeginHorizontal();
                             if (crewMember.seat != null)
@@ -478,7 +512,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Ship Manifest Window - TargetDetailsViewer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window - TargetDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -536,38 +570,11 @@ namespace ShipManifest
                 }
 
                 ShipManifestBehaviour.isSeat2Seat = true;
-
-                if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
-                    ShipManifestBehaviour.crewXfer = true;
-                else
-                {
-                    GameEvents.onCrewBoardVessel.Fire(ShipManifestBehaviour.evaAction);
-                    GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
-                    ShipManifestBehaviour.clsVessel = CLSAddon.Instance.Vessel;
-
-                    //if (ShipManifestBehaviour.clsVessel.Spaces != null && ShipManifestBehaviour.SelectedResource == "Crew")
-                    //{
-                    //    if (ShipManifestBehaviour.SelectedPartSource != null)
-                    //    {
-                    //        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
-                    //        ShipManifestBehaviour.SelectedPartSource.RemoveOnMouseExit(OnMouseExit);
-                    //    }
-                    //    if (ShipManifestBehaviour.SelectedPartTarget != null)
-                    //    {
-                    //        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
-                    //        ShipManifestBehaviour.SelectedPartSource.RemoveOnMouseExit(OnMouseExit);
-                    //    }
-                    //    foreach (CLSSpace space in ShipManifestBehaviour.clsVessel.Spaces)
-                    //    {
-                    //        space.Highlight(false);
-                    //    }
-                    //}
-                    //ShipManifestBehaviour.OnMouseHighlights();
-                }
+                ShipManifestBehaviour.crewXfer = true;
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage("Error moving crewmember.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format("Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -588,19 +595,12 @@ namespace ShipManifest
                 if (crewMember.seat == null)
                     ManifestUtilities.LogMessage(string.Format("Crew member seat is null."), "Info", true);
 
-                if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
-                    ShipManifestBehaviour.crewXfer = true;
-                else
-                {
-                    GameEvents.onCrewBoardVessel.Fire(ShipManifestBehaviour.evaAction);
-                    GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
-                    ShipManifestBehaviour.OnMouseHighlights();
-                }
+                ShipManifestBehaviour.crewXfer = true;
                
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage("Error TransferCrewMember.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format("Error TransferCrewMember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -734,7 +734,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  TransferResource.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  TransferResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -753,11 +753,44 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  GetFreeSeat.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  GetFreeSeat.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
             return null;
         }
 
+        private int GetScienceCount(Part part, bool IsCapacity)
+        {
+            try
+            {
+                int scienceCount = 0;
+                int capacity = 0;
+                foreach (PartModule pm in part.Modules)
+                {
+                    // Containers.
+                    if (pm is ModuleScienceContainer)
+                    {
+                        scienceCount += ((ModuleScienceContainer)pm).GetScienceCount();
+                        capacity += ((ModuleScienceContainer)pm).capacity;
+                    }
+                    else if (pm is ModuleScienceExperiment)
+                    {
+                        scienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+                        capacity += 1;
+                    }
+                }
+
+                if (IsCapacity)
+                    return capacity;
+                else
+                    return scienceCount;
+            }
+            catch (Exception ex)
+            {
+                ManifestUtilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                return 0;
+            }
+        }
+        
         private void logCrewMember(ProtoCrewMember crewMember, Part target)
         {
             try
