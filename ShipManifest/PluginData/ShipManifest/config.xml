@@ -42,9 +42,11 @@
   <string name="PumpSoundStart">ShipManifest/Sounds/59328-1</string>
   <string name="PumpSoundRun">ShipManifest/Sounds/59328-2</string>
   <string name="PumpSoundStop">ShipManifest/Sounds/59328-3</string>
+  <double name="PumpSoundVol">3</double>
   <string name="CrewSoundStart">ShipManifest/Sounds/14214-1</string>
   <string name="CrewSoundRun">ShipManifest/Sounds/14214-2</string>
   <string name="CrewSoundStop">ShipManifest/Sounds/14214-3</string>
+  <double name="CrewSound1Vol">3</double>
   <string name="SourcePartColor">red</string>
   <string name="TargetPartColor">green</string>
   <string name="TargetPartCrewColor">blue</string>
@@ -54,5 +56,6 @@
   <bool name="EnableCLS">1</bool>
   <string name="DebugLogPath">Plugins\PluginData\</string>
   <double name="IVATimeDelaySec">5</double>
-  <bool name="ShowIVAUpdate">0</bool>
+  <bool name="ShowIVAUpdateBtn">0</bool>
+  <bool name="AutoDebug">0</bool>
 </config>
