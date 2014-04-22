@@ -32,6 +32,9 @@ namespace ShipManifest
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class ShipManifestBehaviour : MonoBehaviour
     {
+
+        #region Properties
+
         //Game object that keeps us running
         public static GameObject GameObjectInstance;
         public static SettingsManager ShipManifestSettings = new SettingsManager();
@@ -53,6 +56,7 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         public static double elapsed = 0.0;
 
+        // Deprecated.  Will be replaced by enum XFERState
         [KSPField(isPersistant = true)]
         public static bool IsStarted = false;
 
@@ -62,6 +66,7 @@ namespace ShipManifest
         // Resource xfer vars
         public static bool sXferOn = false;
         public static bool tXferOn = false;
+        public static XFERState XferState = XFERState.Off;
 
         // crew xfer vars
         public static bool crewXfer = false;
@@ -70,6 +75,10 @@ namespace ShipManifest
         public static double Seat2SeatXferDelaySec = 2;
         public static Vessel vessel = null;
 
+        #endregion
+
+        // Toolbar Integration.
+        // TODO:  make optional...
         private IButton button;
 
         #region Datasource properties
@@ -88,8 +97,14 @@ namespace ShipManifest
                     {
                         _partsByResource = new Dictionary<string, List<Part>>();
                     }
-                    if (FlightGlobals.ActiveVessel != vessel)
+                    if (FlightGlobals.ActiveVessel == vessel && _partsByResource != null)
                     {
+                        // Return what we already have...
+                        return _partsByResource;
+                    }
+                    else
+                    {
+                        // Let's update...
                         vessel = FlightGlobals.ActiveVessel;
                         clsVessel = CLSAddon.Instance.Vessel;
                         foreach (Part part in FlightGlobals.ActiveVessel.Parts)
@@ -101,6 +116,7 @@ namespace ShipManifest
                                 // is resource in the list yet?.
                                 if (_partsByResource.Keys.Contains("Crew"))
                                 {
+                                    // found resource.  lets add part to its list.
                                     vFound = true;
                                     List<Part> eParts = _partsByResource["Crew"];
                                     eParts.Add(part);
@@ -170,7 +186,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage("Error getting partsbyresource.  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     _partsByResource = null;
                 }
 
@@ -201,12 +217,10 @@ namespace ShipManifest
                     _selectedResource = value;
 
                     SelectedResourceParts = _partsByResource[_selectedResource];
-
-
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(" in Set SelectedResource.  Error:  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
         }
@@ -249,7 +263,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(" in Get SelectedPartSource.  Error:  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     return null;
                 }
             }
@@ -270,7 +284,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(" in Set SelectedPartSource.  Error:  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
                 ManifestUtilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
             }
@@ -290,7 +304,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(" in Get SelectedPartTarget.  Error:  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     return null;
                 }
             }
@@ -310,7 +324,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(" in Set SelectedPartTarget.  Error:  " + ex.ToString(), "Error", true);
+                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
                 ManifestUtilities.LogMessage("Set SelectedPartTarget.", "Info", SettingsManager.VerboseLogging);
             }
@@ -376,7 +390,7 @@ namespace ShipManifest
         {
             ManifestStyle.SetupGUI();
 
-            if (ShipManifestSettings.ShowDebugger)
+            if (SettingsManager.ShowDebugger)
                 ShipManifestSettings.DebuggerPosition = GUILayout.Window(398648, ShipManifestSettings.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + ShipManifestSettings.CurVersion, GUILayout.MinHeight(20));
         }
 
@@ -407,7 +421,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Update.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Update.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
         
@@ -449,7 +463,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in CanBeXferred.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
 
             return results;
@@ -502,7 +516,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in IsCLS.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in IsCLS.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
             return results;
         }
@@ -549,145 +563,123 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  OnMouseHighlights.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  OnMouseHighlights.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
+        }
+
+        public enum XFERState
+        {
+            Off,
+            Start,
+            Run,
+            Stop
         }
 
         private void RealModePumpXfer()
         {
             try
             {
-                // This method is being executed every frame (OnUpdate)
-                // if we are just starting this handler load needed config.
-                bool XferOn = true;
-                if (ShipManifestBehaviour.timestamp == 0)
+                if (tXferOn || sXferOn)
                 {
-                    // Default sound license: CC-By-SA
-                    // http://www.freesound.org/people/vibe_crc/sounds/59328/
-                    string path1 = ShipManifestSettings.PumpSoundStart; // "ShipManifest/Sounds/59328-1";
-                    string path2 = ShipManifestSettings.PumpSoundRun;   // "ShipManifest/Sounds/59328-2";
-                    string path3 = ShipManifestSettings.PumpSoundStop;  // "ShipManifest/Sounds/59328-3";
+                    double deltaT = 0;
+                    flow_rate = ShipManifestSettings.FlowRate;
 
-                    LoadSounds("Pump", path1, path2, path3);
-                }
-
-                ManifestUtilities.LogMessage("4. XferOn = " + XferOn.ToString() + "...", "Info", SettingsManager.VerboseLogging);
-
-                flow_rate = ShipManifestSettings.FlowRate;
-
-                ManifestUtilities.LogMessage("5. FlowRate = " + flow_rate.ToString(), "Info", SettingsManager.VerboseLogging);
-
-                if (flow_rate == 0)
-                {
-                    XferOn = false;
-                    ManifestUtilities.LogMessage("6. XferOn set to False because FlowRate = 0...", "Info", SettingsManager.VerboseLogging);
-
-                    // play pump shutdown.
-                    source1.Stop();
-                    //source3.Play();
-                    return;
-                }
-                double deltaT = 0;
-
-                // Has timestamp been initiated?
-                if (ShipManifestBehaviour.timestamp > 0)
-                {
-                    deltaT = Planetarium.GetUniversalTime() - ShipManifestBehaviour.timestamp;
-                    ManifestUtilities.LogMessage("7. deltaT = " + deltaT.ToString() + " timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info", SettingsManager.VerboseLogging);
-                }
-
-                if (deltaT > 0)
-                {
-                    ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                    ManifestUtilities.LogMessage("8. New timestamp: " + ShipManifestBehaviour.timestamp.ToString(), "Info", SettingsManager.VerboseLogging);
-
-                    elapsed += deltaT;
-
-                    // Play run sound when start sound is nearly done. (repeats)
-                    if (elapsed >= source1.clip.length - 0.25 && !IsStarted)
+                    switch (XferState)
                     {
-                        source2.Play();
-                        IsStarted = true;
-                        ManifestUtilities.LogMessage("8a. Play pump sound (run)...", "Info", SettingsManager.VerboseLogging);
+                        case XFERState.Off:
+                            // reset counters
+                            timestamp = 0;
+
+                            // Default sound license: CC-By-SA
+                            // http://www.freesound.org/people/vibe_crc/sounds/59328/
+                            string path1 = ShipManifestSettings.PumpSoundStart; // "ShipManifest/Sounds/59328-1";
+                            string path2 = ShipManifestSettings.PumpSoundRun;   // "ShipManifest/Sounds/59328-2";
+                            string path3 = ShipManifestSettings.PumpSoundStop;  // "ShipManifest/Sounds/59328-3";
+
+                            // Load Sounds, and Play Sound 1
+                            LoadSounds("Pump", path1, path2, path3, ShipManifestSettings.PumpSoundVol);
+                            XferState = XFERState.Start;
+                            break;
+
+                        case XFERState.Start:
+
+                            // calculate elapsed.
+                            elapsed += Planetarium.GetUniversalTime();
+
+                            // Play run sound when start sound is nearly done. (repeats)
+                            if (elapsed >= source1.clip.length - 0.25)
+                            {
+                                source2.Play();
+                                ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", SettingsManager.VerboseLogging);
+                                elapsed = 0;
+                                XferState = XFERState.Run;
+                            }
+                            break;
+
+                        case XFERState.Run:
+
+                            deltaT = Planetarium.GetUniversalTime() - timestamp;
+                            double deltaAmt = deltaT * flow_rate;
+
+                            // This adjusts the delta when we get to the end of the xfer.
+                            // Also sets IsStarted = false;
+                            float XferAmount = -1f;
+                            // which way we going?
+                            if (tXferOn)
+                                XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount;
+                            else
+                                XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount;
+
+                            if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred + (float)deltaAmt >= XferAmount)
+                            {
+                                deltaAmt = XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
+                                XferState = XFERState.Stop;
+                                ManifestUtilities.LogMessage("10. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
+                            }
+                            ManifestUtilities.LogMessage("11. DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
+
+                            // Lets increment the AmtXferred....
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred += (float)deltaAmt;
+                            ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info", SettingsManager.VerboseLogging);
+
+                            // Drain source...
+                            if (tXferOn)
+                                SelectedPartTarget.Resources[SelectedResource].amount -= deltaAmt;
+                            else
+                                SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
+
+                            ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
+
+                            // Fill target
+                            if (tXferOn)
+                                SelectedPartSource.Resources[SelectedResource].amount += deltaAmt;
+                            else
+                                SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
+
+                            ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
+
+                            ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", SettingsManager.VerboseLogging);
+                            break;
+
+                        case XFERState.Stop:
+
+                            // play pump shutdown.
+                            source2.Stop();
+                            source3.Play();
+                            timestamp = elapsed = 0;
+                            XferState = XFERState.Off;
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred = 0f;
+                            tXferOn = sXferOn = false;
+                            break;
                     }
-
-                    double deltaAmt = deltaT * flow_rate;
-                    ManifestUtilities.LogMessage("9. DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
-
-                    // This adjusts the delta when we get to the end of the xfer.
-                    // Also sets IsStarted = false;
-                    float XferAmount = -1f;
-                    if (tXferOn)
-                        XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount;
-                    else
-                        XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount;
-
-                    if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred + (float)deltaAmt >= XferAmount)
-                    {
-                        deltaAmt = XferAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred;
-                        XferOn = false;
-                        ManifestUtilities.LogMessage("10. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
-                    }
-                    ManifestUtilities.LogMessage("11. DeltaAmt = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
-
-
-                    double maxAmount = 0;
-                    if (tXferOn)
-                        maxAmount = SelectedPartSource.Resources[SelectedResource].maxAmount;
-                    else
-                        maxAmount = SelectedPartTarget.Resources[SelectedResource].maxAmount;
-
-                    if (IsStarted) // Pump Start complete.
-                    {
-                        // Lets increment the AmtXferred....
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred += (float)deltaAmt;
-                        ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info", SettingsManager.VerboseLogging);
-
-                        // Drain source...
-                        if (tXferOn)
-                            SelectedPartTarget.Resources[SelectedResource].amount -= deltaAmt;
-                        else
-                            SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
-
-                        ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
-
-                        // Fill target
-                        if (tXferOn)
-                            SelectedPartSource.Resources[SelectedResource].amount += deltaAmt;
-                        else
-                            SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
-
-                        ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
-                    }
-                    if (!XferOn)
-                    {
-                        // play pump shutdown.
-                        source2.Stop();
-                        source3.Play();
-                        ShipManifestBehaviour.timestamp = elapsed = 0;
-                        IsStarted = false;
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred = 0f;
-                        ManifestUtilities.LogMessage("14. End Loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
-                        if (tXferOn)
-                            tXferOn = false;
-                        else
-                            sXferOn = false;
-                    }
-                    else
-                    {
-                        ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                        ManifestUtilities.LogMessage("15. Continue loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
-                    }
-                }
-                else
-                {
-                    ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                    ManifestUtilities.LogMessage("16. Continue loop. XferOn = " + XferOn.ToString(), "Info", SettingsManager.VerboseLogging);
+                    ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", SettingsManager.VerboseLogging);
+                    if (XferState != XFERState.Off)
+                        timestamp = Planetarium.GetUniversalTime();
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in RealModeXfer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in RealModePumpXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -695,89 +687,110 @@ namespace ShipManifest
         {
             try
             {
-                if (ShipManifestBehaviour.timestamp == 0)
-                {
-                    // Default sound license: CC-By-SA
-                    // http://www.freesound.org/people/adcbicycle/sounds/14214/
-                    string path1 = ShipManifestSettings.CrewSoundStart; // "ShipManifest/Sounds/14214-1";
-                    string path2 = ShipManifestSettings.CrewSoundRun;   // "ShipManifest/Sounds/14214-2";
-                    string path3 = ShipManifestSettings.CrewSoundStop;  // "ShipManifest/Sounds/14214-3";
-
-                    LoadSounds("Crew", path1, path2, path3);
-                }
-
-                // have we waited long enough?
-                if (elapsed >= crewXferDelaySec || (isSeat2Seat && elapsed > Seat2SeatXferDelaySec))
-                {
-                    ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
-
-                    // Spawn crew in parts and in vessel.
-                    SelectedPartSource.vessel.SpawnCrew();
-                    SelectedPartTarget.vessel.SpawnCrew();
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
-
-                    // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
-                    // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
-                    // and instructions for using CLS API by codepoet.
-
-                    // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
-                    GameEvents.onCrewBoardVessel.Fire(evaAction);
-                    GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
-
-                    // Refresh after CLS refreshes...  (this maintains highlighing....)
-                    clsVessel = CLSAddon.Instance.Vessel;
-                    SelectedResourceParts = _partsByResource[_selectedResource];
-
-                    // Reset State vars
-                    crewXfer = false;
-                    isSeat2Seat = false;
-                }
-                else
-                {
-                    double deltaT = 0;
-
-                    // Has timestamp been initiated?
-                    if (ShipManifestBehaviour.timestamp > 0)
-                    {
-                        deltaT = Planetarium.GetUniversalTime() - ShipManifestBehaviour.timestamp;
-                    }
-                    ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                    if (deltaT > 0)
-                    {
-                        elapsed += deltaT;
-
-                        // Play run sound when start sound is nearly done. (repeats)
-                        if (elapsed >= source1.clip.length - 0.25 && !IsStarted)
-                        {
-                            source2.Play();
-                            IsStarted = true;
-                            ManifestUtilities.LogMessage("8a. Play crew sound (run)...", "Info", SettingsManager.VerboseLogging);
-                            ManifestUtilities.LogMessage("Update:  Crew Transfer in progress. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
-                        }
-                    }
-                }
                 if (crewXfer)
                 {
-                    ShipManifestBehaviour.timestamp = Planetarium.GetUniversalTime();
-                }
-                else
-                {
-                    // play crew sit.
-                    IsStarted = false;
-                    source2.Stop();
-                    source3.Play();
-                    ShipManifestBehaviour.timestamp = elapsed = 0;
-                    ManifestUtilities.LogMessage("14. End Loop. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
-                    ManifestUtilities.LogMessage("Update:  Updating Portraits complete. crewXfer = " + crewXfer.ToString(), "Info", SettingsManager.VerboseLogging);
+                    if (!ShipManifestSettings.RealismMode)
+                    {
+                        if (timestamp != 0)
+                            elapsed += Planetarium.GetUniversalTime() - timestamp;
+
+                        if (elapsed > 1)
+                        {
+                            // Fire Board event for Texture Replacer.
+                            GameEvents.onCrewBoardVessel.Fire(evaAction);
+
+                            // Spawn crew in parts and in vessel.
+                            SelectedPartSource.vessel.SpawnCrew();
+                            SelectedPartTarget.vessel.SpawnCrew();
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
+
+                            FireEventTriggers();
+                            elapsed = timestamp = 0;
+                            crewXfer = false;
+                            ManifestUtilities.LogMessage("crewXfer State:  " + crewXfer.ToString() + "...", "Info", SettingsManager.VerboseLogging);
+                        }
+                        if (crewXfer)
+                            timestamp = Planetarium.GetUniversalTime();
+                    }
+                    else
+                    {
+                        switch (XferState)
+                        {
+                            case XFERState.Off:
+                                // We're just starting loop, so set some evnironment stuff.
+                                timestamp = 0;
+
+                                // Default sound license: CC-By-SA
+                                // http://www.freesound.org/people/adcbicycle/sounds/14214/
+                                string path1 = ShipManifestSettings.CrewSoundStart; // "ShipManifest/Sounds/14214-1";
+                                string path2 = ShipManifestSettings.CrewSoundRun;   // "ShipManifest/Sounds/14214-2";
+                                string path3 = ShipManifestSettings.CrewSoundStop;  // "ShipManifest/Sounds/14214-3";
+
+                                LoadSounds("Crew", path1, path2, path3, ShipManifestSettings.CrewSoundVol);
+                                XferState = XFERState.Start;
+                                break;
+
+                            case XFERState.Start:
+
+                                elapsed += Planetarium.GetUniversalTime() - timestamp;
+
+                                // Play run sound when start sound is nearly done. (repeats)
+                                if (elapsed >= source1.clip.length - 0.25 && !IsStarted)
+                                {
+                                    source2.Play();
+                                    elapsed = 0;
+                                    XferState = XFERState.Run;
+                                }
+                                break;
+
+                            case XFERState.Run:
+
+                                elapsed += Planetarium.GetUniversalTime() - timestamp;
+
+                                if (elapsed >= crewXferDelaySec || (isSeat2Seat && elapsed > Seat2SeatXferDelaySec))
+                                {
+                                    ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
+
+                                    // Fire Board event for Texture Replacer.
+                                    GameEvents.onCrewBoardVessel.Fire(evaAction);
+
+                                    // Spawn crew in parts and in vessel.
+                                    SelectedPartSource.vessel.SpawnCrew();
+                                    SelectedPartTarget.vessel.SpawnCrew();
+                                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
+
+                                    // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
+                                    FireEventTriggers();
+
+                                    // Reset State vars
+                                    XferState = XFERState.Stop;
+                                }
+                                break;
+
+                            case XFERState.Stop:
+
+                                // play crew sit.
+                                source2.Stop();
+                                source3.Play();
+                                ShipManifestBehaviour.timestamp = elapsed = 0;
+                                XferState = XFERState.Off;
+                                crewXfer = false;
+                                isSeat2Seat = false;
+                                break;
+                        }
+                        ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", SettingsManager.VerboseLogging);
+                        if (XferState != XFERState.Off)
+                            timestamp = Planetarium.GetUniversalTime();
+                    }
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in RealModeCrewXfer.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in RealModeCrewXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
-        private void LoadSounds(string SoundType, string path1, string path2, string path3)
+        private void LoadSounds(string SoundType, string path1, string path2, string path3, double dblVol)
         {
             try
             {
@@ -799,16 +812,16 @@ namespace ShipManifest
 
                     // configure sources
                     source1.clip = sound1; // Start sound
-                    source1.volume = 1f;
+                    source1.volume = (float)dblVol;
                     source1.pitch = 1f;
 
                     source2.clip = sound2; // Run sound
                     source2.loop = true;
-                    source2.volume = 1f;
+                    source2.volume = (float)dblVol;
                     source2.pitch = 1f;
 
                     source3.clip = sound3; // Stop Sound
-                    source3.volume = 1f;
+                    source3.volume = (float)dblVol;
                     source3.pitch = 1f;
 
                     // now let's play the Pump start sound.
@@ -822,7 +835,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in LoadSounds.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -836,7 +849,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in RunSave.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -853,7 +866,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Save.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Save.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -893,7 +906,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in Savelog.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -932,7 +945,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in RemoveResourceHighlighting.  Error:  " + ex.ToString(), "Error", SettingsManager.VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format(" in RemoveResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -971,7 +984,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in ChangeResourceHighlighting.  Error:  " + ex.ToString(), "Error", SettingsManager.VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format(" in ChangeResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -981,36 +994,39 @@ namespace ShipManifest
             {
                 // This adds an event handler to each newly selected part,
                 // to manage mouse exit events and preserve highlighting.
-                if (clsVessel.Spaces != null && _selectedResource == "Crew")
+                if (SelectedResource != null)
                 {
-                    foreach (CLSSpace space in clsVessel.Spaces)
+                    if (clsVessel.Spaces != null && SelectedResource == "Crew")
                     {
-                        space.Highlight(true);
+                        foreach (CLSSpace space in clsVessel.Spaces)
+                        {
+                            space.Highlight(true);
+                        }
+                        if (SelectedPartSource != null)
+                        {
+                            Part.OnActionDelegate OnMouseExit = MouseExit;
+                            SelectedPartSource.AddOnMouseExit(OnMouseExit);
+                        }
+                        if (SelectedPartTarget != null)
+                        {
+                            Part.OnActionDelegate OnMouseExit = MouseExit;
+                            SelectedPartTarget.AddOnMouseExit(OnMouseExit);
+                        }
                     }
-                    if (SelectedPartSource != null)
+                    if (_selectedResourceParts != null && _selectedResource != "Crew")
                     {
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartSource.AddOnMouseExit(OnMouseExit);
+                        foreach (Part part in _selectedResourceParts)
+                        {
+                            Part.OnActionDelegate OnMouseExit = MouseExit;
+                            part.AddOnMouseExit(OnMouseExit);
+                        }
                     }
-                    if (SelectedPartTarget != null)
-                    {
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartTarget.AddOnMouseExit(OnMouseExit);
-                    }
+                    OnMouseHighlights();
                 }
-                if (_selectedResourceParts != null && _selectedResource != "Crew")
-                {
-                    foreach (Part part in _selectedResourceParts)
-                    {
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        part.AddOnMouseExit(OnMouseExit);
-                    }
-                }
-                OnMouseHighlights();
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in SetResourceHighlighting.  Error:  " + ex.ToString(), "Error", SettingsManager.VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format(" in SetResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -1053,7 +1069,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  ClearPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  ClearPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -1102,13 +1118,16 @@ namespace ShipManifest
                 }
                 else
                 {
-                    // Set part highlighting on the target part...
-                    SetPartHighlight(_selectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartColor]);
+                    // Set part highlighting on the selected part...
+                    if (IsTargetPart)
+                        SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.TargetPartColor]);
+                    else
+                        SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  SetPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  SetPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -1136,7 +1155,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  ClearHighlight.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  ClearHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -1153,10 +1172,23 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(" in  SetPartHighlight.  Error:  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
+        public static void FireEventTriggers()
+        {
+            // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
+            // and instructions for using CLS API by codepoet.
+
+            // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
+            GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
+
+            // Refresh after CLS refreshes...  (this maintains highlighing....)
+            clsVessel = CLSAddon.Instance.Vessel;
+            SelectedResourceParts = PartsByResource["Crew"];
+        }
+        
         #endregion
 
         private void DebuggerWindow(int windowId)
