@@ -241,7 +241,6 @@ namespace ShipManifest
                 // since we are going to be selecting different parts.
                 // For Crew, we do something different so we skip.
                 ChangeResourceHighlighting();
-
                 _selectedResourceParts = value;
 
                 SetResourceHighlighting();
@@ -344,7 +343,7 @@ namespace ShipManifest
 
         // this is the delagate needed to support the part event handlers
         // extern is needed, as the addon is considered external to KSP, and is expected by the part delagate call.
-        extern Part.OnActionDelegate OnMouseExit(Part part);
+        static extern public Part.OnActionDelegate OnMouseExit(Part part);
 
         // this is the method used with the delagate
         public static void MouseExit(Part part)
@@ -438,9 +437,7 @@ namespace ShipManifest
                 {
                     // Source to target
                     // Are the parts capable of holding kerbals and are there kerbals to move?
-                    if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) &&
-                                                (SelectedPartTarget.protoModuleCrew.Count < SelectedPartTarget.CrewCapacity &&
-                                                SelectedPartSource.protoModuleCrew.Count > 0))
+                    if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && SelectedPartSource.protoModuleCrew.Count > 0)
                     {
                         // now, are the parts connected to each other in the same living space?
                         results = IsCLS();
@@ -449,9 +446,7 @@ namespace ShipManifest
                 else  //SelectedPart must be SeletedPartTarget
                 {
                     // Target to Source
-                    if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) &&
-                        (SelectedPartSource.protoModuleCrew.Count < SelectedPartSource.CrewCapacity &&
-                        SelectedPartTarget.protoModuleCrew.Count > 0))
+                    if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && SelectedPartTarget.protoModuleCrew.Count > 0)
                     {
                         // now, are the parts connected to each other in the same living space?
                         if (IsCLS())
@@ -697,7 +692,8 @@ namespace ShipManifest
                         if (elapsed > 1)
                         {
                             // Fire Board event for Texture Replacer.
-                            GameEvents.onCrewBoardVessel.Fire(evaAction);
+                            if (SettingsManager.TextureReplacer)
+                                GameEvents.onCrewBoardVessel.Fire(evaAction);
 
                             // Spawn crew in parts and in vessel.
                             SelectedPartSource.vessel.SpawnCrew();
@@ -966,15 +962,11 @@ namespace ShipManifest
                 {
                     if (SelectedPartSource != null)
                     {
-                        ClearHighlight(SelectedPartSource);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartSource.RemoveOnMouseExit(OnMouseExit);
+                        SelectedPartSource = null;
                     }
                     if (SelectedPartTarget != null)
                     {
-                        ClearHighlight(SelectedPartTarget);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartTarget.RemoveOnMouseExit(OnMouseExit);
+                        SelectedPartTarget = null;
                     }
                     foreach (CLSSpace space in clsVessel.Spaces)
                     {
@@ -1004,11 +996,13 @@ namespace ShipManifest
                         }
                         if (SelectedPartSource != null)
                         {
+                            CLSPartSource.Highlight(false);
                             Part.OnActionDelegate OnMouseExit = MouseExit;
                             SelectedPartSource.AddOnMouseExit(OnMouseExit);
                         }
                         if (SelectedPartTarget != null)
                         {
+                            CLSPartTarget.Highlight(false);
                             Part.OnActionDelegate OnMouseExit = MouseExit;
                             SelectedPartTarget.AddOnMouseExit(OnMouseExit);
                         }
@@ -1030,6 +1024,11 @@ namespace ShipManifest
             }
         }
 
+        /// <summary>
+        /// This routine is used ot remove source or taget highlighting on a part.  
+        /// it is cls Aware, and preserves the base space highlighting when selected part coler is removed.
+        /// </summary>
+        /// <param name="IsTargetPart"></param>
         public static void ClearSelectedHighlighting(bool IsTargetPart)
         {
             try
@@ -1073,6 +1072,11 @@ namespace ShipManifest
             }
         }
 
+        /// <summary>
+        /// This routine is used ot remove source or taget highlighting on a part.  
+        /// it is cls Aware, and preserves the base space highlighting when selected part coler is removed.
+        /// </summary>
+        /// <param name="IsTargetPart"></param>
         public static void SetSelectedHighlighting(bool IsTargetPart)
         {
             try
@@ -1140,17 +1144,6 @@ namespace ShipManifest
                 {
                     part.SetHighlightDefault();
                     part.SetHighlight(false);
-                }
-                if (SelectedPartSource != null && SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                {
-                    foreach (CLSPart thisPart in clsVessel.Parts)
-                    {
-                        if ((Part)thisPart == part)
-                        {
-                            CLSPartSource.Highlight(true);
-                            break;
-                        }
-                    }
                 }
             }
             catch (Exception ex)
