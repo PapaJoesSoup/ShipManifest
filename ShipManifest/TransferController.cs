@@ -178,7 +178,7 @@ namespace ShipManifest
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    MoveCrewMember(crewMember, ShipManifestBehaviour.SelectedPartSource);
+                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartSource);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
@@ -186,7 +186,7 @@ namespace ShipManifest
                             {
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartTarget, crewMember);
+                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartTarget);
                                 }
                             }
                             GUILayout.EndHorizontal();
@@ -381,7 +381,7 @@ namespace ShipManifest
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    MoveCrewMember(crewMember, ShipManifestBehaviour.SelectedPartTarget);
+                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartTarget);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
@@ -390,7 +390,7 @@ namespace ShipManifest
                                 // set the conditions for a button style change.
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartSource, crewMember);
+                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartSource);
                                 }
                             }
                             GUILayout.EndHorizontal();
@@ -520,31 +520,61 @@ namespace ShipManifest
 
         #region Methods
 
-        private void MoveCrewMember(ProtoCrewMember crewMember, Part part)
+        private void TransferCrewMember(ProtoCrewMember sourceMember, Part sourcePart, Part targetPart)
         {
             try
             {
                 // Build source and target seat indexes.
-                int curIdx = crewMember.seatIdx;
+                int curIdx = sourceMember.seatIdx;
                 int newIdx = curIdx;
-                InternalSeat sourceSeat = crewMember.seat;
-                if (newIdx + 1 == part.CrewCapacity)
-                    newIdx = -1;
+                InternalSeat sourceSeat = sourceMember.seat;
+                InternalSeat targetSeat = null;
+                if (sourcePart == targetPart)
+                {
+                    // Must be a move...
+                    if (newIdx + 1 >= sourcePart.CrewCapacity)
+                        newIdx = 0;
+                    else 
+                        newIdx += 1;
+                    // get target seat from part's inernal model
+                    targetSeat = sourcePart.internalModel.seats[newIdx];
+                }
+                else
+                {
+                    // Xfer to another part
+                    // get target seat from part's inernal model
+                    for (int x = 0; x < targetPart.internalModel.seats.Count; x += 1)
+                    {
+                        InternalSeat seat = targetPart.internalModel.seats[x];
+                        if (!seat.taken)
+                        {
+                            targetSeat = seat;
+                            newIdx = x;
+                            break;
+                        }
+                    }
+                    // All seats full?
+                    if (targetSeat == null)
+                    {
+                        // try to match seat if possible (swap with counterpart)
+                        if (newIdx >= targetPart.internalModel.seats.Count)
+                            newIdx = 0;
+                        targetSeat = targetPart.internalModel.seats[newIdx];
+                    }
+                }
 
-                // get target seat from part's inernal model
-                InternalSeat targetSeat = part.internalModel.seats[newIdx + 1];
-
+                // seats have been chosen.
                 // Do we need to swap places with another Kerbal?
                 if (targetSeat.taken)
                 {
+                    // Swap places.
+
                     // get Kerbal to swap with through his seat...
                     ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
 
-                    // Swap places.
-
-                    // Remove the crew members from the part...
-                    RemoveCrew(crewMember, part);
-                    RemoveCrew(targetMember, part);
+                    // Remove the crew members from the part(s)...
+                    RemoveCrew(sourceMember, sourcePart);
+                    RemoveCrew(targetMember, targetPart);
 
                     // At this point, the kerbals are in the "ether".
                     // this may be why there is an issue with refreshing the internal view.. 
@@ -553,54 +583,40 @@ namespace ShipManifest
                     // I'll look into that...
 
                     // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
-                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(part, part);
-                    GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+                    // Send the kerbal(s) eva.  This is the eva trigger I was looking for
+                    // We will fie the board event when we are ready, in the update code.
+                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                    if (SettingsManager.TextureReplacer)
+                        GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
                     
-                    // Add the crew members back into the part at their new seats.
-                    part.AddCrewmemberAt(crewMember, newIdx + 1);
-                    part.AddCrewmemberAt(targetMember, curIdx);
-                }
+                    // Add the crew members back into the part(s) at their new seats.
+                    sourcePart.AddCrewmemberAt(targetMember, curIdx);                    
+                    targetPart.AddCrewmemberAt(sourceMember, newIdx);
+                 }
                 else
                 {
                     // Just move.
-                    RemoveCrew(crewMember, part);
-                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(part, part);
-                    GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
-                    part.AddCrewmemberAt(crewMember, newIdx + 1);
+                    RemoveCrew(sourceMember, sourcePart);
+                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+
+                    if (SettingsManager.TextureReplacer)
+                        GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+
+                    targetPart.AddCrewmemberAt(sourceMember, newIdx);
                 }
 
-                ShipManifestBehaviour.isSeat2Seat = true;
+                // if moving within a part, set the seat2seat flag
+                if (sourcePart == targetPart)
+                    ShipManifestBehaviour.isSeat2Seat = true;
+                else
+                    ShipManifestBehaviour.isSeat2Seat = false;
+
+                // set the crew transfer flag and wait forthe timeout before firing the board event.
                 ShipManifestBehaviour.crewXfer = true;
             }
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format("Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        private void TransferCrewMember(Part source, Part target, ProtoCrewMember crewMember)
-        {
-            try
-            {
-                RemoveCrew(crewMember, source);
-
-                // Support for Extraplanetary LaunchPads
-                // This is the event trigger I was looking for to begin with on crew xfers!
-               ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part,Part>(source,target);
-               GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
-                crewMember.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
-
-                target.AddCrewmember(crewMember);
- 
-                if (crewMember.seat == null)
-                    ManifestUtilities.LogMessage(string.Format("Crew member seat is null."), "Info", true);
-
-                ShipManifestBehaviour.crewXfer = true;
-               
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format("Error TransferCrewMember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -738,26 +754,6 @@ namespace ShipManifest
             }
         }
 
-        private InternalSeat GetFreeSeat(List<InternalSeat> seats)
-        {
-            try
-            {
-
-                foreach (InternalSeat seat in seats)
-                {
-                    if (!seat.taken)
-                    {
-                        return seat;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  GetFreeSeat.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-            return null;
-        }
-
         private int GetScienceCount(Part part, bool IsCapacity)
         {
             try
@@ -791,30 +787,6 @@ namespace ShipManifest
             }
         }
         
-        private void logCrewMember(ProtoCrewMember crewMember, Part target)
-        {
-            try
-            {
-                ManifestUtilities.LogMessage(string.Format("Crew member:"), "Info", SettingsManager.VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" - Name:          " + crewMember.name), "Info", SettingsManager.VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" - KerbalRef:     " + (crewMember.KerbalRef != null).ToString()), "Info", SettingsManager.VerboseLogging);
-                if (crewMember.KerbalRef != null)
-                    ManifestUtilities.LogMessage(" - kerbalRef.Name:   " + crewMember.KerbalRef.name, "info", SettingsManager.VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" - rosterStatus:  " + crewMember.rosterStatus.ToString()), "Info", SettingsManager.VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" - seatIdx:       " + crewMember.seatIdx.ToString()), "Info", SettingsManager.VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" - seat != null:  " + (crewMember.seat != null).ToString()), "Info", SettingsManager.VerboseLogging);
-                if (crewMember.seat != null)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" - seat part name:     " + crewMember.seat.part.partInfo.name.ToString()), "Info", SettingsManager.VerboseLogging);
-                    //ManifestUtilities.LogMessage(string.Format(" - portraitCamera:     " + crewMember.seat.portraitCamera.enabled.ToString()), "Info", SettingsManager.VerboseLogging);
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format("Error logging crewMember:  " + ex.ToString()), "Error", true);
-            }
-        }
-
         #endregion
     }
 }
