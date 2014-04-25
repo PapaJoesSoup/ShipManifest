@@ -121,7 +121,7 @@ namespace ShipManifest
             }
         }
 
-        #region Ship Manifest Window Gui Layout Code
+        #region Ship Manifest & Roster Window - Gui Layout Code
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -223,120 +223,66 @@ namespace ShipManifest
         private Vector2 rosterScrollViewer = Vector2.zero;
         private void RosterWindow(int windowId)
         {
-            GUIStyle style = GUI.skin.button;
-            var defaultColor = style.normal.textColor;
-            GUILayout.BeginVertical();
-
-            rosterScrollViewer = GUILayout.BeginScrollView(rosterScrollViewer, GUILayout.Height(200), GUILayout.Width(360));
-            GUILayout.BeginVertical();
-
-            foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster)
+            try
             {
-                GUIStyle labelStyle = null;
-                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
-                    labelStyle = ManifestStyle.LabelStyleRed;
-                else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED)
-                    labelStyle = ManifestStyle.LabelStyleYellow;
-                else
-                    labelStyle = ManifestStyle.LabelStyle;
 
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));  // + "  (" + kerbal.seat.vessel.name + ")"
-                string buttonText = string.Empty;
+                GUIStyle style = GUI.skin.button;
+                var defaultColor = style.normal.textColor;
+                GUILayout.BeginVertical();
 
-                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE)
-                    GUI.enabled = true;
-                else
-                    GUI.enabled = false;
+                RosterListViewer();
 
-                if (GUILayout.Button((SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel", GUILayout.Width(60)))
+                if (SelectedKerbal != null)
                 {
-                    if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
+                    GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
+                    SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
+
+                    if (!string.IsNullOrEmpty(saveMessage))
                     {
-                        SelectedKerbal = new KerbalModel(kerbal, false);
+                        GUILayout.Label(saveMessage, ManifestStyle.ErrorLabelRedStyle);
                     }
-                    else
+
+                    GUILayout.Label("Courage");
+                    SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1);
+
+                    GUILayout.Label("Stupidity");
+                    SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1);
+
+                    SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
+
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
                     {
                         SelectedKerbal = null;
                     }
-                }
-
-                if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && IsPreLaunch && ShipManifestBehaviour.SelectedPartSource != null && !PartCrewIsFull(ShipManifestBehaviour.SelectedPartSource))
-                {
-                    GUI.enabled = true;
-                    buttonText = "Add";
-                }
-                else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
-                {
-                    GUI.enabled = true;
-                    buttonText = "Respawn";
+                    if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
+                    {
+                        saveMessage = SelectedKerbal.SubmitChanges();
+                        if (string.IsNullOrEmpty(saveMessage))
+                            SelectedKerbal = null;
+                    }
+                    GUILayout.EndHorizontal();
                 }
                 else
                 {
-                    GUI.enabled = false;
-                    buttonText = "--";
+                    if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
+                    {
+                        SelectedKerbal = CreateKerbal();
+                    }
                 }
 
-                if (GUILayout.Button(buttonText, GUILayout.Width(60)))
-                {
-                    if (buttonText == "Add")
-                        AddCrew(ShipManifestBehaviour.SelectedPartSource, kerbal);
-                    else if (buttonText == "Respawn")
-                        RespawnKerbal(kerbal);
-                }
-                GUILayout.EndHorizontal();
-                GUI.enabled = true;
+                GUILayout.EndVertical();
+                GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
             }
-
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-
-            if (SelectedKerbal != null)
+            catch (Exception ex)
             {
-                GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
-                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
-
-                if (!string.IsNullOrEmpty(saveMessage))
-                {
-                    GUILayout.Label(saveMessage, ManifestStyle.ErrorLabelRedStyle);
-                }
-
-                GUILayout.Label("Courage");
-                SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1);
-
-                GUILayout.Label("Stupidity");
-                SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1);
-
-                SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-                {
-                    SelectedKerbal = null;
-                }
-                if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
-                {
-                    saveMessage = SelectedKerbal.SubmitChanges();
-                    if (string.IsNullOrEmpty(saveMessage))
-                        SelectedKerbal = null;
-                }
-                GUILayout.EndHorizontal();
+                ManifestUtilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
-            else
-            {
-                if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
-                {
-                    SelectedKerbal = CreateKerbal();
-                }
-            }
-
-            GUILayout.EndVertical();
-            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
 
-#endregion
+        #endregion
 
-        #region Manifest Window Gui components
+        #region Ship Manifest Window Gui components
 
         private void PreLaunchGUI()
         {
@@ -466,6 +412,82 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
+
+        private void RosterListViewer()
+        {
+            try
+            {
+                rosterScrollViewer = GUILayout.BeginScrollView(rosterScrollViewer, GUILayout.Height(200), GUILayout.Width(360));
+                GUILayout.BeginVertical();
+
+                foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster)
+                {
+                    GUIStyle labelStyle = null;
+                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
+                        labelStyle = ManifestStyle.LabelStyleRed;
+                    else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED)
+                        labelStyle = ManifestStyle.LabelStyleYellow;
+                    else
+                        labelStyle = ManifestStyle.LabelStyle;
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));  // + "  (" + kerbal.seat.vessel.name + ")"
+                    string buttonText = string.Empty;
+
+                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE)
+                        GUI.enabled = true;
+                    else
+                        GUI.enabled = false;
+
+                    if (GUILayout.Button((SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel", GUILayout.Width(60)))
+                    {
+                        if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
+                        {
+                            SelectedKerbal = new KerbalModel(kerbal, false);
+                        }
+                        else
+                        {
+                            SelectedKerbal = null;
+                        }
+                    }
+
+                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && IsPreLaunch && ShipManifestBehaviour.SelectedPartSource != null && !PartCrewIsFull(ShipManifestBehaviour.SelectedPartSource))
+                    {
+                        GUI.enabled = true;
+                        buttonText = "Add";
+                    }
+                    else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
+                    {
+                        GUI.enabled = true;
+                        buttonText = "Respawn";
+                    }
+                    else
+                    {
+                        GUI.enabled = false;
+                        buttonText = "--";
+                    }
+
+                    if (GUILayout.Button(buttonText, GUILayout.Width(60)))
+                    {
+                        if (buttonText == "Add")
+                            AddCrew(ShipManifestBehaviour.SelectedPartSource, kerbal);
+                        else if (buttonText == "Respawn")
+                            RespawnKerbal(kerbal);
+                    }
+                    GUILayout.EndHorizontal();
+                    GUI.enabled = true;
+                }
+
+                GUILayout.EndVertical();
+                GUILayout.EndScrollView();
+
+            }
+            catch (Exception ex)
+            {
+                ManifestUtilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
         #endregion
 
         #region Methods
