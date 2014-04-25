@@ -1,5 +1,9 @@
 ShipManifest
 ============
+Version 0.23.5.3.2.1a - 25 Apr, 2014 - TextureReplacer Switch add
+ - New Crew Transfers are now possible between full parts.   Crew members will swap places, just like a Move withing a part.
+ - Added Config file switch (TextureReplacer) to allow enable/disable of Texture replcaer event code.  For testing.  Disabled by Default.
+ 
 Version 0.23.5.3.2.1 - 22 Apr, 2014 - Bug fixes Edition.
  - New:  Resource/Part Button Improvements:
          - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1058979&viewfull=1#post1058979
