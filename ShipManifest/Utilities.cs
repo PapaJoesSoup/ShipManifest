@@ -131,7 +131,7 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.23.5.3.2.1";
+        public string CurVersion = "0.23.5.3.3";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
@@ -174,6 +174,8 @@ namespace ShipManifest
         public bool EnableCrew = true;
         public bool EnablePFResources = true;
         public bool EnableCLS = true;
+
+        public static bool TextureReplacer = false;
 
         public static double IVATimeDelaySec = 5;
         public static bool ShowIVAUpdateBtn = false;
@@ -387,6 +389,7 @@ namespace ShipManifest
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
                 ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
                 AutoDebug = configfile.GetValue<bool>("AutoDebug");
+                TextureReplacer = configfile.GetValue<bool>("TextureReplacer");
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -448,6 +451,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TextureReplacer Loaded: {0}", TextureReplacer), "Info", VerboseLogging);
 
                 ValidateLoad();
             }
@@ -536,6 +540,7 @@ namespace ShipManifest
                 configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
                 configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
                 configfile.SetValue("AutoDebug", AutoDebug);
+                configfile.SetValue("TextureReplacer", TextureReplacer);
 
                 configfile.save();
 
@@ -571,6 +576,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("TextureReplacer Saved: {0}", TextureReplacer.ToString()), "Info", VerboseLogging);
             }
             catch (Exception ex)
             {
