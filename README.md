@@ -1,6 +1,6 @@
 ShipManifest
 ============
-Version 0.23.5.3.2.1b - 26 Apr, 2014 - TACLS test Edition. Non public release (Not on Spaceport)
+Version 0.23.5.3.2.1b - 26 Apr, 2014 - Inflatable Habs Test Edition. Non public release (Not on Spaceport)
  - Bug:  SM not detecting Changes in Creability with Inflatable Parts...
          - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
 
