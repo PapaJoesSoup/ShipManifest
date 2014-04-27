@@ -97,7 +97,7 @@ namespace ShipManifest
                     {
                         _partsByResource = new Dictionary<string, List<Part>>();
                     }
-                    if (FlightGlobals.ActiveVessel == vessel && _partsByResource != null)
+                    if (FlightGlobals.ActiveVessel == vessel)
                     {
                         // Return what we already have...
                         return _partsByResource;
@@ -107,21 +107,50 @@ namespace ShipManifest
                         // Let's update...
                         vessel = FlightGlobals.ActiveVessel;
                         clsVessel = CLSAddon.Instance.Vessel;
+                        // First Crew...
+                        if (ShipManifestSettings.EnableCrew && ShipManifestSettings.EnableCLS)
+                        {
+                            foreach (CLSPart part in clsVessel.Parts)
+                            {
+                                // First let's Get any Crew...
+                                if (part.Habitable)
+                                {
+                                    bool vResouceFound = false;
+                                    // is resource in the list yet?.
+                                    if (_partsByResource.Keys.Contains("Crew"))
+                                    {
+                                        // found resource.  lets add part to its list.
+                                        vResouceFound = true;
+                                        List<Part> eParts = _partsByResource["Crew"];
+                                        eParts.Add((Part)part);
+                                    }
+                                    if (!vResouceFound)
+                                    {
+                                        // found a new resource.  lets add it to the list of resources.
+                                        List<Part> nParts = new List<Part>();
+                                        nParts.Add((Part)part);
+                                        _partsByResource.Add("Crew", nParts);
+                                    }
+                                
+                                }
+                            }
+                        }
+
                         foreach (Part part in FlightGlobals.ActiveVessel.Parts)
                         {
                             // First let's Get any Crew...
-                            if (part.CrewCapacity > 0 && ShipManifestBehaviour.ShipManifestSettings.EnableCrew)
+                            if (part.CrewCapacity > 0 && ShipManifestSettings.EnableCrew && !ShipManifestSettings.EnableCLS)
                             {
-                                bool vFound = false;
+                                bool vResourceFound = false;
                                 // is resource in the list yet?.
                                 if (_partsByResource.Keys.Contains("Crew"))
                                 {
                                     // found resource.  lets add part to its list.
-                                    vFound = true;
+                                    vResourceFound = true;
                                     List<Part> eParts = _partsByResource["Crew"];
                                     eParts.Add(part);
                                 }
-                                if (!vFound)
+                                if (!vResourceFound)
                                 {
                                     // found a new resource.  lets add it to the list of resources.
                                     List<Part> nParts = new List<Part>();
@@ -131,28 +160,28 @@ namespace ShipManifest
                             }
 
                             // Let's Get any Science...
-                            if (ShipManifestBehaviour.ShipManifestSettings.EnableScience)
+                            if (ShipManifestSettings.EnableScience)
                             {
-                                bool mFound = false;
+                                bool mResourceFound = false;
                                 foreach (PartModule pm in part.Modules)
                                 {
                                     // is resource in the list yet?.
                                     // 
-                                    if (!mFound && (pm is ModuleScienceContainer || pm is ModuleScienceExperiment))
+                                    if (!mResourceFound && (pm is ModuleScienceContainer || pm is ModuleScienceExperiment))
                                     {
                                         if (_partsByResource.Keys.Contains("Science"))
                                         {
-                                            mFound = true;
+                                            mResourceFound = true;
                                             List<Part> eParts = _partsByResource["Science"];
                                             eParts.Add(part);
                                         }
-                                        if (!mFound)
+                                        if (!mResourceFound)
                                         {
                                             // found a new resource.  lets add it to the list of resources.
                                             List<Part> nParts = new List<Part>();
                                             nParts.Add(part);
                                             _partsByResource.Add("Science", nParts);
-                                            mFound = true;
+                                            mResourceFound = true;
                                         }
                                     }
                                 }
@@ -162,17 +191,17 @@ namespace ShipManifest
                             foreach (PartResource resource in part.Resources)
                             {
                                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                                if (!ShipManifestBehaviour.ShipManifestSettings.RealismMode || (ShipManifestBehaviour.ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                                if (!ShipManifestSettings.RealismMode || (ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
                                 {
-                                    bool vFound = false;
+                                    bool vResourceFound = false;
                                     // is resource in the list yet?.
                                     if (_partsByResource.Keys.Contains(resource.info.name))
                                     {
-                                        vFound = true;
+                                        vResourceFound = true;
                                         List<Part> eParts = _partsByResource[resource.info.name];
                                         eParts.Add(part);
                                     }
-                                    if (!vFound)
+                                    if (!vResourceFound)
                                     {
                                         // found a new resource.  lets add it to the list of resources.
                                         List<Part> nParts = new List<Part>();
@@ -280,6 +309,7 @@ namespace ShipManifest
                     // reset transfer amount (for resource xfer slider control)
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
+                    OnMouseHighlights();
                 }
                 catch (Exception ex)
                 {
@@ -320,6 +350,7 @@ namespace ShipManifest
                     // reset transfer amount (for resource xfer slider control)
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
+                    OnMouseHighlights();
                 }
                 catch (Exception ex)
                 {
@@ -379,10 +410,15 @@ namespace ShipManifest
             };
         }
 
-        public void OnDestroy()
+        public void Start()
         {
-            CancelInvoke("RunSave");
-            button.Destroy();
+            GameEvents.onVesselChange.Add(OnVesselChange);
+        }
+
+        private void OnVesselChange(Vessel data)
+        {
+            vessel = null;
+            ManifestUtilities.LogMessage("OnVesselChange fired.", "Info", SettingsManager.VerboseLogging);
         }
 
         public void OnGUI()
@@ -424,6 +460,13 @@ namespace ShipManifest
             }
         }
         
+        public void OnDestroy()
+        {
+            GameEvents.onVesselChange.Remove(OnVesselChange);
+            CancelInvoke("RunSave");
+            button.Destroy();
+        }
+
         #endregion
 
         #region Logic Methods
@@ -748,7 +791,8 @@ namespace ShipManifest
                                     ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
 
                                     // Fire Board event for Texture Replacer.
-                                    GameEvents.onCrewBoardVessel.Fire(evaAction);
+                                    if (SettingsManager.TextureReplacer)
+                                        GameEvents.onCrewBoardVessel.Fire(evaAction);
 
                                     // Spawn crew in parts and in vessel.
                                     SelectedPartSource.vessel.SpawnCrew();
@@ -1128,6 +1172,7 @@ namespace ShipManifest
                     else
                         SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
                 }
+                OnMouseHighlights();
             }
             catch (Exception ex)
             {
