@@ -1,5 +1,9 @@
 ShipManifest
 ============
+Version 0.23.5.3.2.1b - 26 Apr, 2014 - TACLS test Edition. Non public release (Not on Spaceport)
+ - Bug:  SM not detecting Changes in Creability with Inflatable Parts...
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
+
 Version 0.23.5.3.2.1a - 25 Apr, 2014 - TextureReplacer Switch add
  - New Crew Transfers are now possible between full parts.   Crew members will swap places, just like a Move withing a part.
  - Added Config file switch (TextureReplacer) to allow enable/disable of Texture replcaer event code.  For testing.  Disabled by Default.
