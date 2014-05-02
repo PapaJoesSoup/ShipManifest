@@ -404,13 +404,13 @@ namespace ShipManifest
                     }
                 }
 
-                GUILayout.EndVertical();
-                GUILayout.EndScrollView();
             }
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
+            GUILayout.EndVertical();
+            GUILayout.EndScrollView();
         }
 
         private void RosterListViewer()
