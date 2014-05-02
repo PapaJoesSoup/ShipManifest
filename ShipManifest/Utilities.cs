@@ -174,8 +174,13 @@ namespace ShipManifest
         public bool EnableCrew = true;
         public bool EnablePFResources = true;
         public bool EnableCLS = true;
+        public bool prevEnableScience = true;
+        public bool prevEnableCrew = true;
+        public bool prevEnablePFResources = true;
+        public bool prevEnableCLS = true;
 
-        public static bool TextureReplacer = false;
+        public static bool EnableTextureReplacer = false;
+        public static bool prevEnableTextureReplacer = false;
 
         public static double IVATimeDelaySec = 5;
         public static bool ShowIVAUpdateBtn = false;
@@ -212,11 +217,14 @@ namespace ShipManifest
         public void SettingsWindow(int windowId)
         {
             // Store settings in case we cancel later...
-            PrevRealismMode = RealismMode;
+
             PrevShowDebugger = ShowDebugger;
             PrevVerboseLogging = VerboseLogging;
             PrevAutoSave = AutoSave;
             PrevSaveIntervalSec = SaveIntervalSec;
+
+            // Realism Mode settings.
+            PrevRealismMode = RealismMode;
             PrevFlowRate = FlowRate;
             PrevPumpSoundStart = PumpSoundStart;
             PrevPumpSoundRun = PumpSoundRun;
@@ -224,6 +232,11 @@ namespace ShipManifest
             PrevCrewSoundStart = CrewSoundStart;
             PrevCrewSoundRun = CrewSoundRun;
             PrevCrewSoundStop = CrewSoundStop;
+            prevEnableScience = EnableScience;
+            prevEnableCrew = EnableCrew;
+            prevEnablePFResources = EnablePFResources;
+            prevEnableCLS = EnableCLS;
+            prevEnableTextureReplacer = EnableTextureReplacer;
 
             string label = "";
             string txtSaveInterval = SaveIntervalSec.ToString();
@@ -231,13 +244,14 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
-            label = ShowDebugger ? "Disable Debug Console" : "Enable Debug Console";
+
+            label = "Enable Debug Console";
             ShowDebugger = GUILayout.Toggle(ShowDebugger, label, GUILayout.Width(300));
 
-            label = VerboseLogging ? "Verbose Logging Enabled" : "Verbose Logging Disabled";
+            label = "Enable Verbose Logging";
             VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
 
-            label = AutoSave ? "AutoSave Settings Enabled" : "AutoSave Settings Disabled";
+            label = "Enable AutoSave Settings";
             AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
 
             GUILayout.BeginHorizontal();
@@ -246,60 +260,103 @@ namespace ShipManifest
             GUILayout.Label("(sec)", GUILayout.Width(40));
             GUILayout.EndHorizontal();
 
-            label = RealismMode ? "Realism Mode Enabled" : "Realism Mode Disabled";
+            // AutoDebug Mode
+            label = "Enable SM Debug Window On Error";
+            AutoDebug = GUILayout.Toggle(AutoDebug, label, GUILayout.Width(300));
+
+            // TextureReplacer Mode
+            label = "Enable Texture Replacer Events";
+            EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
+
+            label = "Enable Realism Mode";
 
             if (!LockRealismMode)
             {
                 // Realism Mode
                 RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+
+                if (RealismMode)
+                {
+
+                    // EnableCLS Mode
+                    label = "Enable Connected Living Spaces (CLS)";
+                    EnableCLS = GUILayout.Toggle(EnableCLS, label, GUILayout.Width(300));
+                    // EnableCrew Mode
+                    label = "Enable Crew Xfers";
+                    EnableCrew = GUILayout.Toggle(EnableCrew, label, GUILayout.Width(300));
+                    // EnableScience Mode
+                    label = "Enable Science Xfers";
+                    EnableScience = GUILayout.Toggle(EnableScience, label, GUILayout.Width(300));
+                    // EnablePFResources Mode
+                    label = "Enable Resources in Pre-Flight";
+                    EnablePFResources = GUILayout.Toggle(EnablePFResources, label, GUILayout.Width(300));
+
+                    // Pump Start Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Pump Start Sound: ", GUILayout.Width(120));
+                    PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // Pump Run Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Pump Run Sound: ", GUILayout.Width(120));
+                    PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // Pump Stop Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Pump Stop Sound: ", GUILayout.Width(120));
+                    PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // create xfer Flow Rate slider;
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
+                    FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // Crew Start Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Crew Exit Sound: ", GUILayout.Width(120));
+                    CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // Crew Run Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Crew Xfer Sound: ", GUILayout.Width(120));
+                    CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+
+                    // Crew Stop Sound
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Crew Enter Sound: ", GUILayout.Width(120));
+                    CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(200));
+                    GUILayout.EndHorizontal();
+                }
+                else
+                {
+                    // Just display the mode...  (no cheating... )
+                    GUILayout.Label("Pump Start Sound:  " + PumpSoundStart.ToString());
+                    GUILayout.Label("Pump Run Sound:  " + PumpSoundRun.ToString());
+                    GUILayout.Label("Pump Stop Sound:  " + PumpSoundStop.ToString());
+                    GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
+                    GUILayout.Label("Crew Exit Sound:  " + CrewSoundStart.ToString());
+                    GUILayout.Label("Crew Xfer Sound:  " + CrewSoundRun.ToString());
+                    GUILayout.Label("Crew Enter Sound:  " + CrewSoundStop.ToString());
+
+                    // Just display the mode...  (no cheating... )
+                    GUILayout.Label("Enable CLS:  " + EnableCLS.ToString());
+                    GUILayout.Label("Enable Crew Xfers:  " + RealismMode.ToString());
+                    GUILayout.Label("Enable Science Xfers:  " + EnableScience.ToString());
+                    GUILayout.Label("Enable Resources in Pre-Flight:  " + EnablePFResources.ToString());
+                    GUILayout.Label("Enable SM Debug Popup On error:  " + AutoDebug.ToString());
+                }
             }
             else
             {
                 // Just display the mode...  (no cheating... )
                 GUILayout.Label("Realism Mode:  " + RealismMode.ToString());
             }
-
-            // Pump Start Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Start Sound: ", GUILayout.Width(120));
-            PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // Pump Run Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Run Sound: ", GUILayout.Width(120));
-            PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // Pump Stop Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Stop Sound: ", GUILayout.Width(120));
-            PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // create xfer Flow Rate slider;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
-            FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // Crew Start Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Exit Sound: ", GUILayout.Width(120));
-            CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // Crew Run Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Xfer Sound: ", GUILayout.Width(120));
-            CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
-
-            // Crew Stop Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Enter Sound: ", GUILayout.Width(120));
-            CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(200));
-            GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
@@ -325,6 +382,11 @@ namespace ShipManifest
                 CrewSoundStart = PrevCrewSoundStart;
                 CrewSoundRun = PrevCrewSoundRun;
                 CrewSoundStop = PrevCrewSoundStop;
+                EnableScience = prevEnableScience;
+                EnableCrew = prevEnableCrew;
+                EnablePFResources = prevEnablePFResources;
+                EnableCLS = prevEnableCLS;
+                EnableTextureReplacer = prevEnableTextureReplacer;
 
                 ShowSettings = false;
             }
@@ -389,7 +451,7 @@ namespace ShipManifest
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
                 ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
                 AutoDebug = configfile.GetValue<bool>("AutoDebug");
-                TextureReplacer = configfile.GetValue<bool>("TextureReplacer");
+                EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -451,7 +513,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("TextureReplacer Loaded: {0}", TextureReplacer), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
 
                 ValidateLoad();
             }
@@ -540,7 +602,7 @@ namespace ShipManifest
                 configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
                 configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
                 configfile.SetValue("AutoDebug", AutoDebug);
-                configfile.SetValue("TextureReplacer", TextureReplacer);
+                configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
 
                 configfile.save();
 
@@ -576,7 +638,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("TextureReplacer Saved: {0}", TextureReplacer.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
             }
             catch (Exception ex)
             {
