@@ -58,5 +58,5 @@
   <double name="IVATimeDelaySec">5</double>
   <bool name="ShowIVAUpdateBtn">0</bool>
   <bool name="AutoDebug">0</bool>
-  <bool name="TextureReplacer">0</bool>
+  <bool name="EnableTextureReplacer">0</bool>
 </config>
