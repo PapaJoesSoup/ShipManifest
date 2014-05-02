@@ -97,7 +97,7 @@ namespace ShipManifest
                     {
                         _partsByResource = new Dictionary<string, List<Part>>();
                     }
-                    if (FlightGlobals.ActiveVessel == vessel)
+                    if (FlightGlobals.ActiveVessel == vessel && _partsByResource != null)
                     {
                         // Return what we already have...
                         return _partsByResource;
@@ -107,39 +107,10 @@ namespace ShipManifest
                         // Let's update...
                         vessel = FlightGlobals.ActiveVessel;
                         clsVessel = CLSAddon.Instance.Vessel;
-                        // First Crew...
-                        if (ShipManifestSettings.EnableCrew && ShipManifestSettings.EnableCLS)
-                        {
-                            foreach (CLSPart part in clsVessel.Parts)
-                            {
-                                // First let's Get any Crew...
-                                if (part.Habitable)
-                                {
-                                    bool vResouceFound = false;
-                                    // is resource in the list yet?.
-                                    if (_partsByResource.Keys.Contains("Crew"))
-                                    {
-                                        // found resource.  lets add part to its list.
-                                        vResouceFound = true;
-                                        List<Part> eParts = _partsByResource["Crew"];
-                                        eParts.Add((Part)part);
-                                    }
-                                    if (!vResouceFound)
-                                    {
-                                        // found a new resource.  lets add it to the list of resources.
-                                        List<Part> nParts = new List<Part>();
-                                        nParts.Add((Part)part);
-                                        _partsByResource.Add("Crew", nParts);
-                                    }
-                                
-                                }
-                            }
-                        }
-
                         foreach (Part part in FlightGlobals.ActiveVessel.Parts)
                         {
                             // First let's Get any Crew...
-                            if (part.CrewCapacity > 0 && ShipManifestSettings.EnableCrew && !ShipManifestSettings.EnableCLS)
+                            if (part.CrewCapacity > 0 && ShipManifestSettings.EnableCrew)
                             {
                                 bool vResourceFound = false;
                                 // is resource in the list yet?.
@@ -158,7 +129,6 @@ namespace ShipManifest
                                     _partsByResource.Add("Crew", nParts);
                                 }
                             }
-
                             // Let's Get any Science...
                             if (ShipManifestSettings.EnableScience)
                             {
@@ -735,7 +705,7 @@ namespace ShipManifest
                         if (elapsed > 1)
                         {
                             // Fire Board event for Texture Replacer.
-                            if (SettingsManager.TextureReplacer)
+                            if (SettingsManager.EnableTextureReplacer)
                                 GameEvents.onCrewBoardVessel.Fire(evaAction);
 
                             // Spawn crew in parts and in vessel.
@@ -791,7 +761,7 @@ namespace ShipManifest
                                     ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
 
                                     // Fire Board event for Texture Replacer.
-                                    if (SettingsManager.TextureReplacer)
+                                    if (SettingsManager.EnableTextureReplacer)
                                         GameEvents.onCrewBoardVessel.Fire(evaAction);
 
                                     // Spawn crew in parts and in vessel.
