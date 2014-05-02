@@ -586,7 +586,7 @@ namespace ShipManifest
                     // Send the kerbal(s) eva.  This is the eva trigger I was looking for
                     // We will fie the board event when we are ready, in the update code.
                     ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
-                    if (SettingsManager.TextureReplacer)
+                    if (SettingsManager.EnableTextureReplacer)
                         GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
                     
                     // Add the crew members back into the part(s) at their new seats.
@@ -599,7 +599,7 @@ namespace ShipManifest
                     RemoveCrew(sourceMember, sourcePart);
                     ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
 
-                    if (SettingsManager.TextureReplacer)
+                    if (SettingsManager.EnableTextureReplacer)
                         GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
 
                     targetPart.AddCrewmemberAt(sourceMember, newIdx);
