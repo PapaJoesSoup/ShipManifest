@@ -56,7 +56,7 @@
       <HintPath>..\..\..\..\..\ksp-win-0-23-0\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="ConnectedLivingSpace">
-      <HintPath>..\..\..\..\..\ksp-win-0-23-0\KSP_win\GameData\ConnectedLivingSpace\Plugins\ConnectedLivingSpace.dll</HintPath>
+      <HintPath>..\..\..\..\Downloads\uploads_2014_05_ConnectedLivingSpace-release-v1.0.4.1\GameData\ConnectedLivingSpace\Plugins\ConnectedLivingSpace.dll</HintPath>
     </Reference>
     <Reference Include="Toolbar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
