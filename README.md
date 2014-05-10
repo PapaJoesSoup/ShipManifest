@@ -1,6 +1,6 @@
 ShipManifest
 ============
-Version 0.23.5.3.2.2 - 2 May, 2014 - CLS Hot Fix Edition..
+Version 0.23.5.3.2.2a - 9 May, 2014 - CLS Hot Fix Edition..
  -  New: Hot Fix.  Recompiled with new assembly reference.  No other changes. 
 
 Version 0.23.5.3.2.2 - 2 May, 2014 - Realism Settings Love Edition..
