@@ -1,7 +1,9 @@
 ShipManifest
 ============
-Version 0.23.5.3.2.2 - 2 May, 2014 - Realism Settings Love Edition..
+Version 0.23.5.3.2.2 - 2 May, 2014 - CLS Hot Fix Edition..
+ -  New: Hot Fix.  Recompiled with new assembly reference.  No other changes. 
 
+Version 0.23.5.3.2.2 - 2 May, 2014 - Realism Settings Love Edition..
  -  New: Crew Transfers should allow swapping Kerbals between parts. Swaps are possible within a part, but not between parts. - www.youtube.com/watch?v=I_TNxjnW234
     New: Added config file switch for Enable/Disable TextureReplacer eva event triggers. testing shows it conflicts with TACLS.
  -  Bug: Highlighting behaves abnormally on resource changes from crew to another resource. Residual selected part highlighting... - Internally found, Post release of 0.23.5.3.2.1
