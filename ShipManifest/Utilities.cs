@@ -136,9 +136,6 @@ namespace ShipManifest
         public Rect ManifestPosition;
         public Rect TransferPosition;
 
-        public Rect PrevResourceManifestPosition;
-        public Rect PrevResourceTransferPosition;
-
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
@@ -146,26 +143,27 @@ namespace ShipManifest
 
         public bool AutoSave;
         public float SaveIntervalSec = 60f;
-        public bool PrevAutoSave;
-        public float PrevSaveIntervalSec = 60f;
+        public bool prevAutoSave;
+        public float prevSaveIntervalSec = 60f;
 
         public Rect RosterPosition;
         public bool ShowRoster { get; set; }
 
         public bool RealismMode = false;
-        public bool PrevRealismMode = false;
-        public bool LockRealismMode = false;
+        public bool prevRealismMode = false;
+        public bool LockSettings = false;
+        public bool prevLockSettings = false;
 
         public static bool VerboseLogging = false;
-        public static bool PrevVerboseLogging = false;
+        public static bool prevVerboseLogging = false;
 
         public Rect DebuggerPosition;
         public static bool ShowDebugger = false;
-        public static bool PrevShowDebugger = false;
+        public static bool prevShowDebugger = false;
         public static bool AutoDebug = false;
 
         public float FlowRate = 100;
-        public float PrevFlowRate = 100;
+        public float prevFlowRate = 100;
         public float MaxFlowRate = 100;
         public float MinFlowRate = 0;
 
@@ -191,9 +189,9 @@ namespace ShipManifest
         public string PumpSoundStart = "ShipManifest/Sounds/59328-1";
         public string PumpSoundRun = "ShipManifest/Sounds/59328-2";
         public string PumpSoundStop = "ShipManifest/Sounds/59328-3";
-        public string PrevPumpSoundStart = "";
-        public string PrevPumpSoundRun = "";
-        public string PrevPumpSoundStop = "";
+        public string prevPumpSoundStart = "";
+        public string prevPumpSoundRun = "";
+        public string prevPumpSoundStop = "";
 
         public double PumpSoundVol = 3;
         public double CrewSoundVol = 3;
@@ -201,9 +199,9 @@ namespace ShipManifest
         public string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
         public string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
         public string CrewSoundStop = "ShipManifest/Sounds/xxxxx-3";
-        public string PrevCrewSoundStart = "";
-        public string PrevCrewSoundRun = "";
-        public string PrevCrewSoundStop = "";
+        public string prevCrewSoundStart = "";
+        public string prevCrewSoundRun = "";
+        public string prevCrewSoundStop = "";
 
         public static string SourcePartColor = "red";
         public static string TargetPartColor = "green";
@@ -218,25 +216,28 @@ namespace ShipManifest
         {
             // Store settings in case we cancel later...
 
-            PrevShowDebugger = ShowDebugger;
-            PrevVerboseLogging = VerboseLogging;
-            PrevAutoSave = AutoSave;
-            PrevSaveIntervalSec = SaveIntervalSec;
+            prevShowDebugger = ShowDebugger;
+            prevVerboseLogging = VerboseLogging;
+            prevAutoSave = AutoSave;
+            prevSaveIntervalSec = SaveIntervalSec;
 
             // Realism Mode settings.
-            PrevRealismMode = RealismMode;
-            PrevFlowRate = FlowRate;
-            PrevPumpSoundStart = PumpSoundStart;
-            PrevPumpSoundRun = PumpSoundRun;
-            PrevPumpSoundStop = PumpSoundStop;
-            PrevCrewSoundStart = CrewSoundStart;
-            PrevCrewSoundRun = CrewSoundRun;
-            PrevCrewSoundStop = CrewSoundStop;
+            prevRealismMode = RealismMode;
             prevEnableScience = EnableScience;
             prevEnableCrew = EnableCrew;
             prevEnablePFResources = EnablePFResources;
             prevEnableCLS = EnableCLS;
             prevEnableTextureReplacer = EnableTextureReplacer;
+            prevLockSettings = LockSettings;
+
+            // sounds
+            prevFlowRate = FlowRate;
+            prevPumpSoundStart = PumpSoundStart;
+            prevPumpSoundRun = PumpSoundRun;
+            prevPumpSoundStop = PumpSoundStop;
+            prevCrewSoundStart = CrewSoundStart;
+            prevCrewSoundRun = CrewSoundRun;
+            prevCrewSoundStop = CrewSoundStop;
 
             string label = "";
             string txtSaveInterval = SaveIntervalSec.ToString();
@@ -244,12 +245,158 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
+            GUI.enabled = true;
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
+            if (!LockSettings)
+                GUILayout.Label("Settings / Options", GUILayout.Height(10));
+            else
+                GUILayout.Label("Settings / Options  (Locked.  Unlock in Config file)", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
-            label = "Enable Debug Console";
+            bool isEnabled = (!LockSettings);
+            // Realism Mode
+            GUI.enabled = isEnabled;
+            label = "Enable Realism Mode";
+            RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+
+            // EnableCrew Mode
+            GUI.enabled = isEnabled;
+            GUILayout.BeginHorizontal();
+            label = "Enable Crew Xfers";
+            EnableCrew = GUILayout.Toggle(EnableCrew, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            if (!EnableCrew)
+            {
+                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                {
+                    // Clear Resource selection.
+                    ShipManifestBehaviour.SelectedResource = null;
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow = false;
+                }
+            }
+            // EnableCLS Mode
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            if (!EnableCrew)
+                GUI.enabled = false;
+            else
+                GUI.enabled = isEnabled;
+            label = "Enable CLS  (Connected Living Spaces)";
+            EnableCLS = GUILayout.Toggle(EnableCLS, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            if (!EnableCLS && prevEnableCLS)
+            {
+                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                {
+                    //Reassign the resource to observe new settings.
+                    ShipManifestBehaviour.SelectedResource = "Crew";
+                }
+            }
+            else if (EnableCLS && !prevEnableCLS)
+            {
+                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                {
+                    //Reassign the resource to observe new settings.
+                    ShipManifestBehaviour.SelectedResource = "Crew";
+                }
+            }
+
+            // EnableScience Mode
+            GUILayout.BeginHorizontal();
+            GUI.enabled = isEnabled;
+            label = "Enable Science Xfers";
+            EnableScience = GUILayout.Toggle(EnableScience, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            if (!EnableScience)
+            {
+                if (ShipManifestBehaviour.SelectedResource == "Science")
+                {
+                    // Clear Resource selection.
+                    ShipManifestBehaviour.SelectedResource = null;
+                }
+            }
+
+            // EnablePFResources Mode
+            GUILayout.BeginHorizontal();
+            GUI.enabled = isEnabled;
+            label = "Enable Resources in Pre-Flight";
+            EnablePFResources = GUILayout.Toggle(EnablePFResources, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            // LockSettings Mode
+            GUI.enabled = isEnabled;
+            label = "Lock Settings  (If set ON, edit config File to Turn OFF)";
+            LockSettings = GUILayout.Toggle(LockSettings, label, GUILayout.Width(300));
+
+            GUI.enabled = true;
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
+            GUILayout.Label("Sounds", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+            GUILayout.Label("Transfer Pump:", GUILayout.Height(20));
+            // Pump Start Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Pump Starting: ", GUILayout.Width(100));
+            PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            // Pump Run Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Pump Running: ", GUILayout.Width(100));
+            PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            // Pump Stop Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Pump Stopping: ", GUILayout.Width(100));
+            PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            // create xfer Flow Rate slider;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(100), GUILayout.Height(20));
+            FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label(" ", GUILayout.Height(10));
+            GUILayout.Label("Crew:", GUILayout.Height(20));
+            // Crew Start Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Exiting: ", GUILayout.Width(100));
+            CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            // Crew Run Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Xfering: ", GUILayout.Width(100));
+            CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            // Crew Stop Sound
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Crew Entering: ", GUILayout.Width(100));
+            CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(220));
+            GUILayout.EndHorizontal();
+
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
+            GUILayout.Label("Configuraton", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            // AutoDebug Mode
+            label = "Enable SM Debug Window On Error";
+            AutoDebug = GUILayout.Toggle(AutoDebug, label, GUILayout.Width(300));
+
+            label = "Enable Debug Window";
             ShowDebugger = GUILayout.Toggle(ShowDebugger, label, GUILayout.Width(300));
 
             label = "Enable Verbose Logging";
             VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
+
+            // TextureReplacer Mode
+            label = "Enable Texture Replacer Events";
+            EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
 
             label = "Enable AutoSave Settings";
             AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
@@ -259,104 +406,6 @@ namespace ShipManifest
             txtSaveInterval = GUILayout.TextField(txtSaveInterval, GUILayout.Width(40));
             GUILayout.Label("(sec)", GUILayout.Width(40));
             GUILayout.EndHorizontal();
-
-            // AutoDebug Mode
-            label = "Enable SM Debug Window On Error";
-            AutoDebug = GUILayout.Toggle(AutoDebug, label, GUILayout.Width(300));
-
-            // TextureReplacer Mode
-            label = "Enable Texture Replacer Events";
-            EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
-
-            label = "Enable Realism Mode";
-
-            if (!LockRealismMode)
-            {
-                // Realism Mode
-                RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
-
-                if (RealismMode)
-                {
-
-                    // EnableCLS Mode
-                    label = "Enable Connected Living Spaces (CLS)";
-                    EnableCLS = GUILayout.Toggle(EnableCLS, label, GUILayout.Width(300));
-                    // EnableCrew Mode
-                    label = "Enable Crew Xfers";
-                    EnableCrew = GUILayout.Toggle(EnableCrew, label, GUILayout.Width(300));
-                    // EnableScience Mode
-                    label = "Enable Science Xfers";
-                    EnableScience = GUILayout.Toggle(EnableScience, label, GUILayout.Width(300));
-                    // EnablePFResources Mode
-                    label = "Enable Resources in Pre-Flight";
-                    EnablePFResources = GUILayout.Toggle(EnablePFResources, label, GUILayout.Width(300));
-
-                    // Pump Start Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Pump Start Sound: ", GUILayout.Width(120));
-                    PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // Pump Run Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Pump Run Sound: ", GUILayout.Width(120));
-                    PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // Pump Stop Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Pump Stop Sound: ", GUILayout.Width(120));
-                    PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // create xfer Flow Rate slider;
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
-                    FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // Crew Start Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Crew Exit Sound: ", GUILayout.Width(120));
-                    CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // Crew Run Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Crew Xfer Sound: ", GUILayout.Width(120));
-                    CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-
-                    // Crew Stop Sound
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Crew Enter Sound: ", GUILayout.Width(120));
-                    CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(200));
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    // Just display the mode...  (no cheating... )
-                    GUILayout.Label("Pump Start Sound:  " + PumpSoundStart.ToString());
-                    GUILayout.Label("Pump Run Sound:  " + PumpSoundRun.ToString());
-                    GUILayout.Label("Pump Stop Sound:  " + PumpSoundStop.ToString());
-                    GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(120), GUILayout.Height(20));
-                    GUILayout.Label("Crew Exit Sound:  " + CrewSoundStart.ToString());
-                    GUILayout.Label("Crew Xfer Sound:  " + CrewSoundRun.ToString());
-                    GUILayout.Label("Crew Enter Sound:  " + CrewSoundStop.ToString());
-
-                    // Just display the mode...  (no cheating... )
-                    GUILayout.Label("Enable CLS:  " + EnableCLS.ToString());
-                    GUILayout.Label("Enable Crew Xfers:  " + RealismMode.ToString());
-                    GUILayout.Label("Enable Science Xfers:  " + EnableScience.ToString());
-                    GUILayout.Label("Enable Resources in Pre-Flight:  " + EnablePFResources.ToString());
-                    GUILayout.Label("Enable SM Debug Popup On error:  " + AutoDebug.ToString());
-                }
-            }
-            else
-            {
-                // Just display the mode...  (no cheating... )
-                GUILayout.Label("Realism Mode:  " + RealismMode.ToString());
-            }
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
@@ -370,23 +419,24 @@ namespace ShipManifest
             }
             if (GUILayout.Button("Cancel"))
             {
-                RealismMode = PrevRealismMode;
-                ShowDebugger = PrevShowDebugger;
-                VerboseLogging = PrevVerboseLogging;
-                AutoSave = PrevAutoSave;
-                SaveIntervalSec = PrevSaveIntervalSec;
-                FlowRate = PrevFlowRate;
-                PumpSoundStart = PrevPumpSoundStart;
-                PumpSoundRun = PrevPumpSoundRun;
-                PumpSoundStop = PrevPumpSoundStop;
-                CrewSoundStart = PrevCrewSoundStart;
-                CrewSoundRun = PrevCrewSoundRun;
-                CrewSoundStop = PrevCrewSoundStop;
+                RealismMode = prevRealismMode;
+                ShowDebugger = prevShowDebugger;
+                VerboseLogging = prevVerboseLogging;
+                AutoSave = prevAutoSave;
+                SaveIntervalSec = prevSaveIntervalSec;
+                FlowRate = prevFlowRate;
+                PumpSoundStart = prevPumpSoundStart;
+                PumpSoundRun = prevPumpSoundRun;
+                PumpSoundStop = prevPumpSoundStop;
+                CrewSoundStart = prevCrewSoundStart;
+                CrewSoundRun = prevCrewSoundRun;
+                CrewSoundStop = prevCrewSoundStop;
                 EnableScience = prevEnableScience;
                 EnableCrew = prevEnableCrew;
                 EnablePFResources = prevEnablePFResources;
                 EnableCLS = prevEnableCLS;
                 EnableTextureReplacer = prevEnableTextureReplacer;
+                LockSettings = prevLockSettings;
 
                 ShowSettings = false;
             }
@@ -420,7 +470,7 @@ namespace ShipManifest
                 RosterPosition = configfile.GetValue<Rect>("RosterPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
                 RealismMode = configfile.GetValue<bool>("RealismMode");
-                LockRealismMode = configfile.GetValue<bool>("LockRealismMode");
+                LockSettings = configfile.GetValue<bool>("LockSettings");
                 VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
                 AutoSave = configfile.GetValue<bool>("AutoSave");
                 SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
@@ -489,7 +539,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("LockRealismMode Loaded: {0}", LockRealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("LockSettings Loaded: {0}", LockSettings.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SaveIntervalSec Loaded: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
@@ -528,7 +578,7 @@ namespace ShipManifest
 
             //ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
             //RealismMode = configfile.GetValue<bool>("RealismMode");
-            //LockRealismMode = configfile.GetValue<bool>("LockRealismMode");
+            //LockSettings = configfile.GetValue<bool>("LockSettings");
             //VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
             //AutoSave = configfile.GetValue<bool>("AutoSave");
             //SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
@@ -573,7 +623,7 @@ namespace ShipManifest
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
                 configfile.SetValue("RealismMode", RealismMode);
-                configfile.SetValue("LockRealismMode", LockRealismMode);
+                configfile.SetValue("LockSettings", LockSettings);
                 configfile.SetValue("VerboseLogging", VerboseLogging);
                 configfile.SetValue("AutoSave", AutoSave);
                 configfile.SetValue("SaveIntervalSec", (double)SaveIntervalSec);
@@ -612,7 +662,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("LockRealismMode Saved: {0}", LockRealismMode.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("SaveIntervalSec Saved: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
