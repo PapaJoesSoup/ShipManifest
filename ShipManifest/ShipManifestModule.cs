@@ -56,10 +56,6 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         public static double elapsed = 0.0;
 
-        // Deprecated.  Will be replaced by enum XFERState
-        [KSPField(isPersistant = true)]
-        public static bool IsStarted = false;
-
         [KSPField(isPersistant = true)]
         public static double flow_rate = (double)ShipManifestSettings.FlowRate;
 
@@ -85,7 +81,7 @@ namespace ShipManifest
 
         // dataSource for Resource manifest and ResourceTransfer windows
         // Provides a list of resources and the parts that contain that resource.
-        public static List<string> keyList = new List<string>();
+        public static List<string> ResourceList = new List<string>();
         public static Dictionary<string, List<Part>> _partsByResource = null;
         public static Dictionary<string, List<Part>> PartsByResource
         {
@@ -93,24 +89,22 @@ namespace ShipManifest
             {
                 try
                 {
-                    if (_partsByResource == null || vessel == null)
-                    {
+                    if (_partsByResource == null)
                         _partsByResource = new Dictionary<string, List<Part>>();
-                    }
-                    if (FlightGlobals.ActiveVessel == vessel && _partsByResource != null)
-                    {
-                        // Return what we already have...
-                        return _partsByResource;
-                    }
                     else
+                        _partsByResource.Clear();
+
+                    // Let's update...
+                    if (FlightGlobals.ActiveVessel != null)
                     {
-                        // Let's update...
+                        //ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  "), "Info", SettingsManager.VerboseLogging);
                         vessel = FlightGlobals.ActiveVessel;
                         clsVessel = CLSAddon.Instance.Vessel;
+                        _partsByResource = new Dictionary<string, List<Part>>();
                         foreach (Part part in FlightGlobals.ActiveVessel.Parts)
                         {
-                            // First let's Get any Crew...
-                            if (part.CrewCapacity > 0 && ShipManifestSettings.EnableCrew)
+                            // First let's Get any Crew, if desired...
+                            if (ShipManifestSettings.EnableCrew && part.CrewCapacity > 0)
                             {
                                 bool vResourceFound = false;
                                 // is resource in the list yet?.
@@ -190,9 +184,9 @@ namespace ShipManifest
                 }
 
                 if (_partsByResource != null)
-                    keyList = new List<string>(_partsByResource.Keys);
+                    ResourceList = new List<string>(_partsByResource.Keys);
                 else
-                    keyList = null;
+                    ResourceList = null;
 
                 return _partsByResource;
             }
@@ -215,7 +209,10 @@ namespace ShipManifest
                     _prevSelectedResource = _selectedResource;
                     _selectedResource = value;
 
-                    SelectedResourceParts = _partsByResource[_selectedResource];
+                    if (value == null)
+                        SelectedResourceParts = new List<Part>();
+                    else
+                        SelectedResourceParts = _partsByResource[_selectedResource];
                 }
                 catch (Exception ex)
                 {
@@ -225,6 +222,7 @@ namespace ShipManifest
         }
 
         // Provides a list of parts for a given resource.
+        // Used to maintain Add/Remove of OnMouseExit handlers
         private static List<Part> _selectedResourceParts;
         public static List<Part> SelectedResourceParts
         {
@@ -382,13 +380,7 @@ namespace ShipManifest
 
         public void Start()
         {
-            GameEvents.onVesselChange.Add(OnVesselChange);
-        }
 
-        private void OnVesselChange(Vessel data)
-        {
-            vessel = null;
-            ManifestUtilities.LogMessage("OnVesselChange fired.", "Info", SettingsManager.VerboseLogging);
         }
 
         public void OnGUI()
@@ -409,7 +401,7 @@ namespace ShipManifest
                     {
                         //Instantiate the controller for the active vessel.
                         ManifestController.GetInstance(FlightGlobals.ActiveVessel).CanDrawButton = true;
-
+                       
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
                         if (tXferOn || sXferOn)
@@ -432,7 +424,6 @@ namespace ShipManifest
         
         public void OnDestroy()
         {
-            GameEvents.onVesselChange.Remove(OnVesselChange);
             CancelInvoke("RunSave");
             button.Destroy();
         }
@@ -462,10 +453,7 @@ namespace ShipManifest
                     if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && SelectedPartTarget.protoModuleCrew.Count > 0)
                     {
                         // now, are the parts connected to each other in the same living space?
-                        if (IsCLS())
-                        {
-                            results = true;
-                        }
+                        results = IsCLS();
                     }
                 }
             }
@@ -583,6 +571,17 @@ namespace ShipManifest
             Stop
         }
 
+        private void RebuildPartLists()
+        {
+            //  We need to rebuiild all parts.
+            vessel = null;
+            _partsByResource = null;
+            if (SelectedResource == null || !ResourceList.Contains(SelectedResource))
+                SelectedResource = null;
+            else
+                SelectedResourceParts = PartsByResource[SelectedResource];
+        }
+        
         private void RealModePumpXfer()
         {
             try
@@ -630,8 +629,7 @@ namespace ShipManifest
                             double deltaAmt = deltaT * flow_rate;
 
                             // This adjusts the delta when we get to the end of the xfer.
-                            // Also sets IsStarted = false;
-                            float XferAmount = -1f;
+                            float XferAmount = 0f;
                             // which way we going?
                             if (tXferOn)
                                 XferAmount = ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount;
@@ -651,10 +649,41 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage("11a. AmtXferred = " + ManifestController.GetInstance(FlightGlobals.ActiveVessel).AmtXferred.ToString(), "Info", SettingsManager.VerboseLogging);
 
                             // Drain source...
+                            // and let's make sure we can move the amount requested or adjust it and stop the flow after the move.
                             if (tXferOn)
+                            {
+                                // Source is target on Interface...
+                                // if the amount to move exceeds either the balance of the source or the capacity of the target, reduce it.
+                                if (SelectedPartTarget.Resources[SelectedResource].amount - deltaAmt < 0)
+                                {
+                                    deltaAmt = SelectedPartTarget.Resources[SelectedResource].amount;
+                                    XferState = XFERState.Stop;
+                                }
+                                else if (SelectedPartSource.Resources[SelectedResource].amount + deltaAmt > SelectedPartSource.Resources[SelectedResource].maxAmount)
+                                {
+                                    deltaAmt = SelectedPartSource.Resources[SelectedResource].maxAmount - SelectedPartSource.Resources[SelectedResource].amount;
+                                    XferState = XFERState.Stop;
+                                }
+
                                 SelectedPartTarget.Resources[SelectedResource].amount -= deltaAmt;
+                            }
                             else
+                            {
+                                // Source is source on Interface...
+                                if (SelectedPartSource.Resources[SelectedResource].amount - deltaAmt < 0)
+                                {
+                                    deltaAmt = SelectedPartSource.Resources[SelectedResource].amount;
+                                    XferState = XFERState.Stop;
+                                }
+                                else if (SelectedPartTarget.Resources[SelectedResource].amount + deltaAmt > SelectedPartTarget.Resources[SelectedResource].maxAmount)
+                                {
+                                    deltaAmt = SelectedPartTarget.Resources[SelectedResource].maxAmount - SelectedPartTarget.Resources[SelectedResource].amount;
+                                    XferState = XFERState.Stop;
+                                }
+
                                 SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
+                            }
+
 
                             ManifestUtilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
 
@@ -744,7 +773,7 @@ namespace ShipManifest
                                 elapsed += Planetarium.GetUniversalTime() - timestamp;
 
                                 // Play run sound when start sound is nearly done. (repeats)
-                                if (elapsed >= source1.clip.length - 0.25 && !IsStarted)
+                                if (elapsed >= source1.clip.length - 0.25)
                                 {
                                     source2.Play();
                                     elapsed = 0;
@@ -924,16 +953,7 @@ namespace ShipManifest
         {
             try
             {
-                if (_selectedResourceParts != null && _selectedResource != "Crew")
-                {
-                    foreach (Part part in _selectedResourceParts)
-                    {
-                        ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        part.RemoveOnMouseExit(OnMouseExit);
-                    }
-                }
-                if (clsVessel.Spaces != null && _selectedResource == "Crew")
+                if (_selectedResource == "Crew" && ShipManifestSettings.EnableCLS)
                 {
                     if (SelectedPartSource != null)
                     {
@@ -947,9 +967,20 @@ namespace ShipManifest
                         Part.OnActionDelegate OnMouseExit = MouseExit;
                         SelectedPartTarget.RemoveOnMouseExit(OnMouseExit);
                     }
+                    if (clsVessel == null)
+                        clsVessel = CLSAddon.Instance.Vessel;
                     foreach (CLSSpace space in clsVessel.Spaces)
                     {
                         space.Highlight(false);
+                    }
+                }
+                else if (_selectedResourceParts != null)
+                {
+                    foreach (Part part in _selectedResourceParts)
+                    {
+                        ClearHighlight(part);
+                        Part.OnActionDelegate OnMouseExit = MouseExit;
+                        part.RemoveOnMouseExit(OnMouseExit);
                     }
                 }
             }
@@ -963,16 +994,7 @@ namespace ShipManifest
         {
             try
             {
-                if (_selectedResourceParts != null && _prevSelectedResource != "Crew")
-                {
-                    foreach (Part part in _selectedResourceParts)
-                    {
-                        ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        part.RemoveOnMouseExit(OnMouseExit);
-                    }
-                }
-                if (clsVessel.Spaces != null && _prevSelectedResource == "Crew")
+                if (_prevSelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
                 {
                     if (SelectedPartSource != null)
                     {
@@ -982,9 +1004,20 @@ namespace ShipManifest
                     {
                         SelectedPartTarget = null;
                     }
+                    if (clsVessel == null)
+                        clsVessel = CLSAddon.Instance.Vessel;
                     foreach (CLSSpace space in clsVessel.Spaces)
                     {
                         space.Highlight(false);
+                    }
+                }
+                else if (_selectedResourceParts != null)
+                {
+                    foreach (Part part in _selectedResourceParts)
+                    {
+                        ClearHighlight(part);
+                        Part.OnActionDelegate OnMouseExit = MouseExit;
+                        part.RemoveOnMouseExit(OnMouseExit);
                     }
                 }
             }
@@ -1002,8 +1035,10 @@ namespace ShipManifest
                 // to manage mouse exit events and preserve highlighting.
                 if (SelectedResource != null)
                 {
-                    if (clsVessel.Spaces != null && SelectedResource == "Crew")
+                    if (SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
                     {
+                        if (clsVessel == null)
+                            clsVessel = CLSAddon.Instance.Vessel;
                         foreach (CLSSpace space in clsVessel.Spaces)
                         {
                             space.Highlight(true);
@@ -1021,7 +1056,7 @@ namespace ShipManifest
                             SelectedPartTarget.AddOnMouseExit(OnMouseExit);
                         }
                     }
-                    if (_selectedResourceParts != null && _selectedResource != "Crew")
+                    else if (_selectedResourceParts != null)
                     {
                         foreach (Part part in _selectedResourceParts)
                         {
@@ -1039,7 +1074,7 @@ namespace ShipManifest
         }
 
         /// <summary>
-        /// This routine is used ot remove source or taget highlighting on a part.  
+        /// This routine is used to remove source or taget highlighting on a part.  
         /// it is cls Aware, and preserves the base space highlighting when selected part coler is removed.
         /// </summary>
         /// <param name="IsTargetPart"></param>
@@ -1189,12 +1224,8 @@ namespace ShipManifest
             // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
             // and instructions for using CLS API by codepoet.
 
-            // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
+            GameEvents.onVesselWasModified.Fire(FlightGlobals.ActiveVessel);
             GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
-
-            // Refresh after CLS refreshes...  (this maintains highlighing....)
-            clsVessel = CLSAddon.Instance.Vessel;
-            SelectedResourceParts = PartsByResource["Crew"];
         }
         
         #endregion
