@@ -1,5 +1,19 @@
 ShipManifest
 ============
+Version 0.23.5.3.2.3 - 11 May, 2014 - Settings, Roster & Bug Fix Edition.
+ - New:  Roster Window now allows adding and removing individual Kerbals during pre-flight in Realism Mode, and Anytime in Standard mode.
+ - New:  Additional changes to Settings.   
+         - Now sepearate sections make finding things easier.  
+         - Changed LockRealismMode to LockSettings, as Realism Mode is not a parent setting.
+		 - Added Locksettings to the Settings Window.  Once set, must be turned off in config file.
+		 - Made Enable CLS a child of Enable Crew
+ - Bug:  SM not detecting Changes in CrewCapacity with Inflatable Parts...
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
+ - Bug:  SM not Erroring when attempting to transfer to a pert with no internal model
+		 = http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-2-2-May-14?p=1140559&viewfull=1#post1140559
+ - Bug:  SM still allowing negative numbers in resource transfers.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-2-2-May-14?p=1136419&viewfull=1#post1136419
+
 Version 0.23.5.3.2.2a - 9 May, 2014 - CLS Hot Fix Edition..
  -  New: Hot Fix.  Recompiled with new assembly reference.  No other changes. 
 
