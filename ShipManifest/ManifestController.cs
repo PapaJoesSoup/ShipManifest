@@ -76,10 +76,18 @@ namespace ShipManifest
             try
             {
                 if (FlightGlobals.fetch == null)
-                { return; }
+                { 
+                    ShipManifestBehaviour.SelectedPartSource = ShipManifestBehaviour.SelectedPartTarget = null;
+                    ShipManifestBehaviour.SelectedResource = null;
+                    return;
+                }
 
                 if (FlightGlobals.ActiveVessel != Vessel)
-                { return; }
+                {
+                    ShipManifestBehaviour.SelectedPartSource = ShipManifestBehaviour.SelectedPartTarget = null;
+                    ShipManifestBehaviour.SelectedResource = null;
+                    return; 
+                }
 
                 ManifestStyle.SetupGUI();
 
@@ -225,7 +233,6 @@ namespace ShipManifest
         {
             try
             {
-
                 GUIStyle style = GUI.skin.button;
                 var defaultColor = style.normal.textColor;
                 GUILayout.BeginVertical();
@@ -369,7 +376,7 @@ namespace ShipManifest
 
                 if (ShipManifestBehaviour.SelectedResource != null)
                 {
-                    foreach (Part part in ShipManifestBehaviour.SelectedResourceParts)
+                    foreach (Part part in ShipManifestBehaviour.PartsByResource[ShipManifestBehaviour.SelectedResource])
                     {
                         string resourcename = "";
                         if (ShipManifestBehaviour.SelectedResource != "Crew" && ShipManifestBehaviour.SelectedResource != "Science")
@@ -451,7 +458,7 @@ namespace ShipManifest
                         }
                     }
 
-                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && IsPreLaunch && ShipManifestBehaviour.SelectedPartSource != null && !PartCrewIsFull(ShipManifestBehaviour.SelectedPartSource))
+                    if (((ShipManifestBehaviour.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestBehaviour.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && ShipManifestBehaviour.SelectedPartSource != null && !PartCrewIsFull(ShipManifestBehaviour.SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -460,6 +467,11 @@ namespace ShipManifest
                     {
                         GUI.enabled = true;
                         buttonText = "Respawn";
+                    }
+                    else if (((ShipManifestBehaviour.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestBehaviour.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                    {
+                        GUI.enabled = true;
+                        buttonText = "Remove";
                     }
                     else
                     {
@@ -470,9 +482,16 @@ namespace ShipManifest
                     if (GUILayout.Button(buttonText, GUILayout.Width(60)))
                     {
                         if (buttonText == "Add")
-                            AddCrew(ShipManifestBehaviour.SelectedPartSource, kerbal);
+                            AddCrew(kerbal, ShipManifestBehaviour.SelectedPartSource);
                         else if (buttonText == "Respawn")
                             RespawnKerbal(kerbal);
+                        else if (buttonText == "Remove")
+                        {
+                            // get part...
+                            Part part = FindPart(kerbal);
+                            if (part != null)
+                                RemoveCrew(kerbal, part);
+                        }
                     }
                     GUILayout.EndHorizontal();
                     GUI.enabled = true;
@@ -507,18 +526,36 @@ namespace ShipManifest
             }
         }
 
-        public void AddCrew(Part part, ProtoCrewMember kerbal)
+        public void AddCrew(ProtoCrewMember kerbal, Part part)
         {
             part.AddCrewmember(kerbal);
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.ASSIGNED;
-            if (kerbal.seat != null)
-                kerbal.seat.SpawnCrew();
+            if (part.internalModel != null)
+            {
+                if (kerbal.seat != null)
+                    kerbal.seat.SpawnCrew();
+            }
             ShipManifestBehaviour.FireEventTriggers();
         }
 
         private bool PartCrewIsFull(Part part)
         {
             return !(part.protoModuleCrew.Count < part.CrewCapacity);
+        }
+
+        private Part FindPart(ProtoCrewMember kerbal)
+        {
+            foreach (Part part in FlightGlobals.ActiveVessel.Parts)
+            {
+                foreach (ProtoCrewMember curkerbal in part.protoModuleCrew)
+                {
+                    if (curkerbal == kerbal)
+                    {
+                        return part;
+                    }
+                }
+            }
+            return null;
         }
 
         private void RemoveCrew(ProtoCrewMember member, Part part)
