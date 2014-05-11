@@ -119,7 +119,7 @@ namespace ShipManifest
                 SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                foreach (Part part in ShipManifestBehaviour.SelectedResourceParts)
+                foreach (Part part in ShipManifestBehaviour.PartsByResource[ShipManifestBehaviour.SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
@@ -322,8 +322,7 @@ namespace ShipManifest
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
-
-                foreach (Part part in ShipManifestBehaviour.SelectedResourceParts)
+                foreach (Part part in ShipManifestBehaviour.PartsByResource[ShipManifestBehaviour.SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
@@ -524,95 +523,105 @@ namespace ShipManifest
         {
             try
             {
-                // Build source and target seat indexes.
-                int curIdx = sourceMember.seatIdx;
-                int newIdx = curIdx;
-                InternalSeat sourceSeat = sourceMember.seat;
-                InternalSeat targetSeat = null;
-                if (sourcePart == targetPart)
+                if (sourcePart.internalModel != null && targetPart.internalModel != null)
                 {
-                    // Must be a move...
-                    if (newIdx + 1 >= sourcePart.CrewCapacity)
-                        newIdx = 0;
-                    else 
-                        newIdx += 1;
-                    // get target seat from part's inernal model
-                    targetSeat = sourcePart.internalModel.seats[newIdx];
-                }
-                else
-                {
-                    // Xfer to another part
-                    // get target seat from part's inernal model
-                    for (int x = 0; x < targetPart.internalModel.seats.Count; x += 1)
+                    // Build source and target seat indexes.
+                    int curIdx = sourceMember.seatIdx;
+                    int newIdx = curIdx;
+                    InternalSeat sourceSeat = sourceMember.seat;
+                    InternalSeat targetSeat = null;
+                    if (sourcePart == targetPart)
                     {
-                        InternalSeat seat = targetPart.internalModel.seats[x];
-                        if (!seat.taken)
+                        // Must be a move...
+                        if (newIdx + 1 >= sourcePart.CrewCapacity)
+                            newIdx = 0;
+                        else
+                            newIdx += 1;
+                        // get target seat from part's inernal model
+                        targetSeat = sourcePart.internalModel.seats[newIdx];
+                    }
+                    else
+                    {
+                        // Xfer to another part
+                        // get target seat from part's inernal model
+                        for (int x = 0; x < targetPart.internalModel.seats.Count; x += 1)
                         {
-                            targetSeat = seat;
-                            newIdx = x;
-                            break;
+                            InternalSeat seat = targetPart.internalModel.seats[x];
+                            if (!seat.taken)
+                            {
+                                targetSeat = seat;
+                                newIdx = x;
+                                break;
+                            }
+                        }
+                        // All seats full?
+                        if (targetSeat == null)
+                        {
+                            // try to match seat if possible (swap with counterpart)
+                            if (newIdx >= targetPart.internalModel.seats.Count)
+                                newIdx = 0;
+                            targetSeat = targetPart.internalModel.seats[newIdx];
                         }
                     }
-                    // All seats full?
-                    if (targetSeat == null)
+
+                    // seats have been chosen.
+                    // Do we need to swap places with another Kerbal?
+                    if (targetSeat.taken)
                     {
-                        // try to match seat if possible (swap with counterpart)
-                        if (newIdx >= targetPart.internalModel.seats.Count)
-                            newIdx = 0;
-                        targetSeat = targetPart.internalModel.seats[newIdx];
+                        // Swap places.
+
+                        // get Kerbal to swap with through his seat...
+                        ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
+
+                        // Remove the crew members from the part(s)...
+                        RemoveCrew(sourceMember, sourcePart);
+                        RemoveCrew(targetMember, targetPart);
+
+                        // At this point, the kerbals are in the "ether".
+                        // this may be why there is an issue with refreshing the internal view.. 
+                        // It may allow (or expect) a board call from an (invisible) eva object.   
+                        // If I can manage to properly trigger that call... then all should properly refresh...
+                        // I'll look into that...
+
+                        // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
+                        // Send the kerbal(s) eva.  This is the eva trigger I was looking for
+                        // We will fie the board event when we are ready, in the update code.
+                        ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        if (SettingsManager.EnableTextureReplacer)
+                            GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+
+                        // Add the crew members back into the part(s) at their new seats.
+                        sourcePart.AddCrewmemberAt(targetMember, curIdx);
+                        targetPart.AddCrewmemberAt(sourceMember, newIdx);
                     }
+                    else
+                    {
+                        // Just move.
+                        RemoveCrew(sourceMember, sourcePart);
+                        ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+
+                        if (SettingsManager.EnableTextureReplacer)
+                            GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+
+                        targetPart.AddCrewmemberAt(sourceMember, newIdx);
+                    }
+
+                    // if moving within a part, set the seat2seat flag
+                    if (sourcePart == targetPart)
+                        ShipManifestBehaviour.isSeat2Seat = true;
+                    else
+                        ShipManifestBehaviour.isSeat2Seat = false;
+
+                    // set the crew transfer flag and wait forthe timeout before firing the board event.
+                    ShipManifestBehaviour.crewXfer = true;
                 }
-
-                // seats have been chosen.
-                // Do we need to swap places with another Kerbal?
-                if (targetSeat.taken)
-                {
-                    // Swap places.
-
-                    // get Kerbal to swap with through his seat...
-                    ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
-
-                    // Remove the crew members from the part(s)...
-                    RemoveCrew(sourceMember, sourcePart);
-                    RemoveCrew(targetMember, targetPart);
-
-                    // At this point, the kerbals are in the "ether".
-                    // this may be why there is an issue with refreshing the internal view.. 
-                    // It may allow (or expect) a board call from an (invisible) eva object.   
-                    // If I can manage to properly trigger that call... then all should properly refresh...
-                    // I'll look into that...
-
-                    // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
-                    // Send the kerbal(s) eva.  This is the eva trigger I was looking for
-                    // We will fie the board event when we are ready, in the update code.
-                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
-                    if (SettingsManager.EnableTextureReplacer)
-                        GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
-                    
-                    // Add the crew members back into the part(s) at their new seats.
-                    sourcePart.AddCrewmemberAt(targetMember, curIdx);                    
-                    targetPart.AddCrewmemberAt(sourceMember, newIdx);
-                 }
                 else
                 {
-                    // Just move.
+                    // no portraits, so let's just move kerbals...
                     RemoveCrew(sourceMember, sourcePart);
-                    ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
-
-                    if (SettingsManager.EnableTextureReplacer)
-                        GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
-
-                    targetPart.AddCrewmemberAt(sourceMember, newIdx);
+                    AddCrew(sourceMember, targetPart);
+                    ShipManifestBehaviour.crewXfer = true;
                 }
-
-                // if moving within a part, set the seat2seat flag
-                if (sourcePart == targetPart)
-                    ShipManifestBehaviour.isSeat2Seat = true;
-                else
-                    ShipManifestBehaviour.isSeat2Seat = false;
-
-                // set the crew transfer flag and wait forthe timeout before firing the board event.
-                ShipManifestBehaviour.crewXfer = true;
             }
             catch (Exception ex)
             {
