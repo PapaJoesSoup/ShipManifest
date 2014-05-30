@@ -34,7 +34,7 @@ namespace ShipManifest
                 {
                     if (ShipManifestBehaviour.clsVessel != null)
                     {
-                        foreach (CLSSpace space in ShipManifestBehaviour.clsVessel.Spaces)
+                        foreach (ICLSSpace space in ShipManifestBehaviour.clsVessel.Spaces)
                         {
                             space.Highlight(false);
                         }
@@ -67,10 +67,10 @@ namespace ShipManifest
                 SourceTransferViewer();
 
                 // Text above Source Details. (Between viewers)
-                if (ShipManifestBehaviour.SelectedResource == "Crew" && SettingsManager.ShowIVAUpdateBtn)
+                if (SelectedResource == "Crew" && SettingsManager.ShowIVAUpdateBtn)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(ShipManifestBehaviour.SelectedPartSource != null ? string.Format("{0}", ShipManifestBehaviour.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
+                    GUILayout.Label(SelectedPartSource != null ? string.Format("{0}", SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
                     if (GUILayout.Button("Update Portraits", ManifestStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
                     {
                         RespawnCrew();
@@ -79,7 +79,7 @@ namespace ShipManifest
                 }
                 else
                 {
-                    GUILayout.Label(ShipManifestBehaviour.SelectedPartSource != null ? string.Format("{0}", ShipManifestBehaviour.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
+                    GUILayout.Label(SelectedPartSource != null ? string.Format("{0}", SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
                 }
 
                 // Build Details ScrollViewer
@@ -95,7 +95,7 @@ namespace ShipManifest
                 TargetTransferViewer();
 
                 // Text between viewers
-                GUILayout.Label(ShipManifestBehaviour.SelectedPartTarget != null ? string.Format("{0}", ShipManifestBehaviour.SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
+                GUILayout.Label(SelectedPartTarget != null ? string.Format("{0}", SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
 
                 // Build Target details Viewer
                 TargetDetailsViewer();
@@ -119,11 +119,11 @@ namespace ShipManifest
                 SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                foreach (Part part in ShipManifestBehaviour.PartsByResource[ShipManifestBehaviour.SelectedResource])
+                foreach (Part part in PartsByResource[SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
-                    switch (ShipManifestBehaviour.SelectedResource)
+                    switch (SelectedResource)
                     {
                         case "Crew":
                             strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
@@ -133,16 +133,16 @@ namespace ShipManifest
                             strDescription = cntScience.ToString() + " - " + part.partInfo.title;
                             break;
                         default:
-                            strDescription = part.Resources[ShipManifestBehaviour.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            strDescription = part.Resources[SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
                             break;
                     }
 
                     // set the conditions for a button style change.
-                    var style = ShipManifestBehaviour.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                    var style = SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
                     {
-                        ShipManifestBehaviour.SelectedModuleSource = null;
-                        ShipManifestBehaviour.SelectedPartSource = part;
+                        SelectedModuleSource = null;
+                        SelectedPartSource = part;
                         ManifestUtilities.LogMessage("SelectedPartSource...", "Info", SettingsManager.VerboseLogging);
                     }
                 }
@@ -165,36 +165,36 @@ namespace ShipManifest
                 SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(90), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (ShipManifestBehaviour.SelectedPartSource != null)
+                if (SelectedPartSource != null)
                 {
-                    if (ShipManifestBehaviour.SelectedResource == "Crew")
+                    if (SelectedResource == "Crew")
                     {
-                        List<ProtoCrewMember> crewMembers = ShipManifestBehaviour.SelectedPartSource.protoModuleCrew;
-                        for (int x = 0; x < ShipManifestBehaviour.SelectedPartSource.protoModuleCrew.Count(); x++)
+                        List<ProtoCrewMember> crewMembers = SelectedPartSource.protoModuleCrew;
+                        for (int x = 0; x < SelectedPartSource.protoModuleCrew.Count(); x++)
                         {
-                            ProtoCrewMember crewMember = ShipManifestBehaviour.SelectedPartSource.protoModuleCrew[x];
+                            ProtoCrewMember crewMember = SelectedPartSource.protoModuleCrew[x];
                             GUILayout.BeginHorizontal();
                             if (crewMember.seat != null)
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartSource);
+                                    TransferCrewMember(crewMember, SelectedPartSource, SelectedPartSource);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestBehaviour.CanBeXferred(ShipManifestBehaviour.SelectedPartSource))
+                            if (ShipManifestBehaviour.CanBeXferred(SelectedPartSource))
                             {
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartTarget);
+                                    TransferCrewMember(crewMember, SelectedPartSource, SelectedPartTarget);
                                 }
                             }
                             GUILayout.EndHorizontal();
                         }
                     }
-                    else if (ShipManifestBehaviour.SelectedResource == "Science")
+                    else if (SelectedResource == "Science")
                     {
-                        foreach (PartModule pm in ShipManifestBehaviour.SelectedPartSource.Modules)
+                        foreach (PartModule pm in SelectedPartSource.Modules)
                         {
                             // Containers.
                             int scienceCount = 0;
@@ -216,13 +216,13 @@ namespace ShipManifest
                                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
                                 // If we have target selected, it is not the same as the source, and there is science to xfer.
-                                if ((ShipManifestBehaviour.SelectedModuleTarget != null && pm != ShipManifestBehaviour.SelectedModuleTarget) && scienceCount > 0)
+                                if ((SelectedModuleTarget != null && pm != SelectedModuleTarget) && scienceCount > 0)
                                 {
                                     if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                     {
-                                        ShipManifestBehaviour.SelectedModuleSource = pm;
-                                        TransferScience(ShipManifestBehaviour.SelectedModuleSource, ShipManifestBehaviour.SelectedModuleTarget);
-                                        ShipManifestBehaviour.SelectedModuleSource = null;
+                                        SelectedModuleSource = pm;
+                                        TransferScience(SelectedModuleSource, SelectedModuleTarget);
+                                        SelectedModuleSource = null;
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -232,13 +232,13 @@ namespace ShipManifest
                     else
                     {
                         // resources are left....
-                        foreach (PartResource resource in ShipManifestBehaviour.SelectedPartSource.Resources)
+                        foreach (PartResource resource in SelectedPartSource.Resources)
                         {
-                            if (resource.info.name == ShipManifestBehaviour.SelectedResource)
+                            if (resource.info.name == SelectedResource)
                             {
                                 // This routine assumes that a resource has been selected on the Resource manifest window.
                                 string flowtextS = "Off";
-                                bool flowboolS = ShipManifestBehaviour.SelectedPartSource.Resources[ShipManifestBehaviour.SelectedResource].flowState;
+                                bool flowboolS = SelectedPartSource.Resources[SelectedResource].flowState;
                                 if (flowboolS)
                                 {
                                     flowtextS = "On";
@@ -247,7 +247,7 @@ namespace ShipManifest
                                 {
                                     flowtextS = "Off";
                                 }
-                                PartResource.FlowMode flowmodeS = ShipManifestBehaviour.SelectedPartSource.Resources[ShipManifestBehaviour.SelectedResource].flowMode;
+                                PartResource.FlowMode flowmodeS = SelectedPartSource.Resources[SelectedResource].flowMode;
 
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
@@ -256,26 +256,26 @@ namespace ShipManifest
                                 {
                                     if (flowboolS)
                                     {
-                                        ShipManifestBehaviour.SelectedPartSource.Resources[ShipManifestBehaviour.SelectedResource].flowState = false;
+                                        SelectedPartSource.Resources[SelectedResource].flowState = false;
                                         flowtextS = "Off";
                                     }
                                     else
                                     {
-                                        ShipManifestBehaviour.SelectedPartSource.Resources[ShipManifestBehaviour.SelectedResource].flowState = true;
+                                        SelectedPartSource.Resources[SelectedResource].flowState = true;
                                         flowtextS = "On";
                                     }
                                 }
                                 GUILayout.EndHorizontal();
-                                if ((ShipManifestBehaviour.SelectedPartTarget != null && ShipManifestBehaviour.SelectedPartSource != ShipManifestBehaviour.SelectedPartTarget) &&
-                                    (ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].amount > 0 && ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].amount < ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].maxAmount))
+                                if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) &&
+                                    (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
                                 {
                                     if (!ShipManifestBehaviour.tXferOn)
                                     {
                                         // let's determine how much of a resource we can move to the target.
-                                        double maxXferAmount = ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].maxAmount - ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].amount;
-                                        if (maxXferAmount > ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].amount)
+                                        double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
+                                        if (maxXferAmount > SelectedPartSource.Resources[resource.info.name].amount)
                                         {
-                                            maxXferAmount = ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].amount;
+                                            maxXferAmount = SelectedPartSource.Resources[resource.info.name].amount;
                                         }
 
                                         // This is used to set the slider to the max amount by default.  
@@ -293,7 +293,7 @@ namespace ShipManifest
                                         sXferAmount = float.Parse(GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80)));
                                         if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
                                         {
-                                            TransferResource(ShipManifestBehaviour.SelectedPartSource, ShipManifestBehaviour.SelectedPartTarget, (double)sXferAmount);
+                                            TransferResource(SelectedPartSource, SelectedPartTarget, (double)sXferAmount);
                                         }
                                         GUILayout.EndHorizontal();
                                         GUILayout.BeginHorizontal();
@@ -322,11 +322,11 @@ namespace ShipManifest
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
-                foreach (Part part in ShipManifestBehaviour.PartsByResource[ShipManifestBehaviour.SelectedResource])
+                foreach (Part part in PartsByResource[SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
-                    switch (ShipManifestBehaviour.SelectedResource)
+                    switch (SelectedResource)
                     {
                         case "Crew":
                             strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
@@ -336,15 +336,15 @@ namespace ShipManifest
                             strDescription = cntScience.ToString() + " - " + part.partInfo.title;
                             break;
                         default:
-                            strDescription = part.Resources[ShipManifestBehaviour.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            strDescription = part.Resources[SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
                             break;
                     }
 
                     // set the conditions for a button style change.
-                    var style = ShipManifestBehaviour.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                    var style = SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
                     {
-                        ShipManifestBehaviour.SelectedPartTarget = part;
+                        SelectedPartTarget = part;
                         ManifestUtilities.LogMessage("SelectedPartTarget...", "Info", SettingsManager.VerboseLogging);
                     }
                 }
@@ -367,44 +367,44 @@ namespace ShipManifest
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
-                if (ShipManifestBehaviour.SelectedPartTarget != null)
+                if (SelectedPartTarget != null)
                 {
-                    if (ShipManifestBehaviour.SelectedResource == "Crew")
+                    if (SelectedResource == "Crew")
                     {
-                        for (int x = 0; x < ShipManifestBehaviour.SelectedPartTarget.protoModuleCrew.Count(); x++)
+                        for (int x = 0; x < SelectedPartTarget.protoModuleCrew.Count(); x++)
                         {
-                            ProtoCrewMember crewMember = ShipManifestBehaviour.SelectedPartTarget.protoModuleCrew[x];
+                            ProtoCrewMember crewMember = SelectedPartTarget.protoModuleCrew[x];
                             // This routine assumes that a resource has been selected on the Resource manifest window.
                             GUILayout.BeginHorizontal();
                             if (crewMember.seat != null)
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartTarget);
+                                    TransferCrewMember(crewMember, SelectedPartTarget, SelectedPartTarget);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestBehaviour.CanBeXferred(ShipManifestBehaviour.SelectedPartTarget))
+                            if (ShipManifestBehaviour.CanBeXferred(SelectedPartTarget))
                             {
                                 // set the conditions for a button style change.
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    TransferCrewMember(crewMember, ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartSource);
+                                    TransferCrewMember(crewMember, SelectedPartTarget, SelectedPartSource);
                                 }
                             }
                             GUILayout.EndHorizontal();
                         }
                     }
-                    else if (ShipManifestBehaviour.SelectedResource == "Science")
+                    else if (SelectedResource == "Science")
                     {
                         int count = 0;
-                        foreach (PartModule tpm in ShipManifestBehaviour.SelectedPartTarget.Modules)
+                        foreach (PartModule tpm in SelectedPartTarget.Modules)
                         {
                             if (tpm is ModuleScienceContainer)
                                 count += 1;
                         }
 
-                        foreach (PartModule pm in ShipManifestBehaviour.SelectedPartTarget.Modules)
+                        foreach (PartModule pm in SelectedPartTarget.Modules)
                         {
                             // Containers.
                             int scienceCount = 0;
@@ -415,15 +415,15 @@ namespace ShipManifest
                                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
                                 // set the conditions for a button style change.
                                 bool ShowReceive = false;
-                                if (pm == ShipManifestBehaviour.SelectedModuleTarget)
+                                if (pm == SelectedModuleTarget)
                                     ShowReceive = true;
                                 else if (count == 1)
                                     ShowReceive = true;
-                                ShipManifestBehaviour.SelectedModuleTarget = pm;
+                                SelectedModuleTarget = pm;
                                 var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
                                 if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    ShipManifestBehaviour.SelectedModuleTarget = pm;
+                                    SelectedModuleTarget = pm;
                                 }
                                 GUILayout.EndHorizontal();
                             }
@@ -432,13 +432,13 @@ namespace ShipManifest
                     else
                     {
                         // Resources
-                        foreach (PartResource resource in ShipManifestBehaviour.SelectedPartTarget.Resources)
+                        foreach (PartResource resource in SelectedPartTarget.Resources)
                         {
-                            if (resource.info.name == ShipManifestBehaviour.SelectedResource)
+                            if (resource.info.name == SelectedResource)
                             {
                                 // This routine assumes that a resource has been selected on the Resource manifest window.
                                 string flowtextT = "Off";
-                                bool flowboolT = ShipManifestBehaviour.SelectedPartTarget.Resources[ShipManifestBehaviour.SelectedResource].flowState;
+                                bool flowboolT = SelectedPartTarget.Resources[SelectedResource].flowState;
                                 if (flowboolT)
                                 {
                                     flowtextT = "On";
@@ -456,26 +456,26 @@ namespace ShipManifest
                                 {
                                     if (flowboolT)
                                     {
-                                        ShipManifestBehaviour.SelectedPartTarget.Resources[ShipManifestBehaviour.SelectedResource].flowState = false;
+                                        SelectedPartTarget.Resources[SelectedResource].flowState = false;
                                         flowtextT = "Off";
                                     }
                                     else
                                     {
-                                        ShipManifestBehaviour.SelectedPartTarget.Resources[ShipManifestBehaviour.SelectedResource].flowState = true;
+                                        SelectedPartTarget.Resources[SelectedResource].flowState = true;
                                         flowtextT = "On";
                                     }
                                 }
                                 GUILayout.EndHorizontal();
-                                if ((ShipManifestBehaviour.SelectedPartSource != null && ShipManifestBehaviour.SelectedPartSource != ShipManifestBehaviour.SelectedPartTarget) && (ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].amount > 0 && ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].amount < ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].maxAmount))
+                                if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartTarget.Resources[resource.info.name].amount > 0 && SelectedPartSource.Resources[resource.info.name].amount < SelectedPartSource.Resources[resource.info.name].maxAmount))
                                 {
                                     // create xfer slider;
                                     if (!ShipManifestBehaviour.sXferOn)
                                     {
                                         // let's determine how much of a resource we can move to the Source.
-                                        double maxXferAmount = ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].maxAmount - ShipManifestBehaviour.SelectedPartSource.Resources[resource.info.name].amount;
-                                        if (maxXferAmount > ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].amount)
+                                        double maxXferAmount = SelectedPartSource.Resources[resource.info.name].maxAmount - SelectedPartSource.Resources[resource.info.name].amount;
+                                        if (maxXferAmount > SelectedPartTarget.Resources[resource.info.name].amount)
                                         {
-                                            maxXferAmount = ShipManifestBehaviour.SelectedPartTarget.Resources[resource.info.name].amount;
+                                            maxXferAmount = SelectedPartTarget.Resources[resource.info.name].amount;
                                         }
 
                                         // This is used to set the slider to the max amount by default.  
@@ -492,7 +492,7 @@ namespace ShipManifest
                                         tXferAmount = float.Parse(GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80)));
                                         if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
                                         {
-                                            TransferResource(ShipManifestBehaviour.SelectedPartTarget, ShipManifestBehaviour.SelectedPartSource, (double)tXferAmount);
+                                            TransferResource(SelectedPartTarget, SelectedPartSource, (double)tXferAmount);
                                         }
                                         GUILayout.EndHorizontal();
                                         GUILayout.BeginHorizontal();
@@ -586,9 +586,9 @@ namespace ShipManifest
                         // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
                         // Send the kerbal(s) eva.  This is the eva trigger I was looking for
                         // We will fie the board event when we are ready, in the update code.
-                        ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
                         if (SettingsManager.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+                            GameEvents.onCrewOnEva.Fire(evaAction);
 
                         // Add the crew members back into the part(s) at their new seats.
                         sourcePart.AddCrewmemberAt(targetMember, curIdx);
@@ -598,10 +598,10 @@ namespace ShipManifest
                     {
                         // Just move.
                         RemoveCrew(sourceMember, sourcePart);
-                        ShipManifestBehaviour.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
 
                         if (SettingsManager.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(ShipManifestBehaviour.evaAction);
+                            GameEvents.onCrewOnEva.Fire(evaAction);
 
                         targetPart.AddCrewmemberAt(sourceMember, newIdx);
                     }
@@ -720,11 +720,11 @@ namespace ShipManifest
         {
             try
             {
-                if (source.Resources.Contains(ShipManifestBehaviour.SelectedResource) && target.Resources.Contains(ShipManifestBehaviour.SelectedResource))
+                if (source.Resources.Contains(SelectedResource) && target.Resources.Contains(SelectedResource))
                 {
-                    double maxAmount = target.Resources[ShipManifestBehaviour.SelectedResource].maxAmount;
-                    double sourceAmount = source.Resources[ShipManifestBehaviour.SelectedResource].amount;
-                    double targetAmount = target.Resources[ShipManifestBehaviour.SelectedResource].amount;
+                    double maxAmount = target.Resources[SelectedResource].maxAmount;
+                    double sourceAmount = source.Resources[SelectedResource].amount;
+                    double targetAmount = target.Resources[SelectedResource].amount;
                     if (XferAmount == 0)
                     {
                         XferAmount = maxAmount - targetAmount;
@@ -742,7 +742,7 @@ namespace ShipManifest
 
 
                         // This flag enables the Update handler in ResourceManifestBehaviour
-                        if (source == ShipManifestBehaviour.SelectedPartSource)
+                        if (source == SelectedPartSource)
                             ShipManifestBehaviour.sXferOn = true;
                         else
                             ShipManifestBehaviour.tXferOn = true;
@@ -750,10 +750,10 @@ namespace ShipManifest
                     else
                     {
                         // Fill target
-                        target.Resources[ShipManifestBehaviour.SelectedResource].amount += XferAmount;
+                        target.Resources[SelectedResource].amount += XferAmount;
 
                         // Drain source...
-                        source.Resources[ShipManifestBehaviour.SelectedResource].amount -= XferAmount;
+                        source.Resources[SelectedResource].amount -= XferAmount;
                     }
                 }
             }
