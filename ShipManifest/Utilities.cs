@@ -177,6 +177,9 @@ namespace ShipManifest
         public bool prevEnablePFResources = true;
         public bool prevEnableCLS = true;
 
+        // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
+        public static bool CLSInstalled = true;
+
         public static bool EnableTextureReplacer = false;
         public static bool prevEnableTextureReplacer = false;
 
@@ -215,29 +218,7 @@ namespace ShipManifest
         public void SettingsWindow(int windowId)
         {
             // Store settings in case we cancel later...
-
-            prevShowDebugger = ShowDebugger;
-            prevVerboseLogging = VerboseLogging;
-            prevAutoSave = AutoSave;
-            prevSaveIntervalSec = SaveIntervalSec;
-
-            // Realism Mode settings.
-            prevRealismMode = RealismMode;
-            prevEnableScience = EnableScience;
-            prevEnableCrew = EnableCrew;
-            prevEnablePFResources = EnablePFResources;
-            prevEnableCLS = EnableCLS;
-            prevEnableTextureReplacer = EnableTextureReplacer;
-            prevLockSettings = LockSettings;
-
-            // sounds
-            prevFlowRate = FlowRate;
-            prevPumpSoundStart = PumpSoundStart;
-            prevPumpSoundRun = PumpSoundRun;
-            prevPumpSoundStop = PumpSoundStop;
-            prevCrewSoundStart = CrewSoundStart;
-            prevCrewSoundRun = CrewSoundRun;
-            prevCrewSoundStop = CrewSoundStop;
+            StoreTempSettings();
 
             string label = "";
             string txtSaveInterval = SaveIntervalSec.ToString();
@@ -268,17 +249,17 @@ namespace ShipManifest
 
             if (!EnableCrew)
             {
-                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
                 {
                     // Clear Resource selection.
-                    ShipManifestBehaviour.SelectedResource = null;
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow = false;
                 }
             }
             // EnableCLS Mode
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
-            if (!EnableCrew)
+            if (!EnableCrew || !SettingsManager.CLSInstalled)
                 GUI.enabled = false;
             else
                 GUI.enabled = isEnabled;
@@ -288,18 +269,18 @@ namespace ShipManifest
 
             if (!EnableCLS && prevEnableCLS)
             {
-                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
                 {
                     //Reassign the resource to observe new settings.
-                    ShipManifestBehaviour.SelectedResource = "Crew";
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = "Crew";
                 }
             }
             else if (EnableCLS && !prevEnableCLS)
             {
-                if (ShipManifestBehaviour.SelectedResource == "Crew")
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
                 {
                     //Reassign the resource to observe new settings.
-                    ShipManifestBehaviour.SelectedResource = "Crew";
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = "Crew";
                 }
             }
 
@@ -312,10 +293,10 @@ namespace ShipManifest
 
             if (!EnableScience)
             {
-                if (ShipManifestBehaviour.SelectedResource == "Science")
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Science")
                 {
                     // Clear Resource selection.
-                    ShipManifestBehaviour.SelectedResource = null;
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
                 }
             }
 
@@ -419,25 +400,8 @@ namespace ShipManifest
             }
             if (GUILayout.Button("Cancel"))
             {
-                RealismMode = prevRealismMode;
-                ShowDebugger = prevShowDebugger;
-                VerboseLogging = prevVerboseLogging;
-                AutoSave = prevAutoSave;
-                SaveIntervalSec = prevSaveIntervalSec;
-                FlowRate = prevFlowRate;
-                PumpSoundStart = prevPumpSoundStart;
-                PumpSoundRun = prevPumpSoundRun;
-                PumpSoundStop = prevPumpSoundStop;
-                CrewSoundStart = prevCrewSoundStart;
-                CrewSoundRun = prevCrewSoundRun;
-                CrewSoundStop = prevCrewSoundStop;
-                EnableScience = prevEnableScience;
-                EnableCrew = prevEnableCrew;
-                EnablePFResources = prevEnablePFResources;
-                EnableCLS = prevEnableCLS;
-                EnableTextureReplacer = prevEnableTextureReplacer;
-                LockSettings = prevLockSettings;
-
+                // We've canclled, so restore original settings.
+                RestoreTempSettings();
                 ShowSettings = false;
             }
             GUILayout.EndHorizontal();
@@ -564,12 +528,15 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("Load Settings Complete"), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format(" "), "Info", VerboseLogging);
 
                 ValidateLoad();
             }
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" "), "Info", VerboseLogging);
             }
         }
 
@@ -710,6 +677,54 @@ namespace ShipManifest
             Colors.Add("red", Color.red);
             Colors.Add("white", Color.white);
             Colors.Add("yellow", Color.yellow);
+        }
+
+        private void StoreTempSettings()
+        {
+            prevShowDebugger = ShowDebugger;
+            prevVerboseLogging = VerboseLogging;
+            prevAutoSave = AutoSave;
+            prevSaveIntervalSec = SaveIntervalSec;
+
+            // Realism Mode settings.
+            prevRealismMode = RealismMode;
+            prevEnableScience = EnableScience;
+            prevEnableCrew = EnableCrew;
+            prevEnablePFResources = EnablePFResources;
+            prevEnableCLS = EnableCLS;
+            prevEnableTextureReplacer = EnableTextureReplacer;
+            prevLockSettings = LockSettings;
+
+            // sounds
+            prevFlowRate = FlowRate;
+            prevPumpSoundStart = PumpSoundStart;
+            prevPumpSoundRun = PumpSoundRun;
+            prevPumpSoundStop = PumpSoundStop;
+            prevCrewSoundStart = CrewSoundStart;
+            prevCrewSoundRun = CrewSoundRun;
+            prevCrewSoundStop = CrewSoundStop;
+        }
+
+        private void RestoreTempSettings()
+        {
+            RealismMode = prevRealismMode;
+            ShowDebugger = prevShowDebugger;
+            VerboseLogging = prevVerboseLogging;
+            AutoSave = prevAutoSave;
+            SaveIntervalSec = prevSaveIntervalSec;
+            FlowRate = prevFlowRate;
+            PumpSoundStart = prevPumpSoundStart;
+            PumpSoundRun = prevPumpSoundRun;
+            PumpSoundStop = prevPumpSoundStop;
+            CrewSoundStart = prevCrewSoundStart;
+            CrewSoundRun = prevCrewSoundRun;
+            CrewSoundStop = prevCrewSoundStop;
+            EnableScience = prevEnableScience;
+            EnableCrew = prevEnableCrew;
+            EnablePFResources = prevEnablePFResources;
+            EnableCLS = prevEnableCLS;
+            EnableTextureReplacer = prevEnableTextureReplacer;
+            LockSettings = prevLockSettings;
         }
 
         #endregion
