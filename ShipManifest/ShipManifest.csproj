@@ -55,8 +55,9 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\..\ksp-win-0-23-0\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="ConnectedLivingSpace">
-      <HintPath>..\..\..\..\Downloads\uploads_2014_05_ConnectedLivingSpace-release-v1.0.4.1\GameData\ConnectedLivingSpace\Plugins\ConnectedLivingSpace.dll</HintPath>
+    <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\CLSv1.0.5.0\dev\CLSDevPackv1.0.5.0\dev\CLSInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Toolbar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -68,6 +69,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLSClient.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="ShipManifestModule.cs" />
     <Compile Include="TransferController.cs" />
