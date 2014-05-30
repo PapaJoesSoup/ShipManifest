@@ -39,7 +39,11 @@ namespace ShipManifest
         public static GameObject GameObjectInstance;
         public static SettingsManager ShipManifestSettings = new SettingsManager();
 
-        public static CLSVessel clsVessel = CLSAddon.Instance.Vessel;
+        // Vessel vars
+        public static ICLSAddon clsAddon;
+        public static ICLSVessel clsVessel = null;
+
+        public static Vessel vessel = null;
 
         // Resource transfer vars
         public static AudioSource source1;
@@ -69,274 +73,12 @@ namespace ShipManifest
         public static double crewXferDelaySec = SettingsManager.IVATimeDelaySec;
         public static bool isSeat2Seat = false;
         public static double Seat2SeatXferDelaySec = 2;
-        public static Vessel vessel = null;
 
         #endregion
 
         // Toolbar Integration.
         // TODO:  make optional...
         private IButton button;
-
-        #region Datasource properties
-
-        // dataSource for Resource manifest and ResourceTransfer windows
-        // Provides a list of resources and the parts that contain that resource.
-        public static List<string> ResourceList = new List<string>();
-        public static Dictionary<string, List<Part>> _partsByResource = null;
-        public static Dictionary<string, List<Part>> PartsByResource
-        {
-            get
-            {
-                try
-                {
-                    if (_partsByResource == null)
-                        _partsByResource = new Dictionary<string, List<Part>>();
-                    else
-                        _partsByResource.Clear();
-
-                    // Let's update...
-                    if (FlightGlobals.ActiveVessel != null)
-                    {
-                        //ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  "), "Info", SettingsManager.VerboseLogging);
-                        vessel = FlightGlobals.ActiveVessel;
-                        clsVessel = CLSAddon.Instance.Vessel;
-                        _partsByResource = new Dictionary<string, List<Part>>();
-                        foreach (Part part in FlightGlobals.ActiveVessel.Parts)
-                        {
-                            // First let's Get any Crew, if desired...
-                            if (ShipManifestSettings.EnableCrew && part.CrewCapacity > 0)
-                            {
-                                bool vResourceFound = false;
-                                // is resource in the list yet?.
-                                if (_partsByResource.Keys.Contains("Crew"))
-                                {
-                                    // found resource.  lets add part to its list.
-                                    vResourceFound = true;
-                                    List<Part> eParts = _partsByResource["Crew"];
-                                    eParts.Add(part);
-                                }
-                                if (!vResourceFound)
-                                {
-                                    // found a new resource.  lets add it to the list of resources.
-                                    List<Part> nParts = new List<Part>();
-                                    nParts.Add(part);
-                                    _partsByResource.Add("Crew", nParts);
-                                }
-                            }
-                            // Let's Get any Science...
-                            if (ShipManifestSettings.EnableScience)
-                            {
-                                bool mResourceFound = false;
-                                foreach (PartModule pm in part.Modules)
-                                {
-                                    // is resource in the list yet?.
-                                    // 
-                                    if (!mResourceFound && (pm is ModuleScienceContainer || pm is ModuleScienceExperiment))
-                                    {
-                                        if (_partsByResource.Keys.Contains("Science"))
-                                        {
-                                            mResourceFound = true;
-                                            List<Part> eParts = _partsByResource["Science"];
-                                            eParts.Add(part);
-                                        }
-                                        if (!mResourceFound)
-                                        {
-                                            // found a new resource.  lets add it to the list of resources.
-                                            List<Part> nParts = new List<Part>();
-                                            nParts.Add(part);
-                                            _partsByResource.Add("Science", nParts);
-                                            mResourceFound = true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Now, let's get flight Resources.
-                            foreach (PartResource resource in part.Resources)
-                            {
-                                // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                                if (!ShipManifestSettings.RealismMode || (ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
-                                {
-                                    bool vResourceFound = false;
-                                    // is resource in the list yet?.
-                                    if (_partsByResource.Keys.Contains(resource.info.name))
-                                    {
-                                        vResourceFound = true;
-                                        List<Part> eParts = _partsByResource[resource.info.name];
-                                        eParts.Add(part);
-                                    }
-                                    if (!vResourceFound)
-                                    {
-                                        // found a new resource.  lets add it to the list of resources.
-                                        List<Part> nParts = new List<Part>();
-                                        nParts.Add(part);
-                                        _partsByResource.Add(resource.info.name, nParts);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    _partsByResource = null;
-                }
-
-                if (_partsByResource != null)
-                    ResourceList = new List<string>(_partsByResource.Keys);
-                else
-                    ResourceList = null;
-
-                return _partsByResource;
-            }
-        }
-
-        // dataSource for Resource manifest and ResourceTransfer windows
-        // Holds the Resource.info.name selected in the Resource Manifest Window.
-        private static string _prevSelectedResource;
-        private static string _selectedResource;
-        public static string SelectedResource
-        {
-            get
-            {
-                return _selectedResource;
-            }
-            set
-            {
-                try
-                {
-                    _prevSelectedResource = _selectedResource;
-                    _selectedResource = value;
-
-                    if (value == null)
-                        SelectedResourceParts = new List<Part>();
-                    else
-                        SelectedResourceParts = _partsByResource[_selectedResource];
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                }
-            }
-        }
-
-        // Provides a list of parts for a given resource.
-        // Used to maintain Add/Remove of OnMouseExit handlers
-        private static List<Part> _selectedResourceParts;
-        public static List<Part> SelectedResourceParts
-        {
-            get
-            {
-                if (_selectedResourceParts == null)
-                    _selectedResourceParts = new List<Part>();
-                return _selectedResourceParts;
-            }
-            set
-            {
-                // This removes the event handler from the currently selected parts, 
-                // since we are going to be selecting different parts.
-                // For Crew, we do something different so we skip.
-                ChangeResourceHighlighting();
-                _selectedResourceParts = value;
-
-                SetResourceHighlighting();
-                ManifestUtilities.LogMessage("Set SelectedResourceParts.", "Info", SettingsManager.VerboseLogging);
-            }
-        }
-
-        private static Part _selectedPartSource;
-        public static Part SelectedPartSource
-        {
-            get
-            {
-                try
-                {
-                    if (_selectedPartSource != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartSource))
-                        _selectedPartSource = null;
-
-                    return _selectedPartSource;
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    return null;
-                }
-            }
-            set
-            {
-                try
-                {
-
-                    ClearSelectedHighlighting(false);
-
-                    _selectedPartSource = value;
-
-                    SetSelectedHighlighting(false);
-
-                    // reset transfer amount (for resource xfer slider control)
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
-                    OnMouseHighlights();
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                }
-                ManifestUtilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
-            }
-        }
-
-        private static Part _selectedPartTarget;
-        public static Part SelectedPartTarget
-        {
-            get
-            {
-                try
-                {
-
-                    if (_selectedPartTarget != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartTarget))
-                        _selectedPartTarget = null;
-                    return _selectedPartTarget;
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    return null;
-                }
-            }
-            set
-            {
-                try
-                {
-                    ClearSelectedHighlighting(true);
-
-                    _selectedPartTarget = value;
-
-                    SetSelectedHighlighting(true);
-
-                    // reset transfer amount (for resource xfer slider control)
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
-                    OnMouseHighlights();
-                }
-                catch (Exception ex)
-                {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                }
-                ManifestUtilities.LogMessage("Set SelectedPartTarget.", "Info", SettingsManager.VerboseLogging);
-            }
-        }
-
-        public static PartModule SelectedModuleSource;
-        public static PartModule SelectedModuleTarget;
-
-        public static CLSPart CLSPartSource;
-        public static CLSPart CLSPartTarget;
-
-        public static GameEvents.FromToAction<Part, Part> evaAction;
-        
-        #endregion
 
         #region Event handlers
 
@@ -347,7 +89,7 @@ namespace ShipManifest
         // this is the method used with the delagate
         public static void MouseExit(Part part)
         {
-            OnMouseHighlights();
+            ManifestController.GetInstance(FlightGlobals.ActiveVessel).OnMouseHighlights();
         }
 
         public void Awake()
@@ -371,17 +113,35 @@ namespace ShipManifest
                     button.TexturePath = ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
                     ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = !ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest;
                     if (!ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest)
-                        RemoveResourceHighlighting();
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
                     else
-                        SetResourceHighlighting();
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
                 }
             };
         }
 
         public void Start()
         {
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+            {
+                GameEvents.onVesselChange.Add(OnVesselChange);
 
-        }
+                clsAddon = CLSClient.GetCLS();
+                if (clsAddon != null)
+                {
+                    ShipManifestSettings.EnableCLS = true;
+                    SettingsManager.CLSInstalled = true;
+                    RunSave();
+                }
+                else
+                {
+                    ShipManifestSettings.EnableCLS = false;
+                    SettingsManager.CLSInstalled = false;
+                    RunSave();
+                }
+                ManifestUtilities.LogMessage("CLS Installed?  " + SettingsManager.CLSInstalled.ToString(), "Info", true);
+            }
+         }
 
         public void OnGUI()
         {
@@ -401,7 +161,7 @@ namespace ShipManifest
                     {
                         //Instantiate the controller for the active vessel.
                         ManifestController.GetInstance(FlightGlobals.ActiveVessel).CanDrawButton = true;
-                       
+
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
                         if (tXferOn || sXferOn)
@@ -421,9 +181,35 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format(" in Update.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
-        
+
+        public void OnVesselChange(Vessel newVessel)
+        {
+            try
+            {
+                // Let's clean up old vessel...
+                if (newVessel.isEVA)
+                {
+                    // if we are EVA, then we don't need SM open.
+                    // kill selected resource and its associated highlighting.
+                    ManifestController.GetInstance(vessel).SelectedResource = null;
+                    ManifestController.GetInstance(vessel).SelectedResourceParts = null;
+                    ManifestController.GetInstance(vessel).ShowShipManifest = false;
+                    ManifestController.GetInstance(vessel).ShowTransferWindow = false;
+                    ManifestUtilities.LogMessage("Vessel is a Kerbal on EVA.  ", "Info", true);
+                }
+                vessel = newVessel;
+                if (SettingsManager.CLSInstalled && ShipManifestSettings.EnableCLS)
+                    clsVessel = clsAddon.Vessel;
+            }
+            catch (Exception ex)
+            {
+                ManifestUtilities.LogMessage(string.Format(" in OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
         public void OnDestroy()
         {
+            GameEvents.onVesselChange.Remove(OnVesselChange);
             CancelInvoke("RunSave");
             button.Destroy();
         }
@@ -437,11 +223,11 @@ namespace ShipManifest
             bool results = false;
             try
             {
-                if (SelectedPart == ShipManifestBehaviour.SelectedPartSource)
+                if (SelectedPart == ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource)
                 {
                     // Source to target
                     // Are the parts capable of holding kerbals and are there kerbals to move?
-                    if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) && SelectedPartSource.protoModuleCrew.Count > 0)
+                    if ((ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget != null && ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource != ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget) && ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.protoModuleCrew.Count > 0)
                     {
                         // now, are the parts connected to each other in the same living space?
                         results = IsCLS();
@@ -450,7 +236,7 @@ namespace ShipManifest
                 else  //SelectedPart must be SeletedPartTarget
                 {
                     // Target to Source
-                    if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && SelectedPartTarget.protoModuleCrew.Count > 0)
+                    if ((ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource != null && ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource != ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget) && ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.protoModuleCrew.Count > 0)
                     {
                         // now, are the parts connected to each other in the same living space?
                         results = IsCLS();
@@ -472,35 +258,35 @@ namespace ShipManifest
             {
                 if (ShipManifestSettings.EnableCLS)
                 {
-                    foreach (CLSSpace mySpace in clsVessel.Spaces)
+                    foreach (ICLSSpace mySpace in clsVessel.Spaces)
                     {
-                        foreach (CLSPart myPart in mySpace.Parts)
+                        foreach (ICLSPart myPart in mySpace.Parts)
                         {
-                            if ((Part)myPart == SelectedPartSource)
+                            if (myPart.Part == ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource)
                             {
-                                CLSPartSource = myPart;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartSource = myPart;
                                 break;
                             }
                         }
-                        foreach (CLSPart myPart in mySpace.Parts)
+                        foreach (ICLSPart myPart in mySpace.Parts)
                         {
-                            if ((Part)myPart == SelectedPartTarget)
+                            if (myPart.Part == ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget)
                             {
-                                CLSPartTarget = myPart;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartTarget = myPart;
                                 break;
                             }
                         }
                     }
 
-                    if (CLSPartSource.Space != null && CLSPartTarget.Space != null && CLSPartSource.Space == CLSPartTarget.Space)
+                    if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartSource.Space != null && ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartTarget.Space != null && ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartSource.Space == ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartTarget.Space)
                     {
                         results = true;
                     }
-                    else if (CLSPartSource.Space == null)
+                    else if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartSource.Space == null)
                     {
                         ManifestUtilities.LogMessage("Source part space is null.", "Error", true);
                     }
-                    else if (CLSPartTarget.Space == null)
+                    else if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).clsPartTarget.Space == null)
                     {
                         ManifestUtilities.LogMessage("Target part space is null.", "Error", true);
                     }
@@ -521,67 +307,6 @@ namespace ShipManifest
 
         #region Action Methods
 
-        public static void OnMouseHighlights()
-        {
-            try
-            {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest && SelectedResourceParts != null)
-                {
-                    if (SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                    {
-                         if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow)
-                        {
-                            SetPartHighlight(SelectedPartSource, SettingsManager.Colors[SettingsManager.SourcePartColor]);
-                            SetPartHighlight(SelectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartCrewColor]);
-                        }
-                    }
-                    else
-                    {
-                        foreach (Part thispart in SelectedResourceParts)
-                        {
-                            if (thispart != SelectedPartSource && thispart != SelectedPartTarget)
-                            {
-                                SetPartHighlight(thispart, Color.yellow);
-                            }
-                        }
-                        if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow)
-                        {
-                            SetPartHighlight(SelectedPartSource, SettingsManager.Colors[SettingsManager.SourcePartColor]);
-                            SetPartHighlight(SelectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartColor]);
-                        }
-                        else
-                        {
-                            SetPartHighlight(SelectedPartSource, Color.yellow);
-                            SetPartHighlight(SelectedPartTarget, Color.yellow);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  OnMouseHighlights.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        public enum XFERState
-        {
-            Off,
-            Start,
-            Run,
-            Stop
-        }
-
-        private void RebuildPartLists()
-        {
-            //  We need to rebuiild all parts.
-            vessel = null;
-            _partsByResource = null;
-            if (SelectedResource == null || !ResourceList.Contains(SelectedResource))
-                SelectedResource = null;
-            else
-                SelectedResourceParts = PartsByResource[SelectedResource];
-        }
-        
         private void RealModePumpXfer()
         {
             try
@@ -654,34 +379,34 @@ namespace ShipManifest
                             {
                                 // Source is target on Interface...
                                 // if the amount to move exceeds either the balance of the source or the capacity of the target, reduce it.
-                                if (SelectedPartTarget.Resources[SelectedResource].amount - deltaAmt < 0)
+                                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount - deltaAmt < 0)
                                 {
-                                    deltaAmt = SelectedPartTarget.Resources[SelectedResource].amount;
+                                    deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount;
                                     XferState = XFERState.Stop;
                                 }
-                                else if (SelectedPartSource.Resources[SelectedResource].amount + deltaAmt > SelectedPartSource.Resources[SelectedResource].maxAmount)
+                                else if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount + deltaAmt > ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].maxAmount)
                                 {
-                                    deltaAmt = SelectedPartSource.Resources[SelectedResource].maxAmount - SelectedPartSource.Resources[SelectedResource].amount;
+                                    deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].maxAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount;
                                     XferState = XFERState.Stop;
                                 }
 
-                                SelectedPartTarget.Resources[SelectedResource].amount -= deltaAmt;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount -= deltaAmt;
                             }
                             else
                             {
                                 // Source is source on Interface...
-                                if (SelectedPartSource.Resources[SelectedResource].amount - deltaAmt < 0)
+                                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount - deltaAmt < 0)
                                 {
-                                    deltaAmt = SelectedPartSource.Resources[SelectedResource].amount;
+                                    deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount;
                                     XferState = XFERState.Stop;
                                 }
-                                else if (SelectedPartTarget.Resources[SelectedResource].amount + deltaAmt > SelectedPartTarget.Resources[SelectedResource].maxAmount)
+                                else if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount + deltaAmt > ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].maxAmount)
                                 {
-                                    deltaAmt = SelectedPartTarget.Resources[SelectedResource].maxAmount - SelectedPartTarget.Resources[SelectedResource].amount;
+                                    deltaAmt = ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].maxAmount - ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount;
                                     XferState = XFERState.Stop;
                                 }
 
-                                SelectedPartSource.Resources[SelectedResource].amount -= deltaAmt;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount -= deltaAmt;
                             }
 
 
@@ -689,9 +414,9 @@ namespace ShipManifest
 
                             // Fill target
                             if (tXferOn)
-                                SelectedPartSource.Resources[SelectedResource].amount += deltaAmt;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount += deltaAmt;
                             else
-                                SelectedPartTarget.Resources[SelectedResource].amount += deltaAmt;
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.Resources[ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource].amount += deltaAmt;
 
                             ManifestUtilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", SettingsManager.VerboseLogging);
 
@@ -735,11 +460,11 @@ namespace ShipManifest
                         {
                             // Fire Board event for Texture Replacer.
                             if (SettingsManager.EnableTextureReplacer)
-                                GameEvents.onCrewBoardVessel.Fire(evaAction);
+                                GameEvents.onCrewBoardVessel.Fire(ManifestController.GetInstance(FlightGlobals.ActiveVessel).evaAction);
 
                             // Spawn crew in parts and in vessel.
-                            SelectedPartSource.vessel.SpawnCrew();
-                            SelectedPartTarget.vessel.SpawnCrew();
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.vessel.SpawnCrew();
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.vessel.SpawnCrew();
                             ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
 
                             FireEventTriggers();
@@ -785,28 +510,22 @@ namespace ShipManifest
 
                                 elapsed += Planetarium.GetUniversalTime() - timestamp;
 
+                                // wait for movement to end...
                                 if (elapsed >= crewXferDelaySec || (isSeat2Seat && elapsed > Seat2SeatXferDelaySec))
                                 {
-                                    ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
-
-                                    // Fire Board event for Texture Replacer.
-                                    if (SettingsManager.EnableTextureReplacer)
-                                        GameEvents.onCrewBoardVessel.Fire(evaAction);
-
-                                    // Spawn crew in parts and in vessel.
-                                    SelectedPartSource.vessel.SpawnCrew();
-                                    SelectedPartTarget.vessel.SpawnCrew();
-                                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
-
-                                    // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
-                                    FireEventTriggers();
-
                                     // Reset State vars
                                     XferState = XFERState.Stop;
                                 }
                                 break;
 
                             case XFERState.Stop:
+
+                                ManifestUtilities.LogMessage("Update:  Updating Portraits...", "info", SettingsManager.VerboseLogging);
+
+                                // Spawn crew in parts and in vessel.
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartSource.vessel.SpawnCrew();
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedPartTarget.vessel.SpawnCrew();
+                                ManifestController.GetInstance(FlightGlobals.ActiveVessel).RespawnCrew();
 
                                 // play crew sit.
                                 source2.Stop();
@@ -815,6 +534,13 @@ namespace ShipManifest
                                 XferState = XFERState.Off;
                                 crewXfer = false;
                                 isSeat2Seat = false;
+
+                                // Fire Board event for Texture Replacer.
+                                if (SettingsManager.EnableTextureReplacer)
+                                    GameEvents.onCrewBoardVessel.Fire(ManifestController.GetInstance(FlightGlobals.ActiveVessel).evaAction);
+
+                                // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
+                                FireEventTriggers();
                                 break;
                         }
                         ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", SettingsManager.VerboseLogging);
@@ -834,7 +560,7 @@ namespace ShipManifest
             try
             {
                 elapsed = 0;
-                ManifestUtilities.LogMessage("1. loading " + SoundType + " sounds...", "Info", true);
+                ManifestUtilities.LogMessage("Loading " + SoundType + " sounds...", "Info", true);
 
                 GameObject go = new GameObject("Audio");
 
@@ -847,7 +573,7 @@ namespace ShipManifest
                     sound1 = GameDatabase.Instance.GetAudioClip(path1);
                     sound2 = GameDatabase.Instance.GetAudioClip(path2);
                     sound3 = GameDatabase.Instance.GetAudioClip(path3);
-                    ManifestUtilities.LogMessage("2. " + SoundType + " sounds loaded...", "Info", true);
+                    ManifestUtilities.LogMessage(SoundType + " sounds loaded...", "Info", SettingsManager.VerboseLogging);
 
                     // configure sources
                     source1.clip = sound1; // Start sound
@@ -865,11 +591,11 @@ namespace ShipManifest
 
                     // now let's play the Pump start sound.
                     source1.Play();
-                    ManifestUtilities.LogMessage("2a. Play " + SoundType + " sound (start)...", "Info", true);
+                    ManifestUtilities.LogMessage("Play " + SoundType + " sound (start)...", "Info", SettingsManager.VerboseLogging);
                 }
                 else
                 {
-                    ManifestUtilities.LogMessage("3. " + SoundType + " sound failed to load...", "Info", true);
+                    ManifestUtilities.LogMessage(SoundType + " sound failed to load...", "Info", SettingsManager.VerboseLogging);
                 }
             }
             catch (Exception ex)
@@ -949,276 +675,6 @@ namespace ShipManifest
             }
         }
 
-        public static void RemoveResourceHighlighting()
-        {
-            try
-            {
-                if (_selectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                {
-                    if (SelectedPartSource != null)
-                    {
-                        ClearHighlight(SelectedPartSource);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartSource.RemoveOnMouseExit(OnMouseExit);
-                    }
-                    if (SelectedPartTarget != null)
-                    {
-                        ClearHighlight(SelectedPartTarget);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        SelectedPartTarget.RemoveOnMouseExit(OnMouseExit);
-                    }
-                    if (clsVessel == null)
-                        clsVessel = CLSAddon.Instance.Vessel;
-                    foreach (CLSSpace space in clsVessel.Spaces)
-                    {
-                        space.Highlight(false);
-                    }
-                }
-                else if (_selectedResourceParts != null)
-                {
-                    foreach (Part part in _selectedResourceParts)
-                    {
-                        ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        part.RemoveOnMouseExit(OnMouseExit);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in RemoveResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        public static void ChangeResourceHighlighting()
-        {
-            try
-            {
-                if (_prevSelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                {
-                    if (SelectedPartSource != null)
-                    {
-                        SelectedPartSource = null;
-                    }
-                    if (SelectedPartTarget != null)
-                    {
-                        SelectedPartTarget = null;
-                    }
-                    if (clsVessel == null)
-                        clsVessel = CLSAddon.Instance.Vessel;
-                    foreach (CLSSpace space in clsVessel.Spaces)
-                    {
-                        space.Highlight(false);
-                    }
-                }
-                else if (_selectedResourceParts != null)
-                {
-                    foreach (Part part in _selectedResourceParts)
-                    {
-                        ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        part.RemoveOnMouseExit(OnMouseExit);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in ChangeResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        public static void SetResourceHighlighting()
-        {
-            try
-            {
-                // This adds an event handler to each newly selected part,
-                // to manage mouse exit events and preserve highlighting.
-                if (SelectedResource != null)
-                {
-                    if (SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                    {
-                        if (clsVessel == null)
-                            clsVessel = CLSAddon.Instance.Vessel;
-                        foreach (CLSSpace space in clsVessel.Spaces)
-                        {
-                            space.Highlight(true);
-                        }
-                        if (SelectedPartSource != null)
-                        {
-                            CLSPartSource.Highlight(false);
-                            Part.OnActionDelegate OnMouseExit = MouseExit;
-                            SelectedPartSource.AddOnMouseExit(OnMouseExit);
-                        }
-                        if (SelectedPartTarget != null)
-                        {
-                            CLSPartTarget.Highlight(false);
-                            Part.OnActionDelegate OnMouseExit = MouseExit;
-                            SelectedPartTarget.AddOnMouseExit(OnMouseExit);
-                        }
-                    }
-                    else if (_selectedResourceParts != null)
-                    {
-                        foreach (Part part in _selectedResourceParts)
-                        {
-                            Part.OnActionDelegate OnMouseExit = MouseExit;
-                            part.AddOnMouseExit(OnMouseExit);
-                        }
-                    }
-                    OnMouseHighlights();
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in SetResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        /// <summary>
-        /// This routine is used to remove source or taget highlighting on a part.  
-        /// it is cls Aware, and preserves the base space highlighting when selected part coler is removed.
-        /// </summary>
-        /// <param name="IsTargetPart"></param>
-        public static void ClearSelectedHighlighting(bool IsTargetPart)
-        {
-            try
-            {
-                Part selectedpart = null;
-                if (IsTargetPart)
-                {
-                    selectedpart = _selectedPartTarget;
-                }
-                else
-                    selectedpart = _selectedPartSource;
-
-                if (ShipManifestBehaviour.SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                {
-                    if (selectedpart != null)
-                    {
-                        //turn off Selected part highlghting
-                        Part.OnActionDelegate OnMouseExit = MouseExit;
-                        selectedpart.RemoveOnMouseExit(OnMouseExit);
-
-                        foreach (CLSPart part in clsVessel.Parts)
-                        {
-                            if ((Part)part == selectedpart)
-                            {
-                                // turn on default CLS highlighting
-                                part.Highlight(true);
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // reset part to normal resource color
-                    SetPartHighlight(selectedpart, Color.yellow);
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  ClearPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        /// <summary>
-        /// This routine is used ot remove source or taget highlighting on a part.  
-        /// it is cls Aware, and preserves the base space highlighting when selected part coler is removed.
-        /// </summary>
-        /// <param name="IsTargetPart"></param>
-        public static void SetSelectedHighlighting(bool IsTargetPart)
-        {
-            try
-            {
-                Part selectedpart = null;
-                if (IsTargetPart)
-                    selectedpart = _selectedPartTarget;
-                else
-                    selectedpart = _selectedPartSource;
-
-                if (SelectedResource == "Crew" && ShipManifestSettings.EnableCLS)
-                {
-                    if (selectedpart != null)
-                    {
-                        foreach (CLSPart part in clsVessel.Parts)
-                        {
-                            if ((Part)part == selectedpart)
-                            {
-                                // let's turn off CLS highlighting and Turn on Target Part Highlighing.
-                                if (IsTargetPart)
-                                {
-                                    CLSPartTarget = part;
-                                    CLSPartTarget.Highlight(false);
-                                }
-                                else
-                                {
-                                    CLSPartSource = part;
-                                    CLSPartSource.Highlight(false);
-                                }
-
-                                //turn on Selected part highlghting
-                                if (IsTargetPart)
-                                    SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.TargetPartCrewColor]);
-                                else
-                                    SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
-
-                                Part.OnActionDelegate OnMouseExit = MouseExit;
-                                selectedpart.AddOnMouseExit(OnMouseExit);
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Set part highlighting on the selected part...
-                    if (IsTargetPart)
-                        SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.TargetPartColor]);
-                    else
-                        SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
-                }
-                OnMouseHighlights();
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  SetPartHighlighting(" + IsTargetPart.ToString() + ").  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        public static void ClearHighlight(Part part)
-        {
-            try
-            {
-
-                if (part != null)
-                {
-                    part.SetHighlightDefault();
-                    part.SetHighlight(false);
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  ClearHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        public static void SetPartHighlight(Part part, Color color)
-        {
-            try
-            {
-
-                if (part != null)
-                {
-                    part.SetHighlightColor(color);
-                    part.SetHighlight(true);
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
         public static void FireEventTriggers()
         {
             // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
@@ -1227,8 +683,16 @@ namespace ShipManifest
             GameEvents.onVesselWasModified.Fire(FlightGlobals.ActiveVessel);
             GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
         }
-        
+
         #endregion
+
+        public enum XFERState
+        {
+            Off,
+            Start,
+            Run,
+            Stop
+        }
 
         private void DebuggerWindow(int windowId)
         {
