@@ -1,5 +1,10 @@
 ShipManifest
 ============
+Version 0.23.5.3.3 - 29 May, 2014 - CLS is Optonal Edition.
+ - New:  CLS is now a soft dependency.  
+   - if you install it, SM will configure for it's use.  
+   - If you do not install it, SM will automatically detect that and set Enable CLS Off.
+
 Version 0.23.5.3.2.3 - 11 May, 2014 - Settings, Roster & Bug Fix Edition.
  - New:  Roster Window now allows adding and removing individual Kerbals during pre-flight in Realism Mode, and Anytime in Standard mode.
  - New:  Additional changes to Settings.   
