@@ -120,7 +120,7 @@ namespace ShipManifest
                                 {
                                     // is resource in the list yet?.
                                     // 
-                                    if (!mResourceFound && (pm is ModuleScienceContainer || pm is ModuleScienceExperiment))
+                                    if (!mResourceFound && (pm is IScienceDataContainer))
                                     {
                                         if (_partsByResource.Keys.Contains("Science"))
                                         {
@@ -659,10 +659,8 @@ namespace ShipManifest
                             int ScienceCount = 0;
                             foreach (PartModule pm in part.Modules)
                             {
-                                if (pm is ModuleScienceContainer)
-                                    ScienceCount += ((ModuleScienceContainer)pm).GetScienceCount();
-                                else if (pm is ModuleScienceExperiment)
-                                    ScienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+                                if (pm is IScienceDataContainer)
+                                    ScienceCount += ((IScienceDataContainer)pm).GetScienceCount();
                             }
                             GUILayout.BeginHorizontal();
                             GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, ScienceCount.ToString()), GUILayout.Width(265));
