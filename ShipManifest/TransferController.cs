@@ -199,18 +199,20 @@ namespace ShipManifest
                             // Containers.
                             int scienceCount = 0;
                             int capacity = 0;
+                            //This is maybe not the best method, but if the part is also a ModuleScienceContainer it should only assign the values once
                             if (pm is ModuleScienceContainer)
                             {
                                 scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
                                 capacity = ((ModuleScienceContainer)pm).capacity;
                             }
-                            else if (pm is ModuleScienceExperiment)
+                            else if (pm is IScienceDataContainer)
                             {
-                                scienceCount = ((ModuleScienceExperiment)pm).GetScienceCount();
+                                scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                                 capacity = 1;
+                                
                             }
 
-                            if (pm is ModuleScienceExperiment || pm is ModuleScienceContainer)
+                            if (pm is IScienceDataContainer)
                             {
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
@@ -777,9 +779,9 @@ namespace ShipManifest
                         scienceCount += ((ModuleScienceContainer)pm).GetScienceCount();
                         capacity += ((ModuleScienceContainer)pm).capacity;
                     }
-                    else if (pm is ModuleScienceExperiment)
+                    else if (pm is IScienceDataContainer)
                     {
-                        scienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+                        scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
                         capacity += 1;
                     }
                 }
