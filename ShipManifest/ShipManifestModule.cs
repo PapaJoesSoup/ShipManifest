@@ -186,16 +186,28 @@ namespace ShipManifest
         {
             try
             {
-                // Let's clean up old vessel...
-                if (newVessel.isEVA)
+                if (newVessel.isEVA && !vessel.isEVA)
                 {
-                    // if we are EVA, then we don't need SM open.
+                    // Let's clean up old clsVessel highlighing...
+                    if (SettingsManager.CLSInstalled && ShipManifestSettings.EnableCLS && !vessel.isEVA && ManifestController.GetInstance(vessel).SelectedResource == "Crew")
+                    {
+                        // For some reason, clsVessel.Highlight(false) fails here.  no error, just does not turn off highlighting...
+                        foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
+                            iPart.Highlight(false);
+
+                        // if we are EVA, then we don't need SM open.
+                        if (clsVessel.Parts[0].Part.vessel.isEVA)
+                            ManifestUtilities.LogMessage("clsVessel is EVA!! Why?.  ", "Info", SettingsManager.VerboseLogging);
+
+                        ManifestUtilities.LogMessage("Setting Old Vessel Highlighting off.  ", "Info", SettingsManager.VerboseLogging);
+                    }
+
                     // kill selected resource and its associated highlighting.
                     ManifestController.GetInstance(vessel).SelectedResource = null;
                     ManifestController.GetInstance(vessel).SelectedResourceParts = null;
                     ManifestController.GetInstance(vessel).ShowShipManifest = false;
                     ManifestController.GetInstance(vessel).ShowTransferWindow = false;
-                    ManifestUtilities.LogMessage("Vessel is a Kerbal on EVA.  ", "Info", true);
+                    ManifestUtilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", true);
                 }
                 vessel = newVessel;
                 if (SettingsManager.CLSInstalled && ShipManifestSettings.EnableCLS)
