@@ -61,8 +61,23 @@ namespace ShipManifest
         public bool CanDrawButton = false;
 
         private string saveMessage = string.Empty;
+        private bool showRosterWindow = false;
+        private bool ShowRosterWindow 
+        {
+            get
+            {
+                return showRosterWindow;
+            }
+            
+            set
+            {
+                if (showRosterWindow && !value)
+                    ClearResourceHighlighting();
+                showRosterWindow = value;
+            } 
+        }
 
-        private bool ShowRosterWindow { get; set; }
+        private bool ShowHatchWindow { get; set; }
 
         #endregion
 
@@ -362,6 +377,11 @@ namespace ShipManifest
                         ShipManifestBehaviour.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                     }
 
+                    //if (ShowShipManifest && ShowHatchWindow)
+                    //{
+                    //    ShipManifestBehaviour.ShipManifestSettings.HatchesPosition = GUILayout.Window(398549, ShipManifestBehaviour.ShipManifestSettings.HatchesPosition, HatchWindow.Display, "Hatches - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                    //}
+
                     if (ShowShipManifest && ShipManifestBehaviour.ShipManifestSettings.ShowSettings)
                     {
                         ShipManifestBehaviour.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestBehaviour.ShipManifestSettings.SettingsPosition, ShipManifestBehaviour.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
@@ -370,7 +390,7 @@ namespace ShipManifest
                     if (resetRosterSize)
                     {
                         ShipManifestBehaviour.ShipManifestSettings.RosterPosition.height = 100; //reset hight
-                        ShipManifestBehaviour.ShipManifestSettings.RosterPosition.width = 360; //reset width
+                        ShipManifestBehaviour.ShipManifestSettings.RosterPosition.width = 400; //reset width
                         resetRosterSize = false;
                     }
 
@@ -386,7 +406,7 @@ namespace ShipManifest
             }
         }
 
-        #region Ship Manifest & Roster Window - Gui Layout Code
+        #region Ship Manifest Window - Gui Layout Code
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -418,21 +438,18 @@ namespace ShipManifest
 
                 GUILayout.BeginHorizontal();
 
-                var transferStyle = ShowTransferWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Transfer...", transferStyle, GUILayout.Width(100), GUILayout.Height(20)))
-                {
-                    try
-                    {
-                        if (SelectedResource != null)
-                        {
-                            ShowTransferWindow = !ShowTransferWindow;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ManifestUtilities.LogMessage(string.Format(" opening Transfer Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    }
-                }
+                //var hatchStyle = ShowHatchWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                //if (GUILayout.Button("Hatches...", hatchStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                //{
+                //    try
+                //    {
+                //        ShowHatchWindow = !ShowHatchWindow;
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        ManifestUtilities.LogMessage(string.Format(" opening Hatches Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                //    }
+                //}
 
                 var settingsStyle = ShipManifestBehaviour.ShipManifestSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
@@ -467,80 +484,6 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        private bool resetRosterSize = true;
-        private KerbalModel _selectedKerbal;
-        private KerbalModel SelectedKerbal
-        {
-            get { return _selectedKerbal; }
-            set
-            {
-                _selectedKerbal = value;
-                if (_selectedKerbal == null)
-                {
-                    saveMessage = string.Empty;
-                    resetRosterSize = true;
-                }
-            }
-        }
-        private Vector2 rosterScrollViewer = Vector2.zero;
-        private void RosterWindow(int windowId)
-        {
-            try
-            {
-                GUIStyle style = GUI.skin.button;
-                var defaultColor = style.normal.textColor;
-                GUILayout.BeginVertical();
-
-                RosterListViewer();
-
-                if (SelectedKerbal != null)
-                {
-                    GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
-                    SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
-
-                    if (!string.IsNullOrEmpty(saveMessage))
-                    {
-                        GUILayout.Label(saveMessage, ManifestStyle.ErrorLabelRedStyle);
-                    }
-
-                    GUILayout.Label("Courage");
-                    SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1);
-
-                    GUILayout.Label("Stupidity");
-                    SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1);
-
-                    SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-                    GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-                    {
-                        SelectedKerbal = null;
-                    }
-                    if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
-                    {
-                        saveMessage = SelectedKerbal.SubmitChanges();
-                        if (string.IsNullOrEmpty(saveMessage))
-                            SelectedKerbal = null;
-                    }
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
-                    {
-                        SelectedKerbal = CreateKerbal();
-                    }
-                }
-
-                GUILayout.EndVertical();
-                GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -599,13 +542,26 @@ namespace ShipManifest
                     {
                         try
                         {
-                            // Now let's update our lists...
-                            if (SelectedResource != resourceName)
+                            ClearResourceHighlighting();
+                            if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
                             {
-                                SelectedResource = resourceName;
-                                SelectedPartSource = SelectedPartTarget = null;
+                                // Now let's update our lists...
+                                if (SelectedResource != resourceName)
+                                {
+                                    SelectedResource = resourceName;
+                                    SelectedPartSource = SelectedPartTarget = null;
+                                }
+                                else if (SelectedResource == resourceName)
+                                {
+                                    SelectedResource = null;
+                                    SelectedPartSource = SelectedPartTarget = null;
+                                }
+                                if (SelectedResource != null)
+                                    ShowTransferWindow = true;
+                                else
+                                    ShowTransferWindow = false;
                             }
-                         }
+                        }
                         catch (Exception ex)
                         {
                             ManifestUtilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
@@ -679,93 +635,6 @@ namespace ShipManifest
                 GUILayout.EndScrollView();
         }
 
-        private void RosterListViewer()
-        {
-            try
-            {
-                rosterScrollViewer = GUILayout.BeginScrollView(rosterScrollViewer, GUILayout.Height(200), GUILayout.Width(360));
-                GUILayout.BeginVertical();
-
-                foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster)
-                {
-                    GUIStyle labelStyle = null;
-                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
-                        labelStyle = ManifestStyle.LabelStyleRed;
-                    else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED)
-                        labelStyle = ManifestStyle.LabelStyleYellow;
-                    else
-                        labelStyle = ManifestStyle.LabelStyle;
-
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(200));  // + "  (" + kerbal.seat.vessel.name + ")"
-                    string buttonText = string.Empty;
-
-                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE)
-                        GUI.enabled = true;
-                    else
-                        GUI.enabled = false;
-
-                    if (GUILayout.Button((SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel", GUILayout.Width(60)))
-                    {
-                        if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
-                        {
-                            SelectedKerbal = new KerbalModel(kerbal, false);
-                        }
-                        else
-                        {
-                            SelectedKerbal = null;
-                        }
-                    }
-
-                    if (((ShipManifestBehaviour.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestBehaviour.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.AVAILABLE && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
-                    {
-                        GUI.enabled = true;
-                        buttonText = "Add";
-                    }
-                    else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.DEAD || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.MISSING)
-                    {
-                        GUI.enabled = true;
-                        buttonText = "Respawn";
-                    }
-                    else if (((ShipManifestBehaviour.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestBehaviour.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.ASSIGNED && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
-                    {
-                        GUI.enabled = true;
-                        buttonText = "Remove";
-                    }
-                    else
-                    {
-                        GUI.enabled = false;
-                        buttonText = "--";
-                    }
-
-                    if (GUILayout.Button(buttonText, GUILayout.Width(60)))
-                    {
-                        if (buttonText == "Add")
-                            AddCrew(kerbal, SelectedPartSource);
-                        else if (buttonText == "Respawn")
-                            RespawnKerbal(kerbal);
-                        else if (buttonText == "Remove")
-                        {
-                            // get part...
-                            Part part = FindPart(kerbal);
-                            if (part != null)
-                                RemoveCrew(kerbal, part);
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-                    GUI.enabled = true;
-                }
-
-                GUILayout.EndVertical();
-                GUILayout.EndScrollView();
-
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
         #endregion
 
         #region Methods
@@ -776,7 +645,7 @@ namespace ShipManifest
             {
                 for (int i = 0; i < part.CrewCapacity && i < count; i++)
                 {
-                    ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewCrewMember();
+                    ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
                     part.AddCrewmember(kerbal);
 
                     if (kerbal.seat != null)
@@ -788,7 +657,7 @@ namespace ShipManifest
         public void AddCrew(ProtoCrewMember kerbal, Part part)
         {
             part.AddCrewmember(kerbal);
-            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.ASSIGNED;
+            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
             if (part.internalModel != null)
             {
                 if (kerbal.seat != null)
@@ -820,15 +689,15 @@ namespace ShipManifest
         private void RemoveCrew(ProtoCrewMember member, Part part)
         {
             part.RemoveCrewmember(member);
-            member.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
+            member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         }
 
         private void RespawnKerbal(ProtoCrewMember kerbal)
         {
             kerbal.SetTimeForRespawn(0);
             kerbal.Spawn();
-            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
-            HighLogic.CurrentGame.CrewRoster.GetNextAvailableCrewMember();
+            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+            HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
         }
 
         private KerbalModel CreateKerbal()
@@ -925,7 +794,12 @@ namespace ShipManifest
         {
             try
             {
-                if (_selectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                if (ShipManifestBehaviour.ShipManifestSettings.EnableCLS && ShipManifestBehaviour.clsVessel != null)
+                {
+                    foreach (ICLSSpace iSpace in ShipManifestBehaviour.clsVessel.Spaces)
+                        iSpace.Highlight(false);
+                }
+                if (_selectedResource == "Crew")
                 {
                     if (SelectedPartSource != null)
                     {
@@ -939,8 +813,6 @@ namespace ShipManifest
                         Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
                         SelectedPartTarget.RemoveOnMouseExit(OnMouseExit);
                     }
-                    if (ShipManifestBehaviour.clsVessel != null)
-                        ShipManifestBehaviour.clsVessel.Highlight(false);
                 }
                 else if (_selectedResourceParts != null)
                 {
@@ -971,8 +843,9 @@ namespace ShipManifest
                         SelectedPartTarget = null;
 
                     if (ShipManifestBehaviour.clsVessel != null)
-                        ShipManifestBehaviour.clsVessel.Highlight(false);
-                 }
+                        foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
+                            iPart.Highlight(false);
+                }
                 else if (_selectedResourceParts != null)
                 {
                     foreach (Part part in _selectedResourceParts)
@@ -1008,7 +881,11 @@ namespace ShipManifest
                         // Highlight if we can..
                         if (ShipManifestBehaviour.clsVessel != null)
                         {
-                            ShipManifestBehaviour.clsVessel.Highlight(true);
+                            foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
+                                iPart.Highlight(false);
+                            foreach (ICLSSpace iSpace in ShipManifestBehaviour.clsVessel.Spaces)
+                                iSpace.Highlight(true);
+                            //ShipManifestBehaviour.clsVessel.Highlight(true);
                             ManifestUtilities.LogMessage("Spaces highlighted", "Info", SettingsManager.VerboseLogging);
                         }
 
@@ -1234,6 +1111,5 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format(" in  OnMouseHighlights.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
-
     }
 }
