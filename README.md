@@ -1,5 +1,13 @@
 ShipManifest
 ============
+Version 0.24.0.3.3.1 - 17 Jul, 2014 - 0.24.0 Edition.
+ - New:  Now compatible with KSP 0.24.0. Squad reworked crew objects and namespace.
+ - New:  Roster Window now shows vessel to which a kerbal is assigned.
+ - New:  Add support for DMagic Science parts (IDataScienceContainer)
+ - Bug:  SM Still doubling LS resource amounts.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-2-2-May-14?p=1136419&viewfull=1#post1136419
+ - Known Issue:  SM & CLS Highlighting still problematic.
+
 Version 0.23.5.3.3 - 29 May, 2014 - CLS is Optonal Edition.
  - New:  CLS is now a soft dependency.  
    - if you install it, SM will configure for it's use.  
