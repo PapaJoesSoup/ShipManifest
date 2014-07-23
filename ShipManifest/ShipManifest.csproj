@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -53,21 +53,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ksp-win64-0-24-0-mod\KSP_win64\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ConnectedLivingSpace\plugins\CLSInterfaces\bin\Debug\CLSInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="Toolbar, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ksp-win64-0-24-0-mod\KSP_win64\GameData\000_Toolbar\Toolbar.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\ksp-win64-0-24-0-mod\KSP_win64\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +72,7 @@
     <Compile Include="RosterWindow.cs" />
     <Compile Include="SettingsManager.cs" />
     <Compile Include="ShipManifestModule.cs" />
+    <Compile Include="ToolbarWrapper.cs" />
     <Compile Include="TransferController.cs" />
     <Compile Include="ManifestController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

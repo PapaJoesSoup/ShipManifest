@@ -1,0 +1,7 @@
+*.cache
+*.force
+ShipManifest/obj/Debug/ShipManifest.csproj.FileListAbsolute.txt
+*.user
+*.suo
+bin/
+obj/
