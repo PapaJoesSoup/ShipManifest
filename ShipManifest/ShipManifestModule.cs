@@ -28,7 +28,7 @@ namespace ShipManifest
         }
     }
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class ShipManifestBehaviour : MonoBehaviour
     {
 
@@ -76,7 +76,6 @@ namespace ShipManifest
         #endregion
 
         // Toolbar Integration.
-        // TODO:  make optional...
         private static IButton ShipManifestButtonBlizzy;
         private static ApplicationLauncherButton ShipManifestButtonStock;
 
@@ -94,32 +93,36 @@ namespace ShipManifest
 
         public void Awake()
         {
+            if (HighLogic.LoadedScene != GameScenes.FLIGHT) { return; } // don't do anything if we're not in a flight scene
+
             DontDestroyOnLoad(this);
             ShipManifestSettings.Load();
             if (ShipManifestSettings.AutoSave)
                 InvokeRepeating("RunSave", ShipManifestSettings.SaveIntervalSec, ShipManifestSettings.SaveIntervalSec);
 
-            // TODO: only enable 1 button or the other
-            ShipManifestButtonBlizzy = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
-            ShipManifestButtonBlizzy.TexturePath = "ShipManifest/Plugins/IconOff_24";
-            ShipManifestButtonBlizzy.ToolTip = "Ship Manifest";
-            ShipManifestButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
-            ShipManifestButtonBlizzy.OnClick += (e) =>
+            if (ShipManifestSettings.EnableBlizzyToolbar)
             {
-                if (shouldToggle())
+                ShipManifestButtonBlizzy = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
+                ShipManifestButtonBlizzy.TexturePath = "ShipManifest/Plugins/IconOff_24";
+                ShipManifestButtonBlizzy.ToolTip = "Ship Manifest";
+                ShipManifestButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
+                ShipManifestButtonBlizzy.OnClick += (e) =>
                 {
-                    ShipManifestButtonBlizzy.TexturePath = ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = !ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest;
-                    if (!ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest)
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
-                    else
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
-                }
-            };
-
-            // TODO: only enable 1 button or the other
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-            // GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
+                    if (shouldToggle())
+                    {
+                        ShipManifestButtonBlizzy.TexturePath = ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = !ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest;
+                        if (!ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest)
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
+                        else
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
+                    }
+                };
+            }
+            else
+            {
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+            }
         }
 
         public void Start()
@@ -155,10 +158,8 @@ namespace ShipManifest
 
         void OnGUIAppLauncherReady()
         {
-            Debug.Log("[ShipManifestModule] OnGUIAppLauncherReady Entered");
             if (ApplicationLauncher.Ready && HighLogic.LoadedSceneIsFlight && ShipManifestButtonStock == null)
             {
-                Debug.Log("[ShipManifestModule] Creating another button: " + ShipManifestButtonStock);
                 ShipManifestButtonStock = ApplicationLauncher.Instance.AddModApplication(
                     onAppLaunchToggleOn,
                     onAppLaunchToggleOff,
