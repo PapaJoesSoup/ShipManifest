@@ -59,4 +59,5 @@
     <bool name="ShowIVAUpdateBtn">0</bool>
     <bool name="AutoDebug">1</bool>
     <bool name="EnableTextureReplacer">0</bool>
+    <bool name="EnableBlizzyToolbar">0</bool>
 </config>
