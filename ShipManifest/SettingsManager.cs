@@ -60,6 +60,7 @@ namespace ShipManifest
         public bool prevEnableCrew = true;
         public bool prevEnablePFResources = true;
         public bool prevEnableCLS = true;
+        public bool EnableBlizzyToolbar = false; // off by default
 
         // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
         public static bool CLSInstalled = true;
@@ -263,6 +264,9 @@ namespace ShipManifest
             label = "Enable Texture Replacer Events";
             EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
 
+            label = "Enable Blizzy Toolbar";
+            EnableBlizzyToolbar = GUILayout.Toggle(EnableBlizzyToolbar, label, GUILayout.Width(300));
+
             label = "Enable AutoSave Settings";
             AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
 
@@ -344,6 +348,7 @@ namespace ShipManifest
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
                 EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
                 EnableCLS = configfile.GetValue<bool>("EnableCLS");
+                EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar");
 
                 DebugLogPath = configfile.GetValue<string>("DebugLogPath");
 
@@ -413,6 +418,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("Load Settings Complete"), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format(" "), "Info", VerboseLogging);
 
@@ -506,6 +512,7 @@ namespace ShipManifest
                 configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
                 configfile.SetValue("AutoDebug", AutoDebug);
                 configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
+                configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
 
                 configfile.save();
 
@@ -542,6 +549,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
             }
             catch (Exception ex)
             {

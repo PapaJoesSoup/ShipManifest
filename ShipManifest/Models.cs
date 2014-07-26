@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -36,8 +37,10 @@ namespace ShipManifest
 
             if (IsNew)
             {
-                Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.AVAILABLE;
-                HighLogic.CurrentGame.CrewRoster.AddCrewMember(Kerbal);
+                MethodInfo dynMethod = HighLogic.CurrentGame.CrewRoster.GetType().GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
+                Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+                //HighLogic.CurrentGame.CrewRoster.AddCrewMember(Kerbal);
+                dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] { Kerbal });
             }
 
             return string.Empty;
@@ -55,7 +58,7 @@ namespace ShipManifest
         {
             if(IsNew || Kerbal.name != Name)
             {
-                return HighLogic.CurrentGame.CrewRoster.ExistsInRoster(Name);
+                return HighLogic.CurrentGame.CrewRoster.Exists(Name);
             }
 
             return false;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using UnityEngine;
-using Toolbar;
 using ConnectedLivingSpace;
 
 namespace ShipManifest
@@ -29,7 +28,7 @@ namespace ShipManifest
         }
     }
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class ShipManifestBehaviour : MonoBehaviour
     {
 
@@ -77,8 +76,8 @@ namespace ShipManifest
         #endregion
 
         // Toolbar Integration.
-        // TODO:  make optional...
-        private IButton button;
+        private static IButton ShipManifestButtonBlizzy;
+        private static ApplicationLauncherButton ShipManifestButtonStock;
 
         #region Event handlers
 
@@ -94,30 +93,36 @@ namespace ShipManifest
 
         public void Awake()
         {
+            if (HighLogic.LoadedScene != GameScenes.FLIGHT) { return; } // don't do anything if we're not in a flight scene
+
             DontDestroyOnLoad(this);
             ShipManifestSettings.Load();
             if (ShipManifestSettings.AutoSave)
                 InvokeRepeating("RunSave", ShipManifestSettings.SaveIntervalSec, ShipManifestSettings.SaveIntervalSec);
 
-            button = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
-            button.TexturePath = "ShipManifest/Plugins/IconOff_24";
-            button.ToolTip = "Ship Manifest";
-            button.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
-            button.OnClick += (e) =>
+            if (ShipManifestSettings.EnableBlizzyToolbar)
             {
-                if (!MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying &&
-                    FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null &&
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).CanDrawButton
-                    )
+                ShipManifestButtonBlizzy = ToolbarManager.Instance.add("ResourceManifest", "ResourceManifest");
+                ShipManifestButtonBlizzy.TexturePath = "ShipManifest/Plugins/IconOff_24";
+                ShipManifestButtonBlizzy.ToolTip = "Ship Manifest";
+                ShipManifestButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
+                ShipManifestButtonBlizzy.OnClick += (e) =>
                 {
-                    button.TexturePath = ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = !ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest;
-                    if (!ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest)
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
-                    else
-                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
-                }
-            };
+                    if (shouldToggle())
+                    {
+                        ShipManifestButtonBlizzy.TexturePath = ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
+                        ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = !ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest;
+                        if (!ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest)
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
+                        else
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
+                    }
+                };
+            }
+            else
+            {
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+            }
         }
 
         public void Start()
@@ -150,6 +155,59 @@ namespace ShipManifest
             if (SettingsManager.ShowDebugger)
                 ShipManifestSettings.DebuggerPosition = GUILayout.Window(398648, ShipManifestSettings.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + ShipManifestSettings.CurVersion, GUILayout.MinHeight(20));
         }
+
+        void OnGUIAppLauncherReady()
+        {
+            if (ApplicationLauncher.Ready && HighLogic.LoadedSceneIsFlight && ShipManifestButtonStock == null)
+            {
+                ShipManifestButtonStock = ApplicationLauncher.Instance.AddModApplication(
+                    onAppLaunchToggleOn,
+                    onAppLaunchToggleOff,
+                    DummyVoid,
+                    DummyVoid,
+                    DummyVoid,
+                    DummyVoid,
+                    ApplicationLauncher.AppScenes.FLIGHT,
+                    (Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_24", false));
+                GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
+                GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
+            }
+        }
+
+        void OnGameSceneLoadRequested(GameScenes scene)
+        {
+            if (ShipManifestButtonStock != null) {
+                ApplicationLauncher.Instance.RemoveModApplication(ShipManifestButtonStock);
+                GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+            }
+        }
+
+        bool shouldToggle()
+        {
+            return (!MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying &&
+                            FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null &&
+                            ManifestController.GetInstance(FlightGlobals.ActiveVessel).CanDrawButton
+                            );
+        }
+
+        void onAppLaunchToggleOn()
+        {
+            if (!shouldToggle()) { ShipManifestButtonStock.SetFalse(); return;  }
+            ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = true;
+            ShipManifestButtonStock.SetTexture((Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOn_24", false));
+            ManifestController.GetInstance(FlightGlobals.ActiveVessel).SetResourceHighlighting();
+        }
+
+        void onAppLaunchToggleOff()
+        {
+            if (!shouldToggle()) { ShipManifestButtonStock.SetTrue(); return; }
+            ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest = false;
+            ShipManifestButtonStock.SetTexture((Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_24", false));
+            ManifestController.GetInstance(FlightGlobals.ActiveVessel).ClearResourceHighlighting();
+        }
+
+        void DummyVoid() { }
 
         public void Update()
         {
@@ -223,7 +281,14 @@ namespace ShipManifest
         {
             GameEvents.onVesselChange.Remove(OnVesselChange);
             CancelInvoke("RunSave");
-            button.Destroy();
+            GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
+            if (ShipManifestButtonBlizzy != null) { 
+                ShipManifestButtonBlizzy.Destroy(); 
+            }
+            if (ShipManifestButtonStock != null)
+            {
+                ApplicationLauncher.Instance.RemoveModApplication(ShipManifestButtonStock); 
+            }
         }
 
         #endregion
