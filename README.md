@@ -1,7 +1,7 @@
 ShipManifest
 ============
 Version 0.24.0.3.3.2 - 26 Jul, 2014 - Post 0.24.0 Bugs and such
- - New: Optional Toolbar support!  Courtesy of ragzilla!
+ - New: Optional Blizzy Toolbar support!  Courtesy of ragzilla!
  - Add option in Config for turning OFF resource transfers.
  - Fix science transfers. Really.
  - Fix Highlighting with CLS. Really
