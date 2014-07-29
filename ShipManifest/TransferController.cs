@@ -206,12 +206,12 @@ namespace ShipManifest
                             int capacity = 0;
                             if (pm is ModuleScienceContainer)
                             {
-                                scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
+						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                                 capacity = ((ModuleScienceContainer)pm).capacity;
                             }
                             else if (pm is ModuleScienceExperiment)
                             {
-                                scienceCount = ((ModuleScienceExperiment)pm).GetScienceCount();
+						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                                 capacity = 1;
                             }
 
@@ -420,7 +420,7 @@ namespace ShipManifest
                             int scienceCount = 0;
                             if (pm is ModuleScienceContainer)
                             {
-                                scienceCount = ((ModuleScienceContainer)pm).GetScienceCount();
+						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
                                 // set the conditions for a button style change.
@@ -784,12 +784,12 @@ namespace ShipManifest
                     // Containers.
                     if (pm is ModuleScienceContainer)
                     {
-                        scienceCount += ((ModuleScienceContainer)pm).GetScienceCount();
+					scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
                         capacity += ((ModuleScienceContainer)pm).capacity;
                     }
                     else if (pm is ModuleScienceExperiment)
                     {
-                        scienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+					scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
                         capacity += 1;
                     }
                 }
