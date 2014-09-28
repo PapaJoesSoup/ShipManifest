@@ -131,17 +131,19 @@ namespace ShipManifest
                             if (ShipManifestBehaviour.ShipManifestSettings.EnableScience)
                             {
                                 bool mResourceFound = false;
-                                foreach (PartModule pm in part.Modules)
+                                IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
+                                foreach (IScienceDataContainer pm in sciModules)
                                 {
                                     // is resource in the list yet?.
                                     // 
-                                    if (!mResourceFound && (pm is ModuleScienceContainer || pm is ModuleScienceExperiment))
+                                    if (!mResourceFound && (pm is IScienceDataContainer))
                                     {
                                         if (_partsByResource.Keys.Contains("Science"))
                                         {
                                             mResourceFound = true;
                                             List<Part> eParts = _partsByResource["Science"];
                                             eParts.Add(part);
+                                            break;
                                         }
                                         if (!mResourceFound)
                                         {
@@ -150,6 +152,7 @@ namespace ShipManifest
                                             nParts.Add(part);
                                             _partsByResource.Add("Science", nParts);
                                             mResourceFound = true;
+                                            break;
                                         }
                                     }
                                 }
@@ -351,10 +354,13 @@ namespace ShipManifest
 
         private void drawGui()
         {
+            string step = "";
             try
             {
+                step = "0 - Start";
                 if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != Vessel)
-                { 
+                {
+                    step = "0a - Vessel Change";
                     SelectedPartSource = SelectedPartTarget = null;
                     SelectedResource = null;
                     return;
@@ -362,11 +368,13 @@ namespace ShipManifest
 
                 ManifestStyle.SetupGUI();
 
+                step = "1 - Show Interface(s)";
                 // Is the scene one we want to be visible in?
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
                 {
                     if (ShowShipManifest)
                     {
+                        step = "2 - Show Manifest";
                         // Let's set all highlighting
                         ShipManifestBehaviour.ShipManifestSettings.ManifestPosition = GUILayout.Window(398544, ShipManifestBehaviour.ShipManifestSettings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                     }
@@ -374,6 +382,7 @@ namespace ShipManifest
                     // What windows do we want to show?
                     if (ShowShipManifest && ShowTransferWindow && SelectedResource != null)
                     {
+                        step = "3 - Show Transfer";
                         ShipManifestBehaviour.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                     }
 
@@ -384,11 +393,13 @@ namespace ShipManifest
 
                     if (ShowShipManifest && ShipManifestBehaviour.ShipManifestSettings.ShowSettings)
                     {
+                        step = "4 - Show Settings";
                         ShipManifestBehaviour.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestBehaviour.ShipManifestSettings.SettingsPosition, ShipManifestBehaviour.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
                     }
 
                     if (resetRosterSize)
                     {
+                        step = "5 - Reset Roster Size";
                         ShipManifestBehaviour.ShipManifestSettings.RosterPosition.height = 100; //reset hight
                         ShipManifestBehaviour.ShipManifestSettings.RosterPosition.width = 400; //reset width
                         resetRosterSize = false;
@@ -396,13 +407,14 @@ namespace ShipManifest
 
                     if (ShowShipManifest && ShipManifestBehaviour.ShipManifestSettings.ShowRoster)
                     {
+                        step = "6 - Show Roster";
                         ShipManifestBehaviour.ShipManifestSettings.RosterPosition = GUILayout.Window(398547, ShipManifestBehaviour.ShipManifestSettings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
                     }
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in drawGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in drawGui at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -881,8 +893,8 @@ namespace ShipManifest
                         // Highlight if we can..
                         if (ShipManifestBehaviour.clsVessel != null)
                         {
-                            foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
-                                iPart.Highlight(false);
+                            //foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
+                            //    iPart.Highlight(false);
                             foreach (ICLSSpace iSpace in ShipManifestBehaviour.clsVessel.Spaces)
                                 iSpace.Highlight(true);
                             //ShipManifestBehaviour.clsVessel.Highlight(true);
