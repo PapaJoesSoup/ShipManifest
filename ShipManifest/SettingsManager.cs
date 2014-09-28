@@ -13,7 +13,7 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.24.0.3.3.1";
+        public string CurVersion = "0.24.2.3.4.0";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
@@ -53,17 +53,19 @@ namespace ShipManifest
 
         // Feature Options
         public bool EnableScience = true;
+        public bool EnableResources = true;
         public bool EnableCrew = true;
         public bool EnablePFResources = true;
-        public bool EnableCLS = true;
+        public bool EnableCLS = false; // off by default
         public bool prevEnableScience = true;
         public bool prevEnableCrew = true;
         public bool prevEnablePFResources = true;
         public bool prevEnableCLS = true;
         public bool EnableBlizzyToolbar = false; // off by default
+        public bool prevEnableBlizzyToolbar = false;
 
         // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
-        public static bool CLSInstalled = true;
+        public static bool CLSInstalled = false;
 
         public static bool EnableTextureReplacer = false;
         public static bool prevEnableTextureReplacer = false;
@@ -185,6 +187,22 @@ namespace ShipManifest
                 }
             }
 
+            // EnableResources Mode
+            GUILayout.BeginHorizontal();
+            GUI.enabled = isEnabled;
+            label = "Enable Resource Xfers";
+            EnableResources = GUILayout.Toggle(EnableResources, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            if (!EnableResources)
+            {
+                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Resources")
+                {
+                    // Clear Resource selection.
+                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
+                }
+            }
+
             // EnablePFResources Mode
             GUILayout.BeginHorizontal();
             GUI.enabled = isEnabled;
@@ -194,7 +212,7 @@ namespace ShipManifest
 
             // LockSettings Mode
             GUI.enabled = isEnabled;
-            label = "Lock Settings  (If set ON, edit config File to Turn OFF)";
+            label = "Lock Settings  (If set ON, disable in config file)";
             LockSettings = GUILayout.Toggle(LockSettings, label, GUILayout.Width(300));
 
             GUI.enabled = true;
@@ -250,6 +268,7 @@ namespace ShipManifest
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             GUILayout.Label("Configuraton", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            
             // AutoDebug Mode
             label = "Enable SM Debug Window On Error";
             AutoDebug = GUILayout.Toggle(AutoDebug, label, GUILayout.Width(300));
@@ -264,7 +283,16 @@ namespace ShipManifest
             label = "Enable Texture Replacer Events";
             EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
 
-            label = "Enable Blizzy Toolbar";
+            if (!ToolbarManager.ToolbarAvailable)
+            {
+                if (EnableBlizzyToolbar)
+                    EnableBlizzyToolbar = false;
+                GUI.enabled = false;
+            }
+            else
+                GUI.enabled = isEnabled;
+
+            label = "Enable Blizzy Toolbar (requires game restart)";
             EnableBlizzyToolbar = GUILayout.Toggle(EnableBlizzyToolbar, label, GUILayout.Width(300));
 
             label = "Enable AutoSave Settings";
@@ -344,8 +372,9 @@ namespace ShipManifest
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
                 TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
 
-                EnableScience = configfile.GetValue<bool>("EnableScience");
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
+                EnableScience = configfile.GetValue<bool>("EnableScience");
+                EnableResources = configfile.GetValue<bool>("EnableResources");
                 EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
                 EnableCLS = configfile.GetValue<bool>("EnableCLS");
                 EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar");
@@ -411,7 +440,9 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableResources Loaded: {0}", EnableResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCLS Loaded: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
@@ -501,8 +532,9 @@ namespace ShipManifest
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
 
-                configfile.SetValue("EnableScience", EnableScience);
                 configfile.SetValue("EnableCrew", EnableCrew);
+                configfile.SetValue("EnableScience", EnableScience);
+                configfile.SetValue("EnableResources", EnableResources);
                 configfile.SetValue("EnablePFResources", EnablePFResources);
                 configfile.SetValue("EnableCLS", EnableCLS);
 
@@ -540,8 +572,9 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCLS Saved: {0}", EnableCLS), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
@@ -579,6 +612,7 @@ namespace ShipManifest
             prevVerboseLogging = VerboseLogging;
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
+            prevEnableBlizzyToolbar = EnableBlizzyToolbar;
 
             // Realism Mode settings.
             prevRealismMode = RealismMode;
@@ -619,9 +653,9 @@ namespace ShipManifest
             EnableCLS = prevEnableCLS;
             EnableTextureReplacer = prevEnableTextureReplacer;
             LockSettings = prevLockSettings;
+            EnableBlizzyToolbar = prevEnableBlizzyToolbar;
         }
 
         #endregion
-
     }
 }
