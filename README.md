@@ -1,11 +1,11 @@
 ShipManifest
 ============
-Version 0.24.0.3.3.2 - 26 Jul, 2014 - Post 0.24.0 Bugs and such
- - New: Optional Blizzy Toolbar support!  Courtesy of ragzilla!
+Version 0.24.2_3.3.2 - 28 Sep, 2014 - Post 0.24.2 Bugs and such
+ - New: Optional Blizzy Toolbar support!  Courtesy of ragzilla!  All mod dependencies are now gone.
  - Add option in Config for turning OFF resource transfers.
- - Fix science transfers. Really.
- - Fix Highlighting with CLS. Really
- - 
+ - Fix science transfers. Really.  (i hope).
+ - Added close button to Debug window.
+ - bug fixes.  still CLS highlighting to fix.  don't like wht I have atm at all...
  
 Version 0.24.0.3.3.1 - 17 Jul, 2014 - 0.24.0 Edition.
  - New:  Now compatible with KSP 0.24.0. Squad reworked crew objects and namespace.
