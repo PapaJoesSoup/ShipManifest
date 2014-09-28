@@ -10,6 +10,7 @@ namespace ShipManifest
     public partial class ManifestController
     {
         #region Properties
+
         // Transfer Controller.  This module contains Resource Manifest specific code. 
         // I made it a partial class to allow file level segregation of resource and crew functionality
         // for improved readability and management by coders.
@@ -22,7 +23,7 @@ namespace ShipManifest
         // Flags to show windows
         public bool ShowTransferWindow { get; set; }
         private bool _showShipManifest = false;
-        public bool ShowShipManifest 
+        public bool ShowShipManifest
         {
             get
             {
@@ -39,7 +40,7 @@ namespace ShipManifest
                             space.Highlight(false);
                         }
                     }
-               }
+                }
                 _showShipManifest = value;
             }
         }
@@ -99,7 +100,7 @@ namespace ShipManifest
 
                 // Build Target details Viewer
                 TargetDetailsViewer();
-                
+
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
@@ -199,40 +200,27 @@ namespace ShipManifest
                     }
                     else if (SelectedResource == "Science")
                     {
-                        foreach (PartModule pm in SelectedPartSource.Modules)
+                        IScienceDataContainer[] modules = SelectedPartSource.FindModulesImplementing <IScienceDataContainer>().ToArray();
+                        foreach (PartModule pm in modules)
                         {
                             // Containers.
-                            int scienceCount = 0;
-                            int capacity = 0;
-                            if (pm is ModuleScienceContainer)
-                            {
-						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
-                                capacity = ((ModuleScienceContainer)pm).capacity;
-                            }
-                            else if (pm is ModuleScienceExperiment)
-                            {
-						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
-                                capacity = 1;
-                            }
+                            int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
 
-                            if (pm is ModuleScienceExperiment || pm is ModuleScienceContainer)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
-                                // If we have target selected, it is not the same as the source, and there is science to xfer.
-                                if ((SelectedModuleTarget != null && pm != SelectedModuleTarget) && scienceCount > 0)
+                            // If we have target selected, it is not the same as the source, and there is science to xfer.
+                            if ((SelectedModuleTarget != null && pm != SelectedModuleTarget) && scienceCount > 0)
+                            {
+                                if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                                    {
-                                        SelectedModuleSource = pm;
-                                        TransferScience(SelectedModuleSource, SelectedModuleTarget);
-                                        SelectedModuleSource = null;
-                                    }
+                                    SelectedModuleSource = pm;
+                                    TransferScience(SelectedModuleSource, SelectedModuleTarget);
+                                    SelectedModuleSource = null;
                                 }
-                                GUILayout.EndHorizontal();
                             }
-                        }
+                            GUILayout.EndHorizontal();
+                         }
                     }
                     else
                     {
@@ -410,7 +398,7 @@ namespace ShipManifest
                         int count = 0;
                         foreach (PartModule tpm in SelectedPartTarget.Modules)
                         {
-                            if (tpm is ModuleScienceContainer)
+                            if (tpm is IScienceDataContainer)
                                 count += 1;
                         }
 
@@ -418,9 +406,9 @@ namespace ShipManifest
                         {
                             // Containers.
                             int scienceCount = 0;
-                            if (pm is ModuleScienceContainer)
+                            if (pm is IScienceDataContainer)
                             {
-						   scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+                                scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                                 GUILayout.BeginHorizontal();
                                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
                                 // set the conditions for a button style change.
@@ -429,7 +417,7 @@ namespace ShipManifest
                                     ShowReceive = true;
                                 else if (count == 1)
                                     ShowReceive = true;
-                                SelectedModuleTarget = pm;
+                                //SelectedModuleTarget = pm;
                                 var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
                                 if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
@@ -642,82 +630,52 @@ namespace ShipManifest
         private void TransferScience(PartModule source, PartModule target)
         {
             ScienceData[] moduleScience = null;
-            int i;
             try
             {
-                if (source is ModuleScienceContainer)
-                {
-                    if (((ModuleScienceContainer)source) != null)
-                        moduleScience = ((IScienceDataContainer)source).GetData();
-                    else
-                        moduleScience = null;
-                    //ManifestUtilities.LogMessage("Science Data Count:  " + ((ModuleScienceContainer) source).GetStoredDataCount(), "Info", SettingsManager.VerboseLogging);
-                    //ManifestUtilities.LogMessage("Science Data s Collectable:  " + ((ModuleScienceContainer) source).dataIsCollectable, "Info", SettingsManager.VerboseLogging);
-                }
+                if (((IScienceDataContainer)source) != null)
+                    moduleScience = ((IScienceDataContainer)source).GetData();
                 else
-                {
-                    if (((ModuleScienceExperiment)source) != null)
-                    {
-                        moduleScience = ((IScienceDataContainer)source).GetData();
-                        ManifestUtilities.LogMessage("moduleScience is collected:  ", "Info", SettingsManager.VerboseLogging);
-                    }
-                    else
-                    {
-                        moduleScience = null;
-                        ManifestUtilities.LogMessage("moduleScience is null:  ", "Info", SettingsManager.VerboseLogging);
-                    }
-                }
+                    moduleScience = null;
 
                 if (moduleScience != null && moduleScience.Length > 0)
                 {
-                    for (i = 0; i < moduleScience.Length; i++)
+                    ManifestUtilities.LogMessage(string.Format("moduleScience has data..."), "Info", SettingsManager.VerboseLogging);
+
+                    if (((IScienceDataContainer)target) != null)
                     {
-                        ManifestUtilities.LogMessage(string.Format("moduleScience has data..."), "Info", SettingsManager.VerboseLogging);
-
-                        if (((ModuleScienceContainer)target) != null)
+                        // Lets store the data from the source.
+                        if (((ModuleScienceContainer)target).StoreData( new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
                         {
-                            if (((ModuleScienceContainer)target).AddData(moduleScience[i]))
+                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", SettingsManager.VerboseLogging);
+                            foreach (ScienceData data in moduleScience)
                             {
-                                if (source is ModuleScienceContainer)
-                                {
-                                    //((ModuleScienceContainer)source).
-                                    ManifestUtilities.LogMessage(string.Format("((ModuleScienceContainer)source) is not null"), "Info", SettingsManager.VerboseLogging);
+                                ((IScienceDataContainer)source).DumpData(data);
+                            }
 
-                                    ((IScienceDataContainer)source).DumpData(moduleScience[i]);
-                                }
-                                else
-                                {
-                                    if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
-                                    {
-                                        ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SettingsManager.VerboseLogging);
-                                        ((IScienceDataContainer)source).DumpData(moduleScience[i]);
-                                    }
-                                    else
-                                    {
-                                        ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred. Reset Experiment"), "Info", SettingsManager.VerboseLogging);
-                                        ((ModuleScienceExperiment)source).ResetExperiment();
-                                    }
-                                }
+                            if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
+                            {
+                                ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SettingsManager.VerboseLogging);
                             }
                             else
                             {
-                                ManifestUtilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", true);
+                                ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", SettingsManager.VerboseLogging);
+                                ((ModuleScienceExperiment)source).ResetExperiment();
                             }
                         }
                         else
                         {
-                            ManifestUtilities.LogMessage(string.Format("((ModuleScienceExperiment)target) is null"), "Info", true);
+                            ManifestUtilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", true);
                         }
+                    }
+                    else
+                    {
+                        ManifestUtilities.LogMessage(string.Format("((IScienceDataContainer)target) is null"), "Info", true);
                     }
                     ManifestUtilities.LogMessage(string.Format("Transfer Complete."), "Info", SettingsManager.VerboseLogging);
                 }
                 else if (moduleScience == null)
                 {
                     ManifestUtilities.LogMessage(string.Format("moduleScience is null..."), "Info", SettingsManager.VerboseLogging);
-                }
-                else  // must be length then...
-                {
-                    ManifestUtilities.LogMessage(string.Format("moduleScience empty (no data)..."), "Info", SettingsManager.VerboseLogging);
                 }
             }
             catch (Exception ex)
@@ -778,26 +736,15 @@ namespace ShipManifest
             try
             {
                 int scienceCount = 0;
-                int capacity = 0;
                 foreach (PartModule pm in part.Modules)
                 {
-                    // Containers.
-                    if (pm is ModuleScienceContainer)
+                    if (pm is IScienceDataContainer)
                     {
-					scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
-                        capacity += ((ModuleScienceContainer)pm).capacity;
-                    }
-                    else if (pm is ModuleScienceExperiment)
-                    {
-					scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
-                        capacity += 1;
+                        scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
                     }
                 }
 
-                if (IsCapacity)
-                    return capacity;
-                else
-                    return scienceCount;
+                return scienceCount;
             }
             catch (Exception ex)
             {
@@ -805,7 +752,7 @@ namespace ShipManifest
                 return 0;
             }
         }
-        
+
         #endregion
     }
 }
