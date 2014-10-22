@@ -102,13 +102,13 @@ namespace ShipManifest
                     if (FlightGlobals.ActiveVessel != null)
                     {
                         //ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  "), "Info", SettingsManager.VerboseLogging);
-                        ShipManifestBehaviour.vessel = Vessel;
+                        ShipManifestAddon.vessel = Vessel;
 
                         _partsByResource = new Dictionary<string, List<Part>>();
                         foreach (Part part in Vessel.Parts)
                         {
                             // First let's Get any Crew, if desired...
-                            if (ShipManifestBehaviour.ShipManifestSettings.EnableCrew && part.CrewCapacity > 0)
+                            if (ShipManifestAddon.ShipManifestSettings.EnableCrew && part.CrewCapacity > 0)
                             {
                                 bool vResourceFound = false;
                                 // is resource in the list yet?.
@@ -128,7 +128,7 @@ namespace ShipManifest
                                 }
                             }
                             // Let's Get any Science...
-                            if (ShipManifestBehaviour.ShipManifestSettings.EnableScience)
+                            if (ShipManifestAddon.ShipManifestSettings.EnableScience)
                             {
                                 bool mResourceFound = false;
                                 IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
@@ -162,7 +162,7 @@ namespace ShipManifest
                             foreach (PartResource resource in part.Resources)
                             {
                                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                                if (!ShipManifestBehaviour.ShipManifestSettings.RealismMode || (ShipManifestBehaviour.ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                                if (!ShipManifestAddon.ShipManifestSettings.RealismMode || (ShipManifestAddon.ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
                                 {
                                     bool vResourceFound = false;
                                     // is resource in the list yet?.
@@ -284,8 +284,8 @@ namespace ShipManifest
                     SetSelectedHighlighting(false);
 
                     // reset transfer amount (for resource xfer slider control)
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
+                    ShipManifestAddon.smController.sXferAmount = -1f;
+                    ShipManifestAddon.smController.tXferAmount = -1f;
                     OnMouseHighlights();
                 }
                 catch (Exception ex)
@@ -325,8 +325,8 @@ namespace ShipManifest
                     SetSelectedHighlighting(true);
 
                     // reset transfer amount (for resource xfer slider control)
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).sXferAmount = -1f;
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).tXferAmount = -1f;
+                    ShipManifestAddon.smController.sXferAmount = -1f;
+                    ShipManifestAddon.smController.tXferAmount = -1f;
                     OnMouseHighlights();
                 }
                 catch (Exception ex)
@@ -372,18 +372,17 @@ namespace ShipManifest
                 // Is the scene one we want to be visible in?
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
                 {
-                    if (ShowShipManifest)
+                    if (SettingsManager.ShowShipManifest)
                     {
                         step = "2 - Show Manifest";
-                        // Let's set all highlighting
-                        ShipManifestBehaviour.ShipManifestSettings.ManifestPosition = GUILayout.Window(398544, ShipManifestBehaviour.ShipManifestSettings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                        ShipManifestAddon.ShipManifestSettings.ManifestPosition = GUILayout.Window(398544, ShipManifestAddon.ShipManifestSettings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                     }
 
                     // What windows do we want to show?
-                    if (ShowShipManifest && ShowTransferWindow && SelectedResource != null)
+                    if (SettingsManager.ShowShipManifest && SettingsManager.ShowTransferWindow && SelectedResource != null)
                     {
                         step = "3 - Show Transfer";
-                        ShipManifestBehaviour.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestBehaviour.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
+                        ShipManifestAddon.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestAddon.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                     }
 
                     //if (ShowShipManifest && ShowHatchWindow)
@@ -391,24 +390,24 @@ namespace ShipManifest
                     //    ShipManifestBehaviour.ShipManifestSettings.HatchesPosition = GUILayout.Window(398549, ShipManifestBehaviour.ShipManifestSettings.HatchesPosition, HatchWindow.Display, "Hatches - " + Vessel.vesselName, GUILayout.MinHeight(20));
                     //}
 
-                    if (ShowShipManifest && ShipManifestBehaviour.ShipManifestSettings.ShowSettings)
+                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.ShipManifestSettings.ShowSettings)
                     {
                         step = "4 - Show Settings";
-                        ShipManifestBehaviour.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestBehaviour.ShipManifestSettings.SettingsPosition, ShipManifestBehaviour.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                        ShipManifestAddon.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestAddon.ShipManifestSettings.SettingsPosition, ShipManifestAddon.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
                     }
 
                     if (resetRosterSize)
                     {
                         step = "5 - Reset Roster Size";
-                        ShipManifestBehaviour.ShipManifestSettings.RosterPosition.height = 100; //reset hight
-                        ShipManifestBehaviour.ShipManifestSettings.RosterPosition.width = 400; //reset width
+                        ShipManifestAddon.ShipManifestSettings.RosterPosition.height = 100; //reset hight
+                        ShipManifestAddon.ShipManifestSettings.RosterPosition.width = 400; //reset width
                         resetRosterSize = false;
                     }
 
-                    if (ShowShipManifest && ShipManifestBehaviour.ShipManifestSettings.ShowRoster)
+                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.ShipManifestSettings.ShowRoster)
                     {
                         step = "6 - Show Roster";
-                        ShipManifestBehaviour.ShipManifestSettings.RosterPosition = GUILayout.Window(398547, ShipManifestBehaviour.ShipManifestSettings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
+                        ShipManifestAddon.ShipManifestSettings.RosterPosition = GUILayout.Window(398547, ShipManifestAddon.ShipManifestSettings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
                     }
                 }
             }
@@ -463,12 +462,12 @@ namespace ShipManifest
                 //    }
                 //}
 
-                var settingsStyle = ShipManifestBehaviour.ShipManifestSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var settingsStyle = ShipManifestAddon.ShipManifestSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
                 {
                     try
                     {
-                        ShipManifestBehaviour.ShipManifestSettings.ShowSettings = !ShipManifestBehaviour.ShipManifestSettings.ShowSettings;
+                        ShipManifestAddon.ShipManifestSettings.ShowSettings = !ShipManifestAddon.ShipManifestSettings.ShowSettings;
                     }
                     catch (Exception ex)
                     {
@@ -476,12 +475,12 @@ namespace ShipManifest
                     }
                 }
 
-                var rosterStyle = ShipManifestBehaviour.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var rosterStyle = ShipManifestAddon.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Roster...", rosterStyle, GUILayout.Width(100), GUILayout.Height(20)))
                 {
                     try
                     {
-                        ShipManifestBehaviour.ShipManifestSettings.ShowRoster = !ShipManifestBehaviour.ShipManifestSettings.ShowRoster;
+                        ShipManifestAddon.ShipManifestSettings.ShowRoster = !ShipManifestAddon.ShipManifestSettings.ShowRoster;
                     }
                     catch (Exception ex)
                     {
@@ -518,7 +517,7 @@ namespace ShipManifest
                 }
                 GUILayout.EndHorizontal();
 
-                if (ShipManifestBehaviour.ShipManifestSettings.EnablePFResources)
+                if (ShipManifestAddon.ShipManifestSettings.EnablePFResources)
                 {
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
@@ -546,8 +545,8 @@ namespace ShipManifest
                 {
                     GUILayout.BeginHorizontal();
                     int width = 265;
-                    if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
-                        width = 215;
+                    if ((!ShipManifestAddon.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                        width = 175;
 
                     var style = SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(width), GUILayout.Height(20)))
@@ -555,7 +554,7 @@ namespace ShipManifest
                         try
                         {
                             ClearResourceHighlighting();
-                            if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                            if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                             {
                                 // Now let's update our lists...
                                 if (SelectedResource != resourceName)
@@ -569,9 +568,9 @@ namespace ShipManifest
                                     SelectedPartSource = SelectedPartTarget = null;
                                 }
                                 if (SelectedResource != null)
-                                    ShowTransferWindow = true;
+                                    SettingsManager.ShowTransferWindow = true;
                                 else
-                                    ShowTransferWindow = false;
+                                    SettingsManager.ShowTransferWindow = false;
                             }
                         }
                         catch (Exception ex)
@@ -579,11 +578,15 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-                    if ((!ShipManifestBehaviour.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!ShipManifestAddon.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
                         if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
                             DumpResource(resourceName);
+                        }
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), ManifestStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
+                        {
+                            FillResource(resourceName);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -675,7 +678,7 @@ namespace ShipManifest
                 if (kerbal.seat != null)
                     kerbal.seat.SpawnCrew();
             }
-            ShipManifestBehaviour.FireEventTriggers();
+            ShipManifestAddon.FireEventTriggers();
         }
 
         private bool PartCrewIsFull(Part part)
@@ -722,38 +725,38 @@ namespace ShipManifest
         {
             this.Vessel.SpawnCrew();
             // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
-            ShipManifestBehaviour.FireEventTriggers();
+            ShipManifestAddon.FireEventTriggers();
         }
 
         private void FillVesselCrew()
         {
-            foreach (var part in PartsByResource["Crew"])
+            foreach (var part in _partsByResource["Crew"])
             {
                 AddCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
             }
-            ShipManifestBehaviour.FireEventTriggers();
+            ShipManifestAddon.FireEventTriggers();
         }
 
         private void EmptyVesselCrew()
         {
-            foreach (var part in PartsByResource["Crew"])
+            foreach (var part in _partsByResource["Crew"])
             {
                 for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
                 {
                     RemoveCrew(part.protoModuleCrew[i], part);
                 }
-                ShipManifestBehaviour.FireEventTriggers();
+                ShipManifestAddon.FireEventTriggers();
             }
         }
 
         private void FillVesselResources()
         {
-            List<string> resources = PartsByResource.Keys.ToList<string>();
+            List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
             {
                 if (resourceName != "Crew" && resourceName != "Science")
                 {
-                    foreach (Part part in PartsByResource[resourceName])
+                    foreach (Part part in _partsByResource[resourceName])
                     {
                         foreach (PartResource resource in part.Resources)
                         {
@@ -767,12 +770,12 @@ namespace ShipManifest
 
         private void EmptyVesselResources()
         {
-            List<string> resources = PartsByResource.Keys.ToList<string>();
+            List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
             {
                 if (resourceName != "Crew" && resourceName != "Science")
                 {
-                    foreach (Part part in PartsByResource[resourceName])
+                    foreach (Part part in _partsByResource[resourceName])
                     {
                         foreach (PartResource resource in part.Resources)
                         {
@@ -786,7 +789,7 @@ namespace ShipManifest
 
         private void DumpResource(string resourceName)
         {
-            foreach (Part part in PartsByResource[resourceName])
+            foreach (Part part in _partsByResource[resourceName])
             {
                 foreach (PartResource resource in part.Resources)
                 {
@@ -794,6 +797,42 @@ namespace ShipManifest
                     {
                         resource.amount = 0;
                     }
+                }
+            }
+        }
+
+        private void FillResource(string resourceName)
+        {
+            foreach (Part part in _partsByResource[resourceName])
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.info.name == resourceName)
+                    {
+                        resource.amount = resource.maxAmount;
+                    }
+                }
+            }
+        }
+
+        private void DumpPartResource(Part part, string resourceName)
+        {
+            foreach (PartResource resource in part.Resources)
+            {
+                if (resource.info.name == resourceName)
+                {
+                    resource.amount = 0;
+                }
+            }
+        }
+
+        private void FillPartResource(Part part, string resourceName)
+        {
+            foreach (PartResource resource in part.Resources)
+            {
+                if (resource.info.name == resourceName)
+                {
+                    resource.amount = resource.maxAmount;
                 }
             }
         }
@@ -806,23 +845,18 @@ namespace ShipManifest
         {
             try
             {
-                if (ShipManifestBehaviour.ShipManifestSettings.EnableCLS && ShipManifestBehaviour.clsVessel != null)
-                {
-                    foreach (ICLSSpace iSpace in ShipManifestBehaviour.clsVessel.Spaces)
-                        iSpace.Highlight(false);
-                }
                 if (_selectedResource == "Crew")
                 {
                     if (SelectedPartSource != null)
                     {
                         ClearHighlight(SelectedPartSource);
-                        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                        Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                         SelectedPartSource.RemoveOnMouseExit(OnMouseExit);
                     }
                     if (SelectedPartTarget != null)
                     {
                         ClearHighlight(SelectedPartTarget);
-                        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                        Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                         SelectedPartTarget.RemoveOnMouseExit(OnMouseExit);
                     }
                 }
@@ -831,14 +865,20 @@ namespace ShipManifest
                     foreach (Part part in _selectedResourceParts)
                     {
                         ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                        Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                         part.RemoveOnMouseExit(OnMouseExit);
                     }
                 }
+                // CLS handling
+                //if (ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                //{
+                //    if (ShipManifestBehaviour.clsVessel != null)
+                //        ShipManifestBehaviour.clsVessel.Highlight(false);
+                //}
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in RemoveResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in ClearResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -846,7 +886,7 @@ namespace ShipManifest
         {
             try
             {
-                if (_prevSelectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                if (_prevSelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
                 {
                     if (SelectedPartSource != null)
                         SelectedPartSource = null;
@@ -854,8 +894,8 @@ namespace ShipManifest
                     if (SelectedPartTarget != null)
                         SelectedPartTarget = null;
 
-                    if (ShipManifestBehaviour.clsVessel != null)
-                        foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
+                    if (ShipManifestAddon.clsVessel != null)
+                        foreach (ICLSPart iPart in ShipManifestAddon.clsVessel.Parts)
                             iPart.Highlight(false);
                 }
                 else if (_selectedResourceParts != null)
@@ -863,7 +903,7 @@ namespace ShipManifest
                     foreach (Part part in _selectedResourceParts)
                     {
                         ClearHighlight(part);
-                        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                        Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                         part.RemoveOnMouseExit(OnMouseExit);
                     }
                 }
@@ -876,61 +916,62 @@ namespace ShipManifest
 
         public void SetResourceHighlighting()
         {
+            string step = "";
             try
             {
                 // This adds an event handler to each newly selected part,
                 // to manage mouse exit events and preserve highlighting.
                 if (SelectedResource != null)
                 {
-                    if (SelectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                    // CLS Handling
+                    if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
                     {
-                        // Handle CLS instantiation
-                        if (ShipManifestBehaviour.clsVessel == null)
-                        {
-                            ShipManifestBehaviour.clsVessel = ShipManifestBehaviour.clsAddon.Vessel;
-                        }
+                        //// Handle CLS instantiation
+                        //if (ShipManifestBehaviour.clsVessel == null)
+                        //{
+                        //    step = "Instantiate clsVessel";
+                        //    ShipManifestBehaviour.clsVessel = ShipManifestBehaviour.clsAddon.Vessel;
+                        //}
 
-                        // Highlight if we can..
-                        if (ShipManifestBehaviour.clsVessel != null)
-                        {
-                            //foreach (ICLSPart iPart in ShipManifestBehaviour.clsVessel.Parts)
-                            //    iPart.Highlight(false);
-                            foreach (ICLSSpace iSpace in ShipManifestBehaviour.clsVessel.Spaces)
-                                iSpace.Highlight(true);
-                            //ShipManifestBehaviour.clsVessel.Highlight(true);
-                            ManifestUtilities.LogMessage("Spaces highlighted", "Info", SettingsManager.VerboseLogging);
-                        }
+                        //// Highlight if we can..
+                        //if (ShipManifestBehaviour.clsVessel != null)
+                        //{
+                        //    step = "highlight clsVessel";
+                        //    ShipManifestBehaviour.clsVessel.Highlight(true);
+                        //    ManifestUtilities.LogMessage("Spaces highlighted", "Info", SettingsManager.VerboseLogging);
+                        //}
 
-                        if (SelectedPartSource != null && clsPartSource != null)
+                        if (SelectedPartSource != null)
                         {
-                            clsPartSource.Highlight(false);
-                            Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                            step = "add Source onMouseExit";
+                            Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                             SelectedPartSource.AddOnMouseExit(OnMouseExit);
                             ManifestUtilities.LogMessage("Source Part Highlighted", "Info", SettingsManager.VerboseLogging);
                         }
-
                         if (SelectedPartTarget != null && clsPartTarget != null)
                         {
-                            clsPartTarget.Highlight(false);
-                            Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                            step = "Add Target onMouseExit";
+                            Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                             SelectedPartTarget.AddOnMouseExit(OnMouseExit);
                             ManifestUtilities.LogMessage("Target part highlighted", "Info", SettingsManager.VerboseLogging);
                         }
                     }
                     else if (_selectedResourceParts != null)
                     {
+                        step = "Add resource onMouseExit";
                         foreach (Part part in _selectedResourceParts)
                         {
-                            Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                            Part.OnActionDelegate OnMouseExit = ShipManifestAddon.MouseExit;
                             part.AddOnMouseExit(OnMouseExit);
                         }
                     }
+                    step = "onMouseHighlights";
                     OnMouseHighlights();
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in SetResourceHighlighting.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                ManifestUtilities.LogMessage(string.Format(" in SetResourceHighlighting.  Error at step: " + step + ":  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -951,24 +992,25 @@ namespace ShipManifest
                 else
                     selectedpart = _selectedPartSource;
 
-                if (SelectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                // CLS Handling
+                if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
                 {
-                    if (selectedpart != null)
-                    {
-                        //turn off Selected part highlghting
-                        Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
-                        selectedpart.RemoveOnMouseExit(OnMouseExit);
+                    //if (selectedpart != null)
+                    //{
+                    //    //turn off Selected part highlghting
+                    //    Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                    //    selectedpart.RemoveOnMouseExit(OnMouseExit);
 
-                        foreach (ICLSPart clsPart in ShipManifestBehaviour.clsVessel.Parts)
-                        {
-                            if (clsPart.Part == selectedpart)
-                            {
-                                // turn on default CLS highlighting
-                                clsPart.Highlight(true);
-                                break;
-                            }
-                        }
-                    }
+                    //    foreach (ICLSPart clsPart in ShipManifestBehaviour.clsVessel.Parts)
+                    //    {
+                    //        if (clsPart.Part == selectedpart)
+                    //        {
+                    //            // turn on default CLS highlighting
+                    //            clsPart.Highlight(true);
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
                 else
                 {
@@ -997,38 +1039,38 @@ namespace ShipManifest
                 else
                     selectedpart = _selectedPartSource;
 
-                if (SelectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
                 {
-                    if (selectedpart != null)
-                    {
-                        foreach (ICLSPart clsPart in ShipManifestBehaviour.clsVessel.Parts)
-                        {
-                            if (clsPart.Part == selectedpart)
-                            {
-                                // let's turn off CLS highlighting and Turn on Target Part Highlighing.
-                                if (IsTargetPart)
-                                {
-                                    clsPartTarget = clsPart;
-                                    clsPartTarget.Highlight(false);
-                                }
-                                else
-                                {
-                                    clsPartSource = clsPart;
-                                    clsPartSource.Highlight(false);
-                                }
+                    //if (selectedpart != null)
+                    //{
+                    //    foreach (ICLSPart clsPart in ShipManifestBehaviour.clsVessel.Parts)
+                    //    {
+                    //        if (clsPart.Part == selectedpart)
+                    //        {
+                    //            // let's turn off CLS highlighting and Turn on Target Part Highlighing.
+                    //            if (IsTargetPart)
+                    //            {
+                    //                clsPartTarget = clsPart;
+                    //                clsPartTarget.Highlight(false);
+                    //            }
+                    //            else
+                    //            {
+                    //                clsPartSource = clsPart;
+                    //                clsPartSource.Highlight(false);
+                    //            }
 
-                                //turn on Selected part highlghting
-                                if (IsTargetPart)
-                                    SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.TargetPartCrewColor]);
-                                else
-                                    SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
+                    //            //turn on Selected part highlghting
+                    //            if (IsTargetPart)
+                    //                SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.TargetPartCrewColor]);
+                    //            else
+                    //                SetPartHighlight(selectedpart, SettingsManager.Colors[SettingsManager.SourcePartColor]);
 
-                                Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
-                                selectedpart.AddOnMouseExit(OnMouseExit);
-                                break;
-                            }
-                        }
-                    }
+                    //            Part.OnActionDelegate OnMouseExit = ShipManifestBehaviour.MouseExit;
+                    //            selectedpart.AddOnMouseExit(OnMouseExit);
+                    //            break;
+                    //        }
+                    //    }
+                    //}
                 }
                 else
                 {
@@ -1082,15 +1124,16 @@ namespace ShipManifest
 
         #endregion
 
+        // Target function for onMouseExit delagate
         public void OnMouseHighlights()
         {
             try
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowShipManifest && SelectedResourceParts != null)
+                if (SettingsManager.ShowShipManifest && SelectedResourceParts != null)
                 {
-                    if (SelectedResource == "Crew" && ShipManifestBehaviour.ShipManifestSettings.EnableCLS)
+                    if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
                     {
-                         if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow)
+                        if (SettingsManager.ShowTransferWindow)
                         {
                             SetPartHighlight(SelectedPartSource, SettingsManager.Colors[SettingsManager.SourcePartColor]);
                             SetPartHighlight(SelectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartCrewColor]);
@@ -1105,7 +1148,7 @@ namespace ShipManifest
                                 SetPartHighlight(thispart, Color.yellow);
                             }
                         }
-                        if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow)
+                        if (SettingsManager.ShowTransferWindow)
                         {
                             SetPartHighlight(SelectedPartSource, SettingsManager.Colors[SettingsManager.SourcePartColor]);
                             SetPartHighlight(SelectedPartTarget, SettingsManager.Colors[SettingsManager.TargetPartColor]);
