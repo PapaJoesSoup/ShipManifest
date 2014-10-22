@@ -20,30 +20,6 @@ namespace ShipManifest
         public float tXferAmount = -1f;
         public float AmtXferred = 0f;
 
-        // Flags to show windows
-        public bool ShowTransferWindow { get; set; }
-        private bool _showShipManifest = false;
-        public bool ShowShipManifest
-        {
-            get
-            {
-                return _showShipManifest;
-            }
-            set
-            {
-                if (value == false)
-                {
-                    if (ShipManifestBehaviour.clsVessel != null)
-                    {
-                        foreach (ICLSSpace space in ShipManifestBehaviour.clsVessel.Spaces)
-                        {
-                            space.Highlight(false);
-                        }
-                    }
-                }
-                _showShipManifest = value;
-            }
-        }
         #endregion
 
         #region TransferWindow GUI Layout)
@@ -139,16 +115,35 @@ namespace ShipManifest
                     }
 
                     // set the conditions for a button style change.
+                    int btnWidth = 265;
+                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                        btnWidth = 180;
                     var style = SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
-                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
-                        if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                         {
                             SelectedModuleSource = null;
                             SelectedPartSource = part;
                             ManifestUtilities.LogMessage("SelectedPartSource...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
+                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    {
+                        var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                        var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+
+                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
+                        {
+                            DumpPartResource(part, SelectedResource);
+                        }
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
+                        {
+                            FillPartResource(part, SelectedResource);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
                 }
 
                 GUILayout.EndVertical();
@@ -182,16 +177,16 @@ namespace ShipManifest
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                         TransferCrewMember(crewMember, SelectedPartSource, SelectedPartSource);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestBehaviour.CanBeXferred(SelectedPartSource))
+                            if (ShipManifestAddon.CanBeXferred(SelectedPartSource))
                             {
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                         TransferCrewMember(crewMember, SelectedPartSource, SelectedPartTarget);
                                 }
                             }
@@ -262,7 +257,7 @@ namespace ShipManifest
                                 if ((SelectedPartTarget != null && SelectedPartSource != SelectedPartTarget) &&
                                     (SelectedPartSource.Resources[resource.info.name].amount > 0 && SelectedPartTarget.Resources[resource.info.name].amount < SelectedPartTarget.Resources[resource.info.name].maxAmount))
                                 {
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                     {
                                         // let's determine how much of a resource we can move to the target.
                                         double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
@@ -334,15 +329,34 @@ namespace ShipManifest
                     }
 
                     // set the conditions for a button style change.
+                    int btnWidth = 265;
+                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                        btnWidth = 180;
                     var style = SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
-                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(265), GUILayout.Height(20)))
+                    GUILayout.BeginHorizontal();
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
-                        if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                         {
                             SelectedPartTarget = part;
                             ManifestUtilities.LogMessage("SelectedPartTarget...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
+                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    {
+                        var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                        var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+
+                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
+                        {
+                            DumpPartResource(part, SelectedResource);
+                        }
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
+                        {
+                            FillPartResource(part, SelectedResource);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
                 }
 
                 GUILayout.EndVertical();
@@ -376,17 +390,17 @@ namespace ShipManifest
                             {
                                 if (GUILayout.Button(">>", ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                                 {
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                         TransferCrewMember(crewMember, SelectedPartTarget, SelectedPartTarget);
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestBehaviour.CanBeXferred(SelectedPartTarget))
+                            if (ShipManifestAddon.CanBeXferred(SelectedPartTarget))
                             {
                                 // set the conditions for a button style change.
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                         TransferCrewMember(crewMember, SelectedPartTarget, SelectedPartSource);
                                 }
                             }
@@ -467,7 +481,7 @@ namespace ShipManifest
                                 if ((SelectedPartSource != null && SelectedPartSource != SelectedPartTarget) && (SelectedPartTarget.Resources[resource.info.name].amount > 0 && SelectedPartSource.Resources[resource.info.name].amount < SelectedPartSource.Resources[resource.info.name].maxAmount))
                                 {
                                     // create xfer slider;
-                                    if (!ShipManifestBehaviour.crewXfer && !ShipManifestBehaviour.sXferOn && !ShipManifestBehaviour.tXferOn)
+                                    if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.sXferOn && !ShipManifestAddon.tXferOn)
                                     {
                                         // let's determine how much of a resource we can move to the Source.
                                         double maxXferAmount = SelectedPartSource.Resources[resource.info.name].maxAmount - SelectedPartSource.Resources[resource.info.name].amount;
@@ -606,19 +620,19 @@ namespace ShipManifest
 
                     // if moving within a part, set the seat2seat flag
                     if (sourcePart == targetPart)
-                        ShipManifestBehaviour.isSeat2Seat = true;
+                        ShipManifestAddon.isSeat2Seat = true;
                     else
-                        ShipManifestBehaviour.isSeat2Seat = false;
+                        ShipManifestAddon.isSeat2Seat = false;
 
                     // set the crew transfer flag and wait forthe timeout before firing the board event.
-                    ShipManifestBehaviour.crewXfer = true;
+                    ShipManifestAddon.crewXfer = true;
                 }
                 else
                 {
                     // no portraits, so let's just move kerbals...
                     RemoveCrew(sourceMember, sourcePart);
                     AddCrew(sourceMember, targetPart);
-                    ShipManifestBehaviour.crewXfer = true;
+                    ShipManifestAddon.crewXfer = true;
                 }
             }
             catch (Exception ex)
@@ -652,7 +666,7 @@ namespace ShipManifest
                                 ((IScienceDataContainer)source).DumpData(data);
                             }
 
-                            if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
+                            if (ShipManifestAddon.ShipManifestSettings.RealismMode)
                             {
                                 ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SettingsManager.VerboseLogging);
                             }
@@ -703,7 +717,7 @@ namespace ShipManifest
                     {
                         XferAmount = sourceAmount;
                     }
-                    if (ShipManifestBehaviour.ShipManifestSettings.RealismMode)
+                    if (ShipManifestAddon.ShipManifestSettings.RealismMode)
                     {
                         // now lets make some noise and slow the process down...
                         ManifestUtilities.LogMessage("Playing pump sound...", "Info", SettingsManager.VerboseLogging);
@@ -711,9 +725,9 @@ namespace ShipManifest
 
                         // This flag enables the Update handler in ResourceManifestBehaviour
                         if (source == SelectedPartSource)
-                            ShipManifestBehaviour.sXferOn = true;
+                            ShipManifestAddon.sXferOn = true;
                         else
-                            ShipManifestBehaviour.tXferOn = true;
+                            ShipManifestAddon.tXferOn = true;
                     }
                     else
                     {
