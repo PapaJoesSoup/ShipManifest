@@ -18,6 +18,21 @@ namespace ShipManifest
         public Rect ManifestPosition;
         public Rect TransferPosition;
 
+        // Flags to show windows
+        public static bool ShowTransferWindow { get; set; }
+        private static bool _showShipManifest = false;
+        public static bool ShowShipManifest
+        {
+            get
+            {
+                return _showShipManifest;
+            }
+            set
+            {
+                _showShipManifest = value;
+            }
+        }
+
         public Rect SettingsPosition;
         public bool ShowSettings { get; set; }
 
@@ -136,11 +151,11 @@ namespace ShipManifest
 
             if (!EnableCrew)
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
+                if (ShipManifestAddon.smController.SelectedResource == "Crew")
                 {
                     // Clear Resource selection.
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).ShowTransferWindow = false;
+                    ShipManifestAddon.smController.SelectedResource = null;
+                    SettingsManager.ShowTransferWindow = false;
                 }
             }
             // EnableCLS Mode
@@ -156,18 +171,18 @@ namespace ShipManifest
 
             if (!EnableCLS && prevEnableCLS)
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
+                if (ShipManifestAddon.smController.SelectedResource == "Crew")
                 {
                     //Reassign the resource to observe new settings.
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = "Crew";
+                    ShipManifestAddon.smController.SelectedResource = "Crew";
                 }
             }
             else if (EnableCLS && !prevEnableCLS)
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Crew")
+                if (ShipManifestAddon.smController.SelectedResource == "Crew")
                 {
                     //Reassign the resource to observe new settings.
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = "Crew";
+                    ShipManifestAddon.smController.SelectedResource = "Crew";
                 }
             }
 
@@ -180,10 +195,10 @@ namespace ShipManifest
 
             if (!EnableScience)
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Science")
+                if (ShipManifestAddon.smController.SelectedResource == "Science")
                 {
                     // Clear Resource selection.
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
+                    ShipManifestAddon.smController.SelectedResource = null;
                 }
             }
 
@@ -196,10 +211,10 @@ namespace ShipManifest
 
             if (!EnableResources)
             {
-                if (ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource == "Resources")
+                if (ShipManifestAddon.smController.SelectedResource == "Resources")
                 {
                     // Clear Resource selection.
-                    ManifestController.GetInstance(FlightGlobals.ActiveVessel).SelectedResource = null;
+                    ShipManifestAddon.smController.SelectedResource = null;
                 }
             }
 
