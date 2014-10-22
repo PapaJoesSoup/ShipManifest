@@ -1,5 +1,13 @@
 ShipManifest
 ============
+Version 0.25.0_3.3.2a - Interim Release with bug fixes and removal of CLS Highlighting
+ - New:  Added Resource Fill button when Realism is off.
+ - New:  Added Part Fill and Dump of a resource when Realism is off.
+ - Improvement:  error handling on frame based errors are now trapped for first occurance.  Subsequent errors will not produce a log entry.
+ - Bug:  When crew is selected, and ONLY the Source part OR the Target part is selected, clicking on a move kerbal (>>) button produces an error.
+ - Bug:  When changing vessesls with the manifest window open, ClearResourceHighlighting causes an error.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-25-0-Ship-Manifest-(Crew-Science-Resources)-v0-24-2_3-3-2-28-Sep-14?p=1481125&viewfull=1#post1481125
+
 Version 0.24.2_3.3.2 - 28 Sep, 2014 - Post 0.24.2 Bugs and such
  - New: Optional Blizzy Toolbar support!  Courtesy of ragzilla!  All mod dependencies are now gone.
  - Add option in Config for turning OFF resource transfers.
