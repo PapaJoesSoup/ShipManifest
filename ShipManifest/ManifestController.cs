@@ -108,7 +108,7 @@ namespace ShipManifest
                         foreach (Part part in Vessel.Parts)
                         {
                             // First let's Get any Crew, if desired...
-                            if (ShipManifestAddon.ShipManifestSettings.EnableCrew && part.CrewCapacity > 0)
+                            if (ShipManifestAddon.Settings.EnableCrew && part.CrewCapacity > 0)
                             {
                                 bool vResourceFound = false;
                                 // is resource in the list yet?.
@@ -128,7 +128,7 @@ namespace ShipManifest
                                 }
                             }
                             // Let's Get any Science...
-                            if (ShipManifestAddon.ShipManifestSettings.EnableScience)
+                            if (ShipManifestAddon.Settings.EnableScience)
                             {
                                 bool mResourceFound = false;
                                 IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
@@ -162,7 +162,7 @@ namespace ShipManifest
                             foreach (PartResource resource in part.Resources)
                             {
                                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                                if (!ShipManifestAddon.ShipManifestSettings.RealismMode || (ShipManifestAddon.ShipManifestSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                                if (!ShipManifestAddon.Settings.RealismMode || (ShipManifestAddon.Settings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
                                 {
                                     bool vResourceFound = false;
                                     // is resource in the list yet?.
@@ -375,14 +375,14 @@ namespace ShipManifest
                     if (SettingsManager.ShowShipManifest)
                     {
                         step = "2 - Show Manifest";
-                        ShipManifestAddon.ShipManifestSettings.ManifestPosition = GUILayout.Window(398544, ShipManifestAddon.ShipManifestSettings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
+                        ShipManifestAddon.Settings.ManifestPosition = GUILayout.Window(398544, ShipManifestAddon.Settings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
                     }
 
                     // What windows do we want to show?
                     if (SettingsManager.ShowShipManifest && SettingsManager.ShowTransferWindow && SelectedResource != null)
                     {
                         step = "3 - Show Transfer";
-                        ShipManifestAddon.ShipManifestSettings.TransferPosition = GUILayout.Window(398545, ShipManifestAddon.ShipManifestSettings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
+                        ShipManifestAddon.Settings.TransferPosition = GUILayout.Window(398545, ShipManifestAddon.Settings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
                     }
 
                     //if (ShowShipManifest && ShowHatchWindow)
@@ -390,24 +390,24 @@ namespace ShipManifest
                     //    ShipManifestBehaviour.ShipManifestSettings.HatchesPosition = GUILayout.Window(398549, ShipManifestBehaviour.ShipManifestSettings.HatchesPosition, HatchWindow.Display, "Hatches - " + Vessel.vesselName, GUILayout.MinHeight(20));
                     //}
 
-                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.ShipManifestSettings.ShowSettings)
+                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.Settings.ShowSettings)
                     {
                         step = "4 - Show Settings";
-                        ShipManifestAddon.ShipManifestSettings.SettingsPosition = GUILayout.Window(398546, ShipManifestAddon.ShipManifestSettings.SettingsPosition, ShipManifestAddon.ShipManifestSettings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                        ShipManifestAddon.Settings.SettingsPosition = GUILayout.Window(398546, ShipManifestAddon.Settings.SettingsPosition, ShipManifestAddon.Settings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
                     }
 
                     if (resetRosterSize)
                     {
                         step = "5 - Reset Roster Size";
-                        ShipManifestAddon.ShipManifestSettings.RosterPosition.height = 100; //reset hight
-                        ShipManifestAddon.ShipManifestSettings.RosterPosition.width = 400; //reset width
+                        ShipManifestAddon.Settings.RosterPosition.height = 100; //reset hight
+                        ShipManifestAddon.Settings.RosterPosition.width = 400; //reset width
                         resetRosterSize = false;
                     }
 
-                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.ShipManifestSettings.ShowRoster)
+                    if (SettingsManager.ShowShipManifest && ShipManifestAddon.Settings.ShowRoster)
                     {
                         step = "6 - Show Roster";
-                        ShipManifestAddon.ShipManifestSettings.RosterPosition = GUILayout.Window(398547, ShipManifestAddon.ShipManifestSettings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
+                        ShipManifestAddon.Settings.RosterPosition = GUILayout.Window(398547, ShipManifestAddon.Settings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
                     }
                 }
             }
@@ -462,12 +462,12 @@ namespace ShipManifest
                 //    }
                 //}
 
-                var settingsStyle = ShipManifestAddon.ShipManifestSettings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var settingsStyle = ShipManifestAddon.Settings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
                 {
                     try
                     {
-                        ShipManifestAddon.ShipManifestSettings.ShowSettings = !ShipManifestAddon.ShipManifestSettings.ShowSettings;
+                        ShipManifestAddon.Settings.ShowSettings = !ShipManifestAddon.Settings.ShowSettings;
                     }
                     catch (Exception ex)
                     {
@@ -475,12 +475,12 @@ namespace ShipManifest
                     }
                 }
 
-                var rosterStyle = ShipManifestAddon.ShipManifestSettings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var rosterStyle = ShipManifestAddon.Settings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Roster...", rosterStyle, GUILayout.Width(100), GUILayout.Height(20)))
                 {
                     try
                     {
-                        ShipManifestAddon.ShipManifestSettings.ShowRoster = !ShipManifestAddon.ShipManifestSettings.ShowRoster;
+                        ShipManifestAddon.Settings.ShowRoster = !ShipManifestAddon.Settings.ShowRoster;
                     }
                     catch (Exception ex)
                     {
@@ -517,7 +517,7 @@ namespace ShipManifest
                 }
                 GUILayout.EndHorizontal();
 
-                if (ShipManifestAddon.ShipManifestSettings.EnablePFResources)
+                if (ShipManifestAddon.Settings.EnablePFResources)
                 {
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
@@ -545,7 +545,7 @@ namespace ShipManifest
                 {
                     GUILayout.BeginHorizontal();
                     int width = 265;
-                    if ((!ShipManifestAddon.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!ShipManifestAddon.Settings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
                     var style = SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
@@ -578,7 +578,7 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-                    if ((!ShipManifestAddon.ShipManifestSettings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!ShipManifestAddon.Settings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
                         if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
@@ -886,7 +886,7 @@ namespace ShipManifest
         {
             try
             {
-                if (_prevSelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
+                if (_prevSelectedResource == "Crew" && ShipManifestAddon.Settings.EnableCLS)
                 {
                     if (SelectedPartSource != null)
                         SelectedPartSource = null;
@@ -924,7 +924,7 @@ namespace ShipManifest
                 if (SelectedResource != null)
                 {
                     // CLS Handling
-                    if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
+                    if (SelectedResource == "Crew" && ShipManifestAddon.Settings.EnableCLS)
                     {
                         //// Handle CLS instantiation
                         //if (ShipManifestBehaviour.clsVessel == null)
@@ -993,7 +993,7 @@ namespace ShipManifest
                     selectedpart = _selectedPartSource;
 
                 // CLS Handling
-                if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
+                if (SelectedResource == "Crew" && ShipManifestAddon.Settings.EnableCLS)
                 {
                     //if (selectedpart != null)
                     //{
@@ -1039,7 +1039,7 @@ namespace ShipManifest
                 else
                     selectedpart = _selectedPartSource;
 
-                if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
+                if (SelectedResource == "Crew" && ShipManifestAddon.Settings.EnableCLS)
                 {
                     //if (selectedpart != null)
                     //{
@@ -1131,7 +1131,7 @@ namespace ShipManifest
             {
                 if (SettingsManager.ShowShipManifest && SelectedResourceParts != null)
                 {
-                    if (SelectedResource == "Crew" && ShipManifestAddon.ShipManifestSettings.EnableCLS)
+                    if (SelectedResource == "Crew" && ShipManifestAddon.Settings.EnableCLS)
                     {
                         if (SettingsManager.ShowTransferWindow)
                         {

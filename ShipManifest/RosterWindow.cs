@@ -140,7 +140,7 @@ namespace ShipManifest
                         }
                     }
 
-                    if (((ShipManifestAddon.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestAddon.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
+                    if (((ShipManifestAddon.Settings.RealismMode && IsPreLaunch) || !ShipManifestAddon.Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -150,7 +150,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                         buttonText = "Respawn";
                     }
-                    else if (((ShipManifestAddon.ShipManifestSettings.RealismMode && IsPreLaunch) || !ShipManifestAddon.ShipManifestSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                    else if (((ShipManifestAddon.Settings.RealismMode && IsPreLaunch) || !ShipManifestAddon.Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
                     {
                         GUI.enabled = true;
                         buttonText = "Remove";

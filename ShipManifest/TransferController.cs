@@ -116,7 +116,7 @@ namespace ShipManifest
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                         btnWidth = 180;
                     var style = SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                     GUILayout.BeginHorizontal();
@@ -129,7 +129,7 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage("SelectedPartSource...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
-                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                     {
                         var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                         var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
@@ -330,7 +330,7 @@ namespace ShipManifest
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                         btnWidth = 180;
                     var style = SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                     GUILayout.BeginHorizontal();
@@ -342,7 +342,7 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage("SelectedPartTarget...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
-                    if (!ShipManifestAddon.ShipManifestSettings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                     {
                         var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                         var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
@@ -666,7 +666,7 @@ namespace ShipManifest
                                 ((IScienceDataContainer)source).DumpData(data);
                             }
 
-                            if (ShipManifestAddon.ShipManifestSettings.RealismMode)
+                            if (ShipManifestAddon.Settings.RealismMode)
                             {
                                 ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SettingsManager.VerboseLogging);
                             }
@@ -717,7 +717,7 @@ namespace ShipManifest
                     {
                         XferAmount = sourceAmount;
                     }
-                    if (ShipManifestAddon.ShipManifestSettings.RealismMode)
+                    if (ShipManifestAddon.Settings.RealismMode)
                     {
                         // now lets make some noise and slow the process down...
                         ManifestUtilities.LogMessage("Playing pump sound...", "Info", SettingsManager.VerboseLogging);
