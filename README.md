@@ -1,5 +1,8 @@
 ShipManifest
 ============
+Version 0.25.0_3.3.2b - Interim Release with Fixed stock Toolbar.  CLS Highlighting still in work.
+ - Bug:  When changing vessesls in Map view, the stock toolbar would disappear.
+
 Version 0.25.0_3.3.2a - Interim Release with bug fixes and removal of CLS Highlighting
  - New:  Added Resource Fill button when Realism is off.
  - New:  Added Part Fill and Dump of a resource when Realism is off.
