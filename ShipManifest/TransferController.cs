@@ -116,7 +116,7 @@ namespace ShipManifest
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!SettingsManager.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                         btnWidth = 180;
                     var style = SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                     GUILayout.BeginHorizontal();
@@ -129,7 +129,7 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage("SelectedPartSource...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
-                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!SettingsManager.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                     {
                         var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                         var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
@@ -182,7 +182,7 @@ namespace ShipManifest
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestAddon.CanBeXferred(SelectedPartSource))
+                            if (ShipManifestAddon.CanKerbalsBeXferred(SelectedPartSource))
                             {
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                                 {
@@ -330,7 +330,7 @@ namespace ShipManifest
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!SettingsManager.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                         btnWidth = 180;
                     var style = SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                     GUILayout.BeginHorizontal();
@@ -342,7 +342,7 @@ namespace ShipManifest
                             ManifestUtilities.LogMessage("SelectedPartTarget...", "Info", SettingsManager.VerboseLogging);
                         }
                     }
-                    if (!ShipManifestAddon.Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    if (!SettingsManager.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                     {
                         var style1 = part.Resources[SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                         var style2 = part.Resources[SelectedResource].amount == part.Resources[SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
@@ -395,7 +395,7 @@ namespace ShipManifest
                                 }
                             }
                             GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                            if (ShipManifestAddon.CanBeXferred(SelectedPartTarget))
+                            if (ShipManifestAddon.CanKerbalsBeXferred(SelectedPartTarget))
                             {
                                 // set the conditions for a button style change.
                                 if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
@@ -666,7 +666,7 @@ namespace ShipManifest
                                 ((IScienceDataContainer)source).DumpData(data);
                             }
 
-                            if (ShipManifestAddon.Settings.RealismMode)
+                            if (SettingsManager.RealismMode)
                             {
                                 ManifestUtilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SettingsManager.VerboseLogging);
                             }
@@ -717,7 +717,7 @@ namespace ShipManifest
                     {
                         XferAmount = sourceAmount;
                     }
-                    if (ShipManifestAddon.Settings.RealismMode)
+                    if (SettingsManager.RealismMode)
                     {
                         // now lets make some noise and slow the process down...
                         ManifestUtilities.LogMessage("Playing pump sound...", "Info", SettingsManager.VerboseLogging);

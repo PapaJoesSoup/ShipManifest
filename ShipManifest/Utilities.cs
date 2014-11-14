@@ -21,13 +21,16 @@ namespace ShipManifest
 
         public static void LoadTexture(ref Texture2D tex, String FileName)
         {
-            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", true);
+            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", SettingsManager.VerboseLogging);
             WWW img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, FileName));
             img1.LoadImageIntoTexture(tex);
         }
 
         public static void LogMessage(string error, string type, bool verbose)
         {
+            // Add rolling error list. This limits growth.  Configure with ErrorListLength
+            if (_errors.Count() > int.Parse(SettingsManager.ErrorLogLength) && SettingsManager.ErrorLogLength != "0")
+                _errors.RemoveRange(0, _errors.Count() - int.Parse(SettingsManager.ErrorLogLength));
             if (verbose)
                 _errors.Add(type + ": " + error);
             if (type == "Error" && SettingsManager.AutoDebug)

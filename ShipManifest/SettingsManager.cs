@@ -13,7 +13,7 @@ namespace ShipManifest
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.24.2.3.4.0";
+        public string CurVersion = "0.25.0.3.4.0";
 
         public Rect ManifestPosition;
         public Rect TransferPosition;
@@ -33,51 +33,56 @@ namespace ShipManifest
             }
         }
 
-        public Rect SettingsPosition;
-        public bool ShowSettings { get; set; }
-
-        public Rect HatchesPosition;
-
-        public string DebugLogPath = "\\Plugins\\PluginData\\";
-
-        public bool AutoSave;
-        public float SaveIntervalSec = 60f;
-        public bool prevAutoSave;
-        public float prevSaveIntervalSec = 60f;
-
-        public Rect RosterPosition;
-        public bool ShowRoster { get; set; }
-
-        public bool RealismMode = false;
-        public bool prevRealismMode = false;
-        public bool LockSettings = false;
-        public bool prevLockSettings = false;
-
         public static bool VerboseLogging = false;
         public static bool prevVerboseLogging = false;
 
-        public Rect DebuggerPosition;
+        public static Rect DebuggerPosition;
         public static bool ShowDebugger = false;
         public static bool prevShowDebugger = false;
         public static bool AutoDebug = false;
+        public static string ErrorLogLength = "1000";
+        public static string prevErrorLogLength = "1000";
 
-        public float FlowRate = 100;
-        public float prevFlowRate = 100;
-        public float MaxFlowRate = 100;
-        public float MinFlowRate = 0;
+        public static Rect SettingsPosition;
+        public static bool ShowSettings { get; set; }
+
+        public static Rect HatchesPosition;
+
+        public static string DebugLogPath = "\\Plugins\\PluginData\\";
+
+        public static bool AutoSave;
+        public static float SaveIntervalSec = 60f;
+        public static bool prevAutoSave;
+        public static float prevSaveIntervalSec = 60f;
+
+        public static Rect RosterPosition;
+        public static bool ShowRoster { get; set; }
+
+        public static bool RealismMode = false;
+        public static bool prevRealismMode = false;
+        public static bool LockSettings = false;
+        public static bool prevLockSettings = false;
+
+
+        public static float FlowRate = 100;
+        public static float prevFlowRate = 100;
+        public static float MaxFlowRate = 100;
+        public static float MinFlowRate = 0;
 
         // Feature Options
-        public bool EnableScience = true;
-        public bool EnableResources = true;
-        public bool EnableCrew = true;
-        public bool EnablePFResources = true;
-        public bool EnableCLS = false; // off by default
-        public bool prevEnableScience = true;
-        public bool prevEnableCrew = true;
-        public bool prevEnablePFResources = true;
-        public bool prevEnableCLS = true;
-        public bool EnableBlizzyToolbar = false; // off by default
-        public bool prevEnableBlizzyToolbar = false;
+        public static bool EnableHighlighting = true;
+        public static bool prevEnableHighlighting = true;
+        public static bool EnableScience = true;
+        public static bool EnableResources = true;
+        public static bool EnableCrew = true;
+        public static bool EnablePFResources = true;
+        public static bool EnableCLS = false; // off by default
+        public static bool prevEnableScience = true;
+        public static bool prevEnableCrew = true;
+        public static bool prevEnablePFResources = true;
+        public static bool prevEnableCLS = true;
+        public static bool EnableBlizzyToolbar = false; // off by default
+        public static bool prevEnableBlizzyToolbar = false;
 
         // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
         public static bool CLSInstalled = false;
@@ -91,26 +96,27 @@ namespace ShipManifest
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
 
-        public string PumpSoundStart = "ShipManifest/Sounds/59328-1";
-        public string PumpSoundRun = "ShipManifest/Sounds/59328-2";
-        public string PumpSoundStop = "ShipManifest/Sounds/59328-3";
-        public string prevPumpSoundStart = "";
-        public string prevPumpSoundRun = "";
-        public string prevPumpSoundStop = "";
+        public static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
+        public static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
+        public static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
+        public static string prevPumpSoundStart = "";
+        public static string prevPumpSoundRun = "";
+        public static string prevPumpSoundStop = "";
 
-        public double PumpSoundVol = 3;
-        public double CrewSoundVol = 3;
+        public static double PumpSoundVol = 3;
+        public static double CrewSoundVol = 3;
 
-        public string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
-        public string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
-        public string CrewSoundStop = "ShipManifest/Sounds/xxxxx-3";
-        public string prevCrewSoundStart = "";
-        public string prevCrewSoundRun = "";
-        public string prevCrewSoundStop = "";
+        public static string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
+        public static string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
+        public static string CrewSoundStop = "ShipManifest/Sounds/xxxxx-3";
+        public static string prevCrewSoundStart = "";
+        public static string prevCrewSoundRun = "";
+        public static string prevCrewSoundStop = "";
 
         public static string SourcePartColor = "red";
         public static string TargetPartColor = "green";
         public static string TargetPartCrewColor = "blue";
+        public static string CLS_SpaceColor = "green";
 
         #endregion
 
@@ -141,6 +147,13 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             label = "Enable Realism Mode";
             RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
+
+            // EnableHighlighting Mode
+            GUI.enabled = isEnabled;
+            GUILayout.BeginHorizontal();
+            label = "Enable Highlighting";
+            EnableHighlighting = GUILayout.Toggle(EnableHighlighting, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
 
             // EnableCrew Mode
             GUI.enabled = isEnabled;
@@ -181,6 +194,10 @@ namespace ShipManifest
             {
                 if (ShipManifestAddon.smController.SelectedResource == "Crew")
                 {
+                    //Refresh the clsVessel if needed.
+                    if (ShipManifestAddon.clsVessel == null)
+                        ShipManifestAddon.GetCLSVessel();
+
                     //Reassign the resource to observe new settings.
                     ShipManifestAddon.smController.SelectedResource = "Crew";
                 }
@@ -294,6 +311,13 @@ namespace ShipManifest
             label = "Enable Verbose Logging";
             VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
 
+            // create Limit Error Log Length slider;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Error Log Length: ", GUILayout.Width(140));
+            ErrorLogLength = GUILayout.TextField(ErrorLogLength, GUILayout.Width(40));
+            GUILayout.Label("(lines)", GUILayout.Width(50));
+            GUILayout.EndHorizontal();
+
             // TextureReplacer Mode
             label = "Enable Texture Replacer Events";
             EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
@@ -387,6 +411,7 @@ namespace ShipManifest
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor");
                 TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
 
+                EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting");
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
                 EnableScience = configfile.GetValue<bool>("EnableScience");
                 EnableResources = configfile.GetValue<bool>("EnableResources");
@@ -399,6 +424,7 @@ namespace ShipManifest
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
                 ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
                 AutoDebug = configfile.GetValue<bool>("AutoDebug");
+                ErrorLogLength = configfile.GetValue<string>("ErrorLogLength");
                 EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
 
                 // Default values for Flow rates
@@ -463,6 +489,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ErrorLogLength Loaded: {0}", ErrorLogLength), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("Load Settings Complete"), "Info", VerboseLogging);
@@ -547,6 +574,7 @@ namespace ShipManifest
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
 
+                configfile.SetValue("EnableHighlighting", EnableHighlighting);
                 configfile.SetValue("EnableCrew", EnableCrew);
                 configfile.SetValue("EnableScience", EnableScience);
                 configfile.SetValue("EnableResources", EnableResources);
@@ -558,6 +586,7 @@ namespace ShipManifest
                 configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
                 configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
                 configfile.SetValue("AutoDebug", AutoDebug);
+                configfile.SetValue("ErrorLogLength", ErrorLogLength);
                 configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
                 configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
 
@@ -587,6 +616,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
@@ -596,6 +626,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("ErrorListLength Saved: {0}", ErrorLogLength.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
             }
@@ -623,22 +654,11 @@ namespace ShipManifest
 
         private void StoreTempSettings()
         {
+            prevRealismMode = RealismMode;
             prevShowDebugger = ShowDebugger;
             prevVerboseLogging = VerboseLogging;
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
-            prevEnableBlizzyToolbar = EnableBlizzyToolbar;
-
-            // Realism Mode settings.
-            prevRealismMode = RealismMode;
-            prevEnableScience = EnableScience;
-            prevEnableCrew = EnableCrew;
-            prevEnablePFResources = EnablePFResources;
-            prevEnableCLS = EnableCLS;
-            prevEnableTextureReplacer = EnableTextureReplacer;
-            prevLockSettings = LockSettings;
-
-            // sounds
             prevFlowRate = FlowRate;
             prevPumpSoundStart = PumpSoundStart;
             prevPumpSoundRun = PumpSoundRun;
@@ -646,6 +666,19 @@ namespace ShipManifest
             prevCrewSoundStart = CrewSoundStart;
             prevCrewSoundRun = CrewSoundRun;
             prevCrewSoundStop = CrewSoundStop;
+            prevEnableScience = EnableScience;
+            prevEnableHighlighting = EnableHighlighting;
+            prevEnableCrew = EnableCrew;
+            prevEnablePFResources = EnablePFResources;
+            prevEnableCLS = EnableCLS;
+            prevEnableTextureReplacer = EnableTextureReplacer;
+            prevLockSettings = LockSettings;
+            prevEnableBlizzyToolbar = EnableBlizzyToolbar;
+
+            // sounds
+
+            //debugger Settings
+            prevErrorLogLength = ErrorLogLength;
         }
 
         private void RestoreTempSettings()
@@ -663,12 +696,16 @@ namespace ShipManifest
             CrewSoundRun = prevCrewSoundRun;
             CrewSoundStop = prevCrewSoundStop;
             EnableScience = prevEnableScience;
+            EnableHighlighting = prevEnableHighlighting;
             EnableCrew = prevEnableCrew;
             EnablePFResources = prevEnablePFResources;
             EnableCLS = prevEnableCLS;
             EnableTextureReplacer = prevEnableTextureReplacer;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
+
+            //debugger Settings
+            prevErrorLogLength = ErrorLogLength;
         }
 
         #endregion

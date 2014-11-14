@@ -62,9 +62,12 @@
     </Reference>
     <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ksp-win64-0-25-0-mod\KSP_win64\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ksp-win-0-25-0\KSP_win\GameData\ConnectedLivingSpace\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="Toolbar">
+      <HintPath>..\..\..\..\..\..\ksp-win64-0-25-0-mod\KSP_win64\GameData\000_Toolbar\Toolbar.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\..\ksp-win64-0-25-0-mod\KSP_win64\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -85,6 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
+    <Content Include="PluginData\IconOff_38.png" />
+    <Content Include="PluginData\IconOn_38.png" />
     <Content Include="PluginData\ShipManifest\config.xml">
       <SubType>Designer</SubType>
     </Content>
@@ -99,7 +104,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win64-0-25-0-mod\KSP_Win64\GameData\ShipManifest\Plugins"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-0-25-0\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetPath)" "E:\KSP\ksp-win64-0-25-0-mod\KSP_Win64\GameData\ShipManifest\Plugins\"
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -65,6 +65,7 @@
   <double name="IVATimeDelaySec">5</double>
   <bool name="ShowIVAUpdateBtn">0</bool>
   <bool name="AutoDebug">0</bool>
+  <string name="ErrorLogLength">1000</string>
   <bool name="EnableTextureReplacer">0</bool>
   <bool name="CLSInstalled">0</bool>
   <bool name="EnableBlizzyToolbar">0</bool>
