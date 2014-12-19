@@ -14,13 +14,11 @@ namespace ShipManifest
         #region Properties
 
         //Game object that keeps us running
-        public static GameObject GameObjectInstance;
-        public static SettingsManager Settings = new SettingsManager();
-
+        public static GameObject GameObjectInstance;  
         public static ManifestController smController;
 
         // Vessel vars
-        public static ICLSAddon clsAddon;
+        public static ICLSAddon clsAddon = null;
         public static ICLSVessel clsVessel = null;
 
         public static Vessel vessel = null;
@@ -66,7 +64,7 @@ namespace ShipManifest
         // Addon state event handlers
         public void Start()
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.Start");
+            ManifestUtilities.LogMessage("ShipManifestAddon.Start.", "Info", SettingsManager.VerboseLogging);
             try
             {
                 if (HighLogic.LoadedSceneIsFlight)
@@ -113,38 +111,39 @@ namespace ShipManifest
         }
         public void Awake()
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.Awake");
             try 
             {
                 if (HighLogic.LoadedScene != GameScenes.FLIGHT) { return; } // don't do anything if we're not in a flight scene
 
                 DontDestroyOnLoad(this);
-                Settings.Load();
+                SettingsManager.Load();
+                ManifestUtilities.LogMessage("ShipManifestAddon.Awake Active...", "info", SettingsManager.VerboseLogging);
+
                 if (SettingsManager.AutoSave)
                     InvokeRepeating("RunSave", SettingsManager.SaveIntervalSec, SettingsManager.SaveIntervalSec);
 
                 if (SettingsManager.EnableBlizzyToolbar)
                 {
                     // Let't try to use Blizzy's toolbar
-                    //Debug.Log("[ShipManifest]:  ShipManifestAddon.Awake - Blizzy Toolbar Selected.");
+                    ManifestUtilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", SettingsManager.VerboseLogging);
                     if (!EnableBlizzyToolBar())
                     {
                         // We failed to activate the toolbar, so revert to stock
                         GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-                        GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed); 
-                        //Debug.Log("[ShipManifest]:  ShipManifestAddon.Awake - Stock Toolbar Selected.");
+                        GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                        ManifestUtilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", SettingsManager.VerboseLogging);
                    }
                 }
                 else 
                 {
                     // Use stock Toolbar
-                    //Debug.Log("[ShipManifest]:  ShipManifestAddon.Awake - Stock Toolbar Selected.");
+                    ManifestUtilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", SettingsManager.VerboseLogging);
                     GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage("Error in:  ShipManifestAddon.Awake.  " + ex.ToString(), "Error", true);
+                ManifestUtilities.LogMessage("Error in:  ShipManifestAddon.Awake.  Error:  " + ex.ToString(), "Error", true);
             }
         }
         public void OnGUI()
@@ -155,7 +154,7 @@ namespace ShipManifest
                 ManifestStyle.SetupGUI();
 
                 if (SettingsManager.ShowDebugger)
-                    SettingsManager.DebuggerPosition = GUILayout.Window(398648, SettingsManager.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
+                    SettingsManager.DebuggerPosition = GUILayout.Window(398648, SettingsManager.DebuggerPosition, DebuggerWindow, " Ship Manifest -  Debug Console - Ver. " + SettingsManager.CurVersion, GUILayout.MinHeight(20));
             }
             catch (Exception ex)
             {
@@ -164,18 +163,17 @@ namespace ShipManifest
         }
         public void Update()
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.Update");
             try
             {
-                if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
-                    if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+                    if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
                     {
                         //Instantiate the controller for the active vessel.
 
                         smController = ManifestController.GetInstance(vessel);
                         smController.CanDrawButton = true;
-                        smController.RefreshHighlight();
+                        smController.UpdateHighlighting();
 
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
@@ -202,10 +200,11 @@ namespace ShipManifest
         }
 
         void DummyVoid() { }
+
         //Vessel state handlers
         public void OnVesselWasModified(Vessel modVessel)
         {
-            Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselWasModified");
+            ManifestUtilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", SettingsManager.VerboseLogging);
             try
             {
                 GetCLSVessel();
@@ -217,20 +216,20 @@ namespace ShipManifest
         }
         public void OnVesselChange(Vessel newVessel)
         {
-            Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselChange");
+            ManifestUtilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", SettingsManager.VerboseLogging);
             try
             {
                 if (vessel != null && SettingsManager.ShowShipManifest)
                 {
                     if (newVessel.isEVA && !vessel.isEVA)
                     {
+                        SettingsManager.ShowShipManifest = false;
+
                         // turn off SM from toolbar
                         if (SettingsManager.EnableBlizzyToolbar)
                             ToggleBlizzyToolBar();
                         else
-                            AppLaunchToggleOff();
-
-                        SettingsManager.ShowShipManifest = false;
+                            ToggleStockToolbar();
 
                         // kill selected resource and its associated highlighting.
                         smController.SelectedResource = null;
@@ -245,11 +244,10 @@ namespace ShipManifest
 
                 // If CLS is enabled, update the CLS vessel view as well.
                 if (SettingsManager.CLSInstalled && SettingsManager.EnableCLS)
-                    if (clsVessel != clsAddon.Vessel)
-                    {
-                        GetCLSVessel();
-                        ManifestUtilities.LogMessage("CLS Vessel changed.", "Info", SettingsManager.VerboseLogging);
-                    }
+                {
+                    GetCLSVessel();
+                    ManifestUtilities.LogMessage("CLS Vessel changed.", "Info", SettingsManager.VerboseLogging);
+                }
             }
             catch (Exception ex)
             {
@@ -276,6 +274,8 @@ namespace ShipManifest
                 GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
                 GameEvents.onFlightReady.Remove(OnFlightReady);
 
+                if (ManifestUtilities.Errors.Count > 0 && SettingsManager.SaveLogOnExit)
+                    Savelog();
                 CancelInvoke("RunSave");
 
                 // Handle Toolbars
@@ -423,7 +423,7 @@ namespace ShipManifest
         //Stock Toolbar button handlers
         private void OnGUIAppLauncherReady()
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUIAppLauncherReady");
+            ManifestUtilities.LogMessage("ShipManifestAddon.OnGUIAppLauncherReady active...", "Info", SettingsManager.VerboseLogging);
             try
             {
                 if (ApplicationLauncher.Ready && HighLogic.LoadedSceneIsFlight && ShipManifestButton_Stock == null)
@@ -436,7 +436,7 @@ namespace ShipManifest
                         DummyVoid,
                         DummyVoid,
                         ApplicationLauncher.AppScenes.FLIGHT,
-                        (Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_24", false));
+                        (Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_38", false));
                 }
             }
             catch (Exception ex)
@@ -467,7 +467,7 @@ namespace ShipManifest
             {
                 if (shouldToggle())
                 {
-                    AppLaunchToggleOn();
+                    ToggleStockToolbar();
                 }
             }
             catch (Exception ex)
@@ -482,7 +482,7 @@ namespace ShipManifest
             {
                 if (shouldToggle())
                 {
-                    AppLaunchToggleOff();
+                    ToggleStockToolbar();
                 }
             }
             catch (Exception ex)
@@ -539,21 +539,19 @@ namespace ShipManifest
         private static bool IsInCLS()
         {
             bool results = false;
-            if (smController.SelectedPartSource == null || smController.SelectedPartTarget == null) 
-                return false;
-            if (smController.clsPartSource == null || smController.clsPartTarget == null)
-                return false;
             try
             {
+                if (smController.SelectedPartSource == null || smController.SelectedPartTarget == null) 
+                    return false;
                 if (SettingsManager.EnableCLS)
                 {
                     if (clsVessel == null)
                         GetCLSVessel();
                     if (clsVessel != null)
                     {
-                        foreach (ICLSSpace mySpace in clsVessel.Spaces)
+                        if (smController.SelectedPartSource != null)
                         {
-                            foreach (ICLSPart myPart in mySpace.Parts)
+                            foreach (ICLSPart myPart in clsVessel.Parts)
                             {
                                 if (myPart.Part == smController.SelectedPartSource)
                                 {
@@ -561,7 +559,10 @@ namespace ShipManifest
                                     break;
                                 }
                             }
-                            foreach (ICLSPart myPart in mySpace.Parts)
+                        }
+                        if (smController.SelectedPartTarget != null)
+                        {
+                            foreach (ICLSPart myPart in clsVessel.Parts)
                             {
                                 if (myPart.Part == smController.SelectedPartTarget)
                                 {
@@ -570,24 +571,9 @@ namespace ShipManifest
                                 }
                             }
                         }
-
-                        if (smController.clsPartSource.Space == null || smController.clsPartTarget.Space == null)
-                        {
-                            GetCLSVessel();
-                        }
                         if (smController.clsPartSource.Space != null && smController.clsPartTarget.Space != null)
-                        {
                             if (smController.clsPartSource.Space == smController.clsPartTarget.Space)
                                 results = true;
-                        }
-                        //else if (smController.clsPartTarget.Space == null)
-                        //{
-                        //    if (!frameErrTripped)
-                        //    {
-                        //        ManifestUtilities.LogMessage("IsInCLS() - Target part space is null.", "Error", true);
-                        //        frameErrTripped = true;
-                        //    }
-                        //}
                     }
                     else
                     {
@@ -623,6 +609,8 @@ namespace ShipManifest
         {
             try
             {
+                ManifestUtilities.LogMessage("GetCLSVessel - Active.", "Info", SettingsManager.VerboseLogging);
+
                 if (clsVessel == null)
                     if (clsAddon == null)
                     {
@@ -657,11 +645,11 @@ namespace ShipManifest
 
         public static void GetCLSSelected()
         {
-            if (smController.SelectedPartSource != null && smController.SelectedResource == "Crew")
+            if (smController.SelectedResource == "Crew")
             {
-                foreach (ICLSSpace mySpace in clsVessel.Spaces)
+                if (smController.SelectedPartSource != null)
                 {
-                    foreach (ICLSPart myPart in mySpace.Parts)
+                    foreach (ICLSPart myPart in clsVessel.Parts)
                     {
                         if (myPart.Part == smController.SelectedPartSource)
                         {
@@ -670,12 +658,9 @@ namespace ShipManifest
                         }
                     }
                 }
-            }
-            if (smController.SelectedPartSource != null && smController.SelectedResource == "Crew")
-            {
-                foreach (ICLSSpace mySpace in clsVessel.Spaces)
+                if (smController.SelectedPartTarget != null)
                 {
-                    foreach (ICLSPart myPart in mySpace.Parts)
+                    foreach (ICLSPart myPart in clsVessel.Parts)
                     {
                         if (myPart.Part == smController.SelectedPartTarget)
                         {
@@ -707,26 +692,26 @@ namespace ShipManifest
                                 SettingsManager.ShowShipManifest = !SettingsManager.ShowShipManifest;
                             }
                         };
-                        Debug.Log("[ShipManifest]: Blizzy Toolbar available!");
+                        ManifestUtilities.LogMessage("Blizzy Toolbar available!", "Info", SettingsManager.VerboseLogging);
                         return true;
                     }
                     else
                     {
-                        Debug.Log("[ShipManifest]: Blizzy Toolbar not available!");
+                        ManifestUtilities.LogMessage("Blizzy Toolbar not available!", "Info", SettingsManager.VerboseLogging);
                         return false;
                     }
                 }
                 catch (Exception ex)
                 {
                     // Blizzy Toolbar instantiation error.
-                    Debug.Log("[ShipManifest]: " + ex.ToString());
+                    ManifestUtilities.LogMessage("Error in EnableBlizzyToolbar... Error:  " + ex, "Error", true);
                     return false;
                 }
             }
             else
             {
                 // No Blizzy Toolbar
-                Debug.Log("[ShipManifest]: Blizzy Toolbar not Enabled.");
+                ManifestUtilities.LogMessage("Blizzy Toolbar not Enabled...", "Info", SettingsManager.VerboseLogging);
                 return false;
             }
         }
@@ -737,23 +722,12 @@ namespace ShipManifest
             SettingsManager.ShowShipManifest = !SettingsManager.ShowShipManifest;
         }
 
-        private void AppLaunchToggleOn()
+        private void ToggleStockToolbar()
         {
-            ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOn_38", false));
-            SettingsManager.ShowShipManifest = true;
-            if (smController.SelectedResource != null)
-                smController.RefreshHighlight();
+            ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(SettingsManager.ShowShipManifest ? "ShipManifest/Plugins/IconOff_38" : "ShipManifest/Plugins/IconOn_38", false));
+            SettingsManager.ShowShipManifest = !SettingsManager.ShowShipManifest;
         }
 
-        private void AppLaunchToggleOff()
-        {
-            SettingsManager.ShowTransferWindow = false;
-            SettingsManager.ShowShipManifest = false;
-            ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_38", false));
-            ManifestController.ClearResourceHighlighting(smController.SelectedResourceParts);
-            smController.SelectedResource = null;
-        }
-        
         private void RealModePumpXfer()
         {
             try
@@ -892,6 +866,7 @@ namespace ShipManifest
                 {
                     ManifestUtilities.LogMessage(string.Format(" in RealModePumpXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     frameErrTripped = true;
+                    throw ex;
                 }
             }
         }
@@ -1015,6 +990,7 @@ namespace ShipManifest
                 {
                     ManifestUtilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Error", true);
                     ManifestUtilities.LogMessage(string.Format(" in RealModeCrewXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    XferState = XFERState.Stop;
                     frameErrTripped = true;
                 }
             }
@@ -1066,6 +1042,7 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format(" in LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                throw ex;
             }
         }
 
@@ -1090,7 +1067,7 @@ namespace ShipManifest
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
                 {
                     ManifestUtilities.LogMessage("Save in progress...", "info", SettingsManager.VerboseLogging);
-                    Settings.Save();
+                    SettingsManager.Save();
                     ManifestUtilities.LogMessage("Save comlete.", "info", SettingsManager.VerboseLogging);
                 }
             }
@@ -1145,7 +1122,7 @@ namespace ShipManifest
             // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
             // and instructions for using CLS API by codepoet.
 
-            GameEvents.onVesselWasModified.Fire(vessel);
+            //GameEvents.onVesselWasModified.Fire(vessel);
             GameEvents.onVesselChange.Fire(vessel);
         }
 
@@ -1215,4 +1192,172 @@ namespace ShipManifest
         }
     }
 
+    public class DockingPortHatch : PartModule
+    {
+        public string docNodeTransformName;
+        public string docNodeAttachmentNodeName;
+        public ModuleDockingNode modDockNode;
+
+        public PartModule Module { get; set; }
+
+        public static bool IsDocked(PartModule iModule)
+        {
+            bool docked = false;
+            return docked;
+        }
+
+        public static bool IsHatchOpen(PartModule iModule)
+        {
+
+            return false;
+        }
+
+        public static bool IsAttached(PartModule iModule)
+        {
+
+            return false;
+        }
+
+        private static bool CheckModuleDockingNode(PartModule iModule)
+        {
+            DockingPortHatch thisHatch = new DockingPortHatch(iModule);
+            if (null == thisHatch.modDockNode)
+            {
+                // We do not know which ModuleDockingNode we are attached to yet. Try to find one.
+                foreach (ModuleDockingNode dockNode in iModule.part.Modules.OfType<ModuleDockingNode>())
+                {
+                    if (thisHatch.IsRelatedDockingNode(dockNode))
+                    {
+                        thisHatch.modDockNode = dockNode;
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return true;
+            }
+            return false;
+        }
+
+
+        public DockingPortHatch()
+        {
+
+        }
+
+        public DockingPortHatch(PartModule iModule)
+        {
+            Module = iModule;
+            docNodeTransformName = "";
+            docNodeAttachmentNodeName = "";
+        }
+
+        // This method allows us to check if a specified ModuleDockingNode is one that this hatch is attached to
+        internal bool IsRelatedDockingNode(ModuleDockingNode dockNode)
+        {
+            if (dockNode.nodeTransformName == this.docNodeTransformName)
+            {
+                this.modDockNode = dockNode;
+                return true;
+            }
+            if (dockNode.referenceAttachNode == this.docNodeAttachmentNodeName)
+            {
+                this.modDockNode = dockNode;
+                return true;
+            }
+            return false;
+        }
+
+        // tries to work out if the docking port is docked based on the state
+        private static bool isInDockedState(PartModule iModule)
+        {
+            DockingPortHatch thisHatch = new DockingPortHatch(iModule);
+            // First ensure that we know which ModuleDockingNode we are referring to.
+            if (CheckModuleDockingNode(iModule))
+            {
+                //thisHatch.
+                if (thisHatch.modDockNode.state == "Docked (dockee)" || thisHatch.modDockNode.state == "Docked (docker)")
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                // This is bad - it means there is a hatch that we can not match to a docking node. This should not happen. We will log an error but it will likely spam the log.
+                Debug.LogError(" Error - Docking port hatch can not find its ModuleDockingNode docNodeTransformName:" + thisHatch.docNodeTransformName + " docNodeAttachmentNodeName " + thisHatch.docNodeAttachmentNodeName);
+            }
+            return false;
+        }
+
+        // tries to work out if the docking port is attached to another docking port (ie in the VAB) and therefore can be treated as if it is docked (for example by not requiring the hatch to be closed)
+        private static bool isAttachedToDockingPort(PartModule iModule)
+        {
+            // First - this is only possible if we have an reference attachmentNode
+            DockingPortHatch thisHatch = new DockingPortHatch(iModule);
+            if (thisHatch.docNodeAttachmentNodeName != null && thisHatch.docNodeAttachmentNodeName != "" && thisHatch.docNodeAttachmentNodeName != string.Empty)
+            {
+                AttachNode thisNode = iModule.part.attachNodes.Find(x => x.id == thisHatch.docNodeAttachmentNodeName);
+                if (null != thisNode)
+                {
+                    Part attachedPart = thisNode.attachedPart;
+                    if (null != attachedPart)
+                    {
+                        // What is the attachNode in the attachedPart that limks back to us?
+                        AttachNode reverseNode = attachedPart.findAttachNodeByPart(iModule.part);
+                        if (null != reverseNode)
+                        {
+                            // Now the big question - is the attached part a docking ndoe that is centred on the reverseNode?
+                            foreach (ModuleDockingNode n in attachedPart.Modules.OfType<ModuleDockingNode>())
+                            {
+                                if (n.referenceAttachNode == reverseNode.id)
+                                {
+                                    // The part has a docking node that references the attachnode that connects back to our part - this is what we have been looking for!
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static void OpenHatch(PartModule iModule)
+        {
+            iModule.Events["OpenHatch"].active = false;
+            if (isInDockedState(iModule) || isAttachedToDockingPort(iModule))
+            {
+                iModule.Fields["IsHatchOpen"].SetValue(true, null);
+                iModule.Events["CloseHatch"].active = true;
+            }
+            else
+            {
+                iModule.Fields["IsHatchOpen"].SetValue(false, null);
+                iModule.Events["CloseHatch"].active = false;
+            }
+
+            // Finally fire the VesselChange event to cause the CLSAddon to re-evaluate everything. ActiveVEssel is only available in flight, but then it should only be possible to open and close hatches in flight so we should be OK.
+            GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
+        }
+
+        public static void CloseHatch(PartModule iModule)
+        {
+            bool docked = isInDockedState(iModule);
+
+            iModule.Fields["IsHatchOpen"].SetValue(false, null);
+
+            iModule.Events["CloseHatch"].active = false;
+            if (isInDockedState(iModule) || isAttachedToDockingPort(iModule))
+            {
+                iModule.Events["OpenHatch"].active = true;
+            }
+            else
+            {
+                iModule.Events["OpenHatch"].active = false;
+            }
+            // Finally fire the VesselChange event to cause the CLSAddon to re-evaluate everything. ActiveVEssel is only available in flight, but then it should only be possible to open and close hatches in flight so we should be OK.
+            GameEvents.onVesselChange.Fire(FlightGlobals.ActiveVessel);
+        }
+    }
 }

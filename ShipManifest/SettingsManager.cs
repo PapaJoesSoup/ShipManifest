@@ -7,16 +7,18 @@ using KSP.IO;
 
 namespace ShipManifest
 {
-    public class SettingsManager
+    public static class SettingsManager
     {
         #region Properties
 
         public static Dictionary<string, Color> Colors;
 
-        public string CurVersion = "0.25.0.3.4.0";
+        public static string CurVersion = "0.25.0.3.4.0";
 
-        public Rect ManifestPosition;
-        public Rect TransferPosition;
+        public static Rect ManifestPosition;
+        public static Rect TransferPosition;
+        public static Rect DebuggerPosition;
+        public static Rect RosterPosition;
 
         // Flags to show windows
         public static bool ShowTransferWindow { get; set; }
@@ -36,12 +38,13 @@ namespace ShipManifest
         public static bool VerboseLogging = false;
         public static bool prevVerboseLogging = false;
 
-        public static Rect DebuggerPosition;
         public static bool ShowDebugger = false;
         public static bool prevShowDebugger = false;
         public static bool AutoDebug = false;
         public static string ErrorLogLength = "1000";
         public static string prevErrorLogLength = "1000";
+        public static bool prevSaveLogOnExit = true;
+        public static bool SaveLogOnExit = true;
 
         public static Rect SettingsPosition;
         public static bool ShowSettings { get; set; }
@@ -55,7 +58,6 @@ namespace ShipManifest
         public static bool prevAutoSave;
         public static float prevSaveIntervalSec = 60f;
 
-        public static Rect RosterPosition;
         public static bool ShowRoster { get; set; }
 
         public static bool RealismMode = false;
@@ -106,9 +108,9 @@ namespace ShipManifest
         public static double PumpSoundVol = 3;
         public static double CrewSoundVol = 3;
 
-        public static string CrewSoundStart = "ShipManifest/Sounds/xxxxx-1";
-        public static string CrewSoundRun = "ShipManifest/Sounds/xxxxx-2";
-        public static string CrewSoundStop = "ShipManifest/Sounds/xxxxx-3";
+        public static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
+        public static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
+        public static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
         public static string prevCrewSoundStart = "";
         public static string prevCrewSoundRun = "";
         public static string prevCrewSoundStop = "";
@@ -122,8 +124,8 @@ namespace ShipManifest
 
         #region Settings Window (GUI)
 
-        private Vector2 ScrollViewerSettings = Vector2.zero;
-        public void SettingsWindow(int windowId)
+        private static Vector2 ScrollViewerSettings = Vector2.zero;
+        public static void SettingsWindow(int windowId)
         {
             // Store settings in case we cancel later...
             StoreTempSettings();
@@ -311,6 +313,9 @@ namespace ShipManifest
             label = "Enable Verbose Logging";
             VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
 
+            label = "Save Error log on Exit";
+            SaveLogOnExit = GUILayout.Toggle(SaveLogOnExit, label, GUILayout.Width(300));
+
             // create Limit Error Log Length slider;
             GUILayout.BeginHorizontal();
             GUILayout.Label("Error Log Length: ", GUILayout.Width(140));
@@ -334,6 +339,7 @@ namespace ShipManifest
             label = "Enable Blizzy Toolbar (requires game restart)";
             EnableBlizzyToolbar = GUILayout.Toggle(EnableBlizzyToolbar, label, GUILayout.Width(300));
 
+            GUI.enabled = isEnabled; 
             label = "Enable AutoSave Settings";
             AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
 
@@ -369,9 +375,9 @@ namespace ShipManifest
 
         #region Methods
 
-        public void Load()
+        public static void Load()
         {
-            ManifestUtilities.LogMessage("Settings load started...", "Info", VerboseLogging);
+            //ManifestUtilities.LogMessage("Settings load started...", "Info", VerboseLogging);
 
             try
             {
@@ -419,12 +425,12 @@ namespace ShipManifest
                 EnableCLS = configfile.GetValue<bool>("EnableCLS");
                 EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar");
 
-                DebugLogPath = configfile.GetValue<string>("DebugLogPath");
-
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
                 ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
                 AutoDebug = configfile.GetValue<bool>("AutoDebug");
+                DebugLogPath = configfile.GetValue<string>("DebugLogPath");
                 ErrorLogLength = configfile.GetValue<string>("ErrorLogLength");
+                SaveLogOnExit = configfile.GetValue<bool>("SaveLogOnExit");
                 EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
 
                 // Default values for Flow rates
@@ -490,21 +496,20 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ErrorLogLength Loaded: {0}", ErrorLogLength), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SaveLogOnExit Loaded: {0}", SaveLogOnExit), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format("Load Settings Complete"), "Info", VerboseLogging);
-                ManifestUtilities.LogMessage(string.Format(" "), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
 
                 ValidateLoad();
             }
             catch (Exception ex)
             {
                 ManifestUtilities.LogMessage(string.Format("Failed to Load Settings: {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                ManifestUtilities.LogMessage(string.Format(" "), "Info", VerboseLogging);
             }
         }
 
-        private void ValidateLoad()
+        private static void ValidateLoad()
         {
 
             //ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
@@ -540,7 +545,7 @@ namespace ShipManifest
 
         }
 
-        public void Save()
+        public static void Save()
         {
             try
             {
@@ -587,6 +592,7 @@ namespace ShipManifest
                 configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
                 configfile.SetValue("AutoDebug", AutoDebug);
                 configfile.SetValue("ErrorLogLength", ErrorLogLength);
+                configfile.SetValue("SaveLogOnExit", SaveLogOnExit);
                 configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
                 configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
 
@@ -627,6 +633,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("ErrorListLength Saved: {0}", ErrorLogLength.ToString()), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("SaveLogOnExit Saved: {0}", SaveLogOnExit.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
             }
@@ -652,7 +659,7 @@ namespace ShipManifest
             Colors.Add("yellow", Color.yellow);
         }
 
-        private void StoreTempSettings()
+        private static void StoreTempSettings()
         {
             prevRealismMode = RealismMode;
             prevShowDebugger = ShowDebugger;
@@ -674,6 +681,7 @@ namespace ShipManifest
             prevEnableTextureReplacer = EnableTextureReplacer;
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
+            prevSaveLogOnExit = SaveLogOnExit;
 
             // sounds
 
@@ -681,7 +689,7 @@ namespace ShipManifest
             prevErrorLogLength = ErrorLogLength;
         }
 
-        private void RestoreTempSettings()
+        private static void RestoreTempSettings()
         {
             RealismMode = prevRealismMode;
             ShowDebugger = prevShowDebugger;
@@ -703,6 +711,7 @@ namespace ShipManifest
             EnableTextureReplacer = prevEnableTextureReplacer;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
+            SaveLogOnExit = prevSaveLogOnExit;
 
             //debugger Settings
             prevErrorLogLength = ErrorLogLength;

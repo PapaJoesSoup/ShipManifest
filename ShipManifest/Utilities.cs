@@ -28,13 +28,21 @@ namespace ShipManifest
 
         public static void LogMessage(string error, string type, bool verbose)
         {
-            // Add rolling error list. This limits growth.  Configure with ErrorListLength
-            if (_errors.Count() > int.Parse(SettingsManager.ErrorLogLength) && SettingsManager.ErrorLogLength != "0")
-                _errors.RemoveRange(0, _errors.Count() - int.Parse(SettingsManager.ErrorLogLength));
-            if (verbose)
-                _errors.Add(type + ": " + error);
-            if (type == "Error" && SettingsManager.AutoDebug)
+            try
+            {
+                // Add rolling error list. This limits growth.  Configure with ErrorListLength
+                if (_errors.Count() > int.Parse(SettingsManager.ErrorLogLength) && int.Parse(SettingsManager.ErrorLogLength) > 0)
+                    _errors.RemoveRange(0, _errors.Count() - int.Parse(SettingsManager.ErrorLogLength));
+                if (verbose)
+                    _errors.Add(type + ": " + error);
+                if (type == "Error" && SettingsManager.AutoDebug)
+                    SettingsManager.ShowDebugger = true;
+            }
+            catch (Exception ex)
+            {
+                _errors.Add("Error: " + ex.ToString());
                 SettingsManager.ShowDebugger = true;
+            }
         }
     }
 
