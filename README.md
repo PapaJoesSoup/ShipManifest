@@ -1,5 +1,12 @@
 ShipManifest
 ============
+Version 0.24.0.3.3 - 19 Dec, 2014 - 0.90 compatability Edition.
+ - Update to correct highlighting errors due to KSP 0.90 changes. 
+ - Added a Highlighting switch.  If you don't want highlighting at all, turn it off!
+ - Other under the hood changes to improve overall highlighting behavior.  Works very nice now.
+
+Note:  CLS is currently broken in .90, so do not use it until updated.
+	
 Version 0.25.0_3.3.2b - Interim Release with Fixed stock Toolbar.  CLS Highlighting still in work.
  - Bug:  When changing vessesls in Map view, the stock toolbar would disappear.
 
