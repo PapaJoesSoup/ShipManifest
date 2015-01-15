@@ -7,13 +7,13 @@ using KSP.IO;
 
 namespace ShipManifest
 {
-    public static class SettingsManager
+    public  static partial class Settings
     {
         #region Properties
 
         public static Dictionary<string, Color> Colors;
 
-        public static string CurVersion = "0.25.0.3.4.0";
+        public static string CurVersion = "0.90.0_3.3.4";
 
         public static Rect ManifestPosition;
         public static Rect TransferPosition;
@@ -31,7 +31,18 @@ namespace ShipManifest
             }
             set
             {
+                //if (CLSInstalled && EnableCLS && ShipManifestAddon.smController != null)
+                //{ 
+                //    if (_showShipManifest && !value)
+                //        ShipManifestAddon.smController.HighlightCLSVessel(false);
+                //    else if (!_showShipManifest && value)
+                //    {
+                //        if (ShipManifestAddon.smController.SelectedResource == "Crew")
+                //            ShipManifestAddon.smController.HighlightCLSVessel(false);
+                //    }
+                //}
                 _showShipManifest = value;
+
             }
         }
 
@@ -74,6 +85,8 @@ namespace ShipManifest
         // Feature Options
         public static bool EnableHighlighting = true;
         public static bool prevEnableHighlighting = true;
+        public static bool OnlySourceTarget = false;
+        public static bool prevOnlySourceTarget = false;
         public static bool EnableScience = true;
         public static bool EnableResources = true;
         public static bool EnableCrew = true;
@@ -122,257 +135,6 @@ namespace ShipManifest
 
         #endregion
 
-        #region Settings Window (GUI)
-
-        private static Vector2 ScrollViewerSettings = Vector2.zero;
-        public static void SettingsWindow(int windowId)
-        {
-            // Store settings in case we cancel later...
-            StoreTempSettings();
-
-            string label = "";
-            string txtSaveInterval = SaveIntervalSec.ToString();
-
-            GUILayout.BeginVertical();
-            ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
-            GUILayout.BeginVertical();
-            GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            if (!LockSettings)
-                GUILayout.Label("Settings / Options", GUILayout.Height(10));
-            else
-                GUILayout.Label("Settings / Options  (Locked.  Unlock in Config file)", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            bool isEnabled = (!LockSettings);
-            // Realism Mode
-            GUI.enabled = isEnabled;
-            label = "Enable Realism Mode";
-            RealismMode = GUILayout.Toggle(RealismMode, label, GUILayout.Width(300));
-
-            // EnableHighlighting Mode
-            GUI.enabled = isEnabled;
-            GUILayout.BeginHorizontal();
-            label = "Enable Highlighting";
-            EnableHighlighting = GUILayout.Toggle(EnableHighlighting, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            // EnableCrew Mode
-            GUI.enabled = isEnabled;
-            GUILayout.BeginHorizontal();
-            label = "Enable Crew Xfers";
-            EnableCrew = GUILayout.Toggle(EnableCrew, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            if (!EnableCrew)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                {
-                    // Clear Resource selection.
-                    ShipManifestAddon.smController.SelectedResource = null;
-                    SettingsManager.ShowTransferWindow = false;
-                }
-            }
-            // EnableCLS Mode
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            if (!EnableCrew || !SettingsManager.CLSInstalled)
-                GUI.enabled = false;
-            else
-                GUI.enabled = isEnabled;
-            label = "Enable CLS  (Connected Living Spaces)";
-            EnableCLS = GUILayout.Toggle(EnableCLS, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            if (!EnableCLS && prevEnableCLS)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                {
-                    //Reassign the resource to observe new settings.
-                    ShipManifestAddon.smController.SelectedResource = "Crew";
-                }
-            }
-            else if (EnableCLS && !prevEnableCLS)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                {
-                    //Refresh the clsVessel if needed.
-                    if (ShipManifestAddon.clsVessel == null)
-                        ShipManifestAddon.GetCLSVessel();
-
-                    //Reassign the resource to observe new settings.
-                    ShipManifestAddon.smController.SelectedResource = "Crew";
-                }
-            }
-
-            // EnableScience Mode
-            GUILayout.BeginHorizontal();
-            GUI.enabled = isEnabled;
-            label = "Enable Science Xfers";
-            EnableScience = GUILayout.Toggle(EnableScience, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            if (!EnableScience)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Science")
-                {
-                    // Clear Resource selection.
-                    ShipManifestAddon.smController.SelectedResource = null;
-                }
-            }
-
-            // EnableResources Mode
-            GUILayout.BeginHorizontal();
-            GUI.enabled = isEnabled;
-            label = "Enable Resource Xfers";
-            EnableResources = GUILayout.Toggle(EnableResources, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            if (!EnableResources)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Resources")
-                {
-                    // Clear Resource selection.
-                    ShipManifestAddon.smController.SelectedResource = null;
-                }
-            }
-
-            // EnablePFResources Mode
-            GUILayout.BeginHorizontal();
-            GUI.enabled = isEnabled;
-            label = "Enable Resources in Pre-Flight";
-            EnablePFResources = GUILayout.Toggle(EnablePFResources, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            // LockSettings Mode
-            GUI.enabled = isEnabled;
-            label = "Lock Settings  (If set ON, disable in config file)";
-            LockSettings = GUILayout.Toggle(LockSettings, label, GUILayout.Width(300));
-
-            GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Sounds", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            GUILayout.Label("Transfer Pump:", GUILayout.Height(20));
-            // Pump Start Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Starting: ", GUILayout.Width(100));
-            PumpSoundStart = GUILayout.TextField(PumpSoundStart, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            // Pump Run Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Running: ", GUILayout.Width(100));
-            PumpSoundRun = GUILayout.TextField(PumpSoundRun, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            // Pump Stop Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Pump Stopping: ", GUILayout.Width(100));
-            PumpSoundStop = GUILayout.TextField(PumpSoundStop, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            // create xfer Flow Rate slider;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(string.Format("Flow Rate:  {0}", FlowRate.ToString("#######0.####")), GUILayout.Width(100), GUILayout.Height(20));
-            FlowRate = GUILayout.HorizontalSlider(FlowRate, MinFlowRate, MaxFlowRate, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Label(" ", GUILayout.Height(10));
-            GUILayout.Label("Crew:", GUILayout.Height(20));
-            // Crew Start Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Exiting: ", GUILayout.Width(100));
-            CrewSoundStart = GUILayout.TextField(CrewSoundStart, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            // Crew Run Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Xfering: ", GUILayout.Width(100));
-            CrewSoundRun = GUILayout.TextField(CrewSoundRun, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            // Crew Stop Sound
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Crew Entering: ", GUILayout.Width(100));
-            CrewSoundStop = GUILayout.TextField(CrewSoundStop, GUILayout.Width(220));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Configuraton", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-            
-            // AutoDebug Mode
-            label = "Enable SM Debug Window On Error";
-            AutoDebug = GUILayout.Toggle(AutoDebug, label, GUILayout.Width(300));
-
-            label = "Enable Debug Window";
-            ShowDebugger = GUILayout.Toggle(ShowDebugger, label, GUILayout.Width(300));
-
-            label = "Enable Verbose Logging";
-            VerboseLogging = GUILayout.Toggle(VerboseLogging, label, GUILayout.Width(300));
-
-            label = "Save Error log on Exit";
-            SaveLogOnExit = GUILayout.Toggle(SaveLogOnExit, label, GUILayout.Width(300));
-
-            // create Limit Error Log Length slider;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Error Log Length: ", GUILayout.Width(140));
-            ErrorLogLength = GUILayout.TextField(ErrorLogLength, GUILayout.Width(40));
-            GUILayout.Label("(lines)", GUILayout.Width(50));
-            GUILayout.EndHorizontal();
-
-            // TextureReplacer Mode
-            label = "Enable Texture Replacer Events";
-            EnableTextureReplacer = GUILayout.Toggle(EnableTextureReplacer, label, GUILayout.Width(300));
-
-            if (!ToolbarManager.ToolbarAvailable)
-            {
-                if (EnableBlizzyToolbar)
-                    EnableBlizzyToolbar = false;
-                GUI.enabled = false;
-            }
-            else
-                GUI.enabled = isEnabled;
-
-            label = "Enable Blizzy Toolbar (requires game restart)";
-            EnableBlizzyToolbar = GUILayout.Toggle(EnableBlizzyToolbar, label, GUILayout.Width(300));
-
-            GUI.enabled = isEnabled; 
-            label = "Enable AutoSave Settings";
-            AutoSave = GUILayout.Toggle(AutoSave, label, GUILayout.Width(300));
-
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Save Interval: ", GUILayout.Width(120));
-            txtSaveInterval = GUILayout.TextField(txtSaveInterval, GUILayout.Width(40));
-            GUILayout.Label("(sec)", GUILayout.Width(40));
-            GUILayout.EndHorizontal();
-
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save"))
-            {
-                SaveIntervalSec = float.Parse(txtSaveInterval);
-                Save();
-                ShowSettings = false;
-            }
-            if (GUILayout.Button("Cancel"))
-            {
-                // We've canclled, so restore original settings.
-                RestoreTempSettings();
-                ShowSettings = false;
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-
-            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-        }
-
-        #endregion
-
         #region Methods
 
         public static void Load()
@@ -418,6 +180,7 @@ namespace ShipManifest
                 TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
 
                 EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting");
+                OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget");
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
                 EnableScience = configfile.GetValue<bool>("EnableScience");
                 EnableResources = configfile.GetValue<bool>("EnableResources");
@@ -488,6 +251,8 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableResources Loaded: {0}", EnableResources), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
@@ -580,6 +345,7 @@ namespace ShipManifest
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
 
                 configfile.SetValue("EnableHighlighting", EnableHighlighting);
+                configfile.SetValue("OnlySourceTarget", OnlySourceTarget);
                 configfile.SetValue("EnableCrew", EnableCrew);
                 configfile.SetValue("EnableScience", EnableScience);
                 configfile.SetValue("EnableResources", EnableResources);
@@ -623,6 +389,7 @@ namespace ShipManifest
                 ManifestUtilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
+                ManifestUtilities.LogMessage(string.Format("OnlySourceTarget Saved: {0}", OnlySourceTarget), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
                 ManifestUtilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
@@ -675,6 +442,7 @@ namespace ShipManifest
             prevCrewSoundStop = CrewSoundStop;
             prevEnableScience = EnableScience;
             prevEnableHighlighting = EnableHighlighting;
+            prevOnlySourceTarget = OnlySourceTarget;
             prevEnableCrew = EnableCrew;
             prevEnablePFResources = EnablePFResources;
             prevEnableCLS = EnableCLS;
@@ -705,6 +473,7 @@ namespace ShipManifest
             CrewSoundStop = prevCrewSoundStop;
             EnableScience = prevEnableScience;
             EnableHighlighting = prevEnableHighlighting;
+            OnlySourceTarget = prevOnlySourceTarget;
             EnableCrew = prevEnableCrew;
             EnablePFResources = prevEnablePFResources;
             EnableCLS = prevEnableCLS;

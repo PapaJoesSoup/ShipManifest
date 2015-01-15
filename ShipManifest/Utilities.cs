@@ -21,7 +21,7 @@ namespace ShipManifest
 
         public static void LoadTexture(ref Texture2D tex, String FileName)
         {
-            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", SettingsManager.VerboseLogging);
+            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", Settings.VerboseLogging);
             WWW img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, FileName));
             img1.LoadImageIntoTexture(tex);
         }
@@ -31,17 +31,17 @@ namespace ShipManifest
             try
             {
                 // Add rolling error list. This limits growth.  Configure with ErrorListLength
-                if (_errors.Count() > int.Parse(SettingsManager.ErrorLogLength) && int.Parse(SettingsManager.ErrorLogLength) > 0)
-                    _errors.RemoveRange(0, _errors.Count() - int.Parse(SettingsManager.ErrorLogLength));
+                if (_errors.Count() > int.Parse(Settings.ErrorLogLength) && int.Parse(Settings.ErrorLogLength) > 0)
+                    _errors.RemoveRange(0, _errors.Count() - int.Parse(Settings.ErrorLogLength));
                 if (verbose)
                     _errors.Add(type + ": " + error);
-                if (type == "Error" && SettingsManager.AutoDebug)
-                    SettingsManager.ShowDebugger = true;
+                if (type == "Error" && Settings.AutoDebug)
+                    Settings.ShowDebugger = true;
             }
             catch (Exception ex)
             {
                 _errors.Add("Error: " + ex.ToString());
-                SettingsManager.ShowDebugger = true;
+                Settings.ShowDebugger = true;
             }
         }
     }
@@ -67,7 +67,7 @@ namespace ShipManifest
             GUI.skin = HighLogic.Skin;
             if (WindowStyle == null)
             {
-                SettingsManager.LoadColors();
+                Settings.LoadColors();
                 SetStyles();
             }
         }
@@ -98,7 +98,7 @@ namespace ShipManifest
             ButtonSourceStyle.alignment = TextAnchor.UpperLeft;
 
             ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledSourceStyle.normal.textColor = SettingsManager.Colors[SettingsManager.SourcePartColor];
+            ButtonToggledSourceStyle.normal.textColor = Settings.Colors[Settings.SourcePartColor];
             ButtonToggledSourceStyle.fontSize = 14;
             ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
@@ -113,7 +113,7 @@ namespace ShipManifest
             ButtonTargetStyle.alignment = TextAnchor.UpperLeft;
 
             ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledTargetStyle.normal.textColor = SettingsManager.Colors[SettingsManager.TargetPartColor];
+            ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
             ButtonToggledTargetStyle.fontSize = 14;
             ButtonToggledTargetStyle.hover.textColor = Color.blue;
             ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;

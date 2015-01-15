@@ -29,6 +29,10 @@ namespace ShipManifest
         private Vector2 rosterScrollViewer = Vector2.zero;
         private void RosterWindow(int windowId)
         {
+            if (GUI.Button(new Rect(396, 4, 16, 16), ""))
+            {
+                Settings.ShowRoster = false;
+            }
             try
             {
                 GUIStyle style = GUI.skin.button;
@@ -40,7 +44,10 @@ namespace ShipManifest
                 if (SelectedKerbal != null)
                 {
                     GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
-                    SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
+                    if (SelectedKerbal.IsNew)
+                        SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
+                    else
+                        GUILayout.Label(SelectedKerbal.Name);
 
                     if (!string.IsNullOrEmpty(saveMessage))
                     {
@@ -140,7 +147,7 @@ namespace ShipManifest
                         }
                     }
 
-                    if (((SettingsManager.RealismMode && IsPreLaunch) || !SettingsManager.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
+                    if (((Settings.RealismMode && IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -150,7 +157,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                         buttonText = "Respawn";
                     }
-                    else if (((SettingsManager.RealismMode && IsPreLaunch) || !SettingsManager.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                    else if (((Settings.RealismMode && IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
                     {
                         GUI.enabled = true;
                         buttonText = "Remove";
