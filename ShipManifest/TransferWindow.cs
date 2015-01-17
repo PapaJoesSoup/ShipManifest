@@ -308,7 +308,7 @@ namespace ShipManifest
 
                             // Left Details...
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(125));
+                            GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(100));
 
                             // Lets parse the string to allow decimal points.
                             string strXferAmount = sXferAmount.ToString();
@@ -321,7 +321,7 @@ namespace ShipManifest
                             if (sXferAmountHasZero)
                                 strXferAmount += "0";
 
-                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80));
+                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
 
                             // update decimal bool 
                             if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
@@ -576,7 +576,7 @@ namespace ShipManifest
                                 tXferAmount = (float)maxXferAmount;
 
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(125));
+                            GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(100));
 
                             // Lets parse the string to allow decimal points.
                             string strXferAmount = tXferAmount.ToString();
@@ -588,7 +588,7 @@ namespace ShipManifest
                             if (tXferAmountHasZero)
                                 strXferAmount += "0";
 
-                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80));
+                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
 
                             // update decimal bool with new string
                             if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
@@ -596,7 +596,6 @@ namespace ShipManifest
                             else
                                 tXferAmountHasDecimal = false;
 
-                            tXferAmountHasDecimal = strXferAmount.EndsWith(".");
                             //update zero bool 
                             if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
                                 tXferAmountHasZero = true;
