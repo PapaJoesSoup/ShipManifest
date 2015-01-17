@@ -17,7 +17,11 @@ namespace ShipManifest
 
         // variables used for moving resources.  set to a negative to allow slider to function.
         public float sXferAmount = -1f;
+        public bool sXferAmountHasDecimal = false;
+        public bool sXferAmountHasZero = false;
         public float tXferAmount = -1f;
+        public bool tXferAmountHasDecimal = false;
+        public bool tXferAmountHasZero = false;
         public float AmtXferred = 0f;
 
         #endregion
@@ -292,23 +296,48 @@ namespace ShipManifest
                             // let's determine how much of a resource we can move to the target.
                             double maxXferAmount = SelectedPartTarget.Resources[resource.info.name].maxAmount - SelectedPartTarget.Resources[resource.info.name].amount;
                             if (maxXferAmount > SelectedPartSource.Resources[resource.info.name].amount)
-                            {
                                 maxXferAmount = SelectedPartSource.Resources[resource.info.name].amount;
-                            }
+                            if (maxXferAmount < 0)
+                                maxXferAmount = 0;
 
                             // This is used to set the slider to the max amount by default.  
                             // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
                             // We set XferAmount to -1 when we set new source or target parts.
-                            if (sXferAmount == -1)
-                            {
+                            if (sXferAmount < 0)
                                 sXferAmount = (float)maxXferAmount;
-                            }
 
                             // Left Details...
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(125));
+
+                            // Lets parse the string to allow decimal points.
                             string strXferAmount = sXferAmount.ToString();
-                            sXferAmount = float.Parse(GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80)));
+                            float newAmount = 0;
+
+                            // add the decimal point if it was typed.
+                            if (sXferAmountHasDecimal)
+                                strXferAmount += ".";
+                            // add the zero if it was typed.
+                            if (sXferAmountHasZero)
+                                strXferAmount += "0";
+
+                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80));
+
+                            // update decimal bool 
+                            if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
+                                sXferAmountHasDecimal = true;
+                            else
+                                sXferAmountHasDecimal = false;
+
+                            //update zero bool 
+                            if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
+                                sXferAmountHasZero = true;
+                            else
+                                sXferAmountHasZero = false;
+
+                            if (float.TryParse(strXferAmount, out newAmount))
+                                sXferAmount = newAmount;
+
                             if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
                             {
                                 TransferResource(SelectedPartSource, SelectedPartTarget, (double)sXferAmount);
@@ -536,26 +565,50 @@ namespace ShipManifest
                             // let's determine how much of a resource we can move to the Source.
                             double maxXferAmount = SelectedPartSource.Resources[resource.info.name].maxAmount - SelectedPartSource.Resources[resource.info.name].amount;
                             if (maxXferAmount > SelectedPartTarget.Resources[resource.info.name].amount)
-                            {
                                 maxXferAmount = SelectedPartTarget.Resources[resource.info.name].amount;
-                            }
+                            if (maxXferAmount < 0)
+                                maxXferAmount = 0;
 
                             // This is used to set the slider to the max amount by default.  
                             // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
                             // We set XferAmount to -1 when we set new source or target parts.
-                            if (tXferAmount == -1)
-                            {
+                            if (tXferAmount < 0)
                                 tXferAmount = (float)maxXferAmount;
-                            }
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(125));
+
+                            // Lets parse the string to allow decimal points.
                             string strXferAmount = tXferAmount.ToString();
-                            tXferAmount = float.Parse(GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80)));
+                            float newAmount = 0;
+
+                            // add the decimal point if it was typed.
+                            if (tXferAmountHasDecimal)
+                                strXferAmount += ".";
+                            if (tXferAmountHasZero)
+                                strXferAmount += "0";
+
+                            strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(80));
+
+                            // update decimal bool with new string
+                            if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
+                                tXferAmountHasDecimal = true;
+                            else
+                                tXferAmountHasDecimal = false;
+
+                            tXferAmountHasDecimal = strXferAmount.EndsWith(".");
+                            //update zero bool 
+                            if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
+                                tXferAmountHasZero = true;
+                            else
+                                tXferAmountHasZero = false;
+
+                            if (float.TryParse(strXferAmount, out newAmount))
+                                tXferAmount = newAmount;
+                                
                             if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                            {
                                 TransferResource(SelectedPartTarget, SelectedPartSource, (double)tXferAmount);
-                            }
+
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Xfer:  ", GUILayout.Width(50), GUILayout.Height(20));
@@ -747,7 +800,7 @@ namespace ShipManifest
                     double maxAmount = target.Resources[SelectedResource].maxAmount;
                     double sourceAmount = source.Resources[SelectedResource].amount;
                     double targetAmount = target.Resources[SelectedResource].amount;
-                    if (XferAmount == 0)
+                    if (XferAmount <= 0)
                     {
                         XferAmount = maxAmount - targetAmount;
                     }
