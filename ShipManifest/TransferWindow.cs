@@ -247,18 +247,26 @@ namespace ShipManifest
             {
                 // Containers.
                 int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+                bool isCollectable = true;
+                if (pm.moduleName == "ModuleScienceContainer")
+                    isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
+                else if (pm.moduleName == "ModuleScienceExperiment")
+                    isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
-                // If we have target selected, it is not the same as the source, and there is science to xfer.
+                // If we have target selected, it is not the same as the source, there is science to xfer, and it is collectable.
                 if ((ShipManifestAddon.smController.SelectedModuleTarget != null && pm != ShipManifestAddon.smController.SelectedModuleTarget) && scienceCount > 0)
                 {
-                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                    {
-                        ShipManifestAddon.smController.SelectedModuleSource = pm;
-                        TransferScience(ShipManifestAddon.smController.SelectedModuleSource, ShipManifestAddon.smController.SelectedModuleTarget);
-                        ShipManifestAddon.smController.SelectedModuleSource = null;
+                    if ((Settings.RealismMode && isCollectable) || !Settings.RealismMode)
+                    { 
+                        if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            ShipManifestAddon.smController.SelectedModuleSource = pm;
+                            TransferScience(ShipManifestAddon.smController.SelectedModuleSource, ShipManifestAddon.smController.SelectedModuleTarget);
+                            ShipManifestAddon.smController.SelectedModuleSource = null;
+                        }
                     }
                 }
                 GUILayout.EndHorizontal();

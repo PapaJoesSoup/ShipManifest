@@ -131,8 +131,13 @@ namespace ShipManifest
                             }
                         }
                     }
+                    else
+                    {
+                        // Lets show what their status is instead of their vessel assignment...
+                        vesselName = "\r\n  -  " + kerbal.rosterStatus;
+                    }
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(string.Format("{0}{1}", kerbal.name, vesselName), labelStyle, GUILayout.Width(230), GUILayout.Height(10));  // + "  (" + kerbal.seat.vessel.name + ")"
+                    GUILayout.Label(string.Format("{0}{1}", kerbal.name + ", (" + kerbal.experienceTrait.Title + ")", vesselName), labelStyle, GUILayout.Width(230), GUILayout.Height(10));  // + "  (" + kerbal.seat.vessel.name + ")"
                     string buttonText = string.Empty;
 
                     if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
