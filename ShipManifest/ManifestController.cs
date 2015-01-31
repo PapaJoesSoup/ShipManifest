@@ -23,7 +23,6 @@ namespace ShipManifest
                 if (v == null)
                 {
                     controllers.Remove(wr);
-                    RenderingManager.RemoveFromPostDrawQueue(3, kvp.Value.drawGui);
                 }
                 else if (v == vessel)
                 {
@@ -40,6 +39,15 @@ namespace ShipManifest
 
         #region Properties
 
+        // variables used for moving resources.  set to a negative to allow slider to function.
+        public float sXferAmount = -1f;
+        public bool sXferAmountHasDecimal = false;
+        public bool sXferAmountHasZero = false;
+        public float tXferAmount = -1f;
+        public bool tXferAmountHasDecimal = false;
+        public bool tXferAmountHasZero = false;
+        public float AmtXferred = 0f;
+
         public Vessel Vessel
         {
             get { return controllers.Single(p => p.Value == this).Key.Target; }
@@ -55,22 +63,7 @@ namespace ShipManifest
 
         public bool CanDrawButton = false;
 
-        private string saveMessage = string.Empty;
-        private bool showRosterWindow = false;
-        private bool ShowRosterWindow 
-        {
-            get
-            {
-                return showRosterWindow;
-            }
-            
-            set
-            {
-                ClearResourceHighlighting(SelectedResourceParts);
-                showRosterWindow = value;
-            } 
-        }
-
+        public string saveMessage = string.Empty;
         #endregion
 
         #region Datasource properties
@@ -93,7 +86,7 @@ namespace ShipManifest
                     // Let's update...
                     if (FlightGlobals.ActiveVessel != null)
                     {
-                        //ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  "), "Info", SettingsManager.VerboseLogging);
+                        //Utilities.LogMessage(string.Format(" getting partsbyresource.  "), "Info", SettingsManager.VerboseLogging);
                         ShipManifestAddon.vessel = Vessel;
 
                         _partsByResource = new Dictionary<string, List<Part>>();
@@ -178,7 +171,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     _partsByResource = null;
                 }
 
@@ -216,7 +209,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Set SelectedResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
         }
@@ -253,7 +246,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Get SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     return null;
                 }
             }
@@ -273,9 +266,9 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
-                //ManifestUtilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
+                //Utilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
             }
         }
 
@@ -292,7 +285,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     return null;
                 }
             }
@@ -302,9 +295,7 @@ namespace ShipManifest
                 {
                     _selectedPartTarget = value;
                     if (Settings.EnableCLS)
-                    {
                         UpdateCLSSpaces();
-                    }
 
                     // reset transfer amount (for resource xfer slider control)
                     ShipManifestAddon.smController.sXferAmount = -1f;
@@ -312,9 +303,9 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
-                //ManifestUtilities.LogMessage("Set SelectedPartTarget.", "Info", SettingsManager.VerboseLogging);
+                //Utilities.LogMessage("Set SelectedPartTarget.", "Info", SettingsManager.VerboseLogging);
             }
         }
 
@@ -360,7 +351,7 @@ namespace ShipManifest
             {
                 if (!ShipManifestAddon.frameErrTripped)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in GetHatchModules.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in GetHatchModules.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     ShipManifestAddon.frameErrTripped = true;
                 }
             }
@@ -385,13 +376,13 @@ namespace ShipManifest
                                 {
                                     clsPartSource = sPart;
                                     clsSpaceSource = sSpace;
-                                    ManifestUtilities.LogMessage("UpdateCLSSpaces - clsPartSource found;", "info", Settings.VerboseLogging);
+                                    Utilities.LogMessage("UpdateCLSSpaces - clsPartSource found;", "info", Settings.VerboseLogging);
                                     break;
                                 }
                             }
                         }
                         if (clsSpaceSource == null)
-                            ManifestUtilities.LogMessage("UpdateCLSSpaces - clsSpaceSource is null.", "info", Settings.VerboseLogging);
+                            Utilities.LogMessage("UpdateCLSSpaces - clsSpaceSource is null.", "info", Settings.VerboseLogging);
                     }
                     if (_selectedPartTarget != null)
                     {
@@ -405,22 +396,22 @@ namespace ShipManifest
                                 {
                                     clsPartTarget = tPart;
                                     clsSpaceTarget = tSpace;
-                                    ManifestUtilities.LogMessage("UpdateCLSSpaces - clsPartTarget found;", "info", Settings.VerboseLogging);
+                                    Utilities.LogMessage("UpdateCLSSpaces - clsPartTarget found;", "info", Settings.VerboseLogging);
                                     break;
                                 }
                             }
                         }
                         if (clsSpaceTarget == null)
-                            ManifestUtilities.LogMessage("UpdateCLSSpaces - clsSpaceTarget is null.", "info", Settings.VerboseLogging);
+                            Utilities.LogMessage("UpdateCLSSpaces - clsSpaceTarget is null.", "info", Settings.VerboseLogging);
                     }
                 }
                 catch (Exception ex)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
             else
-                ManifestUtilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", Settings.VerboseLogging);
+                Utilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", Settings.VerboseLogging);
         }
         
         public GameEvents.FromToAction<Part, Part> evaAction;
@@ -429,69 +420,7 @@ namespace ShipManifest
 
         public ManifestController()
         {
-            RenderingManager.AddToPostDrawQueue(3, drawGui);
-        }
-
-        private void drawGui()
-        {
-            string step = "";
-            try
-            {
-                step = "0 - Start";
-                if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != Vessel)
-                {
-                    step = "0a - Vessel Change";
-                    SelectedPartSource = SelectedPartTarget = null;
-                    SelectedResource = null;
-                    return;
-                }
-
-                ManifestStyle.SetupGUI();
-
-                step = "1 - Show Interface(s)";
-                // Is the scene one we want to be visible in?
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
-                {
-                    // why is this here?
-                    //UpdateHighlighting();
-                    if (ShipManifestAddon.CanShowShipManifest())
-                    {
-                        step = "2 - Show Manifest";
-                        Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, ShipManifestWindow, "Ship's Manifest - " + Vessel.vesselName, GUILayout.MinHeight(20));
-                    }
-
-                    // What windows do we want to show?
-                    if (ShipManifestAddon.CanShowShipManifest() && Settings.ShowTransferWindow && SelectedResource != null)
-                    {
-                        step = "3 - Show Transfer";
-                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, TransferWindow, "Transfer - " + Vessel.vesselName + " - " + SelectedResource, GUILayout.MinHeight(20));
-                    }
-
-                    if (ShipManifestAddon.CanShowShipManifest() && Settings.ShowSettings)
-                    {
-                        step = "4 - Show Settings";
-                        Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, Settings.SettingsWindow, "Ship Manifest Settings", GUILayout.MinHeight(20));
-                    }
-
-                    if (resetRosterSize)
-                    {
-                        step = "5 - Reset Roster Size";
-                        Settings.RosterPosition.height = 100; //reset hight
-                        Settings.RosterPosition.width = 400; //reset width
-                        resetRosterSize = false;
-                    }
-
-                    if (Settings.ShowShipManifest && Settings.ShowRoster)
-                    {
-                        step = "6 - Show Roster";
-                        Settings.RosterPosition = GUILayout.Window(398547, Settings.RosterPosition, RosterWindow, "Ship Manifest Roster", GUILayout.MinHeight(20));
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ManifestUtilities.LogMessage(string.Format(" in drawGui at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
+            //RenderingManager.AddToPostDrawQueue(3, drawGui);
         }
 
         #region Action Methods
@@ -523,12 +452,12 @@ namespace ShipManifest
             ShipManifestAddon.FireEventTriggers();
         }
 
-        private bool PartCrewIsFull(Part part)
+        public bool PartCrewIsFull(Part part)
         {
             return !(part.protoModuleCrew.Count < part.CrewCapacity);
         }
 
-        private Part FindPart(ProtoCrewMember kerbal)
+        public Part FindPart(ProtoCrewMember kerbal)
         {
             foreach (Part part in FlightGlobals.ActiveVessel.Parts)
             {
@@ -543,13 +472,13 @@ namespace ShipManifest
             return null;
         }
 
-        private void RemoveCrew(ProtoCrewMember member, Part part)
+        public void RemoveCrew(ProtoCrewMember member, Part part)
         {
             part.RemoveCrewmember(member);
             member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         }
 
-        private void RespawnKerbal(ProtoCrewMember kerbal)
+        public void RespawnKerbal(ProtoCrewMember kerbal)
         {
             kerbal.SetTimeForRespawn(0);
             kerbal.Spawn();
@@ -557,7 +486,7 @@ namespace ShipManifest
             HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
         }
 
-        private KerbalModel CreateKerbal()
+        public KerbalModel CreateKerbal()
         {
             ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
             return new KerbalModel(kerbal, true);
@@ -570,7 +499,7 @@ namespace ShipManifest
             ShipManifestAddon.FireEventTriggers();
         }
 
-        private void FillVesselCrew()
+        public void FillVesselCrew()
         {
             foreach (var part in _partsByResource["Crew"])
             {
@@ -579,7 +508,7 @@ namespace ShipManifest
             ShipManifestAddon.FireEventTriggers();
         }
 
-        private void EmptyVesselCrew()
+        public void EmptyVesselCrew()
         {
             foreach (var part in _partsByResource["Crew"])
             {
@@ -591,7 +520,7 @@ namespace ShipManifest
             }
         }
 
-        private void FillVesselResources()
+        public void FillVesselResources()
         {
             List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
@@ -610,7 +539,7 @@ namespace ShipManifest
             }
         }
 
-        private void EmptyVesselResources()
+        public void EmptyVesselResources()
         {
             List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
@@ -629,7 +558,7 @@ namespace ShipManifest
             }
         }
 
-        private void DumpResource(string resourceName)
+        public void DumpResource(string resourceName)
         {
             foreach (Part part in _partsByResource[resourceName])
             {
@@ -643,7 +572,7 @@ namespace ShipManifest
             }
         }
 
-        private void FillResource(string resourceName)
+        public void FillResource(string resourceName)
         {
             foreach (Part part in _partsByResource[resourceName])
             {
@@ -657,7 +586,7 @@ namespace ShipManifest
             }
         }
 
-        private void DumpPartResource(Part part, string resourceName)
+        public void DumpPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -668,7 +597,7 @@ namespace ShipManifest
             }
         }
 
-        private void FillPartResource(Part part, string resourceName)
+        public void FillPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -700,7 +629,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -733,7 +662,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -780,6 +709,7 @@ namespace ShipManifest
                         step = "Set non selected resource part color";
                         Color partColor = Color.yellow;
 
+                        // match color used by CLS if active
                         if (SelectedResource == "Crew" && Settings.EnableCLS)
                             partColor = Color.green;
 
@@ -801,7 +731,7 @@ namespace ShipManifest
                                 ClearPartHighlight(thispart);
                             }
 
-                        step = "clsVessel.Highlight(false)";
+                        //step = "clsVessel.Highlight(false)";
                         //if (SettingsManager.EnableCLS)
                         //    HighlightCLSVessel(false);
                     }
@@ -817,7 +747,7 @@ namespace ShipManifest
             {
                 if (!ShipManifestAddon.frameErrTripped)
                 {
-                    ManifestUtilities.LogMessage(string.Format(" in UpdateHighlight.  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in UpdateHighlight.  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     ShipManifestAddon.frameErrTripped = true;
                 }
             }
@@ -844,7 +774,7 @@ namespace ShipManifest
         //    {
         //        if (!ShipManifestAddon.frameErrTripped)
         //        {
-        //            ManifestUtilities.LogMessage(string.Format(" in HighlightCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //            Utilities.LogMessage(string.Format(" in HighlightCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         //            ShipManifestAddon.frameErrTripped = true;
         //        }
         //    }

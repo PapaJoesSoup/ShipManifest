@@ -8,28 +8,34 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public partial class ManifestController
+    public static class ManifestWindow
     {
         #region Manifest Window - Gui Layout Code
 
+        public static string ToolTip = "";
+
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
-        private Vector2 ScrollViewerShipManifest = Vector2.zero;
-        private Vector2 ScrollViewerResourceManifest2 = Vector2.zero;
-        private void ShipManifestWindow(int windowId)
+        private static Vector2 ScrollViewerShipManifest = Vector2.zero;
+        private static Vector2 ScrollViewerResourceManifest2 = Vector2.zero;
+        public static void Display(int windowId)
         {
-            if (GUI.Button(new Rect(304, 4, 16, 16), ""))
+            Rect rect = new Rect(304, 4, 16, 16);
+            if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowShipManifest = false;
                 ShipManifestAddon.ToggleToolbar();
+                ToolTip = "";
             }
+            if (Event.current.type == EventType.Repaint)
+                ToolTip = Utilities.SetUpToolTip(rect, Settings.ManifestPosition, GUI.tooltip);
             try
             {
                 GUILayout.BeginVertical();
                 ScrollViewerShipManifest = GUILayout.BeginScrollView(ScrollViewerShipManifest, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (IsPreLaunch)
+                if (ShipManifestAddon.smController.IsPreLaunch)
                 {
                     PreLaunchGUI();
                 }
@@ -40,7 +46,7 @@ namespace ShipManifest
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
 
-                GUILayout.Label(SelectedResource != null ? string.Format("{0}", SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
+                GUILayout.Label(ShipManifestAddon.smController.SelectedResource != null ? string.Format("{0}", ShipManifestAddon.smController.SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
 
                 // Resource Details List Viewer
                 ResourceDetailsViewer();
@@ -56,7 +62,7 @@ namespace ShipManifest
                     }
                     catch (Exception ex)
                     {
-                        ManifestUtilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                        Utilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
 
@@ -69,17 +75,32 @@ namespace ShipManifest
                     }
                     catch (Exception ex)
                     {
-                        ManifestUtilities.LogMessage(string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                        Utilities.LogMessage(string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
 
+                if (!Settings.EnableCLS)
+                    GUI.enabled = false;
+                var hatchesStyle = Settings.ShowHatchWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                if (GUILayout.Button("Hatches...", hatchesStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                {
+                    try
+                    {
+                        Settings.ShowHatchWindow = !Settings.ShowHatchWindow;
+                    }
+                    catch (Exception ex)
+                    {
+                        Utilities.LogMessage(string.Format(" opening Hatches Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    }
+                }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -87,18 +108,18 @@ namespace ShipManifest
 
         #region Ship Manifest Window Gui components
 
-        private void PreLaunchGUI()
+        private static void PreLaunchGUI()
         {
             try
             {
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button(string.Format("Fill Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
-                    FillVesselCrew();
+                    ShipManifestAddon.smController.FillVesselCrew();
                 }
                 if (GUILayout.Button(string.Format("Empty Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
-                    EmptyVesselCrew();
+                    ShipManifestAddon.smController.EmptyVesselCrew();
                 }
                 GUILayout.EndHorizontal();
 
@@ -107,33 +128,33 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
-                        FillVesselResources();
+                        ShipManifestAddon.smController.FillVesselResources();
                     }
                     if (GUILayout.Button(string.Format("Empty Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
-                        EmptyVesselResources();
+                        ShipManifestAddon.smController.EmptyVesselResources();
                     }
                     GUILayout.EndHorizontal();
                 }
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in PreLaunchGUI.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in PreLaunchGUI.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
-        private void ResourceButtonList()
+        private static void ResourceButtonList()
         {
             try
             {
-                foreach (string resourceName in PartsByResource.Keys)
+                foreach (string resourceName in ShipManifestAddon.smController.PartsByResource.Keys)
                 {
                     GUILayout.BeginHorizontal();
                     int width = 265;
-                    if ((!Settings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!Settings.RealismMode || ShipManifestAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
-                    var style = SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                    var style = ShipManifestAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {
                         try
@@ -141,17 +162,17 @@ namespace ShipManifest
                             if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
                             {
                                 // Now let's update our lists...
-                                if (SelectedResource != resourceName)
+                                if (ShipManifestAddon.smController.SelectedResource != resourceName)
                                 {
-                                    SelectedResource = resourceName;
-                                    SelectedPartSource = SelectedPartTarget = null;
+                                    ShipManifestAddon.smController.SelectedResource = resourceName;
+                                    ShipManifestAddon.smController.SelectedPartSource = ShipManifestAddon.smController.SelectedPartTarget = null;
                                 }
-                                else if (SelectedResource == resourceName)
+                                else if (ShipManifestAddon.smController.SelectedResource == resourceName)
                                 {
-                                    SelectedResource = null;
-                                    SelectedPartSource = SelectedPartTarget = null;
+                                    ShipManifestAddon.smController.SelectedResource = null;
+                                    ShipManifestAddon.smController.SelectedPartSource = ShipManifestAddon.smController.SelectedPartTarget = null;
                                 }
-                                if (SelectedResource != null)
+                                if (ShipManifestAddon.smController.SelectedResource != null)
                                 {
                                     Settings.ShowTransferWindow = true;
                                 }
@@ -163,18 +184,18 @@ namespace ShipManifest
                         }
                         catch (Exception ex)
                         {
-                            ManifestUtilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                            Utilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-                    if ((!Settings.RealismMode || IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!Settings.RealismMode || ShipManifestAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
                         if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            DumpResource(resourceName);
+                            ShipManifestAddon.smController.DumpResource(resourceName);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), ManifestStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
                         {
-                            FillResource(resourceName);
+                            ShipManifestAddon.smController.FillResource(resourceName);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -182,39 +203,39 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
-        private void ResourceDetailsViewer()
+        private static void ResourceDetailsViewer()
         {
             try
             {
                 ScrollViewerResourceManifest2 = GUILayout.BeginScrollView(ScrollViewerResourceManifest2, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (SelectedResource != null)
+                if (ShipManifestAddon.smController.SelectedResource != null)
                 {
-                    foreach (Part part in PartsByResource[SelectedResource])
+                    foreach (Part part in ShipManifestAddon.smController.PartsByResource[ShipManifestAddon.smController.SelectedResource])
                     {
                         string resourcename = "";
-                        if (SelectedResource != "Crew" && SelectedResource != "Science")
+                        if (ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
                         {
-                            resourcename = part.Resources[SelectedResource].info.name;
+                            resourcename = part.Resources[ShipManifestAddon.smController.SelectedResource].info.name;
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[SelectedResource].amount.ToString("######0.####"), part.Resources[SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
+                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[ShipManifestAddon.smController.SelectedResource].amount.ToString("######0.####"), part.Resources[ShipManifestAddon.smController.SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
                             GUILayout.EndHorizontal();
                         }
-                        else if (SelectedResource == "Crew")
+                        else if (ShipManifestAddon.smController.SelectedResource == "Crew")
                         {
-                            resourcename = SelectedResource;
+                            resourcename = ShipManifestAddon.smController.SelectedResource;
                             GUILayout.BeginHorizontal();
                             GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265));
                             GUILayout.EndHorizontal();
                         }
-                        else if (SelectedResource == "Science")
+                        else if (ShipManifestAddon.smController.SelectedResource == "Science")
                         {
-                            resourcename = SelectedResource;
+                            resourcename = ShipManifestAddon.smController.SelectedResource;
                             int ScienceCount = 0;
                             foreach (PartModule pm in part.Modules)
                             {
@@ -232,7 +253,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
             GUILayout.EndVertical();
             GUILayout.EndScrollView();

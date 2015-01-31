@@ -8,12 +8,13 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public partial class ManifestController
+    public static class RosterWindow
     {
+        public static string ToolTip = "";
 
-        private bool resetRosterSize = true;
-        private KerbalModel _selectedKerbal;
-        private KerbalModel SelectedKerbal
+        public static bool resetRosterSize = true;
+        private static KerbalModel _selectedKerbal;
+        public static KerbalModel SelectedKerbal
         {
             get { return _selectedKerbal; }
             set
@@ -21,18 +22,22 @@ namespace ShipManifest
                 _selectedKerbal = value;
                 if (_selectedKerbal == null)
                 {
-                    saveMessage = string.Empty;
+                    ShipManifestAddon.smController.saveMessage = string.Empty;
                     resetRosterSize = true;
                 }
             }
         }
-        private Vector2 rosterScrollViewer = Vector2.zero;
-        private void RosterWindow(int windowId)
+        private static Vector2 rosterScrollViewer = Vector2.zero;
+        public static void Display(int windowId)
         {
-            if (GUI.Button(new Rect(396, 4, 16, 16), ""))
+            Rect rect = new Rect(396, 4, 16, 16);
+            if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowRoster = false;
+                ToolTip = "";
             }
+            if (Event.current.type == EventType.Repaint)
+                ToolTip = Utilities.SetUpToolTip(rect, Settings.RosterPosition, GUI.tooltip);
             try
             {
                 GUIStyle style = GUI.skin.button;
@@ -49,9 +54,9 @@ namespace ShipManifest
                     else
                         GUILayout.Label(SelectedKerbal.Name);
 
-                    if (!string.IsNullOrEmpty(saveMessage))
+                    if (!string.IsNullOrEmpty(ShipManifestAddon.smController.saveMessage))
                     {
-                        GUILayout.Label(saveMessage, ManifestStyle.ErrorLabelRedStyle);
+                        GUILayout.Label(ShipManifestAddon.smController.saveMessage, ManifestStyle.ErrorLabelRedStyle);
                     }
 
                     GUILayout.Label("Courage");
@@ -69,8 +74,8 @@ namespace ShipManifest
                     }
                     if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
                     {
-                        saveMessage = SelectedKerbal.SubmitChanges();
-                        if (string.IsNullOrEmpty(saveMessage))
+                        ShipManifestAddon.smController.saveMessage = SelectedKerbal.SubmitChanges();
+                        if (string.IsNullOrEmpty(ShipManifestAddon.smController.saveMessage))
                             SelectedKerbal = null;
                     }
                     GUILayout.EndHorizontal();
@@ -79,7 +84,7 @@ namespace ShipManifest
                 {
                     if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
                     {
-                        SelectedKerbal = CreateKerbal();
+                        SelectedKerbal = ShipManifestAddon.smController.CreateKerbal();
                     }
                 }
 
@@ -88,11 +93,11 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
-        private void RosterListViewer()
+        private static void RosterListViewer()
         {
             try
             {
@@ -147,7 +152,7 @@ namespace ShipManifest
                         }
                     }
 
-                    if (((Settings.RealismMode && IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SelectedPartSource != null && !PartCrewIsFull(SelectedPartSource))
+                    if (((Settings.RealismMode && ShipManifestAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && ShipManifestAddon.smController.SelectedPartSource != null && !ShipManifestAddon.smController.PartCrewIsFull(ShipManifestAddon.smController.SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -157,7 +162,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                         buttonText = "Respawn";
                     }
-                    else if (((Settings.RealismMode && IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                    else if (((Settings.RealismMode && ShipManifestAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
                     {
                         GUI.enabled = true;
                         buttonText = "Remove";
@@ -171,15 +176,15 @@ namespace ShipManifest
                     if (GUILayout.Button(buttonText, GUILayout.Width(60)))
                     {
                         if (buttonText == "Add")
-                            AddCrew(kerbal, SelectedPartSource);
+                            ShipManifestAddon.smController.AddCrew(kerbal, ShipManifestAddon.smController.SelectedPartSource);
                         else if (buttonText == "Respawn")
-                            RespawnKerbal(kerbal);
+                            ShipManifestAddon.smController.RespawnKerbal(kerbal);
                         else if (buttonText == "Remove")
                         {
                             // get part...
-                            Part part = FindPart(kerbal);
+                            Part part = ShipManifestAddon.smController.FindPart(kerbal);
                             if (part != null)
-                                RemoveCrew(kerbal, part);
+                                ShipManifestAddon.smController.RemoveCrew(kerbal, part);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -192,7 +197,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                ManifestUtilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
     }

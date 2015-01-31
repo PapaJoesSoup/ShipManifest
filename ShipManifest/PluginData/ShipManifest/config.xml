@@ -24,7 +24,7 @@
     <ymin>0</ymin>
     <ymax>0</ymax>
   </rect>
-  <rect name="HatchesPosition">
+  <rect name="HatchWindowPosition">
     <xmin>0</xmin>
     <xmax>0</xmax>
     <ymin>0</ymin>
@@ -56,6 +56,11 @@
   <string name="SourcePartColor">red</string>
   <string name="TargetPartColor">green</string>
   <string name="TargetPartCrewColor">blue</string>
+  <string name="HatchColor">cyan</string>
+  <string name="HatchOpenColor">cyan</string>
+  <string name="HatchCloseColor">red</string>
+  <bool name="EnableHighlighting">1</bool>
+  <bool name="OnlySourceTarget">0</bool>
   <bool name="EnableCrew">1</bool>
   <bool name="EnableScience">1</bool>
   <bool name="EnableResources">1</bool>
@@ -69,4 +74,5 @@
   <bool name="EnableTextureReplacer">0</bool>
   <bool name="CLSInstalled">0</bool>
   <bool name="EnableBlizzyToolbar">0</bool>
+  <bool name="ShowToolTips">1</bool>
 </config>

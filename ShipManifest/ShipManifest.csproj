@@ -58,7 +58,8 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="CLSInterfaces">
+    <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -72,6 +73,8 @@
   <ItemGroup>
     <Compile Include="CLSClient.cs" />
     <Compile Include="DebuggerWindow.cs" />
+    <Compile Include="HatchWindow.cs" />
+    <Compile Include="ManifestStyle.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="RosterWindow.cs" />
     <Compile Include="Settings.cs" />

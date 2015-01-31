@@ -8,19 +8,26 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public partial class ShipManifestAddon : MonoBehaviour
+    public class DebuggerWindow
     {
-        private void DebuggerWindow(int windowId)
+        public static string ToolTip = "";
+
+        public static void Display(int windowId)
         {
-            if (GUI.Button(new Rect(496, 4, 16, 16), ""))
+            Rect rect = new Rect(496, 4, 16, 16);
+            if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowDebugger = false;
+                ToolTip = "";
             }
+            if (Event.current.type == EventType.Repaint)
+                ToolTip = Utilities.SetUpToolTip(rect, Settings.DebuggerPosition, GUI.tooltip);
+
             GUILayout.BeginVertical();
-            ManifestUtilities.DebugScrollPosition = GUILayout.BeginScrollView(ManifestUtilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
+            Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
             GUILayout.BeginVertical();
 
-            foreach (string error in ManifestUtilities.Errors)
+            foreach (string error in Utilities.Errors)
                 GUILayout.TextArea(error, GUILayout.Width(460));
 
             GUILayout.EndVertical();
@@ -29,13 +36,13 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Clear log", GUILayout.Height(20)))
             {
-                ManifestUtilities.Errors.Clear();
-                ManifestUtilities.Errors.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString() + " UTC.");
+                Utilities.Errors.Clear();
+                Utilities.Errors.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString() + " UTC.");
             }
             if (GUILayout.Button("Save Log", GUILayout.Height(20)))
             {
                 // Create log file and save.
-                Savelog();
+                ShipManifestAddon.Savelog();
             }
             if (GUILayout.Button("Close", GUILayout.Height(20)))
             {

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    public static class ManifestUtilities
+    public static class Utilities
     {
         public static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
         public static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
@@ -44,95 +44,65 @@ namespace ShipManifest
                 Settings.ShowDebugger = true;
             }
         }
-    }
 
-    public static class ManifestStyle
-    {
-        public static GUIStyle WindowStyle;
-        public static GUIStyle IconStyle;
-        public static GUIStyle ButtonSourceStyle;
-        public static GUIStyle ButtonTargetStyle;
-        public static GUIStyle ButtonToggledSourceStyle;
-        public static GUIStyle ButtonToggledTargetStyle;
-        public static GUIStyle ButtonStyle;
-        public static GUIStyle ButtonToggledStyle;
-        public static GUIStyle ErrorLabelRedStyle;
-        public static GUIStyle LabelStyle;
-        public static GUIStyle LabelStyleRed;
-        public static GUIStyle LabelStyleYellow;
-        public static GUIStyle LabelStyleGreen;
-
-        public static void SetupGUI()
+        public static void ShowToolTips()
         {
-            GUI.skin = HighLogic.Skin;
-            if (WindowStyle == null)
+            if (ShipManifestAddon.toolTip != null && ShipManifestAddon.toolTip.Trim().Length > 0)
             {
-                Settings.LoadColors();
-                SetStyles();
+                LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", ShipManifestAddon.toolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);
+                ShowToolTip(ShipManifestAddon.ToolTipPos, ShipManifestAddon.toolTip);
+            }
+
+            // Obtain the new value from the last repaint.
+            string ToolTip = "";
+            if (TransferWindow.ToolTip != null && TransferWindow.ToolTip.Trim().Length > 0)
+                ToolTip = TransferWindow.ToolTip;
+            if (RosterWindow.ToolTip != null && RosterWindow.ToolTip.Trim().Length > 0)
+                ToolTip = RosterWindow.ToolTip;
+            if (DebuggerWindow.ToolTip != null && DebuggerWindow.ToolTip.Trim().Length > 0)
+                ToolTip = DebuggerWindow.ToolTip;
+            if (ManifestWindow.ToolTip != null && ManifestWindow.ToolTip.Trim().Length > 0)
+                ToolTip = ManifestWindow.ToolTip;
+            if (SettingsWindow.ToolTip != null && SettingsWindow.ToolTip.Trim().Length > 0)
+                ToolTip = SettingsWindow.ToolTip;
+            if (HatchWindow.ToolTip != null && HatchWindow.ToolTip.Trim().Length > 0)
+                ToolTip = HatchWindow.ToolTip;
+
+            // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
+            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with callback)
+            ShipManifestAddon.toolTip = ToolTip;
+        }
+
+        public static void ShowToolTip(Vector2 toolTipPos, string ToolTip)
+        {
+            if (Settings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
+            {
+                Vector2 size = ManifestStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
+                Rect rect = new Rect(toolTipPos.x + 20, toolTipPos.y - 4, size.x, size.y);
+                GUI.Window(0, rect, EmptyWindow, ToolTip, ManifestStyle.ToolTipStyle);
+                GUI.BringWindowToFront(0);
+                //Utilities.LogMessage(string.Format("ShowToolTip: \r\nRectangle data:  {0} \r\nToolTip:  {1}\r\nToolTipPos:  {2}", rect.ToString(), ToolTip, toolTipPos.ToString()), "Info", true);
             }
         }
 
-        public static void SetStyles()
+        public static string SetUpToolTip(Rect rect, Rect WindowPosition, string tooltip, float xOffset = 0, float yOffset = 0)
         {
-            WindowStyle = new GUIStyle(GUI.skin.window);
-            IconStyle = new GUIStyle();
+            // this method assumes that we are in a repaint event...
+            string ToolTip = "";
+            if (rect.Contains(Event.current.mousePosition))
+            {
+                ShipManifestAddon.ToolTipPos = Event.current.mousePosition;
+                ShipManifestAddon.ToolTipPos.x = ShipManifestAddon.ToolTipPos.x + WindowPosition.x + xOffset;
+                ShipManifestAddon.ToolTipPos.y = ShipManifestAddon.ToolTipPos.y + WindowPosition.y + yOffset;
+                ToolTip = tooltip;
+                //Utilities.LogMessage(string.Format("Setup Tooltip - Mouse inside Rect: \r\nRectangle data:  {0} \r\nWindowPosition:  {1}\r\nToolTip:  {2}\r\nToolTip Pos:  {3}", rect.ToString(), WindowPosition.ToString(), ToolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);
+            }
+            else
+                ToolTip = "";
 
-            ButtonStyle = new GUIStyle(GUI.skin.button);
-            ButtonStyle.normal.textColor = Color.white;
-            ButtonStyle.hover.textColor = Color.blue;
-            ButtonStyle.fontSize = 14;
-            ButtonStyle.fontStyle = FontStyle.Normal;
-
-            ButtonToggledStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledStyle.normal.textColor = Color.green;
-            ButtonToggledStyle.fontSize = 14;
-            ButtonToggledStyle.hover.textColor = Color.blue;
-            ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
-            ButtonToggledStyle.fontStyle = FontStyle.Normal;
-
-            ButtonSourceStyle = new GUIStyle(GUI.skin.button);
-            ButtonSourceStyle.normal.textColor = Color.white;
-            ButtonSourceStyle.fontSize = 14;
-            ButtonSourceStyle.hover.textColor = Color.blue;
-            ButtonSourceStyle.fontStyle = FontStyle.Normal;
-            ButtonSourceStyle.alignment = TextAnchor.UpperLeft;
-
-            ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledSourceStyle.normal.textColor = Settings.Colors[Settings.SourcePartColor];
-            ButtonToggledSourceStyle.fontSize = 14;
-            ButtonToggledSourceStyle.hover.textColor = Color.blue;
-            ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
-            ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
-            ButtonToggledSourceStyle.alignment = TextAnchor.UpperLeft;
-
-            ButtonTargetStyle = new GUIStyle(GUI.skin.button);
-            ButtonTargetStyle.normal.textColor = Color.white;
-            ButtonTargetStyle.fontSize = 14;
-            ButtonTargetStyle.hover.textColor = Color.blue;
-            ButtonTargetStyle.fontStyle = FontStyle.Normal;
-            ButtonTargetStyle.alignment = TextAnchor.UpperLeft;
-
-            ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
-            ButtonToggledTargetStyle.fontSize = 14;
-            ButtonToggledTargetStyle.hover.textColor = Color.blue;
-            ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
-            ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
-            ButtonToggledTargetStyle.alignment = TextAnchor.UpperLeft;
-
-            ErrorLabelRedStyle = new GUIStyle(GUI.skin.label);
-            ErrorLabelRedStyle.normal.textColor = Color.red;
-
-            LabelStyle = new GUIStyle(GUI.skin.label);
-
-            LabelStyleRed = new GUIStyle(LabelStyle);
-            LabelStyleRed.normal.textColor = Color.red;
-
-            LabelStyleYellow = new GUIStyle(LabelStyle);
-            LabelStyleYellow.normal.textColor = Color.yellow;
-
-            LabelStyleGreen = new GUIStyle(LabelStyle);
-            LabelStyleGreen.normal.textColor = Color.green;
+            return ToolTip;
         }
+        private static void EmptyWindow(int windowId)
+        { }
     }
 }
