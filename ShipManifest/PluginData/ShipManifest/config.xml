@@ -61,6 +61,7 @@
   <string name="HatchCloseColor">red</string>
   <bool name="EnableHighlighting">1</bool>
   <bool name="OnlySourceTarget">0</bool>
+  <bool name="EnableCLSHighlighting">1</bool>
   <bool name="EnableCrew">1</bool>
   <bool name="EnableScience">1</bool>
   <bool name="EnableResources">1</bool>

@@ -256,18 +256,18 @@ namespace ShipManifest
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
-                // If we have target selected, it is not the same as the source, there is science to xfer, and it is collectable.
+                // If we have target selected, it is not the same as the source, there is science to xfer.
                 if ((ShipManifestAddon.smController.SelectedModuleTarget != null && pm != ShipManifestAddon.smController.SelectedModuleTarget) && scienceCount > 0)
-                {
-                    if ((Settings.RealismMode && isCollectable) || !Settings.RealismMode)
-                    { 
-                        if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                        {
-                            ShipManifestAddon.smController.SelectedModuleSource = pm;
-                            TransferScience(ShipManifestAddon.smController.SelectedModuleSource, ShipManifestAddon.smController.SelectedModuleTarget);
-                            ShipManifestAddon.smController.SelectedModuleSource = null;
-                        }
+                {                    
+                    if (Settings.RealismMode && !isCollectable)
+                        GUI.enabled = false;
+                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    {
+                        ShipManifestAddon.smController.SelectedModuleSource = pm;
+                        TransferScience(ShipManifestAddon.smController.SelectedModuleSource, ShipManifestAddon.smController.SelectedModuleTarget);
+                        ShipManifestAddon.smController.SelectedModuleSource = null;
                     }
+                    GUI.enabled = true;
                 }
                 GUILayout.EndHorizontal();
             }

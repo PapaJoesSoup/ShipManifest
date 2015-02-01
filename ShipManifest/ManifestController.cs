@@ -198,9 +198,9 @@ namespace ShipManifest
             {
                 try
                 {
+                    ClearResourceHighlighting(SelectedResourceParts);
                     _prevSelectedResource = _selectedResource;
                     _selectedResource = value;
-                    ClearResourceHighlighting(SelectedResourceParts);
 
                     if (value == null)
                         SelectedResourceParts = new List<Part>();
@@ -645,6 +645,8 @@ namespace ShipManifest
                 {
                     ClearPartHighlight(part);
                 }
+                if (Settings.EnableCLS && Settings.EnableCLSHighlighting && ShipManifestAddon.clsVessel != null)
+                    ShipManifestAddon.clsVessel.Highlight(false);
             }
         }
 
@@ -677,24 +679,20 @@ namespace ShipManifest
                     step = "Showhipmanifest = true";
                     if (ShipManifestAddon.CanShowShipManifest())
                     {
-                        //if (Settings.EnableCLS && ShipManifestAddon.clsVessel != null)
-                        //{
-                        //    if (SelectedResource == "Crew")
-                        //    {
-                        //        step = "Highlight CLS vessel";
-                        //        HighlightCLSVessel(true);
+                        if (Settings.EnableCLS && Settings.EnableCLSHighlighting && ShipManifestAddon.clsVessel != null)
+                        {
+                            if (SelectedResource == "Crew")
+                            {
+                                step = "Highlight CLS vessel";
+                                HighlightCLSVessel(true);
 
-                        //        // Turn off the source and target cls highlighting.  We are going to replace it.
-                        //        if (clsPartSource != null)
-                        //            clsPartSource.Highlight(false);
-                        //        if (clsPartTarget != null)
-                        //            clsPartTarget.Highlight(false);
-                        //    }
-                        //    else
-                        //    {
-                        //        HighlightCLSVessel(false);
-                        //    }
-                        //}
+                                // Turn off the source and target cls highlighting.  We are going to replace it.
+                                if (clsPartSource != null)
+                                    clsPartSource.Highlight(false, true);
+                                if (clsPartTarget != null)
+                                    clsPartTarget.Highlight(false, true);
+                            }
+                        }
 
                         step = "Set Selected Part Colors";
                         if (SelectedPartSource != null)
@@ -730,17 +728,7 @@ namespace ShipManifest
                             {
                                 ClearPartHighlight(thispart);
                             }
-
-                        //step = "clsVessel.Highlight(false)";
-                        //if (SettingsManager.EnableCLS)
-                        //    HighlightCLSVessel(false);
                     }
-                }
-                else 
-                {
-                    step = "clsVessel.Highlight(false)";
-                    //if (SettingsManager.EnableCLS)
-                    //    HighlightCLSVessel(false);
                 }
             }
             catch (Exception ex)
@@ -753,32 +741,32 @@ namespace ShipManifest
             }
         }
 
-        //public void HighlightCLSVessel(bool enabled)
-        //{
-        //    try 
-        //    { 
-        //        if (ShipManifestAddon.clsVessel == null) 
-        //            ShipManifestAddon.GetCLSVessel();
-        //        if (ShipManifestAddon.clsVessel != null)
-        //        {
-        //            foreach (ICLSSpace Space in ShipManifestAddon.clsVessel.Spaces)
-        //            {
-        //                foreach (ICLSPart part in Space.Parts)
-        //                {
-        //                    part.Highlight(enabled);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (!ShipManifestAddon.frameErrTripped)
-        //        {
-        //            Utilities.LogMessage(string.Format(" in HighlightCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-        //            ShipManifestAddon.frameErrTripped = true;
-        //        }
-        //    }
-        //}
+        public void HighlightCLSVessel(bool enabled, bool force = false)
+        {
+            try
+            {
+                if (ShipManifestAddon.clsVessel == null)
+                    ShipManifestAddon.GetCLSVessel();
+                if (ShipManifestAddon.clsVessel != null)
+                {
+                    foreach (ICLSSpace Space in ShipManifestAddon.clsVessel.Spaces)
+                    {
+                        foreach (ICLSPart part in Space.Parts)
+                        {
+                            part.Highlight(enabled, force);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!ShipManifestAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in HighlightCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    ShipManifestAddon.frameErrTripped = true;
+                }
+            }
+        }
         #endregion
     }
 }

@@ -88,6 +88,8 @@ namespace ShipManifest
         public static bool prevEnableHighlighting = true;
         public static bool OnlySourceTarget = false;
         public static bool prevOnlySourceTarget = false;
+        public static bool EnableCLSHighlighting = true;
+        public static bool prevEnableCLSHighlighting = true;
         public static bool EnableScience = true;
         public static bool EnableResources = true;
         public static bool EnableCrew = true;
@@ -191,6 +193,7 @@ namespace ShipManifest
 
                 EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting");
                 OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget");
+                EnableCLSHighlighting = configfile.GetValue<bool>("EnableCLSHighlighting");
                 EnableCrew = configfile.GetValue<bool>("EnableCrew");
                 EnableScience = configfile.GetValue<bool>("EnableScience");
                 EnableResources = configfile.GetValue<bool>("EnableResources");
@@ -269,6 +272,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("EnableCLSHighlighting Loaded: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableResources Loaded: {0}", EnableResources), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
@@ -366,6 +370,7 @@ namespace ShipManifest
 
                 configfile.SetValue("EnableHighlighting", EnableHighlighting);
                 configfile.SetValue("OnlySourceTarget", OnlySourceTarget);
+                configfile.SetValue("EnableCLSHighlighting", EnableCLSHighlighting);
                 configfile.SetValue("EnableCrew", EnableCrew);
                 configfile.SetValue("EnableScience", EnableScience);
                 configfile.SetValue("EnableResources", EnableResources);
@@ -414,6 +419,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("HatchCloseColor Saved: {0}", HatchCloseColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("OnlySourceTarget Saved: {0}", OnlySourceTarget), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("EnableCLSHighlighting Saved: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
@@ -468,6 +474,7 @@ namespace ShipManifest
             prevEnableScience = EnableScience;
             prevEnableHighlighting = EnableHighlighting;
             prevOnlySourceTarget = OnlySourceTarget;
+            prevEnableCLSHighlighting = EnableCLSHighlighting;
             prevEnableCrew = EnableCrew;
             prevEnablePFResources = EnablePFResources;
             prevEnableCLS = EnableCLS;
@@ -500,6 +507,7 @@ namespace ShipManifest
             EnableScience = prevEnableScience;
             EnableHighlighting = prevEnableHighlighting;
             OnlySourceTarget = prevOnlySourceTarget;
+            EnableCLSHighlighting = prevEnableCLSHighlighting;
             EnableCrew = prevEnableCrew;
             EnablePFResources = prevEnablePFResources;
             EnableCLS = prevEnableCLS;

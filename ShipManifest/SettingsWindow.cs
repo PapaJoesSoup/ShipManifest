@@ -49,29 +49,6 @@ namespace ShipManifest
             label = "Enable Realism Mode";
             Settings.RealismMode = GUILayout.Toggle(Settings.RealismMode, label, GUILayout.Width(300));
 
-            // EnableHighlighting Mode
-            GUI.enabled = isEnabled;
-            GUILayout.BeginHorizontal();
-            label = "Enable Highlighting";
-            Settings.EnableHighlighting = GUILayout.Toggle(Settings.EnableHighlighting, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            // OnlySourceTarget Mode
-            GUI.enabled = isEnabled;
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            if (!Settings.EnableHighlighting)
-                GUI.enabled = false;
-            else
-                GUI.enabled = isEnabled;
-            label = "Highlight Only Source / Target Parts";
-            Settings.OnlySourceTarget = GUILayout.Toggle(Settings.OnlySourceTarget, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-
-            // Enable Tool Tips
-            label = "Enable Tool Tips";
-            Settings.ShowToolTips = GUILayout.Toggle(Settings.ShowToolTips, label, GUILayout.Width(300));
-
             // EnableCrew Mode
             GUI.enabled = isEnabled;
             GUILayout.BeginHorizontal();
@@ -88,6 +65,7 @@ namespace ShipManifest
                     Settings.ShowTransferWindow = false;
                 }
             }
+
             // EnableCLS Mode
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
@@ -163,12 +141,53 @@ namespace ShipManifest
             label = "Lock Settings  (If set ON, disable in config file)";
             Settings.LockSettings = GUILayout.Toggle(Settings.LockSettings, label, GUILayout.Width(300));
 
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
+            GUILayout.Label("Highlighting & ToolTips", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+            // EnableHighlighting Mode
+            GUI.enabled = true;
+            GUILayout.BeginHorizontal();
+            label = "Enable Highlighting";
+            Settings.EnableHighlighting = GUILayout.Toggle(Settings.EnableHighlighting, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            // OnlySourceTarget Mode
+            GUI.enabled = true;
+            if (!Settings.EnableHighlighting)
+                GUI.enabled = false;
+            else
+                GUI.enabled = true;
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            label = "Highlight Only Source / Target Parts";
+            Settings.OnlySourceTarget = GUILayout.Toggle(Settings.OnlySourceTarget, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+
+            if (!Settings.EnableHighlighting || !Settings.EnableCLS)
+                GUI.enabled = false;
+            else
+                GUI.enabled = true;
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            label = "Enable CLS Highlighting";
+            Settings.EnableCLSHighlighting = GUILayout.Toggle(Settings.EnableCLSHighlighting, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            if (!Settings.EnableCLSHighlighting && Settings.prevEnableCLSHighlighting && Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                ShipManifestAddon.smController.HighlightCLSVessel(false);
+
+            // Enable Tool Tips
+            GUI.enabled = true;
+            label = "Enable Tool Tips";
+            Settings.ShowToolTips = GUILayout.Toggle(Settings.ShowToolTips, label, GUILayout.Width(300));
+
             GUI.enabled = true;
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             GUILayout.Label("Sounds", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
             GUILayout.Label("Transfer Pump:", GUILayout.Height(20));
+
             // Pump Start Sound
             GUILayout.BeginHorizontal();
             GUILayout.Label("Pump Starting: ", GUILayout.Width(100));
