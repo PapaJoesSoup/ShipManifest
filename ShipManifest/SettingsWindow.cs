@@ -77,24 +77,11 @@ namespace ShipManifest
             Settings.EnableCLS = GUILayout.Toggle(Settings.EnableCLS, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
 
-            if (!Settings.EnableCLS && Settings.prevEnableCLS)
+            if (Settings.EnableCLS != Settings.prevEnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew")
             {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                {
-                    //Reassign the resource to observe new settings.
-                    ShipManifestAddon.smController.SelectedResource = "Crew";
-                }
-            }
-            else if (Settings.EnableCLS && !Settings.prevEnableCLS)
-            {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                {
-                    //Refresh the clsVessel if needed.
-                    ShipManifestAddon.smController.UpdateCLSSpaces();
-
-                    //Reassign the resource to observe new settings.
-                    ShipManifestAddon.smController.SelectedResource = "Crew";
-                }
+                // Update spaces and reassign the resource to observe new settings.
+                ShipManifestAddon.smController.UpdateCLSSpaces();
+                ShipManifestAddon.smController.SelectedResource = "Crew";
             }
 
             // EnableScience Mode
@@ -106,11 +93,9 @@ namespace ShipManifest
 
             if (!Settings.EnableScience)
             {
+                // Clear Resource selection.
                 if (ShipManifestAddon.smController.SelectedResource == "Science")
-                {
-                    // Clear Resource selection.
                     ShipManifestAddon.smController.SelectedResource = null;
-                }
             }
 
             // EnableResources Mode
@@ -122,11 +107,9 @@ namespace ShipManifest
 
             if (!Settings.EnableResources)
             {
+                // Clear Resource selection.
                 if (ShipManifestAddon.smController.SelectedResource == "Resources")
-                {
-                    // Clear Resource selection.
                     ShipManifestAddon.smController.SelectedResource = null;
-                }
             }
 
             // EnablePFResources Mode
@@ -175,10 +158,8 @@ namespace ShipManifest
             GUILayout.EndHorizontal();
             if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
             {
-                if (!Settings.EnableCLSHighlighting && Settings.prevEnableCLSHighlighting)
-                    ShipManifestAddon.smController.HighlightCLSVessel(false);
-                if (Settings.EnableCLSHighlighting && !Settings.prevEnableCLSHighlighting)
-                    ShipManifestAddon.smController.HighlightCLSVessel(true);
+                if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
+                    ShipManifestAddon.smController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
 
             // Enable Tool Tips

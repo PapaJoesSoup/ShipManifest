@@ -8,7 +8,7 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public partial class ManifestController
+    public class ManifestController
     {
         #region Singleton stuff
 
@@ -55,10 +55,7 @@ namespace ShipManifest
 
         public bool IsPreLaunch
         {
-            get
-            {
-                return Vessel.landedAt == "LaunchPad" || Vessel.landedAt == "Runway";
-            }
+            get { return Vessel.landedAt == "LaunchPad" || Vessel.landedAt == "Runway"; }
         }
 
         public bool CanDrawButton = false;

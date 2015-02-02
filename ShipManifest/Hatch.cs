@@ -12,71 +12,41 @@ namespace ShipManifest
         private PartModule _hatchModule;
         public PartModule HatchModule
         {
-            get
-            {
-                return _hatchModule;
-            }
-            set
-            {
-                _hatchModule = value;
-            }
+            get { return _hatchModule; }
+            set { _hatchModule = value; }
         }
 
         private ICLSPart _clsPart;
         public ICLSPart CLSPart
         {
-            get
-            {
-                return _clsPart;
-            }
-            set
-            {
-                _clsPart = value;
-            }
+            get { return _clsPart; }
+            set { _clsPart = value; }
         }
 
         public bool HatchOpen
         {
-            get
-            {
-                return iModule.HatchOpen;
-            }
-            set
-            {
-                iModule.HatchOpen = value;
-            }
+            get { return iModule.HatchOpen; }
+            set { iModule.HatchOpen = value; }
         }
 
         public string HatchStatus
         {
-            get
-            {
-                return iModule.HatchStatus;
-            }
+            get { return iModule.HatchStatus; }
         }
 
         public bool IsDocked
         {
-            get
-            {
-                return iModule.IsDocked;
-            }
+            get { return iModule.IsDocked; }
         }
 
         public string Title
         {
-            get
-            {
-                return iModule.ModDockNode.part.parent.partInfo.title;
-            }
+            get { return iModule.ModDockNode.part.parent.partInfo.title; }
         }
 
         private IModuleDockingHatch iModule
         {
-            get
-            {
-                return (IModuleDockingHatch)this.HatchModule;
-            }
+            get { return (IModuleDockingHatch)this.HatchModule; }
         }
 
         public Hatch() { }
@@ -123,7 +93,6 @@ namespace ShipManifest
                     {
                         iModule.ModDockNode.part.SetHighlight(false, false);
                         iModule.ModDockNode.part.SetHighlightDefault();
-                        //Utilities.LogMessage("actual Default Color=" + iModule.ModDockNode.part.highlightColor.ToString(), "Info", true);
                         iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
                     }
                 }
