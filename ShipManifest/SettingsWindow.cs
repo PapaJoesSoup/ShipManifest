@@ -159,7 +159,7 @@ namespace ShipManifest
             if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
             {
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
-                    ShipManifestAddon.smController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
+                    ManifestController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
 
             // Enable Tool Tips

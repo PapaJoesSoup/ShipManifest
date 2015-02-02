@@ -422,7 +422,7 @@ namespace ShipManifest
 
         #region Action Methods
 
-        public void AddCrew(int count, Part part)
+        private void AddCrew(int count, Part part)
         {
             if (IsPreLaunch && !PartCrewIsFull(part))
             {
@@ -437,7 +437,7 @@ namespace ShipManifest
             }
         }
 
-        public void AddCrew(ProtoCrewMember kerbal, Part part)
+        public static void AddCrew(ProtoCrewMember kerbal, Part part)
         {
             part.AddCrewmember(kerbal);
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
@@ -449,7 +449,7 @@ namespace ShipManifest
             ShipManifestAddon.FireEventTriggers();
         }
 
-        public bool PartCrewIsFull(Part part)
+        public static bool PartCrewIsFull(Part part)
         {
             return !(part.protoModuleCrew.Count < part.CrewCapacity);
         }
@@ -469,13 +469,13 @@ namespace ShipManifest
             return null;
         }
 
-        public void RemoveCrew(ProtoCrewMember member, Part part)
+        public static void RemoveCrew(ProtoCrewMember member, Part part)
         {
             part.RemoveCrewmember(member);
             member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         }
 
-        public void RespawnKerbal(ProtoCrewMember kerbal)
+        public static void RespawnKerbal(ProtoCrewMember kerbal)
         {
             kerbal.SetTimeForRespawn(0);
             kerbal.Spawn();
@@ -492,7 +492,6 @@ namespace ShipManifest
         public void RespawnCrew()
         {
             this.Vessel.SpawnCrew();
-            // Add Extraplanetary LaunchPad support.   This is actually the event I was searching for back at the beginning.. yay!
             ShipManifestAddon.FireEventTriggers();
         }
 
@@ -583,7 +582,7 @@ namespace ShipManifest
             }
         }
 
-        public void DumpPartResource(Part part, string resourceName)
+        public static void DumpPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -594,7 +593,7 @@ namespace ShipManifest
             }
         }
 
-        public void FillPartResource(Part part, string resourceName)
+        public static void FillPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -738,7 +737,7 @@ namespace ShipManifest
             }
         }
 
-        public void HighlightCLSVessel(bool enabled, bool force = false)
+        public static void HighlightCLSVessel(bool enabled, bool force = false)
         {
             try
             {

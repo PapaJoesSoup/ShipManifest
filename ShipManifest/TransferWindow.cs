@@ -136,11 +136,11 @@ namespace ShipManifest
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            ManifestController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            ManifestController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -420,11 +420,11 @@ namespace ShipManifest
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            ManifestController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            ManifestController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -717,8 +717,8 @@ namespace ShipManifest
                         ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
 
                         // Remove the crew members from the part(s)...
-                        ShipManifestAddon.smController.RemoveCrew(sourceMember, sourcePart);
-                        ShipManifestAddon.smController.RemoveCrew(targetMember, targetPart);
+                        ManifestController.RemoveCrew(sourceMember, sourcePart);
+                        ManifestController.RemoveCrew(targetMember, targetPart);
 
                         // At this point, the kerbals are in the "ether".
                         // this may be why there is an issue with refreshing the internal view.. 
@@ -740,7 +740,7 @@ namespace ShipManifest
                     else
                     {
                         // Just move.
-                        ShipManifestAddon.smController.RemoveCrew(sourceMember, sourcePart);
+                        ManifestController.RemoveCrew(sourceMember, sourcePart);
                         ShipManifestAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
 
                         if (Settings.EnableTextureReplacer)
@@ -761,8 +761,8 @@ namespace ShipManifest
                 else
                 {
                     // no portraits, so let's just move kerbals...
-                    ShipManifestAddon.smController.RemoveCrew(sourceMember, sourcePart);
-                    ShipManifestAddon.smController.AddCrew(sourceMember, targetPart);
+                    ManifestController.RemoveCrew(sourceMember, sourcePart);
+                    ManifestController.AddCrew(sourceMember, targetPart);
                     ShipManifestAddon.crewXfer = true;
                 }
             }

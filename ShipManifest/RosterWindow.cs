@@ -157,7 +157,7 @@ namespace ShipManifest
                         }
                     }
 
-                    if (((Settings.RealismMode && ShipManifestAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && ShipManifestAddon.smController.SelectedPartSource != null && !ShipManifestAddon.smController.PartCrewIsFull(ShipManifestAddon.smController.SelectedPartSource))
+                    if (((Settings.RealismMode && ShipManifestAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && ShipManifestAddon.smController.SelectedPartSource != null && !ManifestController.PartCrewIsFull(ShipManifestAddon.smController.SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -181,15 +181,15 @@ namespace ShipManifest
                     if (GUILayout.Button(buttonText, GUILayout.Width(60)))
                     {
                         if (buttonText == "Add")
-                            ShipManifestAddon.smController.AddCrew(kerbal, ShipManifestAddon.smController.SelectedPartSource);
+                            ManifestController.AddCrew(kerbal, ShipManifestAddon.smController.SelectedPartSource);
                         else if (buttonText == "Respawn")
-                            ShipManifestAddon.smController.RespawnKerbal(kerbal);
+                            ManifestController.RespawnKerbal(kerbal);
                         else if (buttonText == "Remove")
                         {
                             // get part...
                             Part part = ShipManifestAddon.smController.FindPart(kerbal);
                             if (part != null)
-                                ShipManifestAddon.smController.RemoveCrew(kerbal, part);
+                                ManifestController.RemoveCrew(kerbal, part);
                         }
                     }
                     GUILayout.EndHorizontal();
