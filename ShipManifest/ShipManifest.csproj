@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="CLSClient.cs" />
     <Compile Include="DebuggerWindow.cs" />
+    <Compile Include="Hatch.cs" />
     <Compile Include="HatchWindow.cs" />
     <Compile Include="ManifestStyle.cs" />
     <Compile Include="Models.cs" />

@@ -173,8 +173,13 @@ namespace ShipManifest
             label = "Enable CLS Highlighting";
             Settings.EnableCLSHighlighting = GUILayout.Toggle(Settings.EnableCLSHighlighting, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            if (!Settings.EnableCLSHighlighting && Settings.prevEnableCLSHighlighting && Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
-                ShipManifestAddon.smController.HighlightCLSVessel(false);
+            if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+            {
+                if (!Settings.EnableCLSHighlighting && Settings.prevEnableCLSHighlighting)
+                    ShipManifestAddon.smController.HighlightCLSVessel(false);
+                if (Settings.EnableCLSHighlighting && !Settings.prevEnableCLSHighlighting)
+                    ShipManifestAddon.smController.HighlightCLSVessel(true);
+            }
 
             // Enable Tool Tips
             GUI.enabled = true;
