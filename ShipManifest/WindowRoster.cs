@@ -56,7 +56,7 @@ namespace ShipManifest
                     if (SelectedKerbal.IsNew)
                         SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
                     else
-                        GUILayout.Label(SelectedKerbal.Name);
+                        GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
 
                     if (!string.IsNullOrEmpty(SMAddon.smController.saveMessage))
                     {
@@ -137,7 +137,7 @@ namespace ShipManifest
                     }
                     else
                     {
-                        // Lets show what their status is instead of their vessel assignment...
+                        // Since the kerbal has no vessel assignment, lets show what their status is instead...
                         vesselName = "\r\n  -  " + kerbal.rosterStatus;
                     }
                     GUILayout.BeginHorizontal();
@@ -154,7 +154,7 @@ namespace ShipManifest
                     if (GUI.enabled)
                         buttonToolTip = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit this Kerbal's characteristics" : "Cancel any changes to this Kerbal";
                     else
-                        buttonToolTip = "Kerbal is assigned to another vessel.  Editing is disabled";
+                        buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
 
                     if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60)))
                     {
@@ -175,25 +175,37 @@ namespace ShipManifest
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
-                        buttonToolTip = "Adds a kerbal to the active vessel, in the first available seat.";
+                        buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
                     }
                     else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                     {
                         GUI.enabled = true;
                         buttonText = "Respawn";
-                        buttonToolTip = "Brings a Kerbal back to life.  Will then become available.";
+                        buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
                     }
                     else if (((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
                     {
                         GUI.enabled = true;
                         buttonText = "Remove";
-                        buttonToolTip = "Removes a Kerbal from the active vessel.  Will then become available.";
+                        buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+                    }
+                    else if (((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource == null)
+                    {
+                        GUI.enabled = false;
+                        buttonText = "Add";
+                        buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
+                    }
+                    else if ((Settings.RealismMode && !SMAddon.smController.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                    {
+                        GUI.enabled = false;
+                        buttonText = "Add";
+                        buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
                     }
                     else
                     {
                         GUI.enabled = false;
                         buttonText = "--";
-                            buttonToolTip = "Kerbal is assigned or available and current settings do not allow any secondary action.";
+                            buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
                     }
 
                     if (GUILayout.Button(new GUIContent(buttonText,buttonToolTip), GUILayout.Width(60)))

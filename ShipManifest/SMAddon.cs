@@ -170,6 +170,8 @@ namespace ShipManifest
         {
             try
             {
+                CheckForToolbarToggle();
+
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
@@ -203,7 +205,6 @@ namespace ShipManifest
                 }
             }
         }
-
 
         void DummyVoid() { }
 
@@ -484,6 +485,41 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOff.  " + ex.ToString(), "Error", true);
+            }
+        }
+        private void CheckForToolbarToggle()
+        {
+            if (Settings.EnableBlizzyToolbar && !Settings.prevEnableBlizzyToolbar)
+            {
+                // Let't try to use Blizzy's toolbar
+                Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
+                if (!EnableBlizzyToolBar())
+                {
+                    // We failed to activate the toolbar, so revert to stock
+                    GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                    GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+
+                    Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                    Settings.EnableBlizzyToolbar = Settings.prevEnableBlizzyToolbar;
+                }
+                else
+                {
+                    OnGUIAppLauncherDestroyed();
+                    GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
+                    GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGUIAppLauncherDestroyed);
+                    Settings.prevEnableBlizzyToolbar = Settings.EnableBlizzyToolbar;
+                }
+
+            }
+            else if (!Settings.EnableBlizzyToolbar && Settings.prevEnableBlizzyToolbar)
+            {
+                // Use stock Toolbar
+                Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                ShipManifestButton_Blizzy.Visible = false;
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                OnGUIAppLauncherReady();
+                Settings.prevEnableBlizzyToolbar = Settings.EnableBlizzyToolbar;
             }
         }
 

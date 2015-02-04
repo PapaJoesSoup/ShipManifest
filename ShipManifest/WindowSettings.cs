@@ -256,14 +256,31 @@ namespace ShipManifest
             GUILayout.Label("Configuraton", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
-            label = "Enable SM Debug Window On Error";
-            Settings.AutoDebug = GUILayout.Toggle(Settings.AutoDebug, label, GUILayout.Width(300));
+            if (!ToolbarManager.ToolbarAvailable)
+            {
+                if (Settings.EnableBlizzyToolbar)
+                    Settings.EnableBlizzyToolbar = false;
+                GUI.enabled = false;
+            }
+            else
+                GUI.enabled = true;
+
+            label = "Enable Blizzy Toolbar (Replaces Stock Toolbar)";
+            Settings.EnableBlizzyToolbar = GUILayout.Toggle(Settings.EnableBlizzyToolbar, label, GUILayout.Width(300));
+
+            GUI.enabled = true;
+            // TextureReplacer Mode
+            label = "Enable Texture Replacer Events";
+            Settings.EnableTextureReplacer = GUILayout.Toggle(Settings.EnableTextureReplacer, label, GUILayout.Width(300));
 
             label = "Enable Debug Window";
             Settings.ShowDebugger = GUILayout.Toggle(Settings.ShowDebugger, label, GUILayout.Width(300));
 
             label = "Enable Verbose Logging";
             Settings.VerboseLogging = GUILayout.Toggle(Settings.VerboseLogging, label, GUILayout.Width(300));
+
+            label = "Enable SM Debug Window On Error";
+            Settings.AutoDebug = GUILayout.Toggle(Settings.AutoDebug, label, GUILayout.Width(300));
 
             label = "Save Error log on Exit";
             Settings.SaveLogOnExit = GUILayout.Toggle(Settings.SaveLogOnExit, label, GUILayout.Width(300));
@@ -275,23 +292,6 @@ namespace ShipManifest
             GUILayout.Label("(lines)", GUILayout.Width(50));
             GUILayout.EndHorizontal();
 
-            // TextureReplacer Mode
-            label = "Enable Texture Replacer Events";
-            Settings.EnableTextureReplacer = GUILayout.Toggle(Settings.EnableTextureReplacer, label, GUILayout.Width(300));
-
-            if (!ToolbarManager.ToolbarAvailable)
-            {
-                if (Settings.EnableBlizzyToolbar)
-                    Settings.EnableBlizzyToolbar = false;
-                GUI.enabled = false;
-            }
-            else
-                GUI.enabled = isEnabled;
-
-            label = "Enable Blizzy Toolbar (requires game restart)";
-            Settings.EnableBlizzyToolbar = GUILayout.Toggle(Settings.EnableBlizzyToolbar, label, GUILayout.Width(300));
-
-            GUI.enabled = isEnabled;
             label = "Enable AutoSave Settings";
             Settings.AutoSave = GUILayout.Toggle(Settings.AutoSave, label, GUILayout.Width(300));
 
