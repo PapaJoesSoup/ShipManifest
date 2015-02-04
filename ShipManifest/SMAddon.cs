@@ -473,12 +473,14 @@ namespace ShipManifest
         }
         private void OnAppLaunchToggleOff()
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnAppLaunchToggleOff");
             try
             {
                 if (shouldToggle())
                 {
                     Settings.ShowShipManifest = false;
+                    Settings.ShowShipManifest = false;
+                    SMAddon.smController.SelectedResource = null;
+                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                     ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_38" : "ShipManifest/Plugins/IconOff_38", false));
                 }
             }
@@ -532,6 +534,11 @@ namespace ShipManifest
             bool results = false;
             try
             {
+                if (SMAddon.crewXfer || SMAddon.XferOn)
+                {
+                    WindowTransfer.xferToolTip = "Transfer in progress.  Xfers disabled.";
+                    return results;
+                }
                 if (SelectedPart == smController.SelectedPartSource)
                 {
                     // Source to target
@@ -556,9 +563,10 @@ namespace ShipManifest
             {
                 Utilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
+            if (WindowTransfer.xferToolTip == "")
+                WindowTransfer.xferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
             return results;
         }
-
         public static bool shouldToggle()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.shouldToggle");
@@ -573,8 +581,17 @@ namespace ShipManifest
             bool results = false;
             try
             {
-                if (smController.SelectedPartSource == null || smController.SelectedPartTarget == null) 
+                if (smController.SelectedPartSource == null || smController.SelectedPartTarget == null)
+                {
+                    WindowTransfer.xferToolTip = "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
                     return false;
+                }
+                if (smController.SelectedPartSource == smController.SelectedPartTarget)
+                {
+                    WindowTransfer.xferToolTip = "Source and Target Part are the same.\r\nyou may Transfer, or use Move Kerbal to the left instead.";
+                    return true;
+                }
+                    
                 if (Settings.EnableCLS && Settings.RealismMode)
                 {
                     if (clsVessel != null)
@@ -582,12 +599,22 @@ namespace ShipManifest
                         if (smController.clsSpaceSource != null && smController.clsSpaceTarget != null)
                         {
                             if (smController.clsSpaceSource == smController.clsSpaceTarget)
+                            {
+                                WindowTransfer.xferToolTip = "Source & Target Part are in the same space.\r\nInternal Xfers are allowed.";
                                 results = true;
+                            }
+                            else
+                                WindowTransfer.xferToolTip = "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
                         }
+                        else
+                            WindowTransfer.xferToolTip = "Either the Source or Target Part is not selected.\r\nPlease Select a Source AND Target part.";
                     }
+                    else
+                        WindowTransfer.xferToolTip = "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
                 }
                 else
                 {
+                    WindowTransfer.xferToolTip = "Realism or CLS are disabled.\r\nXfers anywhere are Allowed.";
                     results = true;
                 }
             }

@@ -28,6 +28,8 @@ namespace ShipManifest
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowShipManifest = false;
+                SMAddon.smController.SelectedResource = null;
+                SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                 SMAddon.ToggleToolbar();
                 ToolTip = "";
             }

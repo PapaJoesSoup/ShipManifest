@@ -621,15 +621,18 @@ namespace ShipManifest
                             }
                         }
                     }
-                    else
-                    {
-                        step = "ShowShipManifest = false";
-                        if (SelectedResourceParts != null)
-                            foreach (Part thispart in SelectedResourceParts)
-                            {
-                                ClearPartHighlight(thispart);
-                            }
-                    }
+                    //else
+                    //{
+                    //    step = "ShowShipManifest = false";
+                    //    if (SelectedResourceParts != null)
+                    //    {
+                    //        foreach (Part thispart in SelectedResourceParts)
+                    //        {
+                    //            ClearPartHighlight(thispart);
+                    //        }
+                    //        SelectedResource = null;
+                    //    }
+                    //}
                 }
             }
             catch (Exception ex)

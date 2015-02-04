@@ -13,6 +13,7 @@ namespace ShipManifest
 
         public static string ToolTip = "";
         public static bool ToolTipActive = false;
+        public static string xferToolTip = "";
 
         #endregion
 
@@ -219,13 +220,20 @@ namespace ShipManifest
                 {
                     if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
-
-                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                    {
-                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
-                    }
-                    GUI.enabled = true;
                 }
+                else
+                    GUI.enabled = false;
+
+                if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                {
+                    TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
+                }
+                if (Event.current.type == EventType.Repaint)
+                {
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetScrollViewerTransfer2.y);
+                }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
         }
@@ -480,8 +488,6 @@ namespace ShipManifest
                     }
                     if (Event.current.type == EventType.Repaint)
                     {
-                        // Since we are using GUILayout, the curent mouse position returns a position with reference to the Target Details viewer. 
-                        // Add the height and width of GUI elements already drawn to the x & y offsets to get the correct screen position
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetScrollViewerTransfer2.y);
                     }
@@ -492,14 +498,20 @@ namespace ShipManifest
                 {
                     if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
-
-                    // set the conditions for a button style change.
-                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                    {
-                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
-                    }
-                    GUI.enabled = true;
                 }
+                else
+                    GUI.enabled = false;
+
+                if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                {
+                    TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
+                }
+                if (Event.current.type == EventType.Repaint)
+                {
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetScrollViewerTransfer2.y);
+                }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
             }
         }
