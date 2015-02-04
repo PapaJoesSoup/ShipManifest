@@ -7,24 +7,28 @@ using KSP.IO;
 
 namespace ShipManifest
 {
-    public static class SettingsWindow
+    public static class WindowSettings
     {
         #region Settings Window (GUI)
 
         public static string ToolTip = "";
+        public static bool ToolTipActive = false;
 
         private static Vector2 ScrollViewerSettings = Vector2.zero;
         public static void Display(int windowId)
         {
+            // Reset Tooltip active flag...
+            ToolTipActive = false;
+
             Rect rect = new Rect(371, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowSettings = false;
-                ShipManifestAddon.ToggleToolbar();
+                SMAddon.ToggleToolbar();
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint)
-                ToolTip = Utilities.SetUpToolTip(rect, Settings.SettingsPosition, GUI.tooltip);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             // Store settings in case we cancel later...
             Settings.StoreTempSettings();
@@ -58,10 +62,10 @@ namespace ShipManifest
 
             if (!Settings.EnableCrew)
             {
-                if (ShipManifestAddon.smController.SelectedResource == "Crew")
+                if (SMAddon.smController.SelectedResource == "Crew")
                 {
                     // Clear Resource selection.
-                    ShipManifestAddon.smController.SelectedResource = null;
+                    SMAddon.smController.SelectedResource = null;
                     Settings.ShowTransferWindow = false;
                 }
             }
@@ -77,11 +81,16 @@ namespace ShipManifest
             Settings.EnableCLS = GUILayout.Toggle(Settings.EnableCLS, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
 
-            if (Settings.EnableCLS != Settings.prevEnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew")
+            if (Settings.EnableCLS != Settings.prevEnableCLS)
             {
-                // Update spaces and reassign the resource to observe new settings.
-                ShipManifestAddon.smController.UpdateCLSSpaces();
-                ShipManifestAddon.smController.SelectedResource = "Crew";
+                if (!Settings.EnableCLS)
+                    SMController.HighlightCLSVessel(false, true);
+                else if (SMAddon.smController.SelectedResource == "Crew")
+                {
+                    // Update spaces and reassign the resource to observe new settings.
+                    SMAddon.UpdateCLSSpaces();
+                    SMAddon.smController.SelectedResource = "Crew";
+                }
             }
 
             // EnableScience Mode
@@ -94,8 +103,8 @@ namespace ShipManifest
             if (!Settings.EnableScience)
             {
                 // Clear Resource selection.
-                if (ShipManifestAddon.smController.SelectedResource == "Science")
-                    ShipManifestAddon.smController.SelectedResource = null;
+                if (SMAddon.smController.SelectedResource == "Science")
+                    SMAddon.smController.SelectedResource = null;
             }
 
             // EnableResources Mode
@@ -108,8 +117,8 @@ namespace ShipManifest
             if (!Settings.EnableResources)
             {
                 // Clear Resource selection.
-                if (ShipManifestAddon.smController.SelectedResource == "Resources")
-                    ShipManifestAddon.smController.SelectedResource = null;
+                if (SMAddon.smController.SelectedResource == "Resources")
+                    SMAddon.smController.SelectedResource = null;
             }
 
             // EnablePFResources Mode
@@ -134,6 +143,19 @@ namespace ShipManifest
             label = "Enable Highlighting";
             Settings.EnableHighlighting = GUILayout.Toggle(Settings.EnableHighlighting, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
+            if (Settings.EnableHighlighting != Settings.prevEnableHighlighting)
+            {
+                if (Settings.EnableCLS)
+                {
+                    if (SMAddon.smController.SelectedResource == "Crew")
+                    {
+                        SMController.HighlightCLSVessel(Settings.EnableHighlighting, true);
+                        // Update spaces and reassign the resource to observe new settings.
+                        SMAddon.UpdateCLSSpaces();
+                        SMAddon.smController.SelectedResource = "Crew";
+                    }
+                }
+            }
 
             // OnlySourceTarget Mode
             GUI.enabled = true;
@@ -146,7 +168,17 @@ namespace ShipManifest
             label = "Highlight Only Source / Target Parts";
             Settings.OnlySourceTarget = GUILayout.Toggle(Settings.OnlySourceTarget, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-
+            if (Settings.OnlySourceTarget && !Settings.prevOnlySourceTarget)
+            {
+                Settings.EnableCLSHighlighting = false;
+                if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
+                {
+                    SMController.HighlightCLSVessel(false, true);
+                    // Update spaces and reassign the resource to observe new settings.
+                    SMAddon.UpdateCLSSpaces();
+                    SMAddon.smController.SelectedResource = "Crew";
+                }
+            }
             if (!Settings.EnableHighlighting || !Settings.EnableCLS)
                 GUI.enabled = false;
             else
@@ -156,10 +188,12 @@ namespace ShipManifest
             label = "Enable CLS Highlighting";
             Settings.EnableCLSHighlighting = GUILayout.Toggle(Settings.EnableCLSHighlighting, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+            if (Settings.EnableCLSHighlighting && !Settings.prevEnableCLSHighlighting)
+                Settings.OnlySourceTarget = false;
+            if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
             {
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
-                    ManifestController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
+                    SMController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
 
             // Enable Tool Tips

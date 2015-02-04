@@ -47,30 +47,30 @@ namespace ShipManifest
 
         public static void ShowToolTips()
         {
-            if (ShipManifestAddon.toolTip != null && ShipManifestAddon.toolTip.Trim().Length > 0)
+            if (SMAddon.toolTip != null && SMAddon.toolTip.Trim().Length > 0)
             {
-                LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", ShipManifestAddon.toolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);
-                ShowToolTip(ShipManifestAddon.ToolTipPos, ShipManifestAddon.toolTip);
+                LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SMAddon.toolTip, SMAddon.ToolTipPos.ToString()), "Info", true);
+                ShowToolTip(SMAddon.ToolTipPos, SMAddon.toolTip);
             }
 
             // Obtain the new value from the last repaint.
             string ToolTip = "";
-            if (TransferWindow.ToolTip != null && TransferWindow.ToolTip.Trim().Length > 0)
-                ToolTip = TransferWindow.ToolTip;
-            if (RosterWindow.ToolTip != null && RosterWindow.ToolTip.Trim().Length > 0)
-                ToolTip = RosterWindow.ToolTip;
-            if (DebuggerWindow.ToolTip != null && DebuggerWindow.ToolTip.Trim().Length > 0)
-                ToolTip = DebuggerWindow.ToolTip;
-            if (ManifestWindow.ToolTip != null && ManifestWindow.ToolTip.Trim().Length > 0)
-                ToolTip = ManifestWindow.ToolTip;
-            if (SettingsWindow.ToolTip != null && SettingsWindow.ToolTip.Trim().Length > 0)
-                ToolTip = SettingsWindow.ToolTip;
-            if (HatchWindow.ToolTip != null && HatchWindow.ToolTip.Trim().Length > 0)
-                ToolTip = HatchWindow.ToolTip;
+            if (WindowTransfer.ToolTip != null && WindowTransfer.ToolTip.Trim().Length > 0)
+                ToolTip = WindowTransfer.ToolTip;
+            if (WindowRoster.ToolTip != null && WindowRoster.ToolTip.Trim().Length > 0)
+                ToolTip = WindowRoster.ToolTip;
+            if (WindowDebugger.ToolTip != null && WindowDebugger.ToolTip.Trim().Length > 0)
+                ToolTip = WindowDebugger.ToolTip;
+            if (WindowManifest.ToolTip != null && WindowManifest.ToolTip.Trim().Length > 0)
+                ToolTip = WindowManifest.ToolTip;
+            if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
+                ToolTip = WindowSettings.ToolTip;
+            if (WindowHatch.ToolTip != null && WindowHatch.ToolTip.Trim().Length > 0)
+                ToolTip = WindowHatch.ToolTip;
 
             // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
-            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with callback)
-            ShipManifestAddon.toolTip = ToolTip;
+            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with onGUI callback functions)
+            SMAddon.toolTip = ToolTip;
         }
 
         public static void ShowToolTip(Vector2 toolTipPos, string ToolTip)
@@ -85,23 +85,30 @@ namespace ShipManifest
             }
         }
 
-        public static string SetUpToolTip(Rect rect, Rect WindowPosition, string tooltip, float xOffset = 0, float yOffset = 0)
+        public static string SetActiveTooltip(Rect rect, Rect WindowPosition, string toolTip, ref bool toolTipActive, float xOffset, float yOffset)
         {
-            // this method assumes that we are in a repaint event...
-            string ToolTip = "";
-            if (rect.Contains(Event.current.mousePosition))
-            {
-                ShipManifestAddon.ToolTipPos = Event.current.mousePosition;
-                ShipManifestAddon.ToolTipPos.x = ShipManifestAddon.ToolTipPos.x + WindowPosition.x + xOffset;
-                ShipManifestAddon.ToolTipPos.y = ShipManifestAddon.ToolTipPos.y + WindowPosition.y + yOffset;
-                ToolTip = tooltip;
-                //Utilities.LogMessage(string.Format("Setup Tooltip - Mouse inside Rect: \r\nRectangle data:  {0} \r\nWindowPosition:  {1}\r\nToolTip:  {2}\r\nToolTip Pos:  {3}", rect.ToString(), WindowPosition.ToString(), ToolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);
-            }
-            else
-                ToolTip = "";
 
-            return ToolTip;
+            if (!toolTipActive && rect.Contains(Event.current.mousePosition))
+            {
+                toolTipActive = true;
+                // Since we are using GUILayout, the curent mouse position returns a position with reference to the source Details viewer. 
+                // Add the height of GUI elements already drawn to y offset to get the correct screen position
+                if (rect.Contains(Event.current.mousePosition))
+                {
+                    SMAddon.ToolTipPos = Event.current.mousePosition;
+                    SMAddon.ToolTipPos.x = SMAddon.ToolTipPos.x + WindowPosition.x + xOffset;
+                    SMAddon.ToolTipPos.y = SMAddon.ToolTipPos.y + WindowPosition.y + yOffset;
+                    //Utilities.LogMessage(string.Format("Setup Tooltip - Mouse inside Rect: \r\nRectangle data:  {0} \r\nWindowPosition:  {1}\r\nToolTip:  {2}\r\nToolTip Pos:  {3}", rect.ToString(), WindowPosition.ToString(), ToolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);
+                }
+                else
+                    toolTip = "";
+            }
+            // We are in a loop so we don't need the return value from SetUpToolTip.  We will assign it instead.
+            if (!toolTipActive)
+                toolTip = "";
+            return toolTip;
         }
+
         private static void EmptyWindow(int windowId)
         { }
     }

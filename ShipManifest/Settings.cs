@@ -60,8 +60,8 @@ namespace ShipManifest
         public static Rect SettingsPosition;
         public static bool ShowSettings { get; set; }
 
-        public static Rect HatchWindowPosition;
-        public static bool ShowHatchWindow { get; set; }
+        public static Rect HatchPosition;
+        public static bool ShowHatch { get; set; }
 
         public static string DebugLogPath = "\\Plugins\\PluginData\\";
 
@@ -163,7 +163,7 @@ namespace ShipManifest
                 TransferPosition = configfile.GetValue<Rect>("TransferPosition");
                 DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
-                HatchWindowPosition = configfile.GetValue<Rect>("HatchWindowPosition");
+                HatchPosition = configfile.GetValue<Rect>("HatchPosition");
                 RosterPosition = configfile.GetValue<Rect>("RosterPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
                 RealismMode = configfile.GetValue<bool>("RealismMode");
@@ -246,6 +246,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("HatchPosition Loaded: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("LockSettings Loaded: {0}", LockSettings.ToString()), "Info", VerboseLogging);
@@ -342,7 +343,7 @@ namespace ShipManifest
                 configfile.SetValue("TransferPosition", TransferPosition);
                 configfile.SetValue("RosterPosition", SettingsPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
-                configfile.SetValue("HatchWindowPosition", HatchWindowPosition);
+                configfile.SetValue("HatchPosition", HatchPosition);
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
                 configfile.SetValue("RealismMode", RealismMode);
@@ -393,7 +394,9 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("HatchPosition Saved: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);

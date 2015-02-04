@@ -7,7 +7,7 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public static class TransferWindow
+    public static class WindowTransfer
     {
         #region Properties
 
@@ -29,34 +29,35 @@ namespace ShipManifest
         {
             try
             {
+                // Reset Tooltip active flag...
+                ToolTipActive = false;
+
                 // This window assumes that a resource has been selected on the Ship manifest window.
-                if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew")
-                    ShipManifestAddon.smController.UpdateCLSSpaces();
+                if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
+                    SMAddon.UpdateCLSSpaces();
 
                 GUILayout.BeginHorizontal();
                 //Left Column Begins
                 GUILayout.BeginVertical();
 
-                // Reset Tooltip active flag...
-                ToolTipActive = false;
 
                 // Build source Transfer Viewer
                 SourceTransferViewer();
 
                 // Text above Source Details. (Between viewers)
-                if (ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowIVAUpdateBtn)
+                if (SMAddon.smController.SelectedResource == "Crew" && Settings.ShowIVAUpdateBtn)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label(ShipManifestAddon.smController.SelectedPartSource != null ? string.Format("{0}", ShipManifestAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
+                    GUILayout.Label(SMAddon.smController.SelectedPartSource != null ? string.Format("{0}", SMAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
                     if (GUILayout.Button("Update Portraits", ManifestStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
                     {
-                        ShipManifestAddon.smController.RespawnCrew();
+                        SMAddon.smController.RespawnCrew();
                     }
                     GUILayout.EndHorizontal();
                 }
                 else
                 {
-                    GUILayout.Label(ShipManifestAddon.smController.SelectedPartSource != null ? string.Format("{0}", ShipManifestAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
+                    GUILayout.Label(SMAddon.smController.SelectedPartSource != null ? string.Format("{0}", SMAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
                 }
 
                 // Build Details ScrollViewer
@@ -72,7 +73,7 @@ namespace ShipManifest
                 TargetTransferViewer();
 
                 // Text between viewers
-                GUILayout.Label(ShipManifestAddon.smController.SelectedPartTarget != null ? string.Format("{0}", ShipManifestAddon.smController.SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
+                GUILayout.Label(SMAddon.smController.SelectedPartTarget != null ? string.Format("{0}", SMAddon.smController.SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
 
                 // Build Target details Viewer
                 TargetDetailsViewer();
@@ -96,11 +97,11 @@ namespace ShipManifest
                 SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                foreach (Part part in ShipManifestAddon.smController.PartsByResource[ShipManifestAddon.smController.SelectedResource])
+                foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
-                    switch (ShipManifestAddon.smController.SelectedResource)
+                    switch (SMAddon.smController.SelectedResource)
                     {
                         case "Crew":
                             strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
@@ -110,37 +111,37 @@ namespace ShipManifest
                             strDescription = cntScience.ToString() + " - " + part.partInfo.title;
                             break;
                         default:
-                            strDescription = part.Resources[ShipManifestAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            strDescription = part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
                             break;
                     }
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!Settings.RealismMode && ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
+                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                         btnWidth = 180;
-                    var style = ShipManifestAddon.smController.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                    var style = SMAddon.smController.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
-                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
+                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
                         {
-                            ShipManifestAddon.smController.SelectedModuleSource = null;
-                            ShipManifestAddon.smController.SelectedPartSource = part;
+                            SMAddon.smController.SelectedModuleSource = null;
+                            SMAddon.smController.SelectedPartSource = part;
                             Utilities.LogMessage("SelectedPartSource...", "Info", Settings.VerboseLogging);
                         }
                     }
-                    if (!Settings.RealismMode && ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
+                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                     {
-                        var style1 = part.Resources[ShipManifestAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
-                        var style2 = part.Resources[ShipManifestAddon.smController.SelectedResource].amount == part.Resources[ShipManifestAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            ManifestController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            SMController.DumpPartResource(part, SMAddon.smController.SelectedResource);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
-                            ManifestController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            SMController.FillPartResource(part, SMAddon.smController.SelectedResource);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -164,13 +165,13 @@ namespace ShipManifest
                 SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(90), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (ShipManifestAddon.smController.SelectedPartSource != null)
+                if (SMAddon.smController.SelectedPartSource != null)
                 {
-                    if (ShipManifestAddon.smController.SelectedResource == "Crew")
+                    if (SMAddon.smController.SelectedResource == "Crew")
                     {
                         SourceDetailsCrew();
                     }
-                    else if (ShipManifestAddon.smController.SelectedResource == "Science")
+                    else if (SMAddon.smController.SelectedResource == "Science")
                     {
                         SourceDetailsScience();
                     }
@@ -191,48 +192,37 @@ namespace ShipManifest
 
         private static void SourceDetailsCrew()
         {
-            List<ProtoCrewMember> crewMembers = ShipManifestAddon.smController.SelectedPartSource.protoModuleCrew;
-            for (int x = 0; x < ShipManifestAddon.smController.SelectedPartSource.protoModuleCrew.Count(); x++)
+            List<ProtoCrewMember> crewMembers = SMAddon.smController.SelectedPartSource.protoModuleCrew;
+            for (int x = 0; x < SMAddon.smController.SelectedPartSource.protoModuleCrew.Count(); x++)
             {
-                ProtoCrewMember crewMember = ShipManifestAddon.smController.SelectedPartSource.protoModuleCrew[x];
+                ProtoCrewMember crewMember = SMAddon.smController.SelectedPartSource.protoModuleCrew[x];
                 GUILayout.BeginHorizontal();
                 if (crewMember.seat != null)
                 {
-                    if (ShipManifestAddon.crewXfer || ShipManifestAddon.XferOn)
+                    if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
 
                     if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                     {
                         ToolTip = "";
-                        TransferCrewMember(crewMember, ShipManifestAddon.smController.SelectedPartSource, ShipManifestAddon.smController.SelectedPartSource);
+                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartSource);
                     }
                     if (Event.current.type == EventType.Repaint)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        if (!ToolTipActive && rect.Contains(Event.current.mousePosition))
-                        {
-                            ToolTipActive = true;
-                            // Since we are using GUILayout, the curent mouse position returns a position with reference to the source Details viewer. 
-                            // Add the height of GUI elements already drawn to y offset to get the correct screen position
-                            Utilities.SetUpToolTip(rect, Settings.TransferPosition, GUI.tooltip, 10, 190);
-                        }
-                        // We are in a loop so we don't need the return value from SetUpToolTip.  We will assign it instead.
-                        if (ToolTipActive)
-                            ToolTip = GUI.tooltip;
-                        else
-                            ToolTip = "";
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 10, 190 - SourceScrollViewerTransfer2.y);
                     }
                     GUI.enabled = true;
                 }
                 GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                if (ShipManifestAddon.CanKerbalsBeXferred(ShipManifestAddon.smController.SelectedPartSource))
+                if (SMAddon.CanKerbalsBeXferred(SMAddon.smController.SelectedPartSource))
                 {
-                    if (ShipManifestAddon.crewXfer || ShipManifestAddon.XferOn)
+                    if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
 
                     if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        TransferCrewMember(crewMember, ShipManifestAddon.smController.SelectedPartSource, ShipManifestAddon.smController.SelectedPartTarget);
+                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
                     }
                     GUI.enabled = true;
                 }
@@ -242,7 +232,7 @@ namespace ShipManifest
 
         private static void SourceDetailsScience()
         {
-            IScienceDataContainer[] modules = ShipManifestAddon.smController.SelectedPartSource.FindModulesImplementing<IScienceDataContainer>().ToArray();
+            IScienceDataContainer[] modules = SMAddon.smController.SelectedPartSource.FindModulesImplementing<IScienceDataContainer>().ToArray();
             foreach (PartModule pm in modules)
             {
                 // Containers.
@@ -257,15 +247,15 @@ namespace ShipManifest
                 GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
                 // If we have target selected, it is not the same as the source, there is science to xfer.
-                if ((ShipManifestAddon.smController.SelectedModuleTarget != null && pm != ShipManifestAddon.smController.SelectedModuleTarget) && scienceCount > 0)
+                if ((SMAddon.smController.SelectedModuleTarget != null && pm != SMAddon.smController.SelectedModuleTarget) && scienceCount > 0)
                 {                    
                     if (Settings.RealismMode && !isCollectable)
                         GUI.enabled = false;
                     if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        ShipManifestAddon.smController.SelectedModuleSource = pm;
-                        TransferScience(ShipManifestAddon.smController.SelectedModuleSource, ShipManifestAddon.smController.SelectedModuleTarget);
-                        ShipManifestAddon.smController.SelectedModuleSource = null;
+                        SMAddon.smController.SelectedModuleSource = pm;
+                        TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
+                        SMAddon.smController.SelectedModuleSource = null;
                     }
                     GUI.enabled = true;
                 }
@@ -275,13 +265,13 @@ namespace ShipManifest
 
         private static void SourceDetailsResources()
         {
-            foreach (PartResource resource in ShipManifestAddon.smController.SelectedPartSource.Resources)
+            foreach (PartResource resource in SMAddon.smController.SelectedPartSource.Resources)
             {
-                if (resource.info.name == ShipManifestAddon.smController.SelectedResource)
+                if (resource.info.name == SMAddon.smController.SelectedResource)
                 {
                     // This routine assumes that a resource has been selected on the Resource manifest window.
                     string flowtextS = "Off";
-                    bool flowboolS = ShipManifestAddon.smController.SelectedPartSource.Resources[ShipManifestAddon.smController.SelectedResource].flowState;
+                    bool flowboolS = SMAddon.smController.SelectedPartSource.Resources[SMAddon.smController.SelectedResource].flowState;
                     if (flowboolS)
                     {
                         flowtextS = "On";
@@ -290,7 +280,7 @@ namespace ShipManifest
                     {
                         flowtextS = "Off";
                     }
-                    PartResource.FlowMode flowmodeS = ShipManifestAddon.smController.SelectedPartSource.Resources[ShipManifestAddon.smController.SelectedResource].flowMode;
+                    PartResource.FlowMode flowmodeS = SMAddon.smController.SelectedPartSource.Resources[SMAddon.smController.SelectedResource].flowMode;
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
@@ -299,74 +289,74 @@ namespace ShipManifest
                     {
                         if (flowboolS)
                         {
-                            ShipManifestAddon.smController.SelectedPartSource.Resources[ShipManifestAddon.smController.SelectedResource].flowState = false;
+                            SMAddon.smController.SelectedPartSource.Resources[SMAddon.smController.SelectedResource].flowState = false;
                             flowtextS = "Off";
                         }
                         else
                         {
-                            ShipManifestAddon.smController.SelectedPartSource.Resources[ShipManifestAddon.smController.SelectedResource].flowState = true;
+                            SMAddon.smController.SelectedPartSource.Resources[SMAddon.smController.SelectedResource].flowState = true;
                             flowtextS = "On";
                         }
                     }
                     GUILayout.EndHorizontal();
-                    if ((ShipManifestAddon.smController.SelectedPartTarget != null && ShipManifestAddon.smController.SelectedPartSource != ShipManifestAddon.smController.SelectedPartTarget) &&
-                        (ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].amount > 0 && ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount < ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].maxAmount))
+                    if ((SMAddon.smController.SelectedPartTarget != null && SMAddon.smController.SelectedPartSource != SMAddon.smController.SelectedPartTarget) &&
+                        (SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount > 0 && SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount < SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].maxAmount))
                     {
-                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
+                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
                         {
                             // let's determine how much of a resource we can move to the target.
-                            double maxXferAmount = ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].maxAmount - ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount;
-                            if (maxXferAmount > ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].amount)
-                                maxXferAmount = ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].amount;
+                            double maxXferAmount = SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].maxAmount - SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount;
+                            if (maxXferAmount > SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount)
+                                maxXferAmount = SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount;
                             if (maxXferAmount < 0)
                                 maxXferAmount = 0;
 
                             // This is used to set the slider to the max amount by default.  
                             // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
                             // We set XferAmount to -1 when we set new source or target parts.
-                            if (ShipManifestAddon.smController.sXferAmount < 0)
-                                ShipManifestAddon.smController.sXferAmount = (float)maxXferAmount;
+                            if (SMAddon.smController.sXferAmount < 0)
+                                SMAddon.smController.sXferAmount = (float)maxXferAmount;
 
                             // Left Details...
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(100));
 
                             // Lets parse the string to allow decimal points.
-                            string strXferAmount = ShipManifestAddon.smController.sXferAmount.ToString();
+                            string strXferAmount = SMAddon.smController.sXferAmount.ToString();
                             float newAmount = 0;
 
                             // add the decimal point if it was typed.
-                            if (ShipManifestAddon.smController.sXferAmountHasDecimal)
+                            if (SMAddon.smController.sXferAmountHasDecimal)
                                 strXferAmount += ".";
                             // add the zero if it was typed.
-                            if (ShipManifestAddon.smController.sXferAmountHasZero)
+                            if (SMAddon.smController.sXferAmountHasZero)
                                 strXferAmount += "0";
 
                             strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
 
                             // update decimal bool 
                             if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
-                                ShipManifestAddon.smController.sXferAmountHasDecimal = true;
+                                SMAddon.smController.sXferAmountHasDecimal = true;
                             else
-                                ShipManifestAddon.smController.sXferAmountHasDecimal = false;
+                                SMAddon.smController.sXferAmountHasDecimal = false;
 
                             //update zero bool 
                             if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
-                                ShipManifestAddon.smController.sXferAmountHasZero = true;
+                                SMAddon.smController.sXferAmountHasZero = true;
                             else
-                                ShipManifestAddon.smController.sXferAmountHasZero = false;
+                                SMAddon.smController.sXferAmountHasZero = false;
 
                             if (float.TryParse(strXferAmount, out newAmount))
-                                ShipManifestAddon.smController.sXferAmount = newAmount;
+                                SMAddon.smController.sXferAmount = newAmount;
 
                             if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
                             {
-                                TransferResource(ShipManifestAddon.smController.SelectedPartSource, ShipManifestAddon.smController.SelectedPartTarget, (double)ShipManifestAddon.smController.sXferAmount);
+                                TransferResource(SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget, (double)SMAddon.smController.sXferAmount);
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Xfer:  ", GUILayout.Width(50), GUILayout.Height(20));
-                            ShipManifestAddon.smController.sXferAmount = GUILayout.HorizontalSlider(ShipManifestAddon.smController.sXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
+                            SMAddon.smController.sXferAmount = GUILayout.HorizontalSlider(SMAddon.smController.sXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
                             GUILayout.EndHorizontal();
                         }
                     }
@@ -381,11 +371,11 @@ namespace ShipManifest
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
-                foreach (Part part in ShipManifestAddon.smController.PartsByResource[ShipManifestAddon.smController.SelectedResource])
+                foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
                 {
                     // Build the part button title...
                     string strDescription = "";
-                    switch (ShipManifestAddon.smController.SelectedResource)
+                    switch (SMAddon.smController.SelectedResource)
                     {
                         case "Crew":
                             strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
@@ -395,36 +385,36 @@ namespace ShipManifest
                             strDescription = cntScience.ToString() + " - " + part.partInfo.title;
                             break;
                         default:
-                            strDescription = part.Resources[ShipManifestAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                            strDescription = part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
                             break;
                     }
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!Settings.RealismMode && ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
+                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                         btnWidth = 180;
-                    var style = ShipManifestAddon.smController.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                    var style = SMAddon.smController.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
-                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
+                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
                         {
-                            ShipManifestAddon.smController.SelectedPartTarget = part;
+                            SMAddon.smController.SelectedPartTarget = part;
                             Utilities.LogMessage("SelectedPartTarget...", "Info", Settings.VerboseLogging);
                         }
                     }
-                    if (!Settings.RealismMode && ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
+                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                     {
-                        var style1 = part.Resources[ShipManifestAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
-                        var style2 = part.Resources[ShipManifestAddon.smController.SelectedResource].amount == part.Resources[ShipManifestAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            ManifestController.DumpPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            SMController.DumpPartResource(part, SMAddon.smController.SelectedResource);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
-                            ManifestController.FillPartResource(part, ShipManifestAddon.smController.SelectedResource);
+                            SMController.FillPartResource(part, SMAddon.smController.SelectedResource);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -448,13 +438,13 @@ namespace ShipManifest
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
-                if (ShipManifestAddon.smController.SelectedPartTarget != null)
+                if (SMAddon.smController.SelectedPartTarget != null)
                 {
-                    if (ShipManifestAddon.smController.SelectedResource == "Crew")
+                    if (SMAddon.smController.SelectedResource == "Crew")
                     {
                         TargetDetailsCrew();
                     }
-                    else if (ShipManifestAddon.smController.SelectedResource == "Science")
+                    else if (SMAddon.smController.SelectedResource == "Science")
                     {
                         TargetDetailsScience();
                     }
@@ -473,50 +463,40 @@ namespace ShipManifest
 
         private static void TargetDetailsCrew()
         {
-            for (int x = 0; x < ShipManifestAddon.smController.SelectedPartTarget.protoModuleCrew.Count(); x++)
+            for (int x = 0; x < SMAddon.smController.SelectedPartTarget.protoModuleCrew.Count(); x++)
             {
-                ProtoCrewMember crewMember = ShipManifestAddon.smController.SelectedPartTarget.protoModuleCrew[x];
+                ProtoCrewMember crewMember = SMAddon.smController.SelectedPartTarget.protoModuleCrew[x];
                 // This routine assumes that a resource has been selected on the Resource manifest window.
                 GUILayout.BeginHorizontal();
                 if (crewMember.seat != null)
                 {
-                    if (ShipManifestAddon.crewXfer || ShipManifestAddon.XferOn)
+                    if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
 
                     if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                     {
                         ToolTip = "";
-                        TransferCrewMember(crewMember, ShipManifestAddon.smController.SelectedPartTarget, ShipManifestAddon.smController.SelectedPartTarget);
+                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartTarget);
                     }
                     if (Event.current.type == EventType.Repaint)
                     {
                         // Since we are using GUILayout, the curent mouse position returns a position with reference to the Target Details viewer. 
                         // Add the height and width of GUI elements already drawn to the x & y offsets to get the correct screen position
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        // we are in a loop, so we need to remember if the tooltip was set earlier
-                        if (!ToolTipActive && rect.Contains(Event.current.mousePosition))
-                        { 
-                            ToolTipActive = true;
-                            Utilities.SetUpToolTip(rect, Settings.TransferPosition, GUI.tooltip, 320, 190);
-                        }
-                        // We are in a loop so we don't need the return value from SetUpToolTip.  We will assign it instead.
-                        if (ToolTipActive)
-                            ToolTip = GUI.tooltip;
-                        else
-                            ToolTip = "";
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetScrollViewerTransfer2.y);
                     }
                     GUI.enabled = true;
                 }
                 GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
-                if (ShipManifestAddon.CanKerbalsBeXferred(ShipManifestAddon.smController.SelectedPartTarget))
+                if (SMAddon.CanKerbalsBeXferred(SMAddon.smController.SelectedPartTarget))
                 {
-                    if (ShipManifestAddon.crewXfer || ShipManifestAddon.XferOn)
+                    if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
 
                     // set the conditions for a button style change.
                     if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        TransferCrewMember(crewMember, ShipManifestAddon.smController.SelectedPartTarget, ShipManifestAddon.smController.SelectedPartSource);
+                        TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
                     }
                     GUI.enabled = true;
                 }
@@ -527,13 +507,13 @@ namespace ShipManifest
         private static void TargetDetailsScience()
         {
             int count = 0;
-            foreach (PartModule tpm in ShipManifestAddon.smController.SelectedPartTarget.Modules)
+            foreach (PartModule tpm in SMAddon.smController.SelectedPartTarget.Modules)
             {
                 if (tpm is IScienceDataContainer)
                     count += 1;
             }
 
-            foreach (PartModule pm in ShipManifestAddon.smController.SelectedPartTarget.Modules)
+            foreach (PartModule pm in SMAddon.smController.SelectedPartTarget.Modules)
             {
                 // Containers.
                 int scienceCount = 0;
@@ -544,7 +524,7 @@ namespace ShipManifest
                     GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
                     // set the conditions for a button style change.
                     bool ShowReceive = false;
-                    if (pm == ShipManifestAddon.smController.SelectedModuleTarget)
+                    if (pm == SMAddon.smController.SelectedModuleTarget)
                         ShowReceive = true;
                     else if (count == 1)
                         ShowReceive = true;
@@ -552,7 +532,7 @@ namespace ShipManifest
                     var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
                     if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        ShipManifestAddon.smController.SelectedModuleTarget = pm;
+                        SMAddon.smController.SelectedModuleTarget = pm;
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -562,13 +542,13 @@ namespace ShipManifest
         private static void TargetDetailsResources()
         {
             // Resources
-            foreach (PartResource resource in ShipManifestAddon.smController.SelectedPartTarget.Resources)
+            foreach (PartResource resource in SMAddon.smController.SelectedPartTarget.Resources)
             {
-                if (resource.info.name == ShipManifestAddon.smController.SelectedResource)
+                if (resource.info.name == SMAddon.smController.SelectedResource)
                 {
                     // This routine assumes that a resource has been selected on the Resource manifest window.
                     string flowtextT = "Off";
-                    bool flowboolT = ShipManifestAddon.smController.SelectedPartTarget.Resources[ShipManifestAddon.smController.SelectedResource].flowState;
+                    bool flowboolT = SMAddon.smController.SelectedPartTarget.Resources[SMAddon.smController.SelectedResource].flowState;
                     if (flowboolT)
                     {
                         flowtextT = "On";
@@ -586,71 +566,71 @@ namespace ShipManifest
                     {
                         if (flowboolT)
                         {
-                            ShipManifestAddon.smController.SelectedPartTarget.Resources[ShipManifestAddon.smController.SelectedResource].flowState = false;
+                            SMAddon.smController.SelectedPartTarget.Resources[SMAddon.smController.SelectedResource].flowState = false;
                             flowtextT = "Off";
                         }
                         else
                         {
-                            ShipManifestAddon.smController.SelectedPartTarget.Resources[ShipManifestAddon.smController.SelectedResource].flowState = true;
+                            SMAddon.smController.SelectedPartTarget.Resources[SMAddon.smController.SelectedResource].flowState = true;
                             flowtextT = "On";
                         }
                     }
                     GUILayout.EndHorizontal();
-                    if ((ShipManifestAddon.smController.SelectedPartSource != null && ShipManifestAddon.smController.SelectedPartSource != ShipManifestAddon.smController.SelectedPartTarget) && (ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount > 0 && ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].amount < ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].maxAmount))
+                    if ((SMAddon.smController.SelectedPartSource != null && SMAddon.smController.SelectedPartSource != SMAddon.smController.SelectedPartTarget) && (SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount > 0 && SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount < SMAddon.smController.SelectedPartSource.Resources[resource.info.name].maxAmount))
                     {
                         // create xfer slider;
-                        if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
+                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
                         {
                             // let's determine how much of a resource we can move to the Source.
-                            double maxXferAmount = ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].maxAmount - ShipManifestAddon.smController.SelectedPartSource.Resources[resource.info.name].amount;
-                            if (maxXferAmount > ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount)
-                                maxXferAmount = ShipManifestAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount;
+                            double maxXferAmount = SMAddon.smController.SelectedPartSource.Resources[resource.info.name].maxAmount - SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount;
+                            if (maxXferAmount > SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount)
+                                maxXferAmount = SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount;
                             if (maxXferAmount < 0)
                                 maxXferAmount = 0;
 
                             // This is used to set the slider to the max amount by default.  
                             // OnUpdate draws every frame, so we need a way to ignore this or the slider will stay at max
                             // We set XferAmount to -1 when we set new source or target parts.
-                            if (ShipManifestAddon.smController.tXferAmount < 0)
-                                ShipManifestAddon.smController.tXferAmount = (float)maxXferAmount;
+                            if (SMAddon.smController.tXferAmount < 0)
+                                SMAddon.smController.tXferAmount = (float)maxXferAmount;
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Enter Xfer Amt:  ", GUILayout.Width(100));
 
                             // Lets parse the string to allow decimal points.
-                            string strXferAmount = ShipManifestAddon.smController.tXferAmount.ToString();
+                            string strXferAmount = SMAddon.smController.tXferAmount.ToString();
                             float newAmount = 0;
 
                             // add the decimal point if it was typed.
-                            if (ShipManifestAddon.smController.tXferAmountHasDecimal)
+                            if (SMAddon.smController.tXferAmountHasDecimal)
                                 strXferAmount += ".";
-                            if (ShipManifestAddon.smController.tXferAmountHasZero)
+                            if (SMAddon.smController.tXferAmountHasZero)
                                 strXferAmount += "0";
 
                             strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
 
                             // update decimal bool with new string
                             if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
-                                ShipManifestAddon.smController.tXferAmountHasDecimal = true;
+                                SMAddon.smController.tXferAmountHasDecimal = true;
                             else
-                                ShipManifestAddon.smController.tXferAmountHasDecimal = false;
+                                SMAddon.smController.tXferAmountHasDecimal = false;
 
                             //update zero bool 
                             if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
-                                ShipManifestAddon.smController.tXferAmountHasZero = true;
+                                SMAddon.smController.tXferAmountHasZero = true;
                             else
-                                ShipManifestAddon.smController.tXferAmountHasZero = false;
+                                SMAddon.smController.tXferAmountHasZero = false;
 
                             if (float.TryParse(strXferAmount, out newAmount))
-                                ShipManifestAddon.smController.tXferAmount = newAmount;
+                                SMAddon.smController.tXferAmount = newAmount;
                                 
                             if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
-                                TransferResource(ShipManifestAddon.smController.SelectedPartTarget, ShipManifestAddon.smController.SelectedPartSource, (double)ShipManifestAddon.smController.tXferAmount);
+                                TransferResource(SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource, (double)SMAddon.smController.tXferAmount);
 
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Xfer:  ", GUILayout.Width(50), GUILayout.Height(20));
-                            ShipManifestAddon.smController.tXferAmount = GUILayout.HorizontalSlider(ShipManifestAddon.smController.tXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
+                            SMAddon.smController.tXferAmount = GUILayout.HorizontalSlider(SMAddon.smController.tXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
                             GUILayout.EndHorizontal();
                         }
                     }
@@ -717,8 +697,8 @@ namespace ShipManifest
                         ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
 
                         // Remove the crew members from the part(s)...
-                        ManifestController.RemoveCrew(sourceMember, sourcePart);
-                        ManifestController.RemoveCrew(targetMember, targetPart);
+                        SMController.RemoveCrew(sourceMember, sourcePart);
+                        SMController.RemoveCrew(targetMember, targetPart);
 
                         // At this point, the kerbals are in the "ether".
                         // this may be why there is an issue with refreshing the internal view.. 
@@ -729,9 +709,9 @@ namespace ShipManifest
                         // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
                         // Send the kerbal(s) eva.  This is the eva trigger I was looking for
                         // We will fie the board event when we are ready, in the update code.
-                        ShipManifestAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
                         if (Settings.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(ShipManifestAddon.smController.evaAction);
+                            GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
 
                         // Add the crew members back into the part(s) at their new seats.
                         sourcePart.AddCrewmemberAt(targetMember, curIdx);
@@ -740,30 +720,30 @@ namespace ShipManifest
                     else
                     {
                         // Just move.
-                        ManifestController.RemoveCrew(sourceMember, sourcePart);
-                        ShipManifestAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        SMController.RemoveCrew(sourceMember, sourcePart);
+                        SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
 
                         if (Settings.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(ShipManifestAddon.smController.evaAction);
+                            GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
 
                         targetPart.AddCrewmemberAt(sourceMember, newIdx);
                     }
 
                     // if moving within a part, set the seat2seat flag
                     if (sourcePart == targetPart)
-                        ShipManifestAddon.isSeat2Seat = true;
+                        SMAddon.isSeat2Seat = true;
                     else
-                        ShipManifestAddon.isSeat2Seat = false;
+                        SMAddon.isSeat2Seat = false;
 
                     // set the crew transfer flag and wait forthe timeout before firing the board event.
-                    ShipManifestAddon.crewXfer = true;
+                    SMAddon.crewXfer = true;
                 }
                 else
                 {
                     // no portraits, so let's just move kerbals...
-                    ManifestController.RemoveCrew(sourceMember, sourcePart);
-                    ManifestController.AddCrew(sourceMember, targetPart);
-                    ShipManifestAddon.crewXfer = true;
+                    SMController.RemoveCrew(sourceMember, sourcePart);
+                    SMController.AddCrew(sourceMember, targetPart);
+                    SMAddon.crewXfer = true;
                 }
             }
             catch (Exception ex)
@@ -833,11 +813,11 @@ namespace ShipManifest
         {
             try
             {
-                if (source.Resources.Contains(ShipManifestAddon.smController.SelectedResource) && target.Resources.Contains(ShipManifestAddon.smController.SelectedResource))
+                if (source.Resources.Contains(SMAddon.smController.SelectedResource) && target.Resources.Contains(SMAddon.smController.SelectedResource))
                 {
-                    double maxAmount = target.Resources[ShipManifestAddon.smController.SelectedResource].maxAmount;
-                    double sourceAmount = source.Resources[ShipManifestAddon.smController.SelectedResource].amount;
-                    double targetAmount = target.Resources[ShipManifestAddon.smController.SelectedResource].amount;
+                    double maxAmount = target.Resources[SMAddon.smController.SelectedResource].maxAmount;
+                    double sourceAmount = source.Resources[SMAddon.smController.SelectedResource].amount;
+                    double targetAmount = target.Resources[SMAddon.smController.SelectedResource].amount;
                     if (XferAmount <= 0)
                     {
                         XferAmount = maxAmount - targetAmount;
@@ -855,20 +835,20 @@ namespace ShipManifest
 
 
                         // This flag enables the Update handler in ShipManifestAddon and sets the direction
-                        if (source == ShipManifestAddon.smController.SelectedPartSource)
-                            ShipManifestAddon.XferMode = ShipManifestAddon.XFERMode.SourceToTarget;
+                        if (source == SMAddon.smController.SelectedPartSource)
+                            SMAddon.XferMode = SMAddon.XFERMode.SourceToTarget;
                         else
-                            ShipManifestAddon.XferMode = ShipManifestAddon.XFERMode.TargetToSource;
+                            SMAddon.XferMode = SMAddon.XFERMode.TargetToSource;
 
-                            ShipManifestAddon.XferOn = true;
+                            SMAddon.XferOn = true;
                     }
                     else
                     {
                         // Fill target
-                        target.Resources[ShipManifestAddon.smController.SelectedResource].amount += XferAmount;
+                        target.Resources[SMAddon.smController.SelectedResource].amount += XferAmount;
 
                         // Drain source...
-                        source.Resources[ShipManifestAddon.smController.SelectedResource].amount -= XferAmount;
+                        source.Resources[SMAddon.smController.SelectedResource].amount -= XferAmount;
                     }
                 }
             }

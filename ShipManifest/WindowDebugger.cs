@@ -8,12 +8,16 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public class DebuggerWindow
+    public class WindowDebugger
     {
         public static string ToolTip = "";
+        public static bool ToolTipActive = false;
 
         public static void Display(int windowId)
         {
+            // Reset Tooltip active flag...
+            ToolTipActive = false;
+
             Rect rect = new Rect(496, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
@@ -21,7 +25,7 @@ namespace ShipManifest
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint)
-                ToolTip = Utilities.SetUpToolTip(rect, Settings.DebuggerPosition, GUI.tooltip);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.DebuggerPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             GUILayout.BeginVertical();
             Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
@@ -42,7 +46,7 @@ namespace ShipManifest
             if (GUILayout.Button("Save Log", GUILayout.Height(20)))
             {
                 // Create log file and save.
-                ShipManifestAddon.Savelog();
+                SMAddon.Savelog();
             }
             if (GUILayout.Button("Close", GUILayout.Height(20)))
             {

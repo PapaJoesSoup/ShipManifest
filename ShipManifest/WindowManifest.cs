@@ -8,11 +8,12 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public static class ManifestWindow
+    public static class WindowManifest
     {
         #region Manifest Window - Gui Layout Code
 
         public static string ToolTip = "";
+        public static bool ToolTipActive = false;
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -20,22 +21,25 @@ namespace ShipManifest
         private static Vector2 ScrollViewerResourceManifest2 = Vector2.zero;
         public static void Display(int windowId)
         {
+            // Reset Tooltip active flag...
+            ToolTipActive = false;
+
             Rect rect = new Rect(304, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 Settings.ShowShipManifest = false;
-                ShipManifestAddon.ToggleToolbar();
+                SMAddon.ToggleToolbar();
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint)
-                ToolTip = Utilities.SetUpToolTip(rect, Settings.ManifestPosition, GUI.tooltip);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.ManifestPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
                 GUILayout.BeginVertical();
                 ScrollViewerShipManifest = GUILayout.BeginScrollView(ScrollViewerShipManifest, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (ShipManifestAddon.smController.IsPreLaunch)
+                if (SMAddon.smController.IsPreLaunch)
                 {
                     PreLaunchGUI();
                 }
@@ -46,7 +50,7 @@ namespace ShipManifest
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
 
-                GUILayout.Label(ShipManifestAddon.smController.SelectedResource != null ? string.Format("{0}", ShipManifestAddon.smController.SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
+                GUILayout.Label(SMAddon.smController.SelectedResource != null ? string.Format("{0}", SMAddon.smController.SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
 
                 // Resource Details List Viewer
                 ResourceDetailsViewer();
@@ -81,12 +85,12 @@ namespace ShipManifest
 
                 if (!Settings.EnableCLS)
                     GUI.enabled = false;
-                var hatchesStyle = Settings.ShowHatchWindow ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var hatchesStyle = Settings.ShowHatch ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                 if (GUILayout.Button("Hatches...", hatchesStyle, GUILayout.Width(100), GUILayout.Height(20)))
                 {
                     try
                     {
-                        Settings.ShowHatchWindow = !Settings.ShowHatchWindow;
+                        Settings.ShowHatch = !Settings.ShowHatch;
                     }
                     catch (Exception ex)
                     {
@@ -115,11 +119,11 @@ namespace ShipManifest
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button(string.Format("Fill Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
-                    ShipManifestAddon.smController.FillVesselCrew();
+                    SMAddon.smController.FillVesselCrew();
                 }
                 if (GUILayout.Button(string.Format("Empty Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
-                    ShipManifestAddon.smController.EmptyVesselCrew();
+                    SMAddon.smController.EmptyVesselCrew();
                 }
                 GUILayout.EndHorizontal();
 
@@ -128,11 +132,11 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
-                        ShipManifestAddon.smController.FillVesselResources();
+                        SMAddon.smController.FillVesselResources();
                     }
                     if (GUILayout.Button(string.Format("Empty Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
-                        ShipManifestAddon.smController.EmptyVesselResources();
+                        SMAddon.smController.EmptyVesselResources();
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -147,32 +151,32 @@ namespace ShipManifest
         {
             try
             {
-                foreach (string resourceName in ShipManifestAddon.smController.PartsByResource.Keys)
+                foreach (string resourceName in SMAddon.smController.PartsByResource.Keys)
                 {
                     GUILayout.BeginHorizontal();
                     int width = 265;
-                    if ((!Settings.RealismMode || ShipManifestAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
-                    var style = ShipManifestAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                    var style = SMAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {
                         try
                         {
-                            if (!ShipManifestAddon.crewXfer && !ShipManifestAddon.XferOn)
+                            if (!SMAddon.crewXfer && !SMAddon.XferOn)
                             {
                                 // Now let's update our lists...
-                                if (ShipManifestAddon.smController.SelectedResource != resourceName)
+                                if (SMAddon.smController.SelectedResource != resourceName)
                                 {
-                                    ShipManifestAddon.smController.SelectedResource = resourceName;
-                                    ShipManifestAddon.smController.SelectedPartSource = ShipManifestAddon.smController.SelectedPartTarget = null;
+                                    SMAddon.smController.SelectedResource = resourceName;
+                                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                                 }
-                                else if (ShipManifestAddon.smController.SelectedResource == resourceName)
+                                else if (SMAddon.smController.SelectedResource == resourceName)
                                 {
-                                    ShipManifestAddon.smController.SelectedResource = null;
-                                    ShipManifestAddon.smController.SelectedPartSource = ShipManifestAddon.smController.SelectedPartTarget = null;
+                                    SMAddon.smController.SelectedResource = null;
+                                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                                 }
-                                if (ShipManifestAddon.smController.SelectedResource != null)
+                                if (SMAddon.smController.SelectedResource != null)
                                 {
                                     Settings.ShowTransferWindow = true;
                                 }
@@ -187,15 +191,15 @@ namespace ShipManifest
                             Utilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-                    if ((!Settings.RealismMode || ShipManifestAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
                         if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.DumpResource(resourceName);
+                            SMAddon.smController.DumpResource(resourceName);
                         }
                         if (GUILayout.Button(string.Format("{0}", "Fill"), ManifestStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
                         {
-                            ShipManifestAddon.smController.FillResource(resourceName);
+                            SMAddon.smController.FillResource(resourceName);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -214,28 +218,28 @@ namespace ShipManifest
                 ScrollViewerResourceManifest2 = GUILayout.BeginScrollView(ScrollViewerResourceManifest2, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (ShipManifestAddon.smController.SelectedResource != null)
+                if (SMAddon.smController.SelectedResource != null)
                 {
-                    foreach (Part part in ShipManifestAddon.smController.PartsByResource[ShipManifestAddon.smController.SelectedResource])
+                    foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
                     {
                         string resourcename = "";
-                        if (ShipManifestAddon.smController.SelectedResource != "Crew" && ShipManifestAddon.smController.SelectedResource != "Science")
+                        if (SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                         {
-                            resourcename = part.Resources[ShipManifestAddon.smController.SelectedResource].info.name;
+                            resourcename = part.Resources[SMAddon.smController.SelectedResource].info.name;
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[ShipManifestAddon.smController.SelectedResource].amount.ToString("######0.####"), part.Resources[ShipManifestAddon.smController.SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
+                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.####"), part.Resources[SMAddon.smController.SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
                             GUILayout.EndHorizontal();
                         }
-                        else if (ShipManifestAddon.smController.SelectedResource == "Crew")
+                        else if (SMAddon.smController.SelectedResource == "Crew")
                         {
-                            resourcename = ShipManifestAddon.smController.SelectedResource;
+                            resourcename = SMAddon.smController.SelectedResource;
                             GUILayout.BeginHorizontal();
                             GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265));
                             GUILayout.EndHorizontal();
                         }
-                        else if (ShipManifestAddon.smController.SelectedResource == "Science")
+                        else if (SMAddon.smController.SelectedResource == "Science")
                         {
-                            resourcename = ShipManifestAddon.smController.SelectedResource;
+                            resourcename = SMAddon.smController.SelectedResource;
                             int ScienceCount = 0;
                             foreach (PartModule pm in part.Modules)
                             {

@@ -9,13 +9,13 @@ using ConnectedLivingSpace;
 namespace ShipManifest
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public partial class ShipManifestAddon : MonoBehaviour
+    public partial class SMAddon : MonoBehaviour
     {
         #region Properties
 
         //Game object that keeps us running
         public static GameObject GameObjectInstance;  
-        public static ManifestController smController;
+        public static SMController smController;
 
         // Vessel vars
         public static ICLSAddon clsAddon = null;
@@ -91,7 +91,7 @@ namespace ShipManifest
 
                     // get the current Vessel data
                     vessel = FlightGlobals.ActiveVessel;
-                    smController = ManifestController.GetInstance(vessel);
+                    smController = SMController.GetInstance(vessel);
 
                     // Is CLS installed and enabled?
                     GetCLSVessel();
@@ -176,7 +176,7 @@ namespace ShipManifest
                     {
                         //Instantiate the controller for the active vessel.
 
-                        smController = ManifestController.GetInstance(vessel);
+                        smController = SMController.GetInstance(vessel);
                         smController.CanDrawButton = true;
                         smController.UpdateHighlighting();
 
@@ -198,7 +198,7 @@ namespace ShipManifest
             {
                 if (!frameErrTripped)
                 {
-                    Utilities.LogMessage(string.Format(" in Update.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     frameErrTripped = true;
                 }
             }
@@ -225,7 +225,7 @@ namespace ShipManifest
             Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
             try
             {
-                if (vessel != null && ShipManifestAddon.CanShowShipManifest())
+                if (vessel != null && SMAddon.CanShowShipManifest())
                 {
                     if (newVessel.isEVA && !vessel.isEVA)
                     {
@@ -241,7 +241,7 @@ namespace ShipManifest
 
                 // Now let's update the current vessel view...
                 vessel = newVessel;
-                smController = ManifestController.GetInstance(vessel);
+                smController = SMController.GetInstance(vessel);
             }
             catch (Exception ex)
             {
@@ -502,7 +502,7 @@ namespace ShipManifest
                     // Are the parts capable of holding kerbals and are there kerbals to move?
                     if ((smController.SelectedPartTarget != null && smController.SelectedPartSource != smController.SelectedPartTarget) && smController.SelectedPartSource.protoModuleCrew.Count > 0)
                     {
-                        // now, are the parts connected to each other in the same living space?
+                        // now if realism mode, are the parts connected to each other in the same living space?
                         results = IsCLSInSameSpace();
                     }
                 }
@@ -511,7 +511,7 @@ namespace ShipManifest
                     // Target to Source
                     if ((smController.SelectedPartSource != null && smController.SelectedPartSource != smController.SelectedPartTarget) && smController.SelectedPartTarget.protoModuleCrew.Count > 0)
                     {
-                        // now, are the parts connected to each other in the same living space?
+                        // now if realism mode, are the parts connected to each other in the same living space?
                         results = IsCLSInSameSpace();
                     }
                 }
@@ -539,7 +539,7 @@ namespace ShipManifest
             {
                 if (smController.SelectedPartSource == null || smController.SelectedPartTarget == null) 
                     return false;
-                if (Settings.EnableCLS)
+                if (Settings.EnableCLS && Settings.RealismMode)
                 {
                     if (clsVessel != null)
                     {
@@ -559,7 +559,7 @@ namespace ShipManifest
             {
                 if (!frameErrTripped)
                 {
-                    Utilities.LogMessage(string.Format(" in IsInCLS.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     frameErrTripped = true;
                 }
             }
@@ -580,9 +580,67 @@ namespace ShipManifest
                 return false;
            }
         }
+        
         #endregion
 
         #region Action Methods
+
+        public static void UpdateCLSSpaces()
+        {
+            SMAddon.GetCLSVessel();
+            if (SMAddon.clsVessel != null)
+            {
+                try
+                {
+                    if (smController.SelectedPartSource != null)
+                    {
+                        smController.clsPartSource = null;
+                        smController.clsSpaceSource = null;
+                        foreach (ICLSSpace sSpace in SMAddon.clsVessel.Spaces)
+                        {
+                            foreach (ICLSPart sPart in sSpace.Parts)
+                            {
+                                if (sPart.Part == smController.SelectedPartSource)
+                                {
+                                    smController.clsPartSource = sPart;
+                                    smController.clsSpaceSource = sSpace;
+                                    Utilities.LogMessage("UpdateCLSSpaces - clsPartSource found;", "info", Settings.VerboseLogging);
+                                    break;
+                                }
+                            }
+                        }
+                        if (smController.clsSpaceSource == null)
+                            Utilities.LogMessage("UpdateCLSSpaces - clsSpaceSource is null.", "info", Settings.VerboseLogging);
+                    }
+                    if (smController.SelectedPartTarget != null)
+                    {
+                        smController.clsPartTarget = null;
+                        smController.clsSpaceTarget = null;
+                        foreach (ICLSSpace tSpace in SMAddon.clsVessel.Spaces)
+                        {
+                            foreach (ICLSPart tPart in tSpace.Parts)
+                            {
+                                if (tPart.Part == smController.SelectedPartTarget)
+                                {
+                                    smController.clsPartTarget = tPart;
+                                    smController.clsSpaceTarget = tSpace;
+                                    Utilities.LogMessage("UpdateCLSSpaces - clsPartTarget found;", "info", Settings.VerboseLogging);
+                                    break;
+                                }
+                            }
+                        }
+                        if (smController.clsSpaceTarget == null)
+                            Utilities.LogMessage("UpdateCLSSpaces - clsSpaceTarget is null.", "info", Settings.VerboseLogging);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utilities.LogMessage(string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                }
+            }
+            else
+                Utilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", Settings.VerboseLogging);
+        }
 
         public static bool GetCLSVessel()
         {
@@ -694,7 +752,7 @@ namespace ShipManifest
                 ManifestStyle.SetupGUI();
 
                 if (Settings.ShowDebugger)
-                    Settings.DebuggerPosition = GUILayout.Window(398648, Settings.DebuggerPosition, DebuggerWindow.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
+                    Settings.DebuggerPosition = GUILayout.Window(398648, Settings.DebuggerPosition, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
 
                 if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != vessel)
                 {
@@ -710,43 +768,48 @@ namespace ShipManifest
                 {
                     // why is this here?
                     //UpdateHighlighting();
-                    if (ShipManifestAddon.CanShowShipManifest())
+                    if (SMAddon.CanShowShipManifest())
                     {
                         step = "2 - Show Manifest";
-                        Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, ManifestWindow.Display, "Ship's Manifest - " + vessel.vesselName, GUILayout.MinHeight(20));
+                        Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, WindowManifest.Display, "Ship's Manifest - " + vessel.vesselName, GUILayout.MinHeight(20));
+                    }
+                    else
+                    {
+                        if (Settings.EnableCLS && smController.SelectedResource == "Crew")
+                            SMController.HighlightCLSVessel(false, true);  
                     }
 
                     // What windows do we want to show?
-                    if (ShipManifestAddon.CanShowShipManifest() && Settings.ShowTransferWindow && smController.SelectedResource != null)
+                    if (SMAddon.CanShowShipManifest() && Settings.ShowTransferWindow && smController.SelectedResource != null)
                     {
                         step = "3 - Show Transfer";
-                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, TransferWindow.Display, "Transfer - " + vessel.vesselName + " - " + smController.SelectedResource, GUILayout.MinHeight(20));
+                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + " - " + smController.SelectedResource, GUILayout.MinHeight(20));
                     }
 
-                    if (ShipManifestAddon.CanShowShipManifest() && Settings.ShowSettings)
+                    if (SMAddon.CanShowShipManifest() && Settings.ShowSettings)
                     {
                         step = "4 - Show Settings";
-                        Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, SettingsWindow.Display, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                        Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, WindowSettings.Display, "Ship Manifest Settings", GUILayout.MinHeight(20));
                     }
 
-                    if (RosterWindow.resetRosterSize)
+                    if (WindowRoster.resetRosterSize)
                     {
                         step = "5 - Reset Roster Size";
                         Settings.RosterPosition.height = 100; //reset hight
                         Settings.RosterPosition.width = 400; //reset width
-                        RosterWindow.resetRosterSize = false;
+                        WindowRoster.resetRosterSize = false;
                     }
 
                     if (Settings.ShowShipManifest && Settings.ShowRoster)
                     {
                         step = "6 - Show Roster";
-                        Settings.RosterPosition = GUILayout.Window(398547, Settings.RosterPosition, RosterWindow.Display, "Ship Manifest Roster", GUILayout.MinHeight(20));
+                        Settings.RosterPosition = GUILayout.Window(398547, Settings.RosterPosition, WindowRoster.Display, "Ship Manifest Roster", GUILayout.MinHeight(20));
                     }
 
-                    if (Settings.ShowShipManifest && Settings.ShowHatchWindow)
+                    if (Settings.ShowShipManifest && Settings.ShowHatch)
                     {
                         step = "6 - Show Hatches";
-                        Settings.HatchWindowPosition = GUILayout.Window(398548, Settings.HatchWindowPosition, HatchWindow.Display, "Ship Manifest Hatches", GUILayout.MinHeight(20));
+                        Settings.HatchPosition = GUILayout.Window(398548, Settings.HatchPosition, WindowHatch.Display, "Ship Manifest Hatches", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
                     }
                 }
             }
@@ -896,7 +959,7 @@ namespace ShipManifest
             {
                 if (!frameErrTripped)
                 {
-                    Utilities.LogMessage(string.Format(" in RealModePumpXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in RealModePumpXfer (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     frameErrTripped = true;
                     throw ex;
                 }
@@ -997,7 +1060,7 @@ namespace ShipManifest
                                 // play crew sit.
                                 source2.Stop();
                                 source3.Play();
-                                ShipManifestAddon.timestamp = elapsed = 0;
+                                SMAddon.timestamp = elapsed = 0;
                                 XferState = XFERState.Off;
                                 crewXfer = false;
                                 isSeat2Seat = false;
@@ -1023,7 +1086,7 @@ namespace ShipManifest
                 if (!frameErrTripped)
                 {
                     Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Error", true);
-                    Utilities.LogMessage(string.Format(" in RealModeCrewXfer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in RealModeCrewXfer (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     XferState = XFERState.Stop;
                     frameErrTripped = true;
                 }

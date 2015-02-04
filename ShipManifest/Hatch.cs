@@ -61,14 +61,14 @@ namespace ShipManifest
             iModule.HatchEvents["CloseHatch"].active = true;
             iModule.HatchEvents["OpenHatch"].active = false;
             iModule.HatchOpen = true;
-            ShipManifestAddon.FireEventTriggers();
+            SMAddon.FireEventTriggers();
         }
         public void CloseHatch()
         {
             iModule.HatchEvents["CloseHatch"].active = false;
             iModule.HatchEvents["OpenHatch"].active = true;
             iModule.HatchOpen = false;
-            ShipManifestAddon.FireEventTriggers();
+            SMAddon.FireEventTriggers();
         }
 
         public void Highlight()
@@ -85,7 +85,7 @@ namespace ShipManifest
             {
                 if (iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchOpenColor] || iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchCloseColor])
                 {
-                    if (Settings.EnableCLS && ShipManifestAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                    if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
                     {
                         CLSPart.Highlight(true, true);
                     }
