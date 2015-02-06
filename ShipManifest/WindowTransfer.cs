@@ -13,7 +13,7 @@ namespace ShipManifest
 
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.TransferToolTips;
 
         internal static string xferToolTip = "";
 
@@ -26,6 +26,10 @@ namespace ShipManifest
         // This window assumes that a resource has been selected on the Ship manifest window.
         internal static void Display(int windowId)
         {
+            // Reset Tooltip active flag...
+            ToolTipActive = false;
+            ShowToolTips = Settings.TransferToolTips;
+
             Rect rect = new Rect(604, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
@@ -34,13 +38,10 @@ namespace ShipManifest
                 SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
-                // Reset Tooltip active flag...
-                ToolTipActive = false;
-
                 // This window assumes that a resource has been selected on the Ship manifest window.
                 if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
                     SMAddon.UpdateCLSSpaces();
@@ -218,7 +219,7 @@ namespace ShipManifest
                         ToolTip = "";
                         TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartSource);
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 10, 190 - SourceDetailsViewerScrollPosition.y);
@@ -238,7 +239,7 @@ namespace ShipManifest
                 {
                     TransferCrewMember(crewMember, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
                 }
-                if (Event.current.type == EventType.Repaint)
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 {
                     Rect rect = GUILayoutUtility.GetLastRect();
                     ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
@@ -282,7 +283,7 @@ namespace ShipManifest
                         TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
                         SMAddon.smController.SelectedModuleSource = null;
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
@@ -328,7 +329,7 @@ namespace ShipManifest
                             flowtextS = "On";
                         }
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 30, 190 - TargetDetailsViewerScrollPosition.y);
@@ -388,7 +389,7 @@ namespace ShipManifest
                             {
                                 TransferResource(SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget, (double)SMAddon.smController.sXferAmount);
                             }
-                            if (Event.current.type == EventType.Repaint)
+                            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
                                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 30, 190 - TargetDetailsViewerScrollPosition.y);
@@ -531,7 +532,7 @@ namespace ShipManifest
                         ToolTip = "";
                         TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartTarget);
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetDetailsViewerScrollPosition.y);
@@ -551,7 +552,7 @@ namespace ShipManifest
                 {
                     TransferCrewMember(crewMember, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
                 }
-                if (Event.current.type == EventType.Repaint)
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 {
                     Rect rect = GUILayoutUtility.GetLastRect();
                     ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetDetailsViewerScrollPosition.y);
@@ -591,7 +592,7 @@ namespace ShipManifest
                     {
                         SMAddon.smController.SelectedModuleTarget = pm;
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
@@ -637,7 +638,7 @@ namespace ShipManifest
                             flowtextT = "On";
                         }
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
@@ -693,7 +694,7 @@ namespace ShipManifest
                                 
                             if (GUILayout.Button(new GUIContent("Xfer","Transfers the selected resource to the selected Source Part"), GUILayout.Width(50), GUILayout.Height(20)))
                                 TransferResource(SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource, (double)SMAddon.smController.tXferAmount);
-                            if (Event.current.type == EventType.Repaint)
+                            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
                                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 340, 190 - TargetDetailsViewerScrollPosition.y);

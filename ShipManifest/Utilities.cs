@@ -26,7 +26,7 @@ namespace ShipManifest
             img1.LoadImageIntoTexture(tex);
         }
 
-        internal static string DisplayResourceTotals(string selectedResource)
+        internal static string DisplayVesselResourceTotals(string selectedResource)
         {
             string displayAmount = "";
             double currAmount = 0;
@@ -60,9 +60,9 @@ namespace ShipManifest
                     }
                 }
                 if (selectedResource != "Science")
-                    displayAmount = string.Format(" - ({0}/{1})", currAmount.ToString("#######0.####"), totAmount.ToString("######0.####"));
+                    displayAmount = string.Format(" - ({0}/{1})", currAmount.ToString("#######0.##"), totAmount.ToString("######0.##"));
                 else
-                    displayAmount = string.Format(" - ({0})", currAmount.ToString("#######0.####"));
+                    displayAmount = string.Format(" - ({0})", currAmount.ToString("#######0"));
             }
             catch (Exception ex)
             {

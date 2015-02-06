@@ -139,8 +139,21 @@ namespace ShipManifest
         internal static string HatchOpenColor = "cyan";
         internal static string HatchCloseColor = "red";
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
+
         internal static bool ShowToolTips = true;
-        internal static bool prevShowTooltips = true;
+        internal static bool prevShowToolTips = true;
+        internal static bool ManifestToolTips = true;
+        internal static bool prevManifestToolTips = true;
+        internal static bool TransferToolTips = true;
+        internal static bool prevTransferToolTips = true;
+        internal static bool SettingsToolTips = true;
+        internal static bool prevSettingsToolTips = true;
+        internal static bool RosterToolTips = true;
+        internal static bool prevRosterToolTips = true;
+        internal static bool HatchToolTips = true;
+        internal static bool prevHatchToolTips = true;
+        internal static bool DebuggerToolTips = true;
+        internal static bool prevDebuggerToolTips = true;
 
         #endregion
 
@@ -209,6 +222,12 @@ namespace ShipManifest
                 SaveLogOnExit = configfile.GetValue<bool>("SaveLogOnExit");
                 EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
                 ShowToolTips = configfile.GetValue<bool>("ShowToolTips");
+                ManifestToolTips = configfile.GetValue<bool>("ManifestToolTips");
+                TransferToolTips = configfile.GetValue<bool>("TransferToolTips");
+                SettingsToolTips = configfile.GetValue<bool>("SettingsToolTips");
+                RosterToolTips = configfile.GetValue<bool>("RosterToolTips");
+                HatchToolTips = configfile.GetValue<bool>("HatchToolTips");
+                DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips");
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -286,6 +305,12 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowToolTips Loaded: {0}", ShowToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("ManifestToolTips Loaded: {0}", ManifestToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("TransferToolTips Loaded: {0}", TransferToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("SettingsToolTips Loaded: {0}", SettingsToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("RosterToolTips Loaded: {0}", RosterToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("HatchToolTips Loaded: {0}", HatchToolTips), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("DebuggerToolTips Loaded: {0}", DebuggerToolTips), "Info", VerboseLogging);
                 Utilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
 
                 ValidateLoad();
@@ -388,6 +413,12 @@ namespace ShipManifest
                 configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
                 configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
                 configfile.SetValue("ShowToolTips", ShowToolTips);
+                configfile.SetValue("ManifestToolTips", ManifestToolTips);
+                configfile.SetValue("TransferToolTips", TransferToolTips);
+                configfile.SetValue("SettingsToolTips", SettingsToolTips);
+                configfile.SetValue("RosterToolTips", RosterToolTips);
+                configfile.SetValue("HatchToolTips", HatchToolTips);
+                configfile.SetValue("DebuggerToolTips", DebuggerToolTips);
 
                 configfile.save();
 
@@ -437,6 +468,12 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowToolTips Saved: {0}", ShowToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("ManifestToolTips Saved: {0}", ManifestToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("TransferToolTips Saved: {0}", TransferToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("SettingsToolTips Saved: {0}", SettingsToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("RosterToolTips Saved: {0}", RosterToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("HatchToolTips Saved: {0}", HatchToolTips.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("DebuggerToolTips Saved: {0}", DebuggerToolTips.ToString()), "Info", VerboseLogging);
             }
             catch (Exception ex)
             {
@@ -485,7 +522,13 @@ namespace ShipManifest
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
-            prevShowTooltips = ShowToolTips;
+            prevShowToolTips = ShowToolTips;
+            prevManifestToolTips = ManifestToolTips;
+            prevTransferToolTips = TransferToolTips;
+            prevSettingsToolTips = SettingsToolTips;
+            prevRosterToolTips = RosterToolTips;
+            prevHatchToolTips = HatchToolTips;
+            prevDebuggerToolTips = DebuggerToolTips;
 
             // sounds
 
@@ -518,7 +561,13 @@ namespace ShipManifest
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
             SaveLogOnExit = prevSaveLogOnExit;
-            ShowToolTips = prevShowTooltips;
+            ShowToolTips = prevShowToolTips;
+            ManifestToolTips = prevManifestToolTips;
+            TransferToolTips = prevTransferToolTips;
+            SettingsToolTips = prevSettingsToolTips;
+            RosterToolTips = prevRosterToolTips;
+            HatchToolTips = prevHatchToolTips;
+            DebuggerToolTips = prevDebuggerToolTips;
 
             //debugger Settings
             prevErrorLogLength = ErrorLogLength;

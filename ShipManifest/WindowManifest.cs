@@ -14,7 +14,7 @@ namespace ShipManifest
 
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.ManifestToolTips;
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -24,6 +24,7 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
+            ShowToolTips = Settings.ManifestToolTips;
 
             Rect rect = new Rect(304, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -34,7 +35,7 @@ namespace ShipManifest
                 SMAddon.ToggleToolbar();
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.ManifestPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
@@ -161,7 +162,7 @@ namespace ShipManifest
                     if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
-                    string DisplayAmounts = Utilities.DisplayResourceTotals(resourceName);
+                    string DisplayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
                     var style = SMAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName + DisplayAmounts), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {

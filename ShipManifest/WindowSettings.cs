@@ -13,13 +13,14 @@ namespace ShipManifest
 
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.SettingsToolTips;
 
         private static Vector2 ScrollViewerPosition = Vector2.zero;
         internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
+            ShowToolTips = Settings.SettingsToolTips;
 
             Rect rect = new Rect(371, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -28,7 +29,7 @@ namespace ShipManifest
                 SMAddon.ToggleToolbar();
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             // Store settings in case we cancel later...
@@ -135,7 +136,7 @@ namespace ShipManifest
             Settings.LockSettings = GUILayout.Toggle(Settings.LockSettings, label, GUILayout.Width(300));
 
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Highlighting & ToolTips", GUILayout.Height(10));
+            GUILayout.Label("Highlighting", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
             // EnableHighlighting Mode
@@ -199,10 +200,46 @@ namespace ShipManifest
 
             // Enable Tool Tips
             GUI.enabled = true;
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
+            GUILayout.Label("ToolTips", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
             label = "Enable Tool Tips";
             Settings.ShowToolTips = GUILayout.Toggle(Settings.ShowToolTips, label, GUILayout.Width(300));
 
+            GUI.enabled = Settings.ShowToolTips;
+            label = "Manifest Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.ManifestToolTips = GUILayout.Toggle(Settings.ManifestToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Transfer Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.TransferToolTips = GUILayout.Toggle(Settings.TransferToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Settings Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.SettingsToolTips = GUILayout.Toggle(Settings.SettingsToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Roster Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.RosterToolTips = GUILayout.Toggle(Settings.RosterToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Hatch Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.HatchToolTips = GUILayout.Toggle(Settings.HatchToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Debugger Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.DebuggerToolTips = GUILayout.Toggle(Settings.DebuggerToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
             GUI.enabled = true;
+
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             GUILayout.Label("Sounds", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));

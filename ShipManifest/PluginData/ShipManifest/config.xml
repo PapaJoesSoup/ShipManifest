@@ -76,4 +76,10 @@
   <bool name="CLSInstalled">0</bool>
   <bool name="EnableBlizzyToolbar">0</bool>
   <bool name="ShowToolTips">1</bool>
+  <bool name="ManifestToolTips">1</bool>
+  <bool name="TransferToolTips">1</bool>
+  <bool name="SettingsToolTips">1</bool>
+  <bool name="RosterToolTips">1</bool>
+  <bool name="HatchToolTips">1</bool>
+  <bool name="DebuggerToolTips">1</bool>
 </config>

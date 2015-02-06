@@ -11,7 +11,7 @@ namespace ShipManifest
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.HatchToolTips;
 
         private static List<Hatch> _hatches = new List<Hatch>();
         internal static List<Hatch> Hatches
@@ -63,6 +63,7 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
+            ShowToolTips = Settings.HatchToolTips;
 
             Rect rect = new Rect(366, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -70,7 +71,7 @@ namespace ShipManifest
                 Settings.ShowHatch = false;
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.HatchPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             GetHatches();
@@ -110,7 +111,7 @@ namespace ShipManifest
                     {
                         iHatch.CloseHatch();
                     }
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         iHatch.Highlight();
                 }
             }

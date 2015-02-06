@@ -849,7 +849,7 @@ namespace ShipManifest
                     {
                         step = "3 - Show Transfer";
                         // Lets build the running totals for each resource for display in title...
-                        string DisplayAmounts = Utilities.DisplayResourceTotals(smController.SelectedResource);
+                        string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResource);
                         Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
                     }
 

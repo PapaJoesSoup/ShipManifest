@@ -12,12 +12,13 @@ namespace ShipManifest
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.DebuggerToolTips;
 
         internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
+            ShowToolTips = Settings.DebuggerToolTips;
 
             Rect rect = new Rect(496, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -25,7 +26,7 @@ namespace ShipManifest
                 Settings.ShowDebugger = false;
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.DebuggerPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             GUILayout.BeginVertical();

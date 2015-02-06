@@ -12,7 +12,7 @@ namespace ShipManifest
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
+        internal static bool ShowToolTips = Settings.RosterToolTips;
 
         internal static bool resetRosterSize = true;
         private static KerbalModel _selectedKerbal;
@@ -34,6 +34,7 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
+            ShowToolTips = Settings.RosterToolTips;
 
             Rect rect = new Rect(396, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -41,7 +42,7 @@ namespace ShipManifest
                 Settings.ShowRoster = false;
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
@@ -169,7 +170,7 @@ namespace ShipManifest
                         }
                     }
                     Rect rect = GUILayoutUtility.GetLastRect();
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
 
                     if (((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource != null && !SMController.PartCrewIsFull(SMAddon.smController.SelectedPartSource))
@@ -224,7 +225,7 @@ namespace ShipManifest
                         }
                     }
                     Rect rect2 = GUILayoutUtility.GetLastRect();
-                    if (Event.current.type == EventType.Repaint)
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect2, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
                     GUILayout.EndHorizontal();
                     GUI.enabled = true;
