@@ -1,5 +1,17 @@
 ShipManifest
 ============
+Version 0.90.0_4.0.0 - Release TBD - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
+ - New:  Added support for CLS Hatches.  Now features a hatch dashboard.  Mouseover a hatch and it is highlighted on the vessel.  Takes advantage of changes made to CLS 1.1.1.0 to support third party Hatch control.  Open/close individual/all hatches in a vessel.
+ - New:  Revised highlighting to reintroduce CLS enabled highlighting.  Added a switch to turn on/off CLS highlighting.  Takes advantage of recent changes made to CLS highlighting.
+ - New:  Many internal architectural changes and refactoring of plugin. Changed windows into separate classes. Prepare for a base window class. Added tooltip support.
+ - New:  Added tool tips for many buttons across entire plugin.  Added ToolTip display switch in settings for those that don't want Tool tips to show, including granularity to the window level. 
+ - New:  Major Roster Window enhancements.  Altered action button dislay behaviors to be more clear.  Added conditional tooltips to aid in use of little known features. Added Kerbal Title and Status to Kerbal info display.
+ - New:  Enabling/Disabling Blizzy Toolbar no longer requires a game restart.  Turn it on or off in settings and it will take effect immediately.
+ - New:  Added SETI compatibility support for dataIsCollectable = false in Realism Mode.   Now you cannot Xfer science data where dataIsCollectable = false for the source module.
+ - New:  Added vessel resource totals (quick reference) to Manifest Window resource buttons and Transfer Window Resource Title.
+ - New:  Added KSP-AVC support [url]http://forum.kerbalspaceprogram.com/threads/79745[/url]
+ - Bug:  When when transferring a resource in realism mode, sometimes the source part ends up negative and causes issues (moves resources 1 unit at a time, backwards.
+
 Version 0.90.0_3.3.4 - 16 Jan, 2015 - Bugs, Mod Tweaks and More Edition.
  - New:  Added a Limited Highlighting switch.  When on, highlights only source and target parts.  
          Highlighting switch must be enabled to use.
