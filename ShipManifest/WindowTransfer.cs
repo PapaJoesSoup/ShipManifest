@@ -105,7 +105,7 @@ namespace ShipManifest
             try
             {
                 // This is a scroll panel (we are using it to make button lists...)
-                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(120), GUILayout.Width(300));
+                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
@@ -174,7 +174,7 @@ namespace ShipManifest
             {
                 // Source Part resource Details
                 // this Scroll viewer is for the details of the part selected above.
-                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, GUILayout.Height(90), GUILayout.Width(300));
+                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedPartSource != null)
@@ -422,7 +422,7 @@ namespace ShipManifest
                     ManifestStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartCrewColor];
                 }
                 // This is a scroll panel (we are using it to make button lists...)
-                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(120), GUILayout.Width(300));
+                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
                 foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
                 {
@@ -488,7 +488,7 @@ namespace ShipManifest
             try
             {
                 // Target Part resource details
-                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, GUILayout.Height(90), GUILayout.Width(300));
+                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------

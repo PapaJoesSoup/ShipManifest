@@ -60,7 +60,7 @@ namespace ShipManifest
                     }
                 }
                 if (selectedResource != "Science")
-                    displayAmount = string.Format(" - ({0}/{1})", currAmount.ToString("#######0.##"), totAmount.ToString("######0.##"));
+                    displayAmount = string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"));
                 else
                     displayAmount = string.Format(" - ({0})", currAmount.ToString("#######0"));
             }
