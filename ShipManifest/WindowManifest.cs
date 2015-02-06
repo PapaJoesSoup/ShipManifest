@@ -8,18 +8,19 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public static class WindowManifest
+    internal static class WindowManifest
     {
         #region Manifest Window - Gui Layout Code
 
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
-        private static Vector2 ScrollViewerShipManifest = Vector2.zero;
-        private static Vector2 ScrollViewerResourceManifest2 = Vector2.zero;
-        public static void Display(int windowId)
+        private static Vector2 SMScrollViewerPosition = Vector2.zero;
+        private static Vector2 ResourceScrollViewerPosition = Vector2.zero;
+        internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
@@ -38,7 +39,7 @@ namespace ShipManifest
             try
             {
                 GUILayout.BeginVertical();
-                ScrollViewerShipManifest = GUILayout.BeginScrollView(ScrollViewerShipManifest, GUILayout.Height(100), GUILayout.Width(300));
+                SMScrollViewerPosition = GUILayout.BeginScrollView(SMScrollViewerPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.IsPreLaunch)
@@ -160,8 +161,9 @@ namespace ShipManifest
                     if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
+                    string DisplayAmounts = Utilities.DisplayResourceTotals(resourceName);
                     var style = SMAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                    if (GUILayout.Button(string.Format("{0}", resourceName), style, GUILayout.Width(width), GUILayout.Height(20)))
+                    if (GUILayout.Button(string.Format("{0}", resourceName + DisplayAmounts), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {
                         try
                         {
@@ -217,7 +219,7 @@ namespace ShipManifest
         {
             try
             {
-                ScrollViewerResourceManifest2 = GUILayout.BeginScrollView(ScrollViewerResourceManifest2, GUILayout.Height(100), GUILayout.Width(300));
+                ResourceScrollViewerPosition = GUILayout.BeginScrollView(ResourceScrollViewerPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedResource != null)

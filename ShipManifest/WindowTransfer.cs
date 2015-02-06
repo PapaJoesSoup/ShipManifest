@@ -7,13 +7,15 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public static class WindowTransfer
+    internal static class WindowTransfer
     {
         #region Properties
 
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
-        public static string xferToolTip = "";
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
+
+        internal static string xferToolTip = "";
 
         #endregion
 
@@ -22,12 +24,18 @@ namespace ShipManifest
         // Resource Transfer Window
         // This window allows you some control over the selected resource on a selected source and target part
         // This window assumes that a resource has been selected on the Ship manifest window.
-        private static Vector2 SourceScrollViewerTransfer = Vector2.zero;
-        private static Vector2 SourceScrollViewerTransfer2 = Vector2.zero;
-        private static Vector2 TargetScrollViewerTransfer = Vector2.zero;
-        private static Vector2 TargetScrollViewerTransfer2 = Vector2.zero;
-        public static void Display(int windowId)
+        internal static void Display(int windowId)
         {
+            Rect rect = new Rect(604, 4, 16, 16);
+            if (GUI.Button(rect, new GUIContent("", "Close Window")))
+            {
+                Settings.ShowTransferWindow = false;
+                SMAddon.smController.SelectedResource = null;
+                SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                ToolTip = "";
+            }
+            if (Event.current.type == EventType.Repaint)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
                 // Reset Tooltip active flag...
@@ -90,12 +98,13 @@ namespace ShipManifest
         }
 
         // Transfer Window components
-        public static void SourceTransferViewer()
+        private static Vector2 SourceTransferViewerScrollPosition = Vector2.zero;
+        internal static void SourceTransferViewer()
         {
             try
             {
                 // This is a scroll panel (we are using it to make button lists...)
-                SourceScrollViewerTransfer = GUILayout.BeginScrollView(SourceScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
+                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
@@ -157,13 +166,14 @@ namespace ShipManifest
             }
         }
 
+        private static Vector2 SourceDetailsViewerScrollPosition = Vector2.zero;
         private static void SourceDetailsViewer()
         {
             try
             {
                 // Source Part resource Details
                 // this Scroll viewer is for the details of the part selected above.
-                SourceScrollViewerTransfer2 = GUILayout.BeginScrollView(SourceScrollViewerTransfer2, GUILayout.Height(90), GUILayout.Width(300));
+                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, GUILayout.Height(90), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedPartSource != null)
@@ -211,11 +221,11 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 10, 190 - SourceScrollViewerTransfer2.y);
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 10, 190 - SourceDetailsViewerScrollPosition.y);
                     }
                     GUI.enabled = true;
                 }
-                GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
+                GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
                 if (SMAddon.CanKerbalsBeXferred(SMAddon.smController.SelectedPartSource))
                 {
                     if (SMAddon.crewXfer || SMAddon.XferOn)
@@ -231,7 +241,7 @@ namespace ShipManifest
                 if (Event.current.type == EventType.Repaint)
                 {
                     Rect rect = GUILayoutUtility.GetLastRect();
-                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetScrollViewerTransfer2.y);
+                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
                 }
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
@@ -256,14 +266,26 @@ namespace ShipManifest
 
                 // If we have target selected, it is not the same as the source, there is science to xfer.
                 if ((SMAddon.smController.SelectedModuleTarget != null && pm != SMAddon.smController.SelectedModuleTarget) && scienceCount > 0)
-                {                    
+                {
+                    string toolTip = "";
                     if (Settings.RealismMode && !isCollectable)
+                    {
                         GUI.enabled = false;
-                    if (GUILayout.Button("Xfer", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                        toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is not transferable";
+                    }
+                    else
+                        toolTip = "Experiment/data is transferable";
+
+                    if (GUILayout.Button(new GUIContent("Xfer", toolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         SMAddon.smController.SelectedModuleSource = pm;
                         TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
                         SMAddon.smController.SelectedModuleSource = null;
+                    }
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
                     }
                     GUI.enabled = true;
                 }
@@ -293,7 +315,7 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
                     GUILayout.Label(string.Format("{0}", flowtextS), GUILayout.Width(30), GUILayout.Height(20));
-                    if (GUILayout.Button("Flow", GUILayout.Width(50), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         if (flowboolS)
                         {
@@ -305,6 +327,11 @@ namespace ShipManifest
                             SMAddon.smController.SelectedPartSource.Resources[SMAddon.smController.SelectedResource].flowState = true;
                             flowtextS = "On";
                         }
+                    }
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 30, 190 - TargetDetailsViewerScrollPosition.y);
                     }
                     GUILayout.EndHorizontal();
                     if ((SMAddon.smController.SelectedPartTarget != null && SMAddon.smController.SelectedPartSource != SMAddon.smController.SelectedPartTarget) &&
@@ -357,9 +384,14 @@ namespace ShipManifest
                             if (float.TryParse(strXferAmount, out newAmount))
                                 SMAddon.smController.sXferAmount = newAmount;
 
-                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                            if (GUILayout.Button(new GUIContent("Xfer", "Transfers the selected resource to the selected Target Part"), GUILayout.Width(50), GUILayout.Height(20)))
                             {
                                 TransferResource(SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget, (double)SMAddon.smController.sXferAmount);
+                            }
+                            if (Event.current.type == EventType.Repaint)
+                            {
+                                Rect rect = GUILayoutUtility.GetLastRect();
+                                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 30, 190 - TargetDetailsViewerScrollPosition.y);
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
@@ -372,12 +404,24 @@ namespace ShipManifest
             }
         }
 
+        private static Vector2 TargetTransferViewerScrollPosition = Vector2.zero;
         private static void TargetTransferViewer()
         {
             try
             {
+                // Adjust style colors for part selectors when using/not using CLS highlighting
+                if (Settings.EnableCLSHighlighting)
+                {
+                    ManifestStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartCrewColor];
+                    ManifestStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartColor];
+                }
+                else
+                {
+                    ManifestStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
+                    ManifestStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartCrewColor];
+                }
                 // This is a scroll panel (we are using it to make button lists...)
-                TargetScrollViewerTransfer = GUILayout.BeginScrollView(TargetScrollViewerTransfer, GUILayout.Height(120), GUILayout.Width(300));
+                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
                 foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
                 {
@@ -437,12 +481,13 @@ namespace ShipManifest
             }
         }
 
+        private static Vector2 TargetDetailsViewerScrollPosition = Vector2.zero;
         private static void TargetDetailsViewer()
         {
             try
             {
                 // Target Part resource details
-                TargetScrollViewerTransfer2 = GUILayout.BeginScrollView(TargetScrollViewerTransfer2, GUILayout.Height(90), GUILayout.Width(300));
+                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, GUILayout.Height(90), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
@@ -489,11 +534,11 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetScrollViewerTransfer2.y);
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetDetailsViewerScrollPosition.y);
                     }
                     GUI.enabled = true;
                 }
-                GUILayout.Label(string.Format("  {0}", crewMember.name), GUILayout.Width(190), GUILayout.Height(20));
+                GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
                 if (SMAddon.CanKerbalsBeXferred(SMAddon.smController.SelectedPartTarget))
                 {
                     if (SMAddon.crewXfer || SMAddon.XferOn)
@@ -509,7 +554,7 @@ namespace ShipManifest
                 if (Event.current.type == EventType.Repaint)
                 {
                     Rect rect = GUILayoutUtility.GetLastRect();
-                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetScrollViewerTransfer2.y);
+                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 320, 190 - TargetDetailsViewerScrollPosition.y);
                 }
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
@@ -542,9 +587,14 @@ namespace ShipManifest
                         ShowReceive = true;
                     //SelectedModuleTarget = pm;
                     var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
-                    if (GUILayout.Button("Recv", style, GUILayout.Width(50), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         SMAddon.smController.SelectedModuleTarget = pm;
+                    }
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
                     }
                     GUILayout.EndHorizontal();
                 }
@@ -574,7 +624,7 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(string.Format("({0}/{1})", resource.amount.ToString("#######0.####"), resource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
                     GUILayout.Label(string.Format("{0}", flowtextT), GUILayout.Width(30), GUILayout.Height(20));
-                    if (GUILayout.Button("Flow", ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent("Flow","Enable/Disable flow of selected resource from this part."), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         if (flowboolT)
                         {
@@ -586,6 +636,11 @@ namespace ShipManifest
                             SMAddon.smController.SelectedPartTarget.Resources[SMAddon.smController.SelectedResource].flowState = true;
                             flowtextT = "On";
                         }
+                    }
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
                     }
                     GUILayout.EndHorizontal();
                     if ((SMAddon.smController.SelectedPartSource != null && SMAddon.smController.SelectedPartSource != SMAddon.smController.SelectedPartTarget) && (SMAddon.smController.SelectedPartTarget.Resources[resource.info.name].amount > 0 && SMAddon.smController.SelectedPartSource.Resources[resource.info.name].amount < SMAddon.smController.SelectedPartSource.Resources[resource.info.name].maxAmount))
@@ -636,8 +691,13 @@ namespace ShipManifest
                             if (float.TryParse(strXferAmount, out newAmount))
                                 SMAddon.smController.tXferAmount = newAmount;
                                 
-                            if (GUILayout.Button("Xfer", GUILayout.Width(50), GUILayout.Height(20)))
+                            if (GUILayout.Button(new GUIContent("Xfer","Transfers the selected resource to the selected Source Part"), GUILayout.Width(50), GUILayout.Height(20)))
                                 TransferResource(SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource, (double)SMAddon.smController.tXferAmount);
+                            if (Event.current.type == EventType.Repaint)
+                            {
+                                Rect rect = GUILayoutUtility.GetLastRect();
+                                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 340, 190 - TargetDetailsViewerScrollPosition.y);
+                            }
 
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();

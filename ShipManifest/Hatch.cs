@@ -7,39 +7,39 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public class Hatch
+    internal class Hatch
     {
         private PartModule _hatchModule;
-        public PartModule HatchModule
+        internal PartModule HatchModule
         {
             get { return _hatchModule; }
             set { _hatchModule = value; }
         }
 
         private ICLSPart _clsPart;
-        public ICLSPart CLSPart
+        internal ICLSPart CLSPart
         {
             get { return _clsPart; }
             set { _clsPart = value; }
         }
 
-        public bool HatchOpen
+        internal bool HatchOpen
         {
             get { return iModule.HatchOpen; }
             set { iModule.HatchOpen = value; }
         }
 
-        public string HatchStatus
+        internal string HatchStatus
         {
             get { return iModule.HatchStatus; }
         }
 
-        public bool IsDocked
+        internal bool IsDocked
         {
             get { return iModule.IsDocked; }
         }
 
-        public string Title
+        internal string Title
         {
             get { return iModule.ModDockNode.part.parent.partInfo.title; }
         }
@@ -49,21 +49,21 @@ namespace ShipManifest
             get { return (IModuleDockingHatch)this.HatchModule; }
         }
 
-        public Hatch() { }
-        public Hatch(PartModule pModule, ICLSPart iPart)
+        internal Hatch() { }
+        internal Hatch(PartModule pModule, ICLSPart iPart)
         {
             this.HatchModule = pModule;
             this.CLSPart = iPart;
         }
 
-        public void OpenHatch()
+        internal void OpenHatch()
         {
             iModule.HatchEvents["CloseHatch"].active = true;
             iModule.HatchEvents["OpenHatch"].active = false;
             iModule.HatchOpen = true;
             SMAddon.FireEventTriggers();
         }
-        public void CloseHatch()
+        internal void CloseHatch()
         {
             iModule.HatchEvents["CloseHatch"].active = false;
             iModule.HatchEvents["OpenHatch"].active = true;
@@ -71,7 +71,7 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        public void Highlight()
+        internal void Highlight()
         {
             if (GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
             {

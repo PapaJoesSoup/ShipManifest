@@ -7,24 +7,24 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    public static class ManifestStyle
+    internal static class ManifestStyle
     {
-        public static GUIStyle WindowStyle;
-        public static GUIStyle IconStyle;
-        public static GUIStyle ButtonSourceStyle;
-        public static GUIStyle ButtonTargetStyle;
-        public static GUIStyle ButtonToggledSourceStyle;
-        public static GUIStyle ButtonToggledTargetStyle;
-        public static GUIStyle ButtonStyle;
-        public static GUIStyle ButtonToggledStyle;
-        public static GUIStyle ErrorLabelRedStyle;
-        public static GUIStyle LabelStyle;
-        public static GUIStyle LabelStyleRed;
-        public static GUIStyle LabelStyleYellow;
-        public static GUIStyle LabelStyleGreen;
-        public static GUIStyle ToolTipStyle;
+        internal static GUIStyle WindowStyle;
+        internal static GUIStyle IconStyle;
+        internal static GUIStyle ButtonSourceStyle;
+        internal static GUIStyle ButtonTargetStyle;
+        internal static GUIStyle ButtonToggledSourceStyle;
+        internal static GUIStyle ButtonToggledTargetStyle;
+        internal static GUIStyle ButtonStyle;
+        internal static GUIStyle ButtonToggledStyle;
+        internal static GUIStyle ErrorLabelRedStyle;
+        internal static GUIStyle LabelStyle;
+        internal static GUIStyle LabelStyleRed;
+        internal static GUIStyle LabelStyleYellow;
+        internal static GUIStyle LabelStyleGreen;
+        internal static GUIStyle ToolTipStyle;
 
-        public static void SetupGUI()
+        internal static void SetupGUI()
         {
             GUI.skin = HighLogic.Skin;
             if (WindowStyle == null)
@@ -34,7 +34,7 @@ namespace ShipManifest
             }
         }
 
-        public static void SetStyles()
+        internal static void SetStyles()
         {
             WindowStyle = new GUIStyle(GUI.skin.window);
             IconStyle = new GUIStyle();
@@ -62,6 +62,7 @@ namespace ShipManifest
             ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledSourceStyle.normal.textColor = Settings.Colors[Settings.SourcePartColor];
             ButtonToggledSourceStyle.fontSize = 14;
+            ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
             ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;

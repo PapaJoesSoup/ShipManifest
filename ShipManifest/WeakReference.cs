@@ -15,7 +15,7 @@ namespace ShipManifest
         /// the specified object.
         /// </summary>
         /// <param name="target">An object to track.</param>
-        public WeakReference(T target)
+        internal WeakReference(T target)
             : base(target)
         {
 
@@ -28,7 +28,7 @@ namespace ShipManifest
         /// <param name="target">An object to track.</param>
         /// <param name="trackResurrection">Indicates when to stop tracking the object. If <c>true</c>, the object is tracked
         /// after finalization; if <c>false</c>, the object is only tracked until finalization..</param>
-        public WeakReference(T target, bool trackResurrection)
+        internal WeakReference(T target, bool trackResurrection)
             : base(target, trackResurrection)
         {
         }
@@ -51,7 +51,7 @@ namespace ShipManifest
         /// <value></value>
         /// <returns>null if the object referenced by the current <see cref="T:System.WeakReference"/> object has been garbage collected; otherwise, a reference to the object referenced by the current <see cref="T:System.WeakReference"/> object.</returns>
         /// <exception cref="T:System.InvalidOperationException">The reference to the target object is invalid. This exception can be thrown while setting this property if the value is a null reference or if the object has been finalized during the set operation.</exception>
-        public new T Target
+        internal new T Target
         {
             get
             {

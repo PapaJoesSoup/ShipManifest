@@ -8,14 +8,15 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public static class WindowRoster
+    internal static class WindowRoster
     {
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
 
-        public static bool resetRosterSize = true;
+        internal static bool resetRosterSize = true;
         private static KerbalModel _selectedKerbal;
-        public static KerbalModel SelectedKerbal
+        internal static KerbalModel SelectedKerbal
         {
             get { return _selectedKerbal; }
             set
@@ -28,8 +29,8 @@ namespace ShipManifest
                 }
             }
         }
-        private static Vector2 rosterScrollViewer = Vector2.zero;
-        public static void Display(int windowId)
+        private static Vector2 ScrollViewerPosition = Vector2.zero;
+        internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
@@ -105,7 +106,7 @@ namespace ShipManifest
         {
             try
             {
-                rosterScrollViewer = GUILayout.BeginScrollView(rosterScrollViewer, GUILayout.Height(200), GUILayout.Width(400));
+                ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(200), GUILayout.Width(400));
                 GUILayout.BeginVertical();
 
                 foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
@@ -169,7 +170,7 @@ namespace ShipManifest
                     }
                     Rect rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint)
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-rosterScrollViewer.y);
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
 
                     if (((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource != null && !SMController.PartCrewIsFull(SMAddon.smController.SelectedPartSource))
                     {
@@ -224,7 +225,7 @@ namespace ShipManifest
                     }
                     Rect rect2 = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint)
-                        ToolTip = Utilities.SetActiveTooltip(rect2, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-rosterScrollViewer.y);
+                        ToolTip = Utilities.SetActiveTooltip(rect2, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
                     GUILayout.EndHorizontal();
                     GUI.enabled = true;
                 }

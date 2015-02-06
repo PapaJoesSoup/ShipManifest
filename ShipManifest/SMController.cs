@@ -8,13 +8,13 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public class SMController
+    internal class SMController
     {
         #region Singleton stuff
 
         private static Dictionary<WeakReference<Vessel>, SMController> controllers = new Dictionary<WeakReference<Vessel>, SMController>();
 
-        public static SMController GetInstance(Vessel vessel)
+        internal static SMController GetInstance(Vessel vessel)
         {
             foreach (var kvp in controllers.ToArray())
             {
@@ -40,36 +40,36 @@ namespace ShipManifest
         #region Properties
 
         // variables used for moving resources.  set to a negative to allow slider to function.
-        public float sXferAmount = -1f;
-        public bool sXferAmountHasDecimal = false;
-        public bool sXferAmountHasZero = false;
-        public float tXferAmount = -1f;
-        public bool tXferAmountHasDecimal = false;
-        public bool tXferAmountHasZero = false;
-        public float AmtXferred = 0f;
+        internal float sXferAmount = -1f;
+        internal bool sXferAmountHasDecimal = false;
+        internal bool sXferAmountHasZero = false;
+        internal float tXferAmount = -1f;
+        internal bool tXferAmountHasDecimal = false;
+        internal bool tXferAmountHasZero = false;
+        internal float AmtXferred = 0f;
 
-        public Vessel Vessel
+        internal Vessel Vessel
         {
             get { return controllers.Single(p => p.Value == this).Key.Target; }
         }
 
-        public bool IsPreLaunch
+        internal bool IsPreLaunch
         {
             get { return Vessel.landedAt == "LaunchPad" || Vessel.landedAt == "Runway"; }
         }
 
-        public bool CanDrawButton = false;
+        internal bool CanDrawButton = false;
 
-        public string saveMessage = string.Empty;
+        internal string saveMessage = string.Empty;
         #endregion
 
         #region Datasource properties
 
         // dataSource for Resource manifest and ResourceTransfer windows
         // Provides a list of resources and the parts that contain that resource.
-        public List<string> ResourceList = new List<string>();
-        public Dictionary<string, List<Part>> _partsByResource = null;
-        public Dictionary<string, List<Part>> PartsByResource
+        internal List<string> ResourceList = new List<string>();
+        internal Dictionary<string, List<Part>> _partsByResource = null;
+        internal Dictionary<string, List<Part>> PartsByResource
         {
             get
             {
@@ -185,7 +185,7 @@ namespace ShipManifest
         // Holds the Resource.info.name selected in the Resource Manifest Window.
         private string _prevSelectedResource;
         private string _selectedResource;
-        public string SelectedResource
+        internal string SelectedResource
         {
             get
             {
@@ -214,7 +214,7 @@ namespace ShipManifest
         // Provides a list of parts for a given resource.
         // Used to maintain Add/Remove of OnMouseExit handlers
         private List<Part> _selectedResourceParts;
-        public List<Part> SelectedResourceParts
+        internal List<Part> SelectedResourceParts
         {
             get
             {
@@ -230,7 +230,7 @@ namespace ShipManifest
         }
 
         private Part _selectedPartSource;
-        public Part SelectedPartSource
+        internal Part SelectedPartSource
         {
             get
             {
@@ -272,7 +272,7 @@ namespace ShipManifest
         }
 
         private Part _selectedPartTarget;
-        public Part SelectedPartTarget
+        internal Part SelectedPartTarget
         {
             get
             {
@@ -309,19 +309,19 @@ namespace ShipManifest
             }
         }
 
-        public PartModule SelectedModuleSource;
-        public PartModule SelectedModuleTarget;
+        internal PartModule SelectedModuleSource;
+        internal PartModule SelectedModuleTarget;
 
-        public ICLSPart clsPartSource;
-        public ICLSPart clsPartTarget;
-        public ICLSSpace clsSpaceSource;
-        public ICLSSpace clsSpaceTarget;
+        internal ICLSPart clsPartSource;
+        internal ICLSPart clsPartTarget;
+        internal ICLSSpace clsSpaceSource;
+        internal ICLSSpace clsSpaceTarget;
 
-        public GameEvents.FromToAction<Part, Part> evaAction;
+        internal GameEvents.FromToAction<Part, Part> evaAction;
 
         #endregion
 
-        public SMController()
+        internal SMController()
         {
         }
 
@@ -342,7 +342,7 @@ namespace ShipManifest
             }
         }
 
-        public static void AddCrew(ProtoCrewMember kerbal, Part part)
+        internal static void AddCrew(ProtoCrewMember kerbal, Part part)
         {
             part.AddCrewmember(kerbal);
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
@@ -354,12 +354,12 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        public static bool PartCrewIsFull(Part part)
+        internal static bool PartCrewIsFull(Part part)
         {
             return !(part.protoModuleCrew.Count < part.CrewCapacity);
         }
 
-        public Part FindPart(ProtoCrewMember kerbal)
+        internal Part FindPart(ProtoCrewMember kerbal)
         {
             foreach (Part part in FlightGlobals.ActiveVessel.Parts)
             {
@@ -374,13 +374,13 @@ namespace ShipManifest
             return null;
         }
 
-        public static void RemoveCrew(ProtoCrewMember member, Part part)
+        internal static void RemoveCrew(ProtoCrewMember member, Part part)
         {
             part.RemoveCrewmember(member);
             member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         }
 
-        public static void RespawnKerbal(ProtoCrewMember kerbal)
+        internal static void RespawnKerbal(ProtoCrewMember kerbal)
         {
             kerbal.SetTimeForRespawn(0);
             kerbal.Spawn();
@@ -388,19 +388,19 @@ namespace ShipManifest
             HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
         }
 
-        public KerbalModel CreateKerbal()
+        internal KerbalModel CreateKerbal()
         {
             ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
             return new KerbalModel(kerbal, true);
         }
 
-        public void RespawnCrew()
+        internal void RespawnCrew()
         {
             this.Vessel.SpawnCrew();
             SMAddon.FireEventTriggers();
         }
 
-        public void FillVesselCrew()
+        internal void FillVesselCrew()
         {
             foreach (var part in _partsByResource["Crew"])
             {
@@ -409,7 +409,7 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        public void EmptyVesselCrew()
+        internal void EmptyVesselCrew()
         {
             foreach (var part in _partsByResource["Crew"])
             {
@@ -421,7 +421,7 @@ namespace ShipManifest
             }
         }
 
-        public void FillVesselResources()
+        internal void FillVesselResources()
         {
             List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
@@ -440,7 +440,7 @@ namespace ShipManifest
             }
         }
 
-        public void EmptyVesselResources()
+        internal void EmptyVesselResources()
         {
             List<string> resources = _partsByResource.Keys.ToList<string>();
             foreach (string resourceName in resources)
@@ -459,7 +459,7 @@ namespace ShipManifest
             }
         }
 
-        public void DumpResource(string resourceName)
+        internal void DumpResource(string resourceName)
         {
             foreach (Part part in _partsByResource[resourceName])
             {
@@ -473,7 +473,7 @@ namespace ShipManifest
             }
         }
 
-        public void FillResource(string resourceName)
+        internal void FillResource(string resourceName)
         {
             foreach (Part part in _partsByResource[resourceName])
             {
@@ -487,7 +487,7 @@ namespace ShipManifest
             }
         }
 
-        public static void DumpPartResource(Part part, string resourceName)
+        internal static void DumpPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -498,7 +498,7 @@ namespace ShipManifest
             }
         }
 
-        public static void FillPartResource(Part part, string resourceName)
+        internal static void FillPartResource(Part part, string resourceName)
         {
             foreach (PartResource resource in part.Resources)
             {
@@ -517,7 +517,7 @@ namespace ShipManifest
         /// Remove highlighting on a part.
         /// </summary>
         /// <param name="part">Part to remove highlighting from.</param>
-        public static void ClearPartHighlight(Part part)
+        internal static void ClearPartHighlight(Part part)
         {
             try
             {
@@ -538,7 +538,7 @@ namespace ShipManifest
         /// Removes Highlighting on parts belonging to the selected resource list.
         /// </summary>
         /// <param name="_ResourceParts"></param>
-        public static void ClearResourceHighlighting(List<Part> _ResourceParts)
+        internal static void ClearResourceHighlighting(List<Part> _ResourceParts)
         {
             if (_ResourceParts != null)
             {
@@ -551,7 +551,7 @@ namespace ShipManifest
             }
         }
 
-        public static void SetPartHighlight(Part part, Color color)
+        internal static void SetPartHighlight(Part part, Color color)
         {
             try
             {
@@ -569,7 +569,7 @@ namespace ShipManifest
             }
         }
 
-        public void UpdateHighlighting()
+        internal void UpdateHighlighting()
         {
             string step = "";
             try
@@ -645,7 +645,7 @@ namespace ShipManifest
             }
         }
 
-        public static void HighlightCLSVessel(bool enabled, bool force = false)
+        internal static void HighlightCLSVessel(bool enabled, bool force = false)
         {
             try
             {

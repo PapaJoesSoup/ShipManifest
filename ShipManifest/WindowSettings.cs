@@ -7,15 +7,16 @@ using KSP.IO;
 
 namespace ShipManifest
 {
-    public static class WindowSettings
+    internal static class WindowSettings
     {
         #region Settings Window (GUI)
 
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
 
-        private static Vector2 ScrollViewerSettings = Vector2.zero;
-        public static void Display(int windowId)
+        private static Vector2 ScrollViewerPosition = Vector2.zero;
+        internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
@@ -37,7 +38,7 @@ namespace ShipManifest
             string txtSaveInterval = Settings.SaveIntervalSec.ToString();
 
             GUILayout.BeginVertical();
-            ScrollViewerSettings = GUILayout.BeginScrollView(ScrollViewerSettings, GUILayout.Height(280), GUILayout.Width(375));
+            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));

@@ -9,11 +9,12 @@ namespace ShipManifest
 {
     static class WindowHatch
     {
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
 
         private static List<Hatch> _hatches = new List<Hatch>();
-        public static List<Hatch> Hatches
+        internal static List<Hatch> Hatches
         {
             get
             {
@@ -57,8 +58,8 @@ namespace ShipManifest
             }
         }
 
-        private static Vector2 DisplayViewer = Vector2.zero;
-        public static void Display(int windowId)
+        private static Vector2 DisplayViewerPosition = Vector2.zero;
+        internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
@@ -76,7 +77,7 @@ namespace ShipManifest
 
             // This is a scroll panel (we are using it to make button lists...)
             GUILayout.BeginVertical();
-            DisplayViewer = GUILayout.BeginScrollView(DisplayViewer, GUILayout.Height(200), GUILayout.Width(370));
+            DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, GUILayout.Height(200), GUILayout.Width(370));
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
@@ -133,7 +134,7 @@ namespace ShipManifest
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
 
-        public static void OpenAllHatches()
+        internal static void OpenAllHatches()
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
@@ -150,7 +151,7 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        public static void CloseAllHatches()
+        internal static void CloseAllHatches()
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound

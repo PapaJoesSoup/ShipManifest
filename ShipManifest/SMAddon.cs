@@ -9,57 +9,57 @@ using ConnectedLivingSpace;
 namespace ShipManifest
 {
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public partial class SMAddon : MonoBehaviour
+    internal partial class SMAddon : MonoBehaviour
     {
         #region Properties
 
         //Game object that keeps us running
-        public static GameObject GameObjectInstance;  
-        public static SMController smController;
+        internal static GameObject GameObjectInstance;  
+        internal static SMController smController;
 
         // Vessel vars
-        public static ICLSAddon clsAddon = null;
-        public static ICLSVessel clsVessel = null;
+        internal static ICLSAddon clsAddon = null;
+        internal static ICLSVessel clsVessel = null;
 
-        public static Vessel vessel = null;
+        internal static Vessel vessel = null;
 
         // Resource transfer vars
-        public static AudioSource source1;
-        public static AudioSource source2;
-        public static AudioSource source3;
+        internal static AudioSource source1;
+        internal static AudioSource source2;
+        internal static AudioSource source3;
 
-        public static AudioClip sound1;
-        public static AudioClip sound2;
-        public static AudioClip sound3;
-
-        [KSPField(isPersistant = true)]
-        public static double timestamp = 0.0;
+        internal static AudioClip sound1;
+        internal static AudioClip sound2;
+        internal static AudioClip sound3;
 
         [KSPField(isPersistant = true)]
-        public static double elapsed = 0.0;
+        internal static double timestamp = 0.0;
 
         [KSPField(isPersistant = true)]
-        public static double flow_rate = (double)Settings.FlowRate;
+        internal static double elapsed = 0.0;
+
+        [KSPField(isPersistant = true)]
+        internal static double flow_rate = (double)Settings.FlowRate;
 
         // Resource xfer vars
-        public static XFERMode XferMode = XFERMode.SourceToTarget;
-        public static bool XferOn = false;
-        public static XFERState XferState = XFERState.Off;
+        internal static XFERMode XferMode = XFERMode.SourceToTarget;
+        internal static bool XferOn = false;
+        internal static XFERState XferState = XFERState.Off;
 
         // crew xfer vars
-        public static bool crewXfer = false;
-        public static double crewXferDelaySec = Settings.IVATimeDelaySec;
-        public static bool isSeat2Seat = false;
-        public static double Seat2SeatXferDelaySec = 2;
+        internal static bool crewXfer = false;
+        internal static double crewXferDelaySec = Settings.IVATimeDelaySec;
+        internal static bool isSeat2Seat = false;
+        internal static double Seat2SeatXferDelaySec = 2;
 
         // Toolbar Integration.
         private static IButton ShipManifestButton_Blizzy = null;
         private static ApplicationLauncherButton ShipManifestButton_Stock = null;
-        public static bool frameErrTripped = false;
+        internal static bool frameErrTripped = false;
 
         // Tooltip vars
-        public static Vector2 ToolTipPos;
-        public static string toolTip;
+        internal static Vector2 ToolTipPos;
+        internal static string toolTip;
 
 
         #endregion
@@ -67,7 +67,7 @@ namespace ShipManifest
         #region Event handlers
 
         // Addon state event handlers
-        public void Start()
+        internal void Start()
         {
             Utilities.LogMessage("ShipManifestAddon.Start.", "Info", Settings.VerboseLogging);
             try
@@ -114,7 +114,7 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.Start.  " + ex.ToString(), "Error", true);
             }
         }
-        public void Awake()
+        internal void Awake()
         {
             try 
             {
@@ -151,7 +151,7 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.Awake.  Error:  " + ex.ToString(), "Error", true);
             }
         }
-        public void OnGUI()
+        internal void OnGUI()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
             try
@@ -166,7 +166,7 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUI.  " + ex.ToString(), "Error", true);
             }
         }
-        public void Update()
+        internal void Update()
         {
             try
             {
@@ -209,7 +209,7 @@ namespace ShipManifest
         void DummyVoid() { }
 
         //Vessel state handlers
-        public void OnVesselWasModified(Vessel modVessel)
+        internal void OnVesselWasModified(Vessel modVessel)
         {
             Utilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
             try
@@ -221,7 +221,7 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselWasModified.  " + ex.ToString(), "Error", true);
             }
         }
-        public void OnVesselChange(Vessel newVessel)
+        internal void OnVesselChange(Vessel newVessel)
         {
             Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
             try
@@ -243,13 +243,15 @@ namespace ShipManifest
                 // Now let's update the current vessel view...
                 vessel = newVessel;
                 smController = SMController.GetInstance(vessel);
+                if (Settings.EnableCLS)
+                    UpdateCLSSpaces();
             }
             catch (Exception ex)
             {
                 Utilities.LogMessage(string.Format(" in OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
-        public void OnDestroy()
+        internal void OnDestroy()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
             try
@@ -529,7 +531,7 @@ namespace ShipManifest
 
         #region Logic Methods
 
-        public static bool CanKerbalsBeXferred(Part SelectedPart)
+        internal static bool CanKerbalsBeXferred(Part SelectedPart)
         {
             bool results = false;
             try
@@ -567,7 +569,7 @@ namespace ShipManifest
                 WindowTransfer.xferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
             return results;
         }
-        public static bool shouldToggle()
+        internal static bool shouldToggle()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.shouldToggle");
             return (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying &&
@@ -630,7 +632,7 @@ namespace ShipManifest
             return results;
         }
 
-        public static bool CanShowShipManifest()
+        internal static bool CanShowShipManifest()
         {
             if (Settings.ShowShipManifest
                 && HighLogic.LoadedScene == GameScenes.FLIGHT
@@ -648,7 +650,7 @@ namespace ShipManifest
 
         #region Action Methods
 
-        public static void UpdateCLSSpaces()
+        internal static void UpdateCLSSpaces()
         {
             SMAddon.GetCLSVessel();
             if (SMAddon.clsVessel != null)
@@ -705,7 +707,7 @@ namespace ShipManifest
                 Utilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", Settings.VerboseLogging);
         }
 
-        public static bool GetCLSVessel()
+        internal static bool GetCLSVessel()
         {
             try
             {
@@ -743,7 +745,7 @@ namespace ShipManifest
             }          
         }
 
-        public static bool EnableBlizzyToolBar()
+        internal static bool EnableBlizzyToolBar()
         {
             if (Settings.EnableBlizzyToolbar)
             {
@@ -787,7 +789,7 @@ namespace ShipManifest
             }
         }
 
-        public static void ToggleToolbar()
+        internal static void ToggleToolbar()
         {
             // turn off SM at toolbar
             if (Settings.EnableBlizzyToolbar)
@@ -801,12 +803,12 @@ namespace ShipManifest
             }
         }
 
-        public static void ToggleBlizzyToolBar()
+        internal static void ToggleBlizzyToolBar()
         {
             ShipManifestButton_Blizzy.TexturePath = Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_24" : "ShipManifest/Plugins/IconOff_24";
         }
 
-        public void DisplayWindows()
+        internal void DisplayWindows()
         {
             string step = "";
             try
@@ -846,7 +848,9 @@ namespace ShipManifest
                     if (SMAddon.CanShowShipManifest() && Settings.ShowTransferWindow && smController.SelectedResource != null)
                     {
                         step = "3 - Show Transfer";
-                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + " - " + smController.SelectedResource, GUILayout.MinHeight(20));
+                        // Lets build the running totals for each resource for display in title...
+                        string DisplayAmounts = Utilities.DisplayResourceTotals(smController.SelectedResource);
+                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
                     }
 
                     if (SMAddon.CanShowShipManifest() && Settings.ShowSettings)
@@ -1206,7 +1210,7 @@ namespace ShipManifest
             }
         }
 
-        public void RunSave()
+        internal void RunSave()
         {
             try
             {
@@ -1237,7 +1241,7 @@ namespace ShipManifest
             }
         }
 
-        public static void Savelog()
+        internal static void Savelog()
         {
             try
             {
@@ -1277,19 +1281,17 @@ namespace ShipManifest
             }
         }
 
-        public static void FireEventTriggers()
+        internal static void FireEventTriggers()
         {
-            // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270-0-23-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-3-1-5-26-Feb-14?p=1033866&viewfull=1#post1033866)
+            // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
             // and instructions for using CLS API by codepoet.
-
-            //GameEvents.onVesselWasModified.Fire(vessel);
             Utilities.LogMessage("FireEventTriggers:  Active.", "info", Settings.VerboseLogging);
             GameEvents.onVesselChange.Fire(vessel);
         }
 
         #endregion
 
-        public enum XFERState
+        internal enum XFERState
         {
             Off,
             Start,
@@ -1297,7 +1299,7 @@ namespace ShipManifest
             Stop
         }
 
-        public enum XFERMode
+        internal enum XFERMode
         {
             SourceToTarget,
             TargetToSource
@@ -1305,10 +1307,10 @@ namespace ShipManifest
 
     }
 
-    public class ShipManifestModule : PartModule
+    internal class ShipManifestModule : PartModule
     {
         [KSPEvent(guiActive = true, guiName = "Destroy Part", active = true)]
-        public void DestoryPart()
+        internal void DestoryPart()
         {
             if (this.part != null)
                 this.part.temperature = 5000;

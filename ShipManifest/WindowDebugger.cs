@@ -8,12 +8,13 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public class WindowDebugger
+    internal class WindowDebugger
     {
-        public static string ToolTip = "";
-        public static bool ToolTipActive = false;
+        internal static string ToolTip = "";
+        internal static bool ToolTipActive = false;
+        internal static bool ShowToolTips = true;
 
-        public static void Display(int windowId)
+        internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;

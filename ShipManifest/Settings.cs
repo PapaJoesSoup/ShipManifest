@@ -7,23 +7,23 @@ using KSP.IO;
 
 namespace ShipManifest
 {
-    public  static class Settings
+    internal  static class Settings
     {
         #region Properties
 
-        public static Dictionary<string, Color> Colors;
+        internal static Dictionary<string, Color> Colors;
 
-        public static string CurVersion = "0.90.0_3.4.0";
+        internal static string CurVersion = "0.90.0_3.4.0";
 
-        public static Rect ManifestPosition;
-        public static Rect TransferPosition;
-        public static Rect DebuggerPosition;
-        public static Rect RosterPosition;
+        internal static Rect ManifestPosition;
+        internal static Rect TransferPosition;
+        internal static Rect DebuggerPosition;
+        internal static Rect RosterPosition;
 
         // Flags to show windows
-        public static bool ShowTransferWindow { get; set; }
+        internal static bool ShowTransferWindow { get; set; }
         private static bool _showShipManifest = false;
-        public static bool ShowShipManifest
+        internal static bool ShowShipManifest
         {
             get
             {
@@ -46,107 +46,107 @@ namespace ShipManifest
             }
         }
 
-        public static bool VerboseLogging = false;
-        public static bool prevVerboseLogging = false;
+        internal static bool VerboseLogging = false;
+        internal static bool prevVerboseLogging = false;
 
-        public static bool ShowDebugger = false;
-        public static bool prevShowDebugger = false;
-        public static bool AutoDebug = false;
-        public static string ErrorLogLength = "1000";
-        public static string prevErrorLogLength = "1000";
-        public static bool prevSaveLogOnExit = true;
-        public static bool SaveLogOnExit = true;
+        internal static bool ShowDebugger = false;
+        internal static bool prevShowDebugger = false;
+        internal static bool AutoDebug = false;
+        internal static string ErrorLogLength = "1000";
+        internal static string prevErrorLogLength = "1000";
+        internal static bool prevSaveLogOnExit = true;
+        internal static bool SaveLogOnExit = true;
 
-        public static Rect SettingsPosition;
-        public static bool ShowSettings { get; set; }
+        internal static Rect SettingsPosition;
+        internal static bool ShowSettings { get; set; }
 
-        public static Rect HatchPosition;
-        public static bool ShowHatch { get; set; }
+        internal static Rect HatchPosition;
+        internal static bool ShowHatch { get; set; }
 
-        public static string DebugLogPath = "\\Plugins\\PluginData\\";
+        internal static string DebugLogPath = "\\Plugins\\PluginData\\";
 
-        public static bool AutoSave;
-        public static float SaveIntervalSec = 60f;
-        public static bool prevAutoSave;
-        public static float prevSaveIntervalSec = 60f;
+        internal static bool AutoSave;
+        internal static float SaveIntervalSec = 60f;
+        internal static bool prevAutoSave;
+        internal static float prevSaveIntervalSec = 60f;
 
-        public static bool ShowRoster { get; set; }
+        internal static bool ShowRoster { get; set; }
 
-        public static bool RealismMode = false;
-        public static bool prevRealismMode = false;
-        public static bool LockSettings = false;
-        public static bool prevLockSettings = false;
+        internal static bool RealismMode = false;
+        internal static bool prevRealismMode = false;
+        internal static bool LockSettings = false;
+        internal static bool prevLockSettings = false;
 
 
-        public static float FlowRate = 100;
-        public static float prevFlowRate = 100;
-        public static float MaxFlowRate = 100;
-        public static float MinFlowRate = 0;
+        internal static float FlowRate = 100;
+        internal static float prevFlowRate = 100;
+        internal static float MaxFlowRate = 100;
+        internal static float MinFlowRate = 0;
 
         // Feature Options
-        public static bool EnableHighlighting = true;
-        public static bool prevEnableHighlighting = true;
-        public static bool OnlySourceTarget = false;
-        public static bool prevOnlySourceTarget = false;
-        public static bool EnableCLSHighlighting = true;
-        public static bool prevEnableCLSHighlighting = true;
-        public static bool EnableScience = true;
-        public static bool EnableResources = true;
-        public static bool EnableCrew = true;
-        public static bool EnablePFResources = true;
-        public static bool EnableCLS = false; // off by default
-        public static bool prevEnableScience = true;
-        public static bool prevEnableCrew = true;
-        public static bool prevEnablePFResources = true;
-        public static bool prevEnableCLS = true;
-        public static bool EnableBlizzyToolbar = false; // off by default
-        public static bool prevEnableBlizzyToolbar = false;
+        internal static bool EnableHighlighting = true;
+        internal static bool prevEnableHighlighting = true;
+        internal static bool OnlySourceTarget = false;
+        internal static bool prevOnlySourceTarget = false;
+        internal static bool EnableCLSHighlighting = true;
+        internal static bool prevEnableCLSHighlighting = true;
+        internal static bool EnableScience = true;
+        internal static bool EnableResources = true;
+        internal static bool EnableCrew = true;
+        internal static bool EnablePFResources = true;
+        internal static bool EnableCLS = false; // off by default
+        internal static bool prevEnableScience = true;
+        internal static bool prevEnableCrew = true;
+        internal static bool prevEnablePFResources = true;
+        internal static bool prevEnableCLS = true;
+        internal static bool EnableBlizzyToolbar = false; // off by default
+        internal static bool prevEnableBlizzyToolbar = false;
 
         // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
-        public static bool CLSInstalled = false;
+        internal static bool CLSInstalled = false;
 
-        public static bool EnableTextureReplacer = false;
-        public static bool prevEnableTextureReplacer = false;
+        internal static bool EnableTextureReplacer = false;
+        internal static bool prevEnableTextureReplacer = false;
 
-        public static double IVATimeDelaySec = 5;
-        public static bool ShowIVAUpdateBtn = false;
+        internal static double IVATimeDelaySec = 5;
+        internal static bool ShowIVAUpdateBtn = false;
 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
 
-        public static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
-        public static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
-        public static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
-        public static string prevPumpSoundStart = "";
-        public static string prevPumpSoundRun = "";
-        public static string prevPumpSoundStop = "";
+        internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
+        internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
+        internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
+        internal static string prevPumpSoundStart = "";
+        internal static string prevPumpSoundRun = "";
+        internal static string prevPumpSoundStop = "";
 
-        public static double PumpSoundVol = 3;
-        public static double CrewSoundVol = 3;
+        internal static double PumpSoundVol = 3;
+        internal static double CrewSoundVol = 3;
 
-        public static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
-        public static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
-        public static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
-        public static string prevCrewSoundStart = "";
-        public static string prevCrewSoundRun = "";
-        public static string prevCrewSoundStop = "";
+        internal static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
+        internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
+        internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
+        internal static string prevCrewSoundStart = "";
+        internal static string prevCrewSoundRun = "";
+        internal static string prevCrewSoundStop = "";
 
-        public static string SourcePartColor = "red";
-        public static string TargetPartColor = "green";
-        public static string TargetPartCrewColor = "blue";
-        public static string CLS_SpaceColor = "green";
-        public static string HatchColor = "cyan";
-        public static string HatchOpenColor = "cyan";
-        public static string HatchCloseColor = "red";
-        public static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
-        public static bool ShowToolTips = true;
-        public static bool prevShowTooltips = true;
+        internal static string SourcePartColor = "red";
+        internal static string TargetPartColor = "green";
+        internal static string TargetPartCrewColor = "blue";
+        internal static string CLS_SpaceColor = "green";
+        internal static string HatchColor = "cyan";
+        internal static string HatchOpenColor = "cyan";
+        internal static string HatchCloseColor = "red";
+        internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
+        internal static bool ShowToolTips = true;
+        internal static bool prevShowTooltips = true;
 
         #endregion
 
         #region Methods
 
-        public static void Load()
+        internal static void Load()
         {
             //Utilities.LogMessage("Settings load started...", "Info", VerboseLogging);
 
@@ -332,7 +332,7 @@ namespace ShipManifest
 
         }
 
-        public static void Save()
+        internal static void Save()
         {
             try
             {
@@ -444,7 +444,7 @@ namespace ShipManifest
             }
         }
 
-        public static void LoadColors()
+        internal static void LoadColors()
         {
             Colors = new Dictionary<string, Color>();
 
@@ -460,7 +460,7 @@ namespace ShipManifest
             Colors.Add("yellow", Color.yellow);
         }
 
-        public static void StoreTempSettings()
+        internal static void StoreTempSettings()
         {
             prevRealismMode = RealismMode;
             prevShowDebugger = ShowDebugger;
@@ -493,7 +493,7 @@ namespace ShipManifest
             prevErrorLogLength = ErrorLogLength;
         }
 
-        public static void RestoreTempSettings()
+        internal static void RestoreTempSettings()
         {
             RealismMode = prevRealismMode;
             ShowDebugger = prevShowDebugger;

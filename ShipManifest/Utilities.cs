@@ -7,26 +7,72 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    public static class Utilities
+    internal static class Utilities
     {
-        public static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
-        public static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
-        public static Vector2 DebugScrollPosition = Vector2.zero;
+        internal static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
+        internal static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
+        internal static Vector2 DebugScrollPosition = Vector2.zero;
 
         private static List<string> _errors = new List<string>();
-        public static List<string> Errors
+        internal static List<string> Errors
         {
             get { return _errors; }
         }
 
-        public static void LoadTexture(ref Texture2D tex, String FileName)
+        internal static void LoadTexture(ref Texture2D tex, String FileName)
         {
             LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", Settings.VerboseLogging);
             WWW img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, FileName));
             img1.LoadImageIntoTexture(tex);
         }
 
-        public static void LogMessage(string error, string type, bool verbose)
+        internal static string DisplayResourceTotals(string selectedResource)
+        {
+            string displayAmount = "";
+            double currAmount = 0;
+            double totAmount = 0;
+            try
+            {
+                if (selectedResource != "Crew" && selectedResource != "Science")
+                {
+                    foreach (Part part in SMAddon.smController._partsByResource[selectedResource])
+                    {
+                        currAmount += part.Resources[selectedResource].amount;
+                        totAmount += part.Resources[selectedResource].maxAmount;
+                    }
+                }
+                else if (selectedResource == "Crew")
+                {
+                    currAmount = (double)SMAddon.smController.Vessel.GetCrewCount();
+                    totAmount = (double)SMAddon.smController.Vessel.GetCrewCapacity();
+                }
+                else if (selectedResource == "Science")
+                {
+                    foreach (Part part in SMAddon.smController._partsByResource[selectedResource])
+                    {
+                        foreach (PartModule module in part.Modules)
+                        {
+                            if (module is IScienceDataContainer)
+                            {
+                                currAmount += (double)((IScienceDataContainer)module).GetScienceCount();
+                            }
+                        }
+                    }
+                }
+                if (selectedResource != "Science")
+                    displayAmount = string.Format(" - ({0}/{1})", currAmount.ToString("#######0.####"), totAmount.ToString("######0.####"));
+                else
+                    displayAmount = string.Format(" - ({0})", currAmount.ToString("#######0.####"));
+            }
+            catch (Exception ex)
+            {
+                LogMessage(String.Format(" in DisplayResourceTotals().  Error:  {0}", ex.ToString()), "Error", true);
+            }
+
+            return displayAmount;
+        }
+
+        internal static void LogMessage(string error, string type, bool verbose)
         {
             try
             {
@@ -45,7 +91,7 @@ namespace ShipManifest
             }
         }
 
-        public static void ShowToolTips()
+        internal static void ShowToolTips()
         {
             if (SMAddon.toolTip != null && SMAddon.toolTip.Trim().Length > 0)
             {
@@ -73,7 +119,7 @@ namespace ShipManifest
             SMAddon.toolTip = ToolTip;
         }
 
-        public static void ShowToolTip(Vector2 toolTipPos, string ToolTip)
+        internal static void ShowToolTip(Vector2 toolTipPos, string ToolTip)
         {
             if (Settings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
             {
@@ -85,7 +131,7 @@ namespace ShipManifest
             }
         }
 
-        public static string SetActiveTooltip(Rect rect, Rect WindowPosition, string toolTip, ref bool toolTipActive, float xOffset, float yOffset)
+        internal static string SetActiveTooltip(Rect rect, Rect WindowPosition, string toolTip, ref bool toolTipActive, float xOffset, float yOffset)
         {
 
             if (!toolTipActive && rect.Contains(Event.current.mousePosition))
