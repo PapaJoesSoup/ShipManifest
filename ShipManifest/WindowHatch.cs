@@ -35,19 +35,16 @@ namespace ShipManifest
             try
             {
                 SMAddon.UpdateCLSSpaces();
-                foreach (ICLSSpace iSpace in SMAddon.clsVessel.Spaces)
+                foreach (ICLSPart iPart in SMAddon.clsVessel.Parts)
                 {
-                    foreach (ICLSPart iPart in iSpace.Parts)
+                    foreach (PartModule pModule in iPart.Part.Modules)
                     {
-                        foreach (PartModule pModule in iPart.Part.Modules)
+                        if (pModule.moduleName == "ModuleDockingHatch")
                         {
-                            if (pModule.moduleName == "ModuleDockingHatch")
-                            {
-                                Hatch pHatch = new Hatch();
-                                pHatch.HatchModule = pModule;
-                                pHatch.CLSPart = iPart;
-                                _hatches.Add(pHatch);
-                            }
+                            Hatch pHatch = new Hatch();
+                            pHatch.HatchModule = pModule;
+                            pHatch.CLSPart = iPart;
+                            _hatches.Add(pHatch);
                         }
                     }
                 }

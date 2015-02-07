@@ -1,0 +1,239 @@
+﻿Version 0.90.0_4.0.0 - Release 06 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
+ - New:  Added support for CLS Hatches.  Now features a hatch dashboard.  Mouseover a hatch and it is highlighted on the vessel.  Takes advantage of changes made to CLS 1.1.1.0 to support third party Hatch control.  Open/close individual/all hatches in a vessel.
+ - New:  Revised highlighting to reintroduce CLS enabled highlighting.  Added a switch to turn on/off CLS highlighting.  Takes advantage of recent changes made to CLS highlighting.
+ - New:  Many internal architectural changes and refactoring of plugin. Changed windows into separate classes. Prepare for a base window class. Added tooltip support.
+ - New:  Added tool tips for many buttons across entire plugin.  Added ToolTip display switch in settings for those that don't want Tool tips to show, including granularity to the window level. 
+ - New:  Major Roster Window enhancements.  Altered action button dislay behaviors to be more clear.  Added conditional tooltips to aid in use of little known features. Added Kerbal Title and Status to Kerbal info display.
+ - New:  Enabling/Disabling Blizzy Toolbar no longer requires a game restart.  Turn it on or off in settings and it will take effect immediately.
+ - New:  Added SETI compatibility support for dataIsCollectable = false in Realism Mode.   Now you cannot Xfer science data where dataIsCollectable = false for the source module.
+ - New:  Added vessel resource totals (quick reference) to Manifest Window resource buttons and Transfer Window Resource Title.
+ - New:  Added KSP-AVC support http://forum.kerbalspaceprogram.com/threads/79745
+ - Bug:  When when transferring a resource in realism mode, sometimes the source part ends up negative and causes issues (moves resources 1 unit at a time, backwards.
+ / Bug:  When Transferring crew in realism mode, Sometimes a Kerbal disappears (usually from a source that contains more kerbal seats than target).
+
+Version 0.90.0_3.3.4 - 15 Jan, 2015 - Bugs, Mod Tweaks and More Edition.
+ - New:  Added a Limited Highlighting switch.  When on, highlights only source and target parts.  
+         Highlighting switch must be enabled to use.
+ - New:  Added close buttons to upper right of most windows.  Cleaned up App launcher toggle button behavior, and synced with close buttons.
+ - New:  Added detection for IVA. Hide Ship Manifest Window when in IVA.
+ - New:  CLS highlightng returns.  Previous method replaced with new model. Livable parts only will be highlighted by SM.
+         To view passable parts, select the space from the CLS plugin menu.  
+ - Bug:  Due to KSP 0.90.0 changes, when using Roster, changes to Kerbal names causes the role to change (bad).  
+         - Removed ability to edit name of existing Kerbals.
+
+Version 0.90.0_3.3.3 - 19 Dec, 2014 - 0.90 compatibility Edition.
+ - Update to correct highlighting errors due to KSP 0.90 changes. 
+ - Added a Highlighting switch.  If you don't want highlighting at all, turn it off!
+ - Other under the hood changes to improve overall highlighting behavior.  Works very nice now.
+
+Version 0.25.0_3.3.2b - Interim Release with bug fixes and removal of CLS Highlighting
+ - Bug:  When changing vessels while in map mode, the toolbar button disappears from the stock toolbar, never to return.
+
+Version 0.25.0_3.3.2a - Interim Release with bug fixes and removal of CLS Highlighting
+ - New:  Added Resource Fill button when Realism is off.
+ - New:  Added Part Fill and Dump of a resource when Realism is off.
+ - Improvement:  error handling on frame based errors are now trapped for first occurance.  Subsequent errors will not produce a log entry.
+ - Bug:  When changing vessesls with the manifest window open, ClearResourceHighlighting causes an error.
+         - http://forum.kerbalspaceprogram.com/threads/62270?p=1481125&viewfull=1#post1481125
+
+Version 0.24.2_3.3.2 - 28 Sep, 2014 - 0.24.2 and bug fixes edition
+ - New:  Ship manifest is now dependency free.  You don't need other mods to use Ship Manifest.
+ - New:  Blizzy Toolbar is now optional.  If you install it, you can enable it.  Off by default. 
+ - New:  Removed auto enable of CLS.  CLS is now Off by default.  If CLS is installed, can be turned on in Settings. 
+ - New:  Bug fixes to correct crashing and errors on startup. 
+ - New:  Added Close button to Debug window. 
+ - New:  Revised Science transfer code to ensure compatibility with DMagic Parts (i hope). 
+ - Other Undocumented changes.  I was in the middle of other updates (bug fixes) when 0.24.2 hit.
+
+Version 0.24.0.3.3.1a - 28 Aug, 2014 - 0.24.0 Compliance Edition.
+ - New:  Removed toolbar from distribution to comply with forum rules.  No other changes.
+
+Version 0.24.0.3.3.1 - 17 Jul, 2014 - 0.24.0 Edition.
+ - New:  Now compatible with KSP 0.24.0. Squad reworked crew objects and namespace.
+ - New:  Roster Window now shows vessel to which a kerbal is assigned.
+ - New:  Add support for DMagic Science parts (IDataScienceContainer)
+ - Bug:  SM Still doubling LS resource amounts.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-(Crew-Science-Resources)-v0-23-5-3-2-2-2-May-14?p=1136419&viewfull=1#post1136419
+ - Known Issue:  SM & CLS Highlighting still problematic.
+	     
+Version 0.23.5.3.3 - 29 May, 2014 - CLS is Optonal Edition.
+ - New:  CLS is now a soft dependency.  if you install it, SM will configure for it's use.  If you do not install it, SM will automatically detect that and set Enable CLS Off.
+
+Version 0.23.5.3.2.3 - 11 May, 2014 - Settings, Roster & Bug Fix Edition.
+ - New:  Roster Window now allows adding and removing individual Kerbals during pre-flight in Realism Mode, and Anytime in Standard mode.
+ - New:  Additional changes to Settings.   
+         - Now sepearate sections make finding things easier.  
+         - Changed LockRealismMode to LockSettings, as Realism Mode is not a parent setting.
+		 - Added Locksettings to the Settings Window.  Once set, must be turned off in config file.
+		 - Made Enable CLS a child of Enable Crew
+ - Bug:  SM not detecting Changes in CrewCapacity with Inflatable Parts...
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-(Crew-Science-Resources)-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
+ - Bug:  SM not Erroring when attempting to transfer to a pert with no internal model
+		 = http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-(Crew-Science-Resources)-v0-23-5-3-2-2-2-May-14?p=1140559&viewfull=1#post1140559
+ - Bug:  SM still allowing negative numbers in resource transfers.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-(Crew-Science-Resources)-v0-23-5-3-2-2-2-May-14?p=1136419&viewfull=1#post1136419
+
+Version 0.23.5.3.2.2a - 9 May, 2014 - CLS Hot Fix Edition..
+ - New:  Recompiled with a new assembly reference to CLS 1.0.4.1. No other changes
+
+Version 0.23.5.3.2.2 - 2 May, 2014 - Realism Settings Love Edition..
+ - New:  Changes to Settings Window to add previously hidden settings and tie them to the realism mode setting.
+ - New:  Crew Transfers should allow swapping Kerbals between parts.  Swaps are possible within a part, but not between parts.
+         - www.youtube.com/watch?v=I_TNxjnW234
+ - New:  Added config file switch for Enable/Disable TextureReplacer eva event triggers.  testing shows it conflicts with TACLS.
+ - Bug:  Highlighting behaves abnormally on resource changes from crew to another resource.  Residual selected part highlighting...
+         - Internally found, Post release of 0.23.5.3.2.1
+ - Bug:  Highlighting behaves abnormally on part changes when moving away from source and target part being the same...
+         - Internally found, Post release of 0.23.5.3.2.1a
+
+ - Dist numbers at release:
+   - Forum views:  43490
+   - DLs:  10319
+
+Version 0.23.5.3.2.1b - 26 Apr, 2014 - TACLS test Edition. Github release (Not on Spaceport)
+ - Bug:  SM not detecting Changes in Creability with Inflatable Parts...
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
+
+Version 0.23.5.3.2.1a - 25 Apr, 2014 - TACLS test Edition. Github release (Not on Spaceport)
+ - New:  Crew Transfers should allow swapping Kerbals between parts.  Swaps are possible within a part, but not between parts.
+         - www.youtube.com/watch?v=I_TNxjnW234
+ - New:  Added config file switch for Enable/Disable TextureReplacer eva event triggers.  testing show it conflicts with TACLS.
+ - Bug:  Highlighting behaves abnormally on resource changes from crew to another resource.  Residual selected part highlighting...
+         - Internally found, Post relese of 0.23.5.3.2.1
+ - Bug:  Highlighting behaves abnormally on part changes when moving away from source and target part being the same...
+         - Internally found, Post relese of 0.23.5.3.2.1a
+
+
+Version 0.23.5.3.2.1 - 22 Apr, 2014 - Bug fixes Edition.
+ - New:  Resource/Part Button Improvements:
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1058979&viewfull=1#post1058979
+		 - General clean up of contrast / formatting for better readability in hover, unselected and selected modes.
+ - New:  Add Auto Popup of Debug console on Error.  Configurable, Off by Default.
+ - Bug:  Highlighting fails for source Part when selecting any resource other than crew.
+         - Internally found, Post relese of 0.23.5.3.2
+ - Bug:  Resource Pump transfers fail wen xferring small amounts.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=950355&viewfull=1#post950355
+ - Bug:  Tanks sometimes go negative.  
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1082740&viewfull=1#post1082740
+ - Bug:  Crew event triggers not firing in Preflight.
+         - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1100162&viewfull=1#post1100162
+ - Bug:  Resource Transfer noises too low.
+         - www.youtube.com/watch?v=I_TNxjnW234 
+ - Bug: Crew event triggers causing duplicate life support resources in TAC Life Support.
+        - http://forum.kerbalspaceprogram.com/...=1#post1108035
+
+ - Dist numbers at release:
+   - Forum views:  36962
+   - DLs:  9012
+
+Version 0.23.5.3.2 - 16 Apr, 2014 - Add ConnectedLivingSpace Integration.
+ - Realism Mode:  Crew Xfers & Moves are now "space" aware.  if the target part is not connected via an internal passageway, then the xfer or move cannot occur.
+ - CLS awareness can be turned off in the config file, for those that want to be able to xfer across living spaces.
+ - General code cleanup and significant reorganization to use fewer frame and memory resources.
+   - InvalidOp bug:  http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1032850&viewfull=1#post1032850
+   - 
+ - Include Toolbar 1.7.1 redistribution 
+ - Connected Spaces illuminate when you select crew.
+ - Source part color is still Red by default, but the target color is set to Blue by default for Crew Only. can be configured.
+ - Connected Living Space Aware. Configurable switch to enable. When enabled, crew transfers can only occur within the same Living Space.
+ - Event trigger Support for TextureReplacer and Extraplanetary LaunchPads. Event throws have been added to ensure proper updating of other mods.
+   - ExtraPlanetary LaunchPads:  http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1051553&viewfull=1#post1051553
+   - Texture Replacer:  http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=950542&viewfull=1#post950542
+                        http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1052405&viewfull=1#post1052405
+ - Dependencies on CLS and Toolbar. Be sure that is understood. I will look at optional dependencies in the future, but for now, it is what it is. Besides, they are great plugins.
+
+ - Dist numbers at release:
+   - Forum views: 32580 
+   - DLs:  7857
+
+Version 0.23.3.1.5 - 26 Feb, 2014 - Add Realism to Crew Transfer.
+ - Realism Mode:  Crew Xfers & Moves now occur in "real" time.  We now have Sounds of crewman moving.  Portrait updates now occur when Kerbals get in thier new seat.
+	- Added Crew sound locations to settings Window.
+	- Added Config for Crew Transfer Duration from part to part.  This is a placeholder for later development.
+	- Added default xfer duration of 2 sec for Seat to Seat Xfers within the same Part.
+ - Resource Xfers enhancements.  Added textbox for entering Exact Xfer Amounts.  Integers can be entered, and fractions can be pasted into box for now...
+ - Rearranged resource xfer details to make it more intuitive after adding text box.
+ - Include Toolbar 1.6.0 redistribution 
+
+ - Dist numbers at release:
+   - Forum views:  19489
+   - DLs:  4712
+
+Version 0.23.3.1.4 - 15 Feb, 2014 - General cleanup, configuration & UI enhancements.
+ - Realism Mode:  Science Xfers now render experiments inoperable after xfer.
+ - Changed Science Xfers Target Module selection to Auto select, If the target Part has only 1 target module. Saves a click the majority of the time. 
+ - Added Save Debug Log support.  Save Log button now works.
+ - Added support for tailoring Ship Manifest for your needs:
+	- Config File switch to enable/disable Fill & Empty Resource buttons in PreFlight.  Enabled by default.
+	- Config File switch to enable/disable Crew Transfer Feature.  Enabled by default.
+	- Config File switch to enable/disable Science Transfer Feature.  Enabled by default.
+- Include Toolbar 1.5.3 redistribution
+
+ - Dist numbers at release:
+   - Forum views:  ??
+   - DLs:  3817
+
+Version 0.23.3.1.3 - 12 Feb, 2014 - Add Preflight features and fix preflight fill resources bug.
+ - Add Crew Fill and Crew Empty Buttons to PreFlight.   Now you can fill or empty your vessel on the pad.
+ - Reworked Resource Fill Vessel and Empty Vessel to respect Realism mode. (resourceTransferMode = NONE).
+ - Added Dump Resource buttons to Resource List in Manifest Window.  Now you can dump single resource on the entire vessel.
+   Realism Mode support:  Preflight, you can dump resources.  In Flight, you cannot.
+ - Added mod version to Debug Window.
+
+Version 0.23.3.1.2 - 11 Feb, 2014 - Add Bi-Directional Resource Xfers and Science Xfer Bug fix.
+ - Bi-Directional Resource transfers.   Now you can move a resource from source to target or target to source.
+ - ** Science bug fix.   Sorry about that everyone.   It now works. :D
+ - Improved verbose logging of science, crew, and resource xfers.
+ - Include Toolbar 1.5.2 redistribution
+
+Version 0.23.3.1.1 - 4 Feb, 2014 - Add Seat to Seat Crew Transfers
+ - Added Seat to Seat Transfers. On source or target kerbal, click ">>".  This will move the kerbal to the next seat in the internal indexed list.  if a kerbal is already in that seat, they will swap!
+ - Include Toolbar 1.4.5 redistribution
+
+Version 0.23.3.1 - 3 Feb, 2014 - Add Science Xfers and Bug fixes
+ - Added Science Transfers. Select source part & module, select target part & module, click xfer.
+ - Add config switch for Resource.TransferMode = None on resources in realism mode.
+ - Add config switch for locking Realism Mode.  
+   1 = locked in the mode set by RealismMode in config.  Displays Realism Mode in Settings Window.  
+   0 = unlocked.  Normal Radio button shows in Settings Window, and Setting can bee changed.
+ - Bug fix. Xfering a crew member frrom target to source would violate the capacity limitation of the part and cause lost kerbals.
+ - Bug fix. xfering crew would sometimes result in no portrait, or missing portrait.  Revised Kerbal spawm methodology.  Thanks to ATG, for helping me characterize the issue.
+
+Version 0.23.3.0 - 27 Jan, 2014 - Add Crew Xfers and Redistribution of toolbar 1.4.4
+ - Crew Transfers.  Uses the same interface as resources.   Crew is simply another resource on the ship.
+ - Crew Roster.  Manage Crew Attributes. Create Crew members, "Kill" Crew members.
+ - Sound file size reduction using .ogg.
+ - Configurable source and target part highlighting (via config file for now...)  source is red and target is green by default now.
+ - Bug fixes.  minor display errors.  Less than 100% fills were not working correctly.
+
+Version 0.23.2.0 - 03 Jan, 2014 - Add Realism Mode and Redistribution of toolbar 1.4.0
+- Add Realism Mode:  Sounds, Real time resource flow between parts.  Configurable sounds and flow rate.
+- Add Setting Window to allow configuration of various features of Ship Manifest.
+- Updated to Toolbar 1.4.0
+
+Version 0.23.1.3.1 - 27 Dec 2013 - minor bug fix and Redistribution of toolbar 1.3.0
+- bug fix:  When closing all windows from toolbar button, part event handlers were not released.  This caused the highlight to fail on mouse over of an affected part.
+- Updated to Toolbar 1.3.0
+
+Version 0.23.1.3 - 23 Dec 2013 - Bug Fix
+- Post Bug Fix regression bug - Source part and target part highlighting failing.
+
+Version 0.23.1.2 - 22 Dec 2013 - Bug Fix
+- When selecting a resource, parts illuminate.   Close manifest window.  Parts stay illuminated.
+
+Version 0.23.1.1 - 22 Dec 2013 - Revision
+- Added Selected resource parts highlighting support.
+- Added OnMouseExit handlers to affected parts. Handlers ensure proper highlighting is retained when active.
+- Added new icons. Now Ship manifest has it own icons.
+- Incorporated Toolbar 1.2.1 by Blizzy78 
+- Removed all remaining commented code related to Crew manifest.
+
+Version 0.23.1.0 - 18 Dec 2013 - Revision
+- Removed Crew Manifest.
+- Improved GUI, resizing and cleaning up data.
+- Cleaned up transfer method, improving accuracy.
+- Incorporated Toolbar 1.2 by Blizzy78. 
+
+Version 0.23.0.1 - 17 Dec 2013 - Initial beta release
+
+This work is based in large part on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.
