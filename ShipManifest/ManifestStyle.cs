@@ -19,6 +19,7 @@ namespace ShipManifest
         internal static GUIStyle ButtonToggledStyle;
         internal static GUIStyle ErrorLabelRedStyle;
         internal static GUIStyle LabelStyle;
+        internal static GUIStyle LabelStyleBold;
         internal static GUIStyle LabelStyleRed;
         internal static GUIStyle LabelStyleYellow;
         internal static GUIStyle LabelStyleGreen;
@@ -88,6 +89,10 @@ namespace ShipManifest
 
             LabelStyle = new GUIStyle(GUI.skin.label);
 
+            LabelStyleBold = new GUIStyle(GUI.skin.label);
+            LabelStyleBold.fontSize = 18;
+            LabelStyleBold.fontStyle = FontStyle.Bold;
+
             LabelStyleRed = new GUIStyle(LabelStyle);
             LabelStyleRed.normal.textColor = Color.red;
 
@@ -101,6 +106,7 @@ namespace ShipManifest
             ToolTipStyle.wordWrap = false;
             ToolTipStyle.fontStyle = FontStyle.Normal;
             ToolTipStyle.normal.textColor = Color.yellow;
+
         }
     }
 }

@@ -388,12 +388,6 @@ namespace ShipManifest
             HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
         }
 
-        internal KerbalModel CreateKerbal()
-        {
-            ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
-            return new KerbalModel(kerbal, true);
-        }
-
         internal void RespawnCrew()
         {
             this.Vessel.SpawnCrew();

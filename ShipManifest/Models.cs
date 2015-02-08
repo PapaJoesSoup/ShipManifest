@@ -15,6 +15,8 @@ namespace ShipManifest
         public float Courage;
         public bool Badass;
         public string Name;
+        public string Profession;
+        public string Title;
 
         public KerbalModel(ProtoCrewMember kerbal, bool isNew)
         {
@@ -23,6 +25,8 @@ namespace ShipManifest
             Stupidity = kerbal.stupidity;
             Courage = kerbal.courage;
             Badass = kerbal.isBadass;
+            Profession = "";
+            Title = kerbal.experienceTrait.Title;
             IsNew = isNew;
         }
 
@@ -46,12 +50,21 @@ namespace ShipManifest
             return string.Empty;
         }
 
+        public static KerbalModel CreateKerbal()
+        {
+            ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
+            return new KerbalModel(kerbal, true);
+        }
+
         public void SyncKerbal()
         {
             Kerbal.name = Name;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;
+            if (Title != Profession)
+                Kerbal.experienceTrait = KerbalModel.GetTrait(Kerbal, Profession);
+            Utilities.LogMessage(string.Format("SyncKerbal.  Trait should be:  " + Profession + ".  New Trait:  {0}", Kerbal.experienceTrait.Title), "info", true);
         }
 
         private bool NameExists()
@@ -62,6 +75,23 @@ namespace ShipManifest
             }
 
             return false;
+        }
+
+        public static Experience.ExperienceTrait GetTrait(ProtoCrewMember kerbal, string Profession)
+        {
+            Experience.ExperienceTrait ThisTrait = kerbal.experienceTrait;
+            Utilities.LogMessage("GetTrait Current Profession is:  " + kerbal.experienceTrait.Title, "info", true);
+            foreach (ProtoCrewMember thiskerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+            {
+                if (thiskerbal.experienceTrait.Title == Profession)
+                {
+                    Utilities.LogMessage("GetTrait " + Profession + " found", "info", true);
+                    ThisTrait = thiskerbal.experienceTrait;
+                    break;
+                }
+            }
+            Utilities.LogMessage(string.Format("GetTrait.  Trait should be:  " + Profession + ".  New Trait:  {0}", ThisTrait.Title), "info", true);
+            return ThisTrait;
         }
     }
 }

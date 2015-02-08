@@ -1,4 +1,9 @@
-﻿Version 0.90.0_4.0.0 - Release 06 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.0.1 - Release 08 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
+ - New:  4.0.1 - Added Create specific Kerbal Type:  Now you can choose Pilot, Engineer or Scientist!
+ - NEW:  4.0.1 - Bug fix for unneeded debug log entry from tooltips
+ - New:  4.0.1 - Bug Fix for Non reset Window positions in Config.xml
+
+Version 0.90.0_4.0.0 - Release 06 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
  - New:  Added support for CLS Hatches.  Now features a hatch dashboard.  Mouseover a hatch and it is highlighted on the vessel.  Takes advantage of changes made to CLS 1.1.1.0 to support third party Hatch control.  Open/close individual/all hatches in a vessel.
  - New:  Revised highlighting to reintroduce CLS enabled highlighting.  Added a switch to turn on/off CLS highlighting.  Takes advantage of recent changes made to CLS highlighting.
  - New:  Many internal architectural changes and refactoring of plugin. Changed windows into separate classes. Prepare for a base window class. Added tooltip support.
