@@ -31,16 +31,6 @@ namespace ShipManifest
             }
             set
             {
-                //if (CLSInstalled && EnableCLS && ShipManifestAddon.smController != null)
-                //{ 
-                //    if (_showShipManifest && !value)
-                //        ShipManifestAddon.smController.HighlightCLSVessel(false);
-                //    else if (!_showShipManifest && value)
-                //    {
-                //        if (ShipManifestAddon.smController.SelectedResource == "Crew")
-                //            ShipManifestAddon.smController.HighlightCLSVessel(false);
-                //    }
-                //}
                 _showShipManifest = value;
 
             }
@@ -77,11 +67,15 @@ namespace ShipManifest
         internal static bool LockSettings = false;
         internal static bool prevLockSettings = false;
 
-
+        //Resource Xfer flow rate options
         internal static float FlowRate = 100;
         internal static float prevFlowRate = 100;
-        internal static float MaxFlowRate = 100;
+        internal static float MaxFlowRate = 1000;
+        internal static float prevMaxFlowRate = 1000;
         internal static float MinFlowRate = 0;
+        internal static float prevMinFlowRate = 0;
+        internal static int MaxFlowTimeSec = 180;
+        internal static int prevMaxFlowTimeSec = 100;
 
         // Feature Options
         internal static bool EnableHighlighting = true;
@@ -187,6 +181,7 @@ namespace ShipManifest
                 FlowRate = (float)configfile.GetValue<double>("FlowRate");
                 MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
                 MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
+                MaxFlowTimeSec = configfile.GetValue<int>("MaxFlowTimeSec");
                 PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
                 PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
                 PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
@@ -233,7 +228,7 @@ namespace ShipManifest
                 if (FlowRate == 0)
                     FlowRate = 100;
                 if (MaxFlowRate == 0)
-                    MaxFlowRate = 100;
+                    MaxFlowRate = 1000;
 
                 // Default sound license: CC-By-SA
                 // http://www.freesound.org/people/vibe_crc/sounds/59328/
@@ -275,6 +270,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("MaxFlowTimeSec Loaded: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
@@ -379,6 +375,7 @@ namespace ShipManifest
                 configfile.SetValue("FlowRate", (double)FlowRate);
                 configfile.SetValue("MinFlowRate", (double)MinFlowRate);
                 configfile.SetValue("MaxFlowRate", (double)MaxFlowRate);
+                configfile.SetValue("MaxFlowTimeSec", MaxFlowTimeSec);
                 configfile.SetValue("PumpSoundStart", PumpSoundStart);
                 configfile.SetValue("PumpSoundRun", PumpSoundRun);
                 configfile.SetValue("PumpSoundStop", PumpSoundStop);
@@ -437,6 +434,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("MaxFlowTimeSec Saved: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
@@ -505,6 +503,9 @@ namespace ShipManifest
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
             prevFlowRate = FlowRate;
+            prevMinFlowRate = MinFlowRate;
+            prevMaxFlowRate = MaxFlowRate;
+            prevMaxFlowTimeSec = MaxFlowTimeSec;
             prevPumpSoundStart = PumpSoundStart;
             prevPumpSoundRun = PumpSoundRun;
             prevPumpSoundStop = PumpSoundStop;
@@ -544,6 +545,9 @@ namespace ShipManifest
             AutoSave = prevAutoSave;
             SaveIntervalSec = prevSaveIntervalSec;
             FlowRate = prevFlowRate;
+            MinFlowRate = prevMinFlowRate;
+            MaxFlowRate = prevMaxFlowRate;
+            MaxFlowTimeSec = prevMaxFlowTimeSec;
             PumpSoundStart = prevPumpSoundStart;
             PumpSoundRun = prevPumpSoundRun;
             PumpSoundStop = prevPumpSoundStop;

@@ -39,11 +39,11 @@ namespace ShipManifest
 
         #region Properties
 
-        // variables used for moving resources.  set to a negative to allow slider to function.
-        internal float sXferAmount = -1f;
+        // variables used for moving resources.
+        internal float sXferAmount = 0f;
         internal bool sXferAmountHasDecimal = false;
         internal bool sXferAmountHasZero = false;
-        internal float tXferAmount = -1f;
+        internal float tXferAmount = 0f;
         internal bool tXferAmountHasDecimal = false;
         internal bool tXferAmountHasZero = false;
         internal float AmtXferred = 0f;
@@ -260,8 +260,8 @@ namespace ShipManifest
                     }
 
                     // reset transfer amount (for resource xfer slider control)
-                    SMAddon.smController.sXferAmount = -1f;
-                    SMAddon.smController.tXferAmount = -1f;
+                    SMAddon.smController.sXferAmount = 0;
+                    SMAddon.smController.tXferAmount = 0;
                 }
                 catch (Exception ex)
                 {
@@ -299,8 +299,8 @@ namespace ShipManifest
                         SMAddon.UpdateCLSSpaces();
 
                     // reset transfer amount (for resource xfer slider control)
-                    SMAddon.smController.sXferAmount = -1f;
-                    SMAddon.smController.tXferAmount = -1f;
+                    SMAddon.smController.sXferAmount = 0f;
+                    SMAddon.smController.tXferAmount = 0f;
                 }
                 catch (Exception ex)
                 {

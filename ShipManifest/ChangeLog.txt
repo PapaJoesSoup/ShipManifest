@@ -1,4 +1,12 @@
-﻿Version 0.90.0_4.0.1 - Release 08 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.0.2 - Release 15 Feb, 2015 - Bugs, Mod Refactoring and More Edition.
+ - New:  Resource Transfer display and setup system refactored.  Added ability to stop a transfer in progress.  
+ - New:  Exposed Resource Transfer Flow Rate Slider min and max values. You can now change the min and max flow rate.  
+ - New:  Added a maximum run time in seconds. SM will use the lesser duration of Xfer amount / flow rate or max time.
+ - New:  Added tool tips to  controls in the options section of the Settings Window.
+ - Bug:  When moving or transferring a kerbal, closing the transfer window, Manifest window or closing the manifest window from any toolbar while the action is in progress causes an error.
+ - Bug:  When closing the Transfer Window, internally resetting the selected resource causes an error.
+
+Version 0.90.0_4.0.1 - Release 08 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
  - New:  4.0.1 - Added Create specific Kerbal Type:  Now you can choose Pilot, Engineer or Scientist!
  - NEW:  4.0.1 - Bug fix for unneeded debug log entry from tooltips
  - New:  4.0.1 - Bug Fix for Non reset Window positions in Config.xml
@@ -14,7 +22,6 @@ Version 0.90.0_4.0.0 - Release 06 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod
  - New:  Added vessel resource totals (quick reference) to Manifest Window resource buttons and Transfer Window Resource Title.
  - New:  Added KSP-AVC support http://forum.kerbalspaceprogram.com/threads/79745
  - Bug:  When when transferring a resource in realism mode, sometimes the source part ends up negative and causes issues (moves resources 1 unit at a time, backwards.
- / Bug:  When Transferring crew in realism mode, Sometimes a Kerbal disappears (usually from a source that contains more kerbal seats than target).
 
 Version 0.90.0_3.3.4 - 15 Jan, 2015 - Bugs, Mod Tweaks and More Edition.
  - New:  Added a Limited Highlighting switch.  When on, highlights only source and target parts.  

@@ -41,6 +41,11 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         internal static double flow_rate = (double)Settings.FlowRate;
 
+        [KSPField(isPersistant = true)]
+        internal static int flow_time = Settings.MaxFlowTimeSec;
+
+        internal static double act_flow_rate = 0;
+
         // Resource xfer vars
         internal static XFERMode XferMode = XFERMode.SourceToTarget;
         internal static bool XferOn = false;
@@ -475,20 +480,23 @@ namespace ShipManifest
         }
         private void OnAppLaunchToggleOff()
         {
-            try
+            if (!SMAddon.crewXfer && !SMAddon.XferOn)
             {
-                if (shouldToggle())
+                try
                 {
-                    Settings.ShowShipManifest = false;
-                    Settings.ShowShipManifest = false;
-                    SMAddon.smController.SelectedResource = null;
-                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
-                    ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_38" : "ShipManifest/Plugins/IconOff_38", false));
+                    if (shouldToggle())
+                    {
+                        Settings.ShowShipManifest = false;
+                        Settings.ShowShipManifest = false;
+                        SMAddon.smController.SelectedResource = null;
+                        SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                        ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_38" : "ShipManifest/Plugins/IconOff_38", false));
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOff.  " + ex.ToString(), "Error", true);
+                catch (Exception ex)
+                {
+                    Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOff.  " + ex.ToString(), "Error", true);
+                }
             }
         }
         private void CheckForToolbarToggle()
@@ -791,15 +799,18 @@ namespace ShipManifest
 
         internal static void ToggleToolbar()
         {
-            // turn off SM at toolbar
-            if (Settings.EnableBlizzyToolbar)
-                ToggleBlizzyToolBar();
-            else
+            if (!SMAddon.crewXfer && !SMAddon.XferOn)
             {
-                if (Settings.ShowShipManifest)
-                    ShipManifestButton_Stock.toggleButton.SetTrue();
+                // turn off SM at toolbar
+                if (Settings.EnableBlizzyToolbar)
+                    ToggleBlizzyToolBar();
                 else
-                    ShipManifestButton_Stock.toggleButton.SetFalse();
+                {
+                    if (Settings.ShowShipManifest)
+                        ShipManifestButton_Stock.toggleButton.SetTrue();
+                    else
+                        ShipManifestButton_Stock.toggleButton.SetFalse();
+                }
             }
         }
 
@@ -930,7 +941,7 @@ namespace ShipManifest
                         case XFERState.Run:
 
                             deltaT = Planetarium.GetUniversalTime() - timestamp;
-                            double deltaAmt = deltaT * flow_rate;
+                            double deltaAmt = deltaT * act_flow_rate;
 
                             // This adjusts the delta when we get to the end of the xfer.
                             float XferAmount = 0f;
@@ -1014,6 +1025,14 @@ namespace ShipManifest
                             timestamp = elapsed = 0;
                             XferState = XFERState.Off;
                             smController.AmtXferred = 0f;
+                            smController.sXferAmount = (float)WindowTransfer.CalcMaxXferAmt(smController.SelectedResource, smController.SelectedPartSource, smController.SelectedPartTarget);
+                            if (smController.sXferAmount < 0.0001)
+                                smController.sXferAmount = 0;
+                            WindowTransfer.strTXferAmount = smController.sXferAmount.ToString();
+                            smController.tXferAmount = (float)WindowTransfer.CalcMaxXferAmt(smController.SelectedResource, smController.SelectedPartTarget, smController.SelectedPartSource);
+                            if (smController.tXferAmount < 0.0001)
+                                smController.tXferAmount = 0;
+                            WindowTransfer.strTXferAmount = smController.tXferAmount.ToString();
                             XferOn = false;
                             break;
                     }

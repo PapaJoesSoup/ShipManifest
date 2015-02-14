@@ -15,7 +15,6 @@ namespace ShipManifest
         public float Courage;
         public bool Badass;
         public string Name;
-        public string Profession;
         public string Title;
 
         public KerbalModel(ProtoCrewMember kerbal, bool isNew)
@@ -25,7 +24,6 @@ namespace ShipManifest
             Stupidity = kerbal.stupidity;
             Courage = kerbal.courage;
             Badass = kerbal.isBadass;
-            Profession = "";
             Title = kerbal.experienceTrait.Title;
             IsNew = isNew;
         }
@@ -58,13 +56,10 @@ namespace ShipManifest
 
         public void SyncKerbal()
         {
-            Kerbal.name = Name;
+            //Kerbal.name = Name;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;
-            if (Title != Profession)
-                Kerbal.experienceTrait = KerbalModel.GetTrait(Kerbal, Profession);
-            Utilities.LogMessage(string.Format("SyncKerbal.  Trait should be:  " + Profession + ".  New Trait:  {0}", Kerbal.experienceTrait.Title), "info", true);
         }
 
         private bool NameExists()

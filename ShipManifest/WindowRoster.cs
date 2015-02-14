@@ -284,10 +284,6 @@ namespace ShipManifest
         private static void EditKerbalViewer()
         {
             GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
-            GUILayout.BeginHorizontal();
-            SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name);
-            GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
-            GUILayout.EndHorizontal();
             GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", ManifestStyle.LabelStyleBold, GUILayout.MaxWidth(200));
 
             if (!string.IsNullOrEmpty(SMAddon.smController.saveMessage))

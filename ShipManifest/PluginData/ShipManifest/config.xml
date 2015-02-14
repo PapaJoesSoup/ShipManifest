@@ -44,7 +44,8 @@
   <double name="SaveIntervalSec">180</double>
   <double name="FlowRate">100</double>
   <double name="MinFlowRate">0</double>
-  <double name="MaxFlowRate">100</double>
+  <double name="MaxFlowRate">1000</double>
+  <int name="MaxFlowTimeSec">180</int>
   <string name="PumpSoundStart">ShipManifest/Sounds/59328-1</string>
   <string name="PumpSoundRun">ShipManifest/Sounds/59328-2</string>
   <string name="PumpSoundStop">ShipManifest/Sounds/59328-3</string>

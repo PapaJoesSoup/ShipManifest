@@ -26,8 +26,14 @@ namespace ShipManifest
             ToolTipActive = false;
             ShowToolTips = Settings.ManifestToolTips;
 
+            GUIContent label = new GUIContent("", "Close Window");
+            if (SMAddon.crewXfer || SMAddon.XferOn)
+            {
+                label = new GUIContent("", "Action in progress.  Cannot close window");
+                GUI.enabled = false;
+            }
             Rect rect = new Rect(304, 4, 16, 16);
-            if (GUI.Button(rect, new GUIContent("", "Close Window")))
+            if (GUI.Button(rect, label))
             {
                 Settings.ShowShipManifest = false;
                 SMAddon.smController.SelectedResource = null;
@@ -37,6 +43,7 @@ namespace ShipManifest
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.ManifestPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
+            GUI.enabled = true;
             try
             {
                 GUILayout.BeginVertical();
