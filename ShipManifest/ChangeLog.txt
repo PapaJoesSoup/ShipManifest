@@ -1,4 +1,4 @@
-﻿Version 0.90.0_4.0.2 - Release 15 Feb, 2015 - Bugs, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.0.2 - Release 13 Feb, 2015 - Bugs, Mod Refactoring and More Edition.
  - New:  Resource Transfer display and setup system refactored.  Added ability to stop a transfer in progress.  
  - New:  Exposed Resource Transfer Flow Rate Slider min and max values. You can now change the min and max flow rate.  
  - New:  Added a maximum run time in seconds. SM will use the lesser duration of Xfer amount / flow rate or max time.
