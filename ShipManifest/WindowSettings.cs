@@ -109,7 +109,7 @@ namespace ShipManifest
                 GUI.enabled = false;
             GUILayout.BeginHorizontal();
             label = "Rename and Keep Profession (Experimental)";
-            toolTip = "When On, causes SM to try to keep the same profesison when Kerbal is Renamed.\r\n(Adds non printing chars to Kerbal name in your game save, Use at your own risk!)";
+            toolTip = "When On, SM will remember the selected profesison when Kerbal is Renamed.\r\nAdds non printing chars to Kerbal name in your game save.\r\n(Should be no issue, but use at your own risk.)";
             GUILayout.Space(20);
             Settings.RenameWithProfession = GUILayout.Toggle(Settings.RenameWithProfession, new GUIContent(label, toolTip), GUILayout.Width(300));
             GUILayout.EndHorizontal();
