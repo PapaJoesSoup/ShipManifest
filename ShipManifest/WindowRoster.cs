@@ -16,7 +16,7 @@ namespace ShipManifest
         internal static bool isPilot = false;
         internal static bool isEngineer = false;
         internal static bool isScientist = false;
-        internal static string KerbalPosition
+        internal static string KerbalProfession
         {
             get
             {
@@ -56,8 +56,10 @@ namespace ShipManifest
             Rect rect = new Rect(396, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
-                Settings.ShowRoster = false;
+                resetRosterSize = true;
+                SelectedKerbal = null;
                 ToolTip = "";
+                Settings.ShowRoster = false;
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
@@ -152,6 +154,7 @@ namespace ShipManifest
                         if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                         {
                             SelectedKerbal = new KerbalModel(kerbal, false);
+                            SetProfessionFlag();
                         }
                         else
                         {
@@ -241,7 +244,7 @@ namespace ShipManifest
                 while (!kerbalFound)
                 {
                     SelectedKerbal = KerbalModel.CreateKerbal();
-                    if (SelectedKerbal.Title == KerbalPosition)
+                    if (SelectedKerbal.Title == KerbalProfession)
                         kerbalFound = true;
                 }
                 OnCreate = false;
@@ -278,12 +281,7 @@ namespace ShipManifest
             {
                 if (!SelectedKerbal.IsNew)
                 {
-                    if (SelectedKerbal.Title == "Pilot")
-                        isPilot = true;
-                    else if (SelectedKerbal.Title == "Engineer")
-                        isEngineer = true;
-                    else
-                        isScientist = true;
+                    SetProfessionFlag();
                 }
                 DisplaySelectProfession();
             }
@@ -307,12 +305,7 @@ namespace ShipManifest
             {
                 if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
                 {
-                    if (isPilot)
-                        SelectedKerbal.Title = "Pilot";
-                    else if (isEngineer)
-                        SelectedKerbal.Title = "Engineer";
-                    else
-                        SelectedKerbal.Title = "Scientist";
+                    SelectedKerbal.Title = KerbalProfession;
                 }
                 SMAddon.smController.saveMessage = SelectedKerbal.SubmitChanges();
                 if (string.IsNullOrEmpty(SMAddon.smController.saveMessage))
@@ -322,6 +315,28 @@ namespace ShipManifest
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20);
             GUILayout.EndHorizontal();
+        }
+
+        private static void SetProfessionFlag()
+        {
+            if (SelectedKerbal.Title == "Pilot")
+            {
+                isPilot = true;
+                isEngineer = false;
+                isScientist = false;
+            }
+            else if (SelectedKerbal.Title == "Engineer")
+            {
+                isPilot = false;
+                isEngineer = true;
+                isScientist = false;
+            }
+            else
+            {
+                isPilot = false;
+                isEngineer = false;
+                isScientist = true;
+            }
         }
 
         private static void DisplaySelectProfession()

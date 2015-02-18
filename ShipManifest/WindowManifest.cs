@@ -87,6 +87,11 @@ namespace ShipManifest
                     try
                     {
                         Settings.ShowRoster = !Settings.ShowRoster;
+                        if (!Settings.ShowRoster)
+                        {
+                            WindowRoster.SelectedKerbal = null;
+                            WindowRoster.ToolTip = "";
+                        }
                     }
                     catch (Exception ex)
                     {

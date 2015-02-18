@@ -295,6 +295,12 @@ namespace ShipManifest
                         ApplicationLauncher.Instance.RemoveModApplication(ShipManifestButton_Stock);
                     }
                 }
+                //Reset Roster Window data
+                WindowRoster.resetRosterSize = true;
+                WindowRoster.SelectedKerbal = null;
+                WindowRoster.ToolTip = "";
+                Settings.ShowRoster = false;
+
             }
             catch (Exception ex)
             {
