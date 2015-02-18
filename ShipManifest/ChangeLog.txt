@@ -1,9 +1,9 @@
-﻿Version 0.90.0_4.1.0 - Release xx Feb, 2015 - Solar Panels Bugs, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.1.0 - Release 18 Feb, 2015 - Solar Panels Bugs, Mod Refactoring and More Edition.
  - New:  Added Deployable Solar Panel Management Window.  Works like Hatch panel. In realism Mode, respects Rectractable = false.
  - New:  Refactored Crew Transfer Display code, Hatch Panel code and data management.  Relocated some methods to more logical locations.
  - New:  Added switch to allow renaming Kerbals. Added support for maintaining professions after rename.  Adds non printing chars to name, so use at your own risk.
- - New:  Added autosave settings on scene change or exiting game.
- - Bug:  After switching scenes and selecting a part with CLS enabled an highligting error occurs.
+ - New:  Added autosave of settings on scene change or exiting game.
+ - Bug:  After switching scenes and selecting a part with CLS enabled an highlighting error occurs.
  - Bug:  after switching scenes and using Hatch panel, an error occurs in highlighting.
  - Bug:  After switching vessels, the hatch panel shows the old vessel info and is not updated. Additionally, CLS highlighting causes errors.   
 
