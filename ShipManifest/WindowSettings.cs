@@ -53,7 +53,10 @@ namespace ShipManifest
 
         private static void DisplayConfiguration()
         {
+            Rect rect = new Rect();
             string label = "";
+            string toolTip = "";
+
             string txtSaveInterval = Settings.SaveIntervalSec.ToString();
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             GUILayout.Label("Configuraton", GUILayout.Height(10));
@@ -94,6 +97,26 @@ namespace ShipManifest
             Settings.ErrorLogLength = GUILayout.TextField(Settings.ErrorLogLength, GUILayout.Width(40));
             GUILayout.Label("(lines)", GUILayout.Width(50));
             GUILayout.EndHorizontal();
+
+            label = "Enable Kerbal Renaming";
+            toolTip = "Allows renaming a Kerbal.  The Profession may change when the kerbal is renamed.";
+            Settings.EnableKerbalRename = GUILayout.Toggle(Settings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
+            if (!Settings.EnableKerbalRename)
+                GUI.enabled = false;
+            GUILayout.BeginHorizontal();
+            label = "Rename and Keep Profession (Experimental)";
+            toolTip = "When On, causes SM to try to keep the same profesison when Kerbal is Renamed.\r\n(Adds non printing chars to Kerbal name in your game save, Use at your own risk!)";
+            GUILayout.Space(20);
+            Settings.RenameWithProfession = GUILayout.Toggle(Settings.RenameWithProfession, new GUIContent(label, toolTip), GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            GUI.enabled = true;
 
             label = "Enable AutoSave Settings";
             Settings.AutoSave = GUILayout.Toggle(Settings.AutoSave, label, GUILayout.Width(300));
@@ -235,7 +258,7 @@ namespace ShipManifest
                 {
                     if (SMAddon.smController.SelectedResource == "Crew")
                     {
-                        SMController.HighlightCLSVessel(Settings.EnableHighlighting, true);
+                        SMAddon.HighlightCLSVessel(Settings.EnableHighlighting, true);
                         // Update spaces and reassign the resource to observe new settings.
                         SMAddon.UpdateCLSSpaces();
                         SMAddon.smController.SelectedResource = "Crew";
@@ -259,7 +282,7 @@ namespace ShipManifest
                 Settings.EnableCLSHighlighting = false;
                 if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
                 {
-                    SMController.HighlightCLSVessel(false, true);
+                    SMAddon.HighlightCLSVessel(false, true);
                     // Update spaces and reassign the resource to observe new settings.
                     SMAddon.UpdateCLSSpaces();
                     SMAddon.smController.SelectedResource = "Crew";
@@ -279,7 +302,7 @@ namespace ShipManifest
             if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
             {
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
-                    SMController.HighlightCLSVessel(Settings.EnableCLSHighlighting);
+                    SMAddon.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
         }
 
@@ -342,7 +365,7 @@ namespace ShipManifest
             if (Settings.EnableCLS != Settings.prevEnableCLS)
             {
                 if (!Settings.EnableCLS)
-                    SMController.HighlightCLSVessel(false, true);
+                    SMAddon.HighlightCLSVessel(false, true);
                 else if (SMAddon.smController.SelectedResource == "Crew")
                 {
                     // Update spaces and reassign the resource to observe new settings.
@@ -388,7 +411,7 @@ namespace ShipManifest
             // EnablePFResources Mode
             GUILayout.BeginHorizontal();
             GUI.enabled = isEnabled;
-            guiLabel = new GUIContent("Enable Resources in Pre-Flight", "Turns on/off Resource Xfers during preflight.\r\nWhen on, Resource transfers are possible and show up in the Resource list.\r\nWhen Off, Resources (fuel, monoprpellent, etc) will not appear in the resource list.");
+            guiLabel = new GUIContent("Enable Resources in Pre-Flight", "Turns on/off Fill and Empty Resources when in preflight.\r\nWhen on, Resource Fill and Dump resources vessel wide are possible and show up in the Resource list.\r\nWhen Off, Fill and Dump Resources vessel wide will not appear in the resource list.");
             Settings.EnablePFResources = GUILayout.Toggle(Settings.EnablePFResources, guiLabel, GUILayout.Width(300));
             Rect rect6 = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)

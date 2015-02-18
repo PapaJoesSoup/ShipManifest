@@ -19,7 +19,6 @@ namespace ShipManifest
 
         // Vessel vars
         internal static ICLSAddon clsAddon = null;
-        internal static ICLSVessel clsVessel = null;
 
         internal static Vessel vessel = null;
 
@@ -69,56 +68,25 @@ namespace ShipManifest
 
         #endregion
 
+        private static List<Hatch> _hatches = new List<Hatch>();
+        internal static List<Hatch> Hatches
+        {
+            get
+            {
+                if (_hatches == null)
+                    _hatches = new List<Hatch>();
+                return _hatches;
+            }
+            set
+            {
+                _hatches.Clear();
+                _hatches = value;
+            }
+        }
+        
         #region Event handlers
 
         // Addon state event handlers
-        internal void Start()
-        {
-            Utilities.LogMessage("ShipManifestAddon.Start.", "Info", Settings.VerboseLogging);
-            try
-            {
-                if (HighLogic.LoadedSceneIsFlight)
-                {
-                    // Instantiate Event handlers
-                    GameEvents.onVesselChange.Add(OnVesselChange);
-                    GameEvents.onPartDie.Add(OnPartDie);
-                    GameEvents.onPartExplode.Add(OnPartExplode);
-                    GameEvents.onPartUndock.Add(OnPartUndock);
-                    GameEvents.onStageSeparation.Add(OnStageSeparation);
-                    GameEvents.onUndock.Add(OnUndock);
-                    GameEvents.onVesselCreate.Add(OnVesselCreate);
-                    GameEvents.onVesselDestroy.Add(OnVesselDestroy);
-                    GameEvents.onVesselWasModified.Add(OnVesselWasModified);
-                    GameEvents.onVesselChange.Add(OnVesselChange);
-                    GameEvents.onVesselLoaded.Add(OnVesselLoaded);
-                    GameEvents.onVesselTerminated.Add(OnVesselTerminated);
-                    GameEvents.onFlightReady.Add(OnFlightReady);
-
-                    // get the current Vessel data
-                    vessel = FlightGlobals.ActiveVessel;
-                    smController = SMController.GetInstance(vessel);
-
-                    // Is CLS installed and enabled?
-                    GetCLSVessel();
-                    if (clsAddon != null)
-                    {
-                        Settings.CLSInstalled = true;
-                        RunSave();
-                    }
-                    else
-                    {
-                        Settings.EnableCLS = false;
-                        Settings.CLSInstalled = false;
-                        RunSave();
-                    }
-                    Utilities.LogMessage("CLS Installed?  " + Settings.CLSInstalled.ToString(), "Info", true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.Start.  " + ex.ToString(), "Error", true);
-            }
-        }
         internal void Awake()
         {
             try 
@@ -156,12 +124,61 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.Awake.  Error:  " + ex.ToString(), "Error", true);
             }
         }
+        internal void Start()
+        {
+            Utilities.LogMessage("ShipManifestAddon.Start.", "Info", Settings.VerboseLogging);
+            try
+            {
+                if (HighLogic.LoadedSceneIsFlight)
+                {
+                    // Instantiate Event handlers
+                    GameEvents.onVesselChange.Add(OnVesselChange);
+                    GameEvents.onPartDie.Add(OnPartDie);
+                    GameEvents.onPartExplode.Add(OnPartExplode);
+                    GameEvents.onPartUndock.Add(OnPartUndock);
+                    GameEvents.onStageSeparation.Add(OnStageSeparation);
+                    GameEvents.onUndock.Add(OnUndock);
+                    GameEvents.onVesselCreate.Add(OnVesselCreate);
+                    GameEvents.onVesselDestroy.Add(OnVesselDestroy);
+                    GameEvents.onVesselWasModified.Add(OnVesselWasModified);
+                    GameEvents.onVesselChange.Add(OnVesselChange);
+                    GameEvents.onVesselLoaded.Add(OnVesselLoaded);
+                    GameEvents.onVesselTerminated.Add(OnVesselTerminated);
+                    GameEvents.onFlightReady.Add(OnFlightReady);
+
+                    // get the current Vessel data
+                    vessel = FlightGlobals.ActiveVessel;
+                    smController = SMController.GetInstance(vessel);
+
+                    // Is CLS installed and enabled?
+                    SMAddon.GetCLSVessel(); 
+                    if (clsAddon != null)
+                    {
+                        Settings.CLSInstalled = true;
+                        RunSave();
+                    }
+                    else
+                    {
+                        Settings.EnableCLS = false;
+                        Settings.CLSInstalled = false;
+                        RunSave();
+                    }
+                    Utilities.LogMessage("CLS Installed?  " + Settings.CLSInstalled.ToString(), "Info", Settings.VerboseLogging);
+                    if (Settings.EnableCLS)
+                        UpdateCLSSpaces();
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.Start.  " + ex.ToString(), "Error", true);
+            }
+        }
         internal void OnGUI()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
             try
             {
-                DisplayWindows();
+                Display();
 
                 Utilities.ShowToolTips();
 
@@ -185,7 +202,7 @@ namespace ShipManifest
 
                         smController = SMController.GetInstance(vessel);
                         smController.CanDrawButton = true;
-                        smController.UpdateHighlighting();
+                        UpdateHighlighting();
 
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
@@ -219,7 +236,7 @@ namespace ShipManifest
             Utilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
             try
             {
-
+                UpdateSMcontroller(modVessel);
             }
             catch (Exception ex)
             {
@@ -231,25 +248,7 @@ namespace ShipManifest
             Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
             try
             {
-                if (vessel != null && SMAddon.CanShowShipManifest())
-                {
-                    if (newVessel.isEVA && !vessel.isEVA)
-                    {
-                        Settings.ShowShipManifest = false;
-                        ToggleToolbar();
-
-                        // kill selected resource and its associated highlighting.
-                        smController.SelectedResource = null;
-                        smController.SelectedResourceParts = null;
-                        Utilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", true);
-                    }
-                }
-
-                // Now let's update the current vessel view...
-                vessel = newVessel;
-                smController = SMController.GetInstance(vessel);
-                if (Settings.EnableCLS)
-                    UpdateCLSSpaces();
+                UpdateSMcontroller(newVessel);
             }
             catch (Exception ex)
             {
@@ -261,6 +260,7 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
             try
             {
+                Save();
                 GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onVesselChange.Remove(OnVesselChange);
                 GameEvents.onPartDie.Remove(OnPartDie);
@@ -277,7 +277,7 @@ namespace ShipManifest
                 GameEvents.onFlightReady.Remove(OnFlightReady);
 
                 if (Utilities.Errors.Count > 0 && Settings.SaveLogOnExit)
-                    Savelog();
+                    WindowDebugger.Savelog();
                 CancelInvoke("RunSave");
 
                 // Handle Toolbars
@@ -306,7 +306,7 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnFlightReady");
             try
             {
-
+                
             }
             catch (Exception ex)
             {
@@ -318,7 +318,7 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselLoaded");
             try
             {
-
+                UpdateSMcontroller(data);
             }
             catch (Exception ex)
             {
@@ -366,7 +366,17 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnPartUndock");
             try
             {
-
+                Utilities.LogMessage("OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", Settings.VerboseLogging);
+                if (smController.SelectedResource == "Crew")
+                {
+                    if (Settings.EnableCLS)
+                        SMAddon.clsAddon.Vessel.Highlight(false);
+                    else
+                    {
+                        smController.SelectedResource = null;
+                        UpdateHighlighting();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -378,7 +388,6 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnStageSeparation");
             try
             {
-
             }
             catch (Exception ex)
             {
@@ -577,6 +586,7 @@ namespace ShipManifest
                 WindowTransfer.xferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
             return results;
         }
+
         internal static bool shouldToggle()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.shouldToggle");
@@ -604,7 +614,7 @@ namespace ShipManifest
                     
                 if (Settings.EnableCLS && Settings.RealismMode)
                 {
-                    if (clsVessel != null)
+                    if (SMAddon.clsAddon.Vessel != null)
                     {
                         if (smController.clsSpaceSource != null && smController.clsSpaceTarget != null)
                         {
@@ -636,7 +646,7 @@ namespace ShipManifest
                     frameErrTripped = true;
                 }
             }
-            //Utilities.LogMessage("IsInCLS() - results = " + results.ToString() , "info", true);
+            //Utilities.LogMessage("IsInCLS() - results = " + results.ToString() , "info", Settings.VerboseLogging);
             return results;
         }
 
@@ -658,10 +668,65 @@ namespace ShipManifest
 
         #region Action Methods
 
+        internal static void GetHatches()
+        {
+            _hatches.Clear();
+            try
+            {
+                foreach (ICLSPart iPart in SMAddon.clsAddon.Vessel.Parts)
+                {
+                    foreach (PartModule pModule in iPart.Part.Modules)
+                    {
+                        if (pModule.moduleName == "ModuleDockingHatch")
+                        {
+                            Hatch pHatch = new Hatch();
+                            pHatch.HatchModule = pModule;
+                            pHatch.CLSPart = iPart;
+                            _hatches.Add(pHatch);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex.ToString()), "Error", true);
+            }
+        }
+
+        internal void UpdateSMcontroller(Vessel newVessel)
+        {
+            try
+            {
+                if (vessel != null && SMAddon.CanShowShipManifest())
+                {
+                    if (newVessel.isEVA && !vessel.isEVA)
+                    {
+                        Settings.ShowShipManifest = false;
+                        ToggleToolbar();
+
+                        // kill selected resource and its associated highlighting.
+                        smController.SelectedResource = null;
+                        smController.SelectedResourceParts = null;
+                        Utilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", Settings.VerboseLogging);
+                    }
+                }
+
+                // Now let's update the current vessel view...
+                vessel = newVessel;
+                smController = SMController.GetInstance(vessel);
+                if (Settings.EnableCLS)
+                    UpdateCLSSpaces();
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.UpdateSMcontroller.  " + ex.ToString(), "Error", true);
+            }
+        }
+        
         internal static void UpdateCLSSpaces()
         {
             SMAddon.GetCLSVessel();
-            if (SMAddon.clsVessel != null)
+            if (SMAddon.clsAddon.Vessel != null)
             {
                 try
                 {
@@ -669,7 +734,7 @@ namespace ShipManifest
                     {
                         smController.clsPartSource = null;
                         smController.clsSpaceSource = null;
-                        foreach (ICLSSpace sSpace in SMAddon.clsVessel.Spaces)
+                        foreach (ICLSSpace sSpace in SMAddon.clsAddon.Vessel.Spaces)
                         {
                             foreach (ICLSPart sPart in sSpace.Parts)
                             {
@@ -689,7 +754,7 @@ namespace ShipManifest
                     {
                         smController.clsPartTarget = null;
                         smController.clsSpaceTarget = null;
-                        foreach (ICLSSpace tSpace in SMAddon.clsVessel.Spaces)
+                        foreach (ICLSSpace tSpace in SMAddon.clsAddon.Vessel.Spaces)
                         {
                             foreach (ICLSPart tPart in tSpace.Parts)
                             {
@@ -705,6 +770,7 @@ namespace ShipManifest
                         if (smController.clsSpaceTarget == null)
                             Utilities.LogMessage("UpdateCLSSpaces - clsSpaceTarget is null.", "info", Settings.VerboseLogging);
                     }
+                    GetHatches();
                 }
                 catch (Exception ex)
                 {
@@ -721,23 +787,15 @@ namespace ShipManifest
             {
                 Utilities.LogMessage("GetCLSVessel - Active.", "Info", Settings.VerboseLogging);
 
-                if (clsVessel == null)
-                    if (clsAddon == null)
-                    {
-                        clsAddon = CLSClient.GetCLS();
-                        if (clsAddon != null)
-                            clsVessel = clsAddon.Vessel;
-                        else
-                            Utilities.LogMessage("GetCLSVessel - clsAddon is null.", "Info", Settings.VerboseLogging);
-                    }
-                    else
-                        clsVessel = clsAddon.Vessel;
-                else
-                    clsVessel = clsAddon.Vessel;
-
-                if (clsVessel != null)
+                clsAddon = CLSClient.GetCLS();
+                if (clsAddon == null)
+                    Utilities.LogMessage("GetCLSVessel - clsAddon is null.", "Info", Settings.VerboseLogging);
+                if (SMAddon.clsAddon.Vessel != null)
                 {
-                    Utilities.LogMessage("GetCLSVessel - Complete.", "Info", Settings.VerboseLogging);
+                    if (SMAddon.clsAddon.Vessel.Spaces[0].Parts[0].Part.vessel != smController.Vessel)
+                        Utilities.LogMessage("GetCLSVessel - Does NOT match! - Complete.", "Info", Settings.VerboseLogging);
+                    else
+                        Utilities.LogMessage("GetCLSVessel - Complete.", "Info", Settings.VerboseLogging);
                     return true;
                 }
                 else
@@ -819,7 +877,7 @@ namespace ShipManifest
             ShipManifestButton_Blizzy.TexturePath = Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_24" : "ShipManifest/Plugins/IconOff_24";
         }
 
-        internal void DisplayWindows()
+        internal void Display()
         {
             string step = "";
             try
@@ -828,7 +886,7 @@ namespace ShipManifest
                 ManifestStyle.SetupGUI();
 
                 if (Settings.ShowDebugger)
-                    Settings.DebuggerPosition = GUILayout.Window(398648, Settings.DebuggerPosition, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
+                    Settings.DebuggerPosition = GUILayout.Window(398643, Settings.DebuggerPosition, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
 
                 if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != vessel)
                 {
@@ -852,7 +910,7 @@ namespace ShipManifest
                     else
                     {
                         if (Settings.EnableCLS && smController.SelectedResource == "Crew")
-                            SMController.HighlightCLSVessel(false, true);  
+                            SMAddon.HighlightCLSVessel(false, true);  
                     }
 
                     // What windows do we want to show?
@@ -886,8 +944,13 @@ namespace ShipManifest
 
                     if (Settings.ShowShipManifest && Settings.ShowHatch)
                     {
-                        step = "6 - Show Hatches";
+                        step = "7 - Show Hatches";
                         Settings.HatchPosition = GUILayout.Window(398548, Settings.HatchPosition, WindowHatch.Display, "Ship Manifest Hatches", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                    }
+                    if (Settings.ShowShipManifest && Settings.ShowPanel)
+                    {
+                        step = "8 - Show Solar Panels";
+                        Settings.PanelPosition = GUILayout.Window(398549, Settings.PanelPosition, WindowSolarPanel.Display, "Ship Manifest Solar Panels", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
                     }
                 }
             }
@@ -1260,52 +1323,175 @@ namespace ShipManifest
             }
         }
 
-        internal static void Savelog()
-        {
-            try
-            {
-                // time to create a file...
-                string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
-
-                string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
-                if (Settings.DebugLogPath.StartsWith(@"\"))
-                    Settings.DebugLogPath = Settings.DebugLogPath.Substring(2, Settings.DebugLogPath.Length - 2);
-
-                if (!Settings.DebugLogPath.EndsWith(@"\"))
-                    Settings.DebugLogPath += @"\";
-
-                filename = path + Settings.DebugLogPath + filename;
-                Utilities.LogMessage("File Name = " + filename, "Info", true);
-
-                try
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (string line in Utilities.Errors)
-                    {
-                        sb.AppendLine(line);
-                    }
-
-                    File.WriteAllText(filename, sb.ToString());
-
-                    Utilities.LogMessage("File written", "Info", true);
-                }
-                catch (Exception ex)
-                {
-                    Utilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info", true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
         internal static void FireEventTriggers()
         {
             // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
             // and instructions for using CLS API by codepoet.
             Utilities.LogMessage("FireEventTriggers:  Active.", "info", Settings.VerboseLogging);
             GameEvents.onVesselChange.Fire(vessel);
+        }
+
+        #region Highlighting methods
+
+        /// <summary>
+        /// Remove highlighting on a part.
+        /// </summary>
+        /// <param name="part">Part to remove highlighting from.</param>
+        internal static void ClearPartHighlight(Part part)
+        {
+            try
+            {
+                if (part != null)
+                {
+                    part.SetHighlight(false, false);
+                    part.SetHighlightDefault();
+                    part.highlightType = Part.HighlightType.OnMouseOver;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
+        /// <summary>
+        /// Removes Highlighting on parts belonging to the selected resource list.
+        /// </summary>
+        /// <param name="_ResourceParts"></param>
+        internal static void ClearResourceHighlighting(List<Part> _ResourceParts)
+        {
+            if (_ResourceParts != null)
+            {
+                foreach (Part part in _ResourceParts)
+                {
+                    ClearPartHighlight(part);
+                }
+                if (Settings.EnableCLS && Settings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null)
+                    SMAddon.clsAddon.Vessel.Highlight(false);
+            }
+        }
+
+        internal static void SetPartHighlight(Part part, Color color)
+        {
+            try
+            {
+
+                if (part != null)
+                {
+                    part.SetHighlightColor(color);
+                    part.SetHighlight(true, false);
+                    part.highlightType = Part.HighlightType.AlwaysOn;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
+        #endregion
+        internal static void UpdateHighlighting()
+        {
+            string step = "";
+            try
+            {
+                // Do we even want to highlight?
+                if (Settings.EnableHighlighting)
+                {
+                    step = "Showhipmanifest = true";
+                    if (SMAddon.CanShowShipManifest())
+                    {
+                        if (Settings.EnableCLS && Settings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null)
+                        {
+                            if (smController.SelectedResource == "Crew")
+                            {
+                                step = "Highlight CLS vessel";
+                                HighlightCLSVessel(true);
+
+                                // Turn off the source and target cls highlighting.  We are going to replace it.
+                                if (smController.clsPartSource != null)
+                                    smController.clsPartSource.Highlight(false, true);
+                                if (smController.clsPartTarget != null)
+                                    smController.clsPartTarget.Highlight(false, true);
+                            }
+                        }
+
+                        step = "Set Selected Part Colors";
+                        if (smController.SelectedPartSource != null)
+                            SMAddon.SetPartHighlight(smController.SelectedPartSource, Settings.Colors[Settings.SourcePartColor]);
+                        if (smController.SelectedPartTarget != null)
+                            if (smController.SelectedResource == "Crew" && Settings.EnableCLS)
+                                SetPartHighlight(smController.SelectedPartTarget, Settings.Colors[Settings.TargetPartCrewColor]);
+                            else
+                                SetPartHighlight(smController.SelectedPartTarget, Settings.Colors[Settings.TargetPartColor]);
+
+                        // Default is yellow
+                        step = "Set non selected resource part color";
+                        Color partColor = Color.yellow;
+
+                        // match color used by CLS if active
+                        if (smController.SelectedResource == "Crew" && Settings.EnableCLS)
+                            partColor = Color.green;
+
+                        step = "Set Resource Part Colors";
+                        foreach (Part thispart in smController.SelectedResourceParts)
+                        {
+                            if (thispart != smController.SelectedPartSource && thispart != smController.SelectedPartTarget && !Settings.OnlySourceTarget)
+                            {
+                                SetPartHighlight(thispart, partColor);
+                            }
+                        }
+                    }
+                    //else
+                    //{
+                    //    step = "ShowShipManifest = false";
+                    //    if (SelectedResourceParts != null)
+                    //    {
+                    //        foreach (Part thispart in SelectedResourceParts)
+                    //        {
+                    //            ClearPartHighlight(thispart);
+                    //        }
+                    //        SelectedResource = null;
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in UpdateHighlight (repeating error).  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
+        }
+
+        internal static void HighlightCLSVessel(bool enabled, bool force = false)
+        {
+            try
+            {
+                //SMAddon.UpdateCLSSpaces();
+                if (SMAddon.clsAddon.Vessel == null)
+                    SMAddon.UpdateCLSSpaces();
+                if (SMAddon.clsAddon.Vessel != null)
+                {
+                    foreach (ICLSSpace Space in SMAddon.clsAddon.Vessel.Spaces)
+                    {
+                        foreach (ICLSPart part in Space.Parts)
+                        {
+                            part.Highlight(enabled, force);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in HighlightCLSVessel (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
         }
 
         #endregion

@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLSClient.cs" />
+    <Compile Include="SolarPanel.cs" />
     <Compile Include="WindowDebugger.cs" />
     <Compile Include="Hatch.cs" />
     <Compile Include="WindowHatch.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="SMAddon.cs" />
     <Compile Include="WindowManifest.cs" />
     <Compile Include="ToolbarWrapper.cs" />
+    <Compile Include="WindowSolarPanel.cs" />
     <Compile Include="WindowTransfer.cs" />
     <Compile Include="SMController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

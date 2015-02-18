@@ -95,7 +95,7 @@ namespace ShipManifest
         {
             if (SMAddon.toolTip != null && SMAddon.toolTip.Trim().Length > 0)
             {
-                //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SMAddon.toolTip, SMAddon.ToolTipPos.ToString()), "Info", true);
+                //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SMAddon.toolTip, SMAddon.ToolTipPos.ToString()), "Info", Settings.VerboseLogging);
                 ShowToolTip(SMAddon.ToolTipPos, SMAddon.toolTip);
             }
 

@@ -195,7 +195,7 @@ namespace ShipManifest
             {
                 try
                 {
-                    ClearResourceHighlighting(SelectedResourceParts);
+                    SMAddon.ClearResourceHighlighting(SelectedResourceParts);
                     _prevSelectedResource = _selectedResource;
                     _selectedResource = value;
 
@@ -224,7 +224,7 @@ namespace ShipManifest
             }
             set
             {
-                ClearResourceHighlighting(_selectedResourceParts);
+                SMAddon.ClearResourceHighlighting(_selectedResourceParts);
                 _selectedResourceParts = value;
             }
         }
@@ -252,7 +252,7 @@ namespace ShipManifest
                 try
                 {
                     if (value != _selectedPartSource)
-                        ClearPartHighlight(_selectedPartSource);
+                        SMAddon.ClearPartHighlight(_selectedPartSource);
                     _selectedPartSource = value;
                     if (Settings.EnableCLS)
                     {
@@ -293,7 +293,7 @@ namespace ShipManifest
                 try
                 {
                     if (value != _selectedPartTarget)
-                        ClearPartHighlight(_selectedPartTarget);
+                        SMAddon.ClearPartHighlight(_selectedPartTarget);
                     _selectedPartTarget = value;
                     if (Settings.EnableCLS)
                         SMAddon.UpdateCLSSpaces();
@@ -316,6 +316,22 @@ namespace ShipManifest
         internal ICLSPart clsPartTarget;
         internal ICLSSpace clsSpaceSource;
         internal ICLSSpace clsSpaceTarget;
+
+        private List<SolarPanel> _solarPanels = new List<SolarPanel>();
+        internal List<SolarPanel> SolarPanels
+        {
+            get
+            {
+                if (_solarPanels == null)
+                    _solarPanels = new List<SolarPanel>();
+                return _solarPanels;
+            }
+            set
+            {
+                _solarPanels.Clear();
+                _solarPanels = value;
+            }
+        }
 
         internal GameEvents.FromToAction<Part, Part> evaAction;
 
@@ -503,167 +519,31 @@ namespace ShipManifest
             }
         }
 
-        #endregion
-
-        #region Highlighting methods
-
-        /// <summary>
-        /// Remove highlighting on a part.
-        /// </summary>
-        /// <param name="part">Part to remove highlighting from.</param>
-        internal static void ClearPartHighlight(Part part)
+        internal void GetSolarPanels()
         {
+            _solarPanels.Clear();
             try
             {
-                if (part != null)
+                foreach (Part pPart in SMAddon.vessel.Parts)
                 {
-                    part.SetHighlight(false, false);
-                    part.SetHighlightDefault();
-                    part.highlightType = Part.HighlightType.OnMouseOver;
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        /// <summary>
-        /// Removes Highlighting on parts belonging to the selected resource list.
-        /// </summary>
-        /// <param name="_ResourceParts"></param>
-        internal static void ClearResourceHighlighting(List<Part> _ResourceParts)
-        {
-            if (_ResourceParts != null)
-            {
-                foreach (Part part in _ResourceParts)
-                {
-                    ClearPartHighlight(part);
-                }
-                if (Settings.EnableCLS && Settings.EnableCLSHighlighting && SMAddon.clsVessel != null)
-                    SMAddon.clsVessel.Highlight(false);
-            }
-        }
-
-        internal static void SetPartHighlight(Part part, Color color)
-        {
-            try
-            {
-
-                if (part != null)
-                {
-                    part.SetHighlightColor(color);
-                    part.SetHighlight(true, false);
-                    part.highlightType = Part.HighlightType.AlwaysOn;
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        internal void UpdateHighlighting()
-        {
-            string step = "";
-            try
-            {
-                // Do we even want to highlight?
-                if (Settings.EnableHighlighting)
-                {
-                    step = "Showhipmanifest = true";
-                    if (SMAddon.CanShowShipManifest())
+                    foreach (PartModule pModule in pPart.Modules)
                     {
-                        if (Settings.EnableCLS && Settings.EnableCLSHighlighting && SMAddon.clsVessel != null)
+                        if (pModule.moduleName == "ModuleDeployableSolarPanel")
                         {
-                            if (SelectedResource == "Crew")
-                            {
-                                step = "Highlight CLS vessel";
-                                HighlightCLSVessel(true);
-
-                                // Turn off the source and target cls highlighting.  We are going to replace it.
-                                if (clsPartSource != null)
-                                    clsPartSource.Highlight(false, true);
-                                if (clsPartTarget != null)
-                                    clsPartTarget.Highlight(false, true);
-                            }
-                        }
-
-                        step = "Set Selected Part Colors";
-                        if (SelectedPartSource != null)
-                            SetPartHighlight(SelectedPartSource, Settings.Colors[Settings.SourcePartColor]);
-                        if (SelectedPartTarget != null)
-                            if (SelectedResource == "Crew" && Settings.EnableCLS)
-                                SetPartHighlight(SelectedPartTarget, Settings.Colors[Settings.TargetPartCrewColor]);
-                            else
-                                SetPartHighlight(SelectedPartTarget, Settings.Colors[Settings.TargetPartColor]);
-
-                        // Default is yellow
-                        step = "Set non selected resource part color";
-                        Color partColor = Color.yellow;
-
-                        // match color used by CLS if active
-                        if (SelectedResource == "Crew" && Settings.EnableCLS)
-                            partColor = Color.green;
-
-                        step = "Set Resource Part Colors";
-                        foreach (Part thispart in SelectedResourceParts)
-                        {
-                            if (thispart != SelectedPartSource && thispart != SelectedPartTarget && !Settings.OnlySourceTarget)
-                            {
-                                SetPartHighlight(thispart, partColor);
-                            }
-                        }
-                    }
-                    //else
-                    //{
-                    //    step = "ShowShipManifest = false";
-                    //    if (SelectedResourceParts != null)
-                    //    {
-                    //        foreach (Part thispart in SelectedResourceParts)
-                    //        {
-                    //            ClearPartHighlight(thispart);
-                    //        }
-                    //        SelectedResource = null;
-                    //    }
-                    //}
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!SMAddon.frameErrTripped)
-                {
-                    Utilities.LogMessage(string.Format(" in UpdateHighlight (repeating error).  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    SMAddon.frameErrTripped = true;
-                }
-            }
-        }
-
-        internal static void HighlightCLSVessel(bool enabled, bool force = false)
-        {
-            try
-            {
-                SMAddon.UpdateCLSSpaces();
-                if (SMAddon.clsVessel != null)
-                {
-                    foreach (ICLSSpace Space in SMAddon.clsVessel.Spaces)
-                    {
-                        foreach (ICLSPart part in Space.Parts)
-                        {
-                            part.Highlight(enabled, force);
+                            SolarPanel pPanel = new SolarPanel();
+                            pPanel.PanelModule = pModule;
+                            _solarPanels.Add(pPanel);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                if (!SMAddon.frameErrTripped)
-                {
-                    Utilities.LogMessage(string.Format(" in HighlightCLSVessel (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    SMAddon.frameErrTripped = true;
-                }
+                Utilities.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex.ToString()), "Error", true);
             }
         }
+
         #endregion
+
     }
 }

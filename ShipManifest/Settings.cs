@@ -13,7 +13,7 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string CurVersion = "0.90.0_3.4.0";
+        internal static string CurVersion = "0.90.0_4.1.0";
 
         internal static Rect ManifestPosition;
         internal static Rect TransferPosition;
@@ -52,6 +52,9 @@ namespace ShipManifest
 
         internal static Rect HatchPosition;
         internal static bool ShowHatch { get; set; }
+
+        internal static Rect PanelPosition;
+        internal static bool ShowPanel { get; set; }
 
         internal static string DebugLogPath = "\\Plugins\\PluginData\\";
 
@@ -132,6 +135,8 @@ namespace ShipManifest
         internal static string HatchColor = "cyan";
         internal static string HatchOpenColor = "cyan";
         internal static string HatchCloseColor = "red";
+        internal static string PanelExtendedColor = "cyan";
+        internal static string PanelRetractedColor = "red";
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
 
         internal static bool ShowToolTips = true;
@@ -146,8 +151,14 @@ namespace ShipManifest
         internal static bool prevRosterToolTips = true;
         internal static bool HatchToolTips = true;
         internal static bool prevHatchToolTips = true;
+        internal static bool PanelToolTips = true;
+        internal static bool prevPanelToolTips = true;
         internal static bool DebuggerToolTips = true;
         internal static bool prevDebuggerToolTips = true;
+        internal static bool EnableKerbalRename = false;
+        internal static bool prevEnableKerbalRename = false;
+        internal static bool RenameWithProfession = false;
+        internal static bool prevRenameWithProfession = false;
 
         #endregion
 
@@ -171,6 +182,7 @@ namespace ShipManifest
                 DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
                 HatchPosition = configfile.GetValue<Rect>("HatchPosition");
+                PanelPosition = configfile.GetValue<Rect>("PanelPosition");
                 RosterPosition = configfile.GetValue<Rect>("RosterPosition");
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
                 RealismMode = configfile.GetValue<bool>("RealismMode");
@@ -198,6 +210,8 @@ namespace ShipManifest
                 HatchColor = configfile.GetValue<string>("HatchColor");
                 HatchOpenColor = configfile.GetValue<string>("HatchOpenColor");
                 HatchCloseColor = configfile.GetValue<string>("HatchCloseColor");
+                PanelExtendedColor = configfile.GetValue<string>("PanelExtendedColor");
+                PanelRetractedColor = configfile.GetValue<string>("PanelRetractedColor");
 
                 EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting");
                 OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget");
@@ -215,6 +229,8 @@ namespace ShipManifest
                 DebugLogPath = configfile.GetValue<string>("DebugLogPath");
                 ErrorLogLength = configfile.GetValue<string>("ErrorLogLength");
                 SaveLogOnExit = configfile.GetValue<bool>("SaveLogOnExit");
+                EnableKerbalRename = configfile.GetValue<bool>("EnableKerbalRename");
+                RenameWithProfession = configfile.GetValue<bool>("RenameWithProfession");
                 EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
                 ShowToolTips = configfile.GetValue<bool>("ShowToolTips");
                 ManifestToolTips = configfile.GetValue<bool>("ManifestToolTips");
@@ -222,6 +238,7 @@ namespace ShipManifest
                 SettingsToolTips = configfile.GetValue<bool>("SettingsToolTips");
                 RosterToolTips = configfile.GetValue<bool>("RosterToolTips");
                 HatchToolTips = configfile.GetValue<bool>("HatchToolTips");
+                PanelToolTips = configfile.GetValue<bool>("PanelToolTips");
                 DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips");
 
                 // Default values for Flow rates
@@ -285,6 +302,8 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("HatchColor Loaded: {0}", HatchColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchOpenColor Loaded: {0}", HatchOpenColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchCloseColor Loaded: {0}", HatchCloseColor), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("PanelExtendedColor Loaded: {0}", PanelExtendedColor), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("PanelRetractedColor Loaded: {0}", PanelRetractedColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
@@ -298,6 +317,8 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ErrorLogLength Loaded: {0}", ErrorLogLength), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("SaveLogOnExit Loaded: {0}", SaveLogOnExit), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("EnableKerbalRename Loaded: {0}", EnableKerbalRename), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("RenameWithProfession Loaded: {0}", RenameWithProfession), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowToolTips Loaded: {0}", ShowToolTips), "Info", VerboseLogging);
@@ -365,6 +386,7 @@ namespace ShipManifest
                 configfile.SetValue("RosterPosition", SettingsPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
                 configfile.SetValue("HatchPosition", HatchPosition);
+                configfile.SetValue("PanelPosition", PanelPosition);
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);
                 configfile.SetValue("ShowDebugger", ShowDebugger);
                 configfile.SetValue("RealismMode", RealismMode);
@@ -390,6 +412,8 @@ namespace ShipManifest
                 configfile.SetValue("HatchColor", HatchColor);
                 configfile.SetValue("HatchOpenColor", HatchOpenColor);
                 configfile.SetValue("HatchCloseColor", HatchCloseColor);
+                configfile.SetValue("PanelExtendedColor", PanelExtendedColor);
+                configfile.SetValue("PanelRetractedColor", PanelRetractedColor);
 
                 configfile.SetValue("EnableHighlighting", EnableHighlighting);
                 configfile.SetValue("OnlySourceTarget", OnlySourceTarget);
@@ -407,6 +431,8 @@ namespace ShipManifest
                 configfile.SetValue("AutoDebug", AutoDebug);
                 configfile.SetValue("ErrorLogLength", ErrorLogLength);
                 configfile.SetValue("SaveLogOnExit", SaveLogOnExit);
+                configfile.SetValue("EnableKerbalRename", EnableKerbalRename);
+                configfile.SetValue("RenameWithProfession", RenameWithProfession);
                 configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
                 configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
                 configfile.SetValue("ShowToolTips", ShowToolTips);
@@ -415,6 +441,7 @@ namespace ShipManifest
                 configfile.SetValue("SettingsToolTips", SettingsToolTips);
                 configfile.SetValue("RosterToolTips", RosterToolTips);
                 configfile.SetValue("HatchToolTips", HatchToolTips);
+                configfile.SetValue("PanelToolTips", PanelToolTips);
                 configfile.SetValue("DebuggerToolTips", DebuggerToolTips);
 
                 configfile.save();
@@ -425,6 +452,7 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchPosition Saved: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("PanelPosition Saved: {0}, {1}, {2}, {3}", PanelPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);
@@ -463,6 +491,8 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ErrorListLength Saved: {0}", ErrorLogLength.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("SaveLogOnExit Saved: {0}", SaveLogOnExit.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("EnableKerbalRename Saved: {0}", EnableKerbalRename.ToString()), "Info", VerboseLogging);
+                Utilities.LogMessage(string.Format("RenameWithProfession Saved: {0}", RenameWithProfession.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("ShowToolTips Saved: {0}", ShowToolTips.ToString()), "Info", VerboseLogging);
@@ -519,6 +549,8 @@ namespace ShipManifest
             prevEnableCrew = EnableCrew;
             prevEnablePFResources = EnablePFResources;
             prevEnableCLS = EnableCLS;
+            prevEnableKerbalRename = EnableKerbalRename;
+            prevRenameWithProfession = RenameWithProfession;
             prevEnableTextureReplacer = EnableTextureReplacer;
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
@@ -529,6 +561,7 @@ namespace ShipManifest
             prevSettingsToolTips = SettingsToolTips;
             prevRosterToolTips = RosterToolTips;
             prevHatchToolTips = HatchToolTips;
+            prevPanelToolTips = PanelToolTips;
             prevDebuggerToolTips = DebuggerToolTips;
 
             // sounds
@@ -561,6 +594,8 @@ namespace ShipManifest
             EnableCrew = prevEnableCrew;
             EnablePFResources = prevEnablePFResources;
             EnableCLS = prevEnableCLS;
+            EnableKerbalRename = prevEnableKerbalRename;
+            RenameWithProfession = prevRenameWithProfession;
             EnableTextureReplacer = prevEnableTextureReplacer;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
@@ -571,6 +606,7 @@ namespace ShipManifest
             SettingsToolTips = prevSettingsToolTips;
             RosterToolTips = prevRosterToolTips;
             HatchToolTips = prevHatchToolTips;
+            PanelToolTips = prevPanelToolTips;
             DebuggerToolTips = prevDebuggerToolTips;
 
             //debugger Settings

@@ -69,7 +69,7 @@ namespace ShipManifest
                 GUILayout.BeginHorizontal();
 
                 var settingsStyle = Settings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Settings...", settingsStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                if (GUILayout.Button("Settings", settingsStyle, GUILayout.Width(70), GUILayout.Height(20)))
                 {
                     try
                     {
@@ -82,7 +82,7 @@ namespace ShipManifest
                 }
 
                 var rosterStyle = Settings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Roster...", rosterStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                if (GUILayout.Button("Roster", rosterStyle, GUILayout.Width(70), GUILayout.Height(20)))
                 {
                     try
                     {
@@ -97,10 +97,12 @@ namespace ShipManifest
                 if (!Settings.EnableCLS)
                     GUI.enabled = false;
                 var hatchesStyle = Settings.ShowHatch ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Hatches...", hatchesStyle, GUILayout.Width(100), GUILayout.Height(20)))
+                if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Width(70), GUILayout.Height(20)))
                 {
                     try
                     {
+                        SMAddon.UpdateCLSSpaces();
+                        SMAddon.GetHatches();
                         Settings.ShowHatch = !Settings.ShowHatch;
                     }
                     catch (Exception ex)
@@ -109,6 +111,19 @@ namespace ShipManifest
                     }
                 }
                 GUI.enabled = true;
+                var panelsStyle = Settings.ShowPanel ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                if (GUILayout.Button("Solar Panels", panelsStyle, GUILayout.Width(80), GUILayout.Height(20)))
+                {
+                    try
+                    {
+                        SMAddon.smController.GetSolarPanels();
+                        Settings.ShowPanel = !Settings.ShowPanel;
+                    }
+                    catch (Exception ex)
+                    {
+                        Utilities.LogMessage(string.Format(" opening Solar Panels Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    }
+                }
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));

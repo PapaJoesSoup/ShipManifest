@@ -13,48 +13,6 @@ namespace ShipManifest
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = Settings.HatchToolTips;
 
-        private static List<Hatch> _hatches = new List<Hatch>();
-        internal static List<Hatch> Hatches
-        {
-            get
-            {
-                if (_hatches == null)
-                    _hatches = new List<Hatch>();
-                return _hatches;
-            }
-            set
-            {
-                _hatches.Clear();
-                _hatches = value;
-            }
-        }
-
-        private static void GetHatches()
-        {
-            _hatches.Clear();
-            try
-            {
-                SMAddon.UpdateCLSSpaces();
-                foreach (ICLSPart iPart in SMAddon.clsVessel.Parts)
-                {
-                    foreach (PartModule pModule in iPart.Part.Modules)
-                    {
-                        if (pModule.moduleName == "ModuleDockingHatch")
-                        {
-                            Hatch pHatch = new Hatch();
-                            pHatch.HatchModule = pModule;
-                            pHatch.CLSPart = iPart;
-                            _hatches.Add(pHatch);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex.ToString()), "Error", true);
-            }
-        }
-
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display(int windowId)
         {
@@ -71,8 +29,6 @@ namespace ShipManifest
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.HatchPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
-            GetHatches();
-
             // This is a scroll panel (we are using it to make button lists...)
             GUILayout.BeginVertical();
             DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, GUILayout.Height(200), GUILayout.Width(370));
@@ -85,14 +41,14 @@ namespace ShipManifest
             try
             {
                 // Display all hatches
-                foreach (Hatch iHatch in Hatches)
+                foreach (Hatch iHatch in SMAddon.Hatches)
                 {
-                    bool isEnabled = false;
+                    bool isEnabled = true;
                     bool open = false;
 
                     // get hatch state
-                    if (iHatch.IsDocked)
-                        isEnabled = true;
+                    if (!iHatch.IsDocked)
+                        isEnabled = false;
                     if (iHatch.HatchOpen)
                         open = true;
 
@@ -108,8 +64,8 @@ namespace ShipManifest
                     {
                         iHatch.CloseHatch();
                     }
-                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                        iHatch.Highlight();
+                    if (Event.current.type == EventType.Repaint)
+                        iHatch.Highlight(GUILayoutUtility.GetLastRect());
                 }
             }
             catch (Exception ex)
@@ -136,7 +92,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Hatch iHatch in Hatches)
+            foreach (Hatch iHatch in SMAddon.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -146,14 +102,14 @@ namespace ShipManifest
                     iModule.HatchOpen = true;
                 }
             }
-            SMAddon.FireEventTriggers();
+            //SMAddon.FireEventTriggers();
         }
 
         internal static void CloseAllHatches()
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Hatch iHatch in Hatches)
+            foreach (Hatch iHatch in SMAddon.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -163,8 +119,36 @@ namespace ShipManifest
                     iModule.HatchOpen = false;
                 }
             }
-            SMAddon.FireEventTriggers();
+            //SMAddon.FireEventTriggers();
         }
 
+        internal static void HighlightAllHatches(bool enable)
+        {
+            foreach (Hatch iHatch in SMAddon.Hatches)
+            {
+                IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
+                if (enable)
+                {
+                    if (iModule.HatchOpen)
+                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchOpenColor]);
+                    else
+                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchCloseColor]);
+                    iModule.ModDockNode.part.SetHighlight(true, false);
+                }
+                else
+                {
+                    if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                    {
+                        iHatch.CLSPart.Highlight(true, true);
+                    }
+                    else
+                    {
+                        iModule.ModDockNode.part.SetHighlight(false, false);
+                        iModule.ModDockNode.part.SetHighlightDefault();
+                        iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                    }
+                }
+            }
+        }
     }
 }

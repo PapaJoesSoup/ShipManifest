@@ -39,9 +39,9 @@ namespace ShipManifest
 
             if (IsNew)
             {
+                // Add to roster.
                 MethodInfo dynMethod = HighLogic.CurrentGame.CrewRoster.GetType().GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
                 Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-                //HighLogic.CurrentGame.CrewRoster.AddCrewMember(Kerbal);
                 dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] { Kerbal });
             }
 
@@ -56,7 +56,18 @@ namespace ShipManifest
 
         public void SyncKerbal()
         {
-            //Kerbal.name = Name;
+            if (Settings.EnableKerbalRename)
+                Kerbal.name = Name;
+            if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
+            KerbalRoster.SetExperienceTrait(Kerbal);
+            if (Title != Kerbal.experienceTrait.Title)
+            {
+                while (Kerbal.experienceTrait.Title != Title)
+                {
+                    Kerbal.name = Name += char.ConvertFromUtf32(1);
+                    KerbalRoster.SetExperienceTrait(Kerbal);
+                }
+            }
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;
@@ -72,21 +83,5 @@ namespace ShipManifest
             return false;
         }
 
-        public static Experience.ExperienceTrait GetTrait(ProtoCrewMember kerbal, string Profession)
-        {
-            Experience.ExperienceTrait ThisTrait = kerbal.experienceTrait;
-            Utilities.LogMessage("GetTrait Current Profession is:  " + kerbal.experienceTrait.Title, "info", true);
-            foreach (ProtoCrewMember thiskerbal in HighLogic.CurrentGame.CrewRoster.Crew)
-            {
-                if (thiskerbal.experienceTrait.Title == Profession)
-                {
-                    Utilities.LogMessage("GetTrait " + Profession + " found", "info", true);
-                    ThisTrait = thiskerbal.experienceTrait;
-                    break;
-                }
-            }
-            Utilities.LogMessage(string.Format("GetTrait.  Trait should be:  " + Profession + ".  New Trait:  {0}", ThisTrait.Title), "info", true);
-            return ThisTrait;
-        }
     }
 }

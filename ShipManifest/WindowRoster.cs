@@ -232,10 +232,104 @@ namespace ShipManifest
 
         private static void CreateKerbalViewer()
         {
+            Rect rect = new Rect();
+            DisplaySelectProfession();
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Create", GUILayout.MaxWidth(80)))
+            {
+                bool kerbalFound = false;
+                while (!kerbalFound)
+                {
+                    SelectedKerbal = KerbalModel.CreateKerbal();
+                    if (SelectedKerbal.Title == KerbalPosition)
+                        kerbalFound = true;
+                }
+                OnCreate = false;
+            }
+            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80)))
+            {
+                OnCreate = false;
+                resetRosterSize = true;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private static void EditKerbalViewer()
+        {
+            Rect rect = new Rect();
+            string label = "";
+            string toolTip = "";
+            GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
+            if (Settings.EnableKerbalRename)
+            {
+                GUILayout.BeginHorizontal();
+                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
+                GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
+                GUILayout.EndHorizontal();
+            }
+            else
+                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", ManifestStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+
+            if (!string.IsNullOrEmpty(SMAddon.smController.saveMessage))
+            {
+                GUILayout.Label(SMAddon.smController.saveMessage, ManifestStyle.ErrorLabelRedStyle);
+            }
+            if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
+            {
+                if (!SelectedKerbal.IsNew)
+                {
+                    if (SelectedKerbal.Title == "Pilot")
+                        isPilot = true;
+                    else if (SelectedKerbal.Title == "Engineer")
+                        isEngineer = true;
+                    else
+                        isScientist = true;
+                }
+                DisplaySelectProfession();
+            }
+
+            GUILayout.Label("Courage");
+            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
+
+            GUILayout.Label("Stupidity");
+            SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
+
+            SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
+            {
+                SelectedKerbal = null;
+            }
+            label = "Apply";
+            toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
+            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
+            {
+                if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
+                {
+                    if (isPilot)
+                        SelectedKerbal.Title = "Pilot";
+                    else if (isEngineer)
+                        SelectedKerbal.Title = "Engineer";
+                    else
+                        SelectedKerbal.Title = "Scientist";
+                }
+                SMAddon.smController.saveMessage = SelectedKerbal.SubmitChanges();
+                if (string.IsNullOrEmpty(SMAddon.smController.saveMessage))
+                    SelectedKerbal = null;
+            }
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20);
+            GUILayout.EndHorizontal();
+        }
+
+        private static void DisplaySelectProfession()
+        {
             GUILayout.BeginHorizontal();
             GUILayout.Space(10);
-            GUILayout.Label("Select Kerbal:  ");
-            GUILayout.Space(20);
+            GUILayout.Label("Profession:");
+            GUILayout.Space(10);
             isPilot = GUILayout.Toggle(isPilot, "Pilot", GUILayout.Width(90));
             if (isPilot)
                 isEngineer = isScientist = false;
@@ -261,57 +355,7 @@ namespace ShipManifest
                     isScientist = true;
             }
             GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create", GUILayout.MaxWidth(80)))
-            {
-                bool kerbalFound = false;
-                while (!kerbalFound)
-                {
-                    SelectedKerbal = KerbalModel.CreateKerbal();
-                    if (SelectedKerbal.Title == KerbalPosition)
-                        kerbalFound = true;
-                }
-                OnCreate = false;
-            }
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80)))
-            {
-                OnCreate = false;
-                resetRosterSize = true;
-            }
-            GUILayout.EndHorizontal();
         }
 
-        private static void EditKerbalViewer()
-        {
-            GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal");
-            GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", ManifestStyle.LabelStyleBold, GUILayout.MaxWidth(200));
-
-            if (!string.IsNullOrEmpty(SMAddon.smController.saveMessage))
-            {
-                GUILayout.Label(SMAddon.smController.saveMessage, ManifestStyle.ErrorLabelRedStyle);
-            }
-
-            GUILayout.Label("Courage");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1);
-
-            GUILayout.Label("Stupidity");
-            SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1);
-
-            SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            if (GUILayout.Button("Apply", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal.Name += char.ConvertFromUtf32(1);
-                SMAddon.smController.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(SMAddon.smController.saveMessage))
-                    SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
     }
 }

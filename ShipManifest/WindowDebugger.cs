@@ -48,7 +48,7 @@ namespace ShipManifest
             if (GUILayout.Button("Save Log", GUILayout.Height(20)))
             {
                 // Create log file and save.
-                SMAddon.Savelog();
+                WindowDebugger.Savelog();
             }
             if (GUILayout.Button("Close", GUILayout.Height(20)))
             {
@@ -60,5 +60,46 @@ namespace ShipManifest
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
+
+        internal static void Savelog()
+        {
+            try
+            {
+                // time to create a file...
+                string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
+
+                string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
+                if (Settings.DebugLogPath.StartsWith(@"\"))
+                    Settings.DebugLogPath = Settings.DebugLogPath.Substring(2, Settings.DebugLogPath.Length - 2);
+
+                if (!Settings.DebugLogPath.EndsWith(@"\"))
+                    Settings.DebugLogPath += @"\";
+
+                filename = path + Settings.DebugLogPath + filename;
+                Utilities.LogMessage("File Name = " + filename, "Info", true);
+
+                try
+                {
+                    StringBuilder sb = new StringBuilder();
+                    foreach (string line in Utilities.Errors)
+                    {
+                        sb.AppendLine(line);
+                    }
+
+                    File.WriteAllText(filename, sb.ToString());
+
+                    Utilities.LogMessage("File written", "Info", true);
+                }
+                catch (Exception ex)
+                {
+                    Utilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
     }
 }

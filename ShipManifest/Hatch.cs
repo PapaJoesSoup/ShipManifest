@@ -41,7 +41,19 @@ namespace ShipManifest
 
         internal string Title
         {
-            get { return iModule.ModDockNode.part.parent.partInfo.title; }
+            get 
+            {
+                string title = "";
+                try
+                {
+                    title = iModule.ModDockNode.part.parent.partInfo.title;
+                }
+                catch
+                {
+                    title = "Unknown";
+                }
+                return title; 
+            }
         }
 
         private IModuleDockingHatch iModule
@@ -61,41 +73,61 @@ namespace ShipManifest
             iModule.HatchEvents["CloseHatch"].active = true;
             iModule.HatchEvents["OpenHatch"].active = false;
             iModule.HatchOpen = true;
-            SMAddon.FireEventTriggers();
+            //SMAddon.FireEventTriggers();
         }
         internal void CloseHatch()
         {
             iModule.HatchEvents["CloseHatch"].active = false;
             iModule.HatchEvents["OpenHatch"].active = true;
             iModule.HatchOpen = false;
-            SMAddon.FireEventTriggers();
+            //SMAddon.FireEventTriggers();
         }
 
-        internal void Highlight()
+        internal void Highlight(Rect rect)
         {
-            if (GUILayoutUtility.GetLastRect().Contains(Event.current.mousePosition))
+            try
             {
-                if (iModule.HatchOpen)
-                    iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchOpenColor]);
-                else
-                    iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchCloseColor]);
-                iModule.ModDockNode.part.SetHighlight(true, false);
-            }
-            else
-            {
-                if (iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchOpenColor] || iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchCloseColor])
+                if (rect.Contains(Event.current.mousePosition))
                 {
-                    if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
-                    {
-                        CLSPart.Highlight(true, true);
-                    }
+                    if (iModule.HatchOpen)
+                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchOpenColor]);
                     else
+                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchCloseColor]);
+                    iModule.ModDockNode.part.SetHighlight(true, false);
+                }
+                else
+                {
+                    if (iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchOpenColor] || iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchCloseColor])
                     {
-                        iModule.ModDockNode.part.SetHighlight(false, false);
-                        iModule.ModDockNode.part.SetHighlightDefault();
-                        iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                        if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                        {
+                            if (CLSPart.Space != null)
+                                CLSPart.Highlight(true, true);
+                            else
+                            {
+                                iModule.ModDockNode.part.SetHighlight(false, false);
+                                iModule.ModDockNode.part.SetHighlightDefault();
+                                iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                            }
+                        }
+                        else
+                        {
+                            iModule.ModDockNode.part.SetHighlight(false, false);
+                            iModule.ModDockNode.part.SetHighlightDefault();
+                            iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in Hatch.Highlight.  Error:  {0}", ex.ToString()), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+
+
             }
         }
     }
