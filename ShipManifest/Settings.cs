@@ -13,7 +13,7 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string CurVersion = "0.90.0_4.1.0";
+        internal static string CurVersion = "0.90.0_4.1.0a";
 
         internal static Rect ManifestPosition;
         internal static Rect TransferPosition;
