@@ -279,10 +279,6 @@ namespace ShipManifest
             }
             if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
             {
-                if (!SelectedKerbal.IsNew)
-                {
-                    SetProfessionFlag();
-                }
                 DisplaySelectProfession();
             }
 
