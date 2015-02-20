@@ -1,4 +1,7 @@
-﻿Version 0.90.0_4.1.0a - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.1.0b - Release 19 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+ - Bug:  In the Roster Window, when editing an existing kerbal with Rename and Rename with Professions on in Settings, You cannot change the profession. You SHOULD be able to.
+
+Version 0.90.0_4.1.0a - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
  - Bug:  under certain conditions, GetCLSVessel generates a Space out of range error.  Troubleshooting code was left in by mistake.
 
 Version 0.90.0_4.1.0 - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
