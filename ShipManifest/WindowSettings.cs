@@ -19,14 +19,19 @@ namespace ShipManifest
         internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
+            Rect rect = new Rect();
             ToolTipActive = false;
             ShowToolTips = Settings.SettingsToolTips;
 
-            Rect rect = new Rect(371, 4, 16, 16);
+            rect = new Rect(371, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
-                Settings.ShowSettings = false;
                 ToolTip = "";
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    SMAddon.OnSMSettingsToggle();
+                else
+                    Settings.ShowSettings = false;
+
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
@@ -252,7 +257,7 @@ namespace ShipManifest
             label = "Enable Highlighting";
             Settings.EnableHighlighting = GUILayout.Toggle(Settings.EnableHighlighting, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            if (Settings.EnableHighlighting != Settings.prevEnableHighlighting)
+            if (Settings.EnableHighlighting != Settings.prevEnableHighlighting && HighLogic.LoadedSceneIsFlight)
             {
                 if (Settings.EnableCLS)
                 {
@@ -280,7 +285,7 @@ namespace ShipManifest
             if (Settings.OnlySourceTarget && !Settings.prevOnlySourceTarget)
             {
                 Settings.EnableCLSHighlighting = false;
-                if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
+                if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
                 {
                     SMAddon.HighlightCLSVessel(false, true);
                     // Update spaces and reassign the resource to observe new settings.
@@ -299,7 +304,7 @@ namespace ShipManifest
             GUILayout.EndHorizontal();
             if (Settings.EnableCLSHighlighting && !Settings.prevEnableCLSHighlighting)
                 Settings.OnlySourceTarget = false;
-            if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+            if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
             {
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
                     SMAddon.HighlightCLSVessel(Settings.EnableCLSHighlighting);
@@ -308,6 +313,7 @@ namespace ShipManifest
 
         private static void DisplayOptions()
         {
+            Rect rect = new Rect();
             ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
             GUI.enabled = true;
@@ -323,7 +329,7 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             GUIContent guiLabel = new GUIContent("Enable Realism Mode","Turns on/off Realism Mode.\r\nWhen ON, causes changes in the interface and limits\r\nyour freedom to things that would not be 'Realistic'.\r\nWhen Off, Allows Fills, Dumps, Repeating Science, instantaneous Xfers, Crew Xfers anywwhere, etc.");
             Settings.RealismMode = GUILayout.Toggle(Settings.RealismMode, guiLabel, GUILayout.Width(300));
-            Rect rect = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
 
@@ -332,13 +338,13 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             guiLabel = new GUIContent("Enable Crew Xfers","Turns on/off Crew transfers.\r\nWhen ON, The Crew option will appear in your resource list.\r\nWhen Off, Crew transfers are not possible.");
             Settings.EnableCrew = GUILayout.Toggle(Settings.EnableCrew, guiLabel, GUILayout.Width(300));
-            Rect rect2 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect2, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
 
             GUILayout.EndHorizontal();
 
-            if (!Settings.EnableCrew)
+            if (!Settings.EnableCrew && HighLogic.LoadedSceneIsFlight)
             {
                 if (SMAddon.smController.SelectedResource == "Crew")
                 {
@@ -357,12 +363,12 @@ namespace ShipManifest
                 GUI.enabled = isEnabled;
             guiLabel = new GUIContent("Enable CLS  (Connected Living Spaces)", "Turns on/off Connected Living space support.\r\nWhen on, Crew can only be xfered to a part in the same 'Living Space'.\r\nWhen Off, Crew transfers are possible to any part that can hold a kerbal.");
             Settings.EnableCLS = GUILayout.Toggle(Settings.EnableCLS, guiLabel, GUILayout.Width(300));
-            Rect rect3 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect3, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             GUILayout.EndHorizontal();
 
-            if (Settings.EnableCLS != Settings.prevEnableCLS)
+            if (Settings.EnableCLS != Settings.prevEnableCLS && HighLogic.LoadedSceneIsFlight)
             {
                 if (!Settings.EnableCLS)
                     SMAddon.HighlightCLSVessel(false, true);
@@ -379,12 +385,12 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             guiLabel = new GUIContent("Enable Science Xfers", "Turns on/off Science Xfers.\r\nWhen on, Science transfers are possible and show up in the Resource list.\r\nWhen Off, Science transfers will not appear in the resource list.");
             Settings.EnableScience = GUILayout.Toggle(Settings.EnableScience, guiLabel, GUILayout.Width(300));
-            Rect rect4 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect4, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             GUILayout.EndHorizontal();
 
-            if (!Settings.EnableScience)
+            if (!Settings.EnableScience && HighLogic.LoadedSceneIsFlight)
             {
                 // Clear Resource selection.
                 if (SMAddon.smController.SelectedResource == "Science")
@@ -396,12 +402,12 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             guiLabel = new GUIContent("Enable Resource Xfers", "Turns on/off Resource Xfers.\r\nWhen on, Resource transfers are possible and show up in the Resource list.\r\nWhen Off, Resources (fuel, monoprpellent, etc) will not appear in the resource list.");
             Settings.EnableResources = GUILayout.Toggle(Settings.EnableResources, guiLabel, GUILayout.Width(300));
-            Rect rect5 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect5, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             GUILayout.EndHorizontal();
 
-            if (!Settings.EnableResources)
+            if (!Settings.EnableResources && HighLogic.LoadedSceneIsFlight)
             {
                 // Clear Resource selection.
                 if (SMAddon.smController.SelectedResource == "Resources")
@@ -413,9 +419,9 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             guiLabel = new GUIContent("Enable Resources in Pre-Flight", "Turns on/off Fill and Empty Resources when in preflight.\r\nWhen on, Resource Fill and Dump resources vessel wide are possible and show up in the Resource list.\r\nWhen Off, Fill and Dump Resources vessel wide will not appear in the resource list.");
             Settings.EnablePFResources = GUILayout.Toggle(Settings.EnablePFResources, guiLabel, GUILayout.Width(300));
-            Rect rect6 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect6, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             GUILayout.EndHorizontal();
 
             // create xfer Flow Rate slider;
@@ -430,9 +436,9 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             guiLabel = new GUIContent("Resource Flow Rate:","Sets the rate that resources Xfer when Realism Mode is on.\r\nThe higher the number the faster resources move.\r\nWhen on, Resource transfers are possible and show up in the Resource list.");
             GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
-            Rect rect7 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect7, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             strFlowRate = GUILayout.TextField(strFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
             GUILayout.EndHorizontal();
             if (float.TryParse(strFlowRate, out newRate))
@@ -446,9 +452,9 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             guiLabel = new GUIContent(" - Min Flow Rate:","Sets the lowest range (left side) on the Flow rate Slider control.");
             GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
-            Rect rect8 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect8, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             strMinFlowRate = GUILayout.TextField(strMinFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
             GUILayout.EndHorizontal();
             if (float.TryParse(strMinFlowRate, out newRate))
@@ -457,9 +463,9 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             guiLabel = new GUIContent(" - Max Flow Rate:","Sets the highest range (right side) on the Flow rate Slider control.");
             GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
-            Rect rect9 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect9, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             strMaxFlowRate = GUILayout.TextField(strMaxFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
             GUILayout.EndHorizontal();
             if (float.TryParse(strMaxFlowRate, out newRate))
@@ -468,9 +474,9 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             guiLabel = new GUIContent(" - Max Flow Time:","Sets the maximum duration (in sec) of a resource transfer.\r\nWorks in conjunction with the Flow rate.  if time it would take\r\nto move a resource exceeds this number, this number will be used to calculate an adjusted flow rate.\r\n(protects your from 20 minute Xfers)");
             GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
-            Rect rect10 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect10, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             strMaxFlowTime = GUILayout.TextField(strMaxFlowTime, 20, GUILayout.Height(20), GUILayout.Width(80));
             GUILayout.EndHorizontal();
             if (float.TryParse(strMaxFlowTime, out newRate))
@@ -480,9 +486,9 @@ namespace ShipManifest
             GUI.enabled = isEnabled;
             guiLabel = new GUIContent("Lock Settings  (If set ON, disable in config file)","Locks the settings in this section so they cannot be altered in game.\r\nTo turn off Locking you MUST edit the Config.xml file.");
             Settings.LockSettings = GUILayout.Toggle(Settings.LockSettings, guiLabel, GUILayout.Width(300));
-            Rect rect11 = GUILayoutUtility.GetLastRect();
+            rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect11, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
         }
 
         #endregion

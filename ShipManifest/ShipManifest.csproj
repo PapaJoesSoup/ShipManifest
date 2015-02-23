@@ -93,13 +93,21 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
-    <Content Include="PluginData\IconOff_38.png" />
-    <Content Include="PluginData\IconOn_38.png" />
+    <Content Include="Images\IconOff_38.png" />
+    <Content Include="Images\IconOn_38.png" />
+    <Content Include="Images\IconR_Off_24.png" />
+    <Content Include="Images\IconR_Off_38.png" />
+    <Content Include="Images\IconR_On_24.png" />
+    <Content Include="Images\IconR_On_38.png" />
+    <Content Include="Images\IconS_Off_24.png" />
+    <Content Include="Images\IconS_Off_38.png" />
+    <Content Include="Images\IconS_On_24.png" />
+    <Content Include="Images\IconS_On_38.png" />
     <Content Include="PluginData\ShipManifest\config.xml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="PluginData\IconOff_24.png" />
-    <Content Include="PluginData\IconOn_24.png" />
+    <Content Include="Images\IconOff_24.png" />
+    <Content Include="Images\IconOn_24.png" />
     <Content Include="Sounds\59328-1.wav" />
     <Content Include="Sounds\59328-2.wav" />
     <Content Include="Sounds\59328-3.wav" />

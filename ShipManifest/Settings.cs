@@ -13,12 +13,13 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string CurVersion = "0.90.0_4.1.0b";
+        internal static string CurVersion = "0.90.0_4.1.1";
 
         internal static Rect ManifestPosition;
         internal static Rect TransferPosition;
         internal static Rect DebuggerPosition;
         internal static Rect RosterPosition;
+        internal static Rect SettingsPosition;
 
         // Flags to show windows
         internal static bool ShowTransferWindow { get; set; }
@@ -32,7 +33,32 @@ namespace ShipManifest
             set
             {
                 _showShipManifest = value;
+            }
+        }
 
+        private static bool _showSettings = false;
+        internal static bool ShowSettings
+        {
+            get
+            {
+                return _showSettings;
+            }
+            set
+            {
+                _showSettings = value;
+            }
+        }
+
+        private static bool _showRoster = false;
+        internal static bool ShowRoster
+        {
+            get
+            {
+                return _showRoster;
+            }
+            set
+            {
+                _showRoster = value;
             }
         }
 
@@ -47,9 +73,6 @@ namespace ShipManifest
         internal static bool prevSaveLogOnExit = true;
         internal static bool SaveLogOnExit = true;
 
-        internal static Rect SettingsPosition;
-        internal static bool ShowSettings { get; set; }
-
         internal static Rect HatchPosition;
         internal static bool ShowHatch { get; set; }
 
@@ -63,7 +86,6 @@ namespace ShipManifest
         internal static bool prevAutoSave;
         internal static float prevSaveIntervalSec = 60f;
 
-        internal static bool ShowRoster { get; set; }
 
         internal static bool RealismMode = false;
         internal static bool prevRealismMode = false;

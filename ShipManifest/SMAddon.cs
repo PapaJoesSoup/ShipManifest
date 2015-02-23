@@ -8,7 +8,7 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     internal partial class SMAddon : MonoBehaviour
     {
         #region Properties
@@ -16,6 +16,8 @@ namespace ShipManifest
         //Game object that keeps us running
         internal static GameObject GameObjectInstance;  
         internal static SMController smController;
+        internal static string ImageFolder = "ShipManifest/Images/";
+        internal static string saveMessage = string.Empty;
 
         // Vessel vars
         internal static ICLSAddon clsAddon = null;
@@ -57,8 +59,12 @@ namespace ShipManifest
         internal static double Seat2SeatXferDelaySec = 2;
 
         // Toolbar Integration.
-        private static IButton ShipManifestButton_Blizzy = null;
-        private static ApplicationLauncherButton ShipManifestButton_Stock = null;
+        private static IButton SMButton_Blizzy = null;
+        private static IButton SMSettings_Blizzy = null;
+        private static IButton SMRoster_Blizzy = null;
+        private static ApplicationLauncherButton SMButton_Stock = null;
+        private static ApplicationLauncherButton SMSettings_Stock = null;
+        private static ApplicationLauncherButton SMRoster_Stock = null;
         internal static bool frameErrTripped = false;
 
         // Tooltip vars
@@ -91,32 +97,34 @@ namespace ShipManifest
         {
             try 
             {
-                if (HighLogic.LoadedScene != GameScenes.FLIGHT) { return; } // don't do anything if we're not in a flight scene
-
-                DontDestroyOnLoad(this);
-                Settings.Load();
-                Utilities.LogMessage("ShipManifestAddon.Awake Active...", "info", Settings.VerboseLogging);
-
-                if (Settings.AutoSave)
-                    InvokeRepeating("RunSave", Settings.SaveIntervalSec, Settings.SaveIntervalSec);
-
-                if (Settings.EnableBlizzyToolbar)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
-                    // Let't try to use Blizzy's toolbar
-                    Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
-                    if (!EnableBlizzyToolBar())
+                    DontDestroyOnLoad(this);
+                    Settings.Load();
+                    Utilities.LogMessage("ShipManifestAddon.Awake Active...", "info", Settings.VerboseLogging);
+
+                    if (Settings.AutoSave)
+                        InvokeRepeating("RunSave", Settings.SaveIntervalSec, Settings.SaveIntervalSec);
+
+                    if (Settings.EnableBlizzyToolbar)
                     {
-                        // We failed to activate the toolbar, so revert to stock
+                        // Let't try to use Blizzy's toolbar
+                        Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
+                        if (!EnableBlizzyToolBar())
+                        {
+                            // We failed to activate the toolbar, so revert to stock
+                            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                            GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                            Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                        }
+                    }
+                    else
+                    {
+                        // Use stock Toolbar
+                        Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
                         GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                         GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
-                        Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
-                   }
-                }
-                else 
-                {
-                    // Use stock Toolbar
-                    Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
-                    GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
+                    }
                 }
             }
             catch (Exception ex)
@@ -129,7 +137,27 @@ namespace ShipManifest
             Utilities.LogMessage("ShipManifestAddon.Start.", "Info", Settings.VerboseLogging);
             try
             {
-                if (HighLogic.LoadedSceneIsFlight)
+                if (WindowRoster.resetRosterSize)
+                {
+                    Settings.RosterPosition.height = 270; //reset hight
+                }
+
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                {
+                    if (GetCLSAddon())
+                    {
+                        Settings.CLSInstalled = true;
+                        RunSave();
+                    }
+                    else
+                    {
+                        Settings.EnableCLS = false;
+                        Settings.CLSInstalled = false;
+                        RunSave();
+                    }
+                }
+
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     // Instantiate Event handlers
                     GameEvents.onVesselChange.Add(OnVesselChange);
@@ -193,7 +221,7 @@ namespace ShipManifest
         {
             try
             {
-                CheckForToolbarToggle();
+                CheckForToolbarTypeToggle();
 
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
@@ -277,30 +305,46 @@ namespace ShipManifest
                 GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
                 GameEvents.onFlightReady.Remove(OnFlightReady);
 
-                if (Utilities.Errors.Count > 0 && Settings.SaveLogOnExit)
-                    WindowDebugger.Savelog();
                 CancelInvoke("RunSave");
 
                 // Handle Toolbars
-                GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
-                if (ShipManifestButton_Blizzy != null)
+                if (SMRoster_Blizzy == null && SMSettings_Blizzy == null && SMButton_Blizzy == null)
                 {
-                    ShipManifestButton_Blizzy.Destroy();
-                }
-                if (ShipManifestButton_Stock != null)
-                {
-                    // Remove the stock toolbar button
-                    GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
-                    if (ShipManifestButton_Stock != null)
+                    if (SMButton_Stock != null)
                     {
-                        ApplicationLauncher.Instance.RemoveModApplication(ShipManifestButton_Stock);
+                        ApplicationLauncher.Instance.RemoveModApplication(SMButton_Stock);
+                        SMButton_Stock = null;
+                    }
+                    if (SMSettings_Stock != null)
+                    {
+                        ApplicationLauncher.Instance.RemoveModApplication(SMSettings_Stock);
+                        SMSettings_Stock = null;
+                    }
+                    if (SMRoster_Stock != null)
+                    {
+                        ApplicationLauncher.Instance.RemoveModApplication(SMRoster_Stock);
+                        SMRoster_Stock = null;
+                    }
+                    if (SMButton_Stock == null && SMSettings_Stock == null && SMRoster_Stock == null)
+                    {
+                        // Remove the stock toolbar button launcher handler
+                        GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
                     }
                 }
+                else
+                {
+                    if (SMButton_Blizzy != null)
+                        SMButton_Blizzy.Destroy();
+                    if (SMRoster_Blizzy != null)
+                        SMRoster_Blizzy.Destroy();
+                    if (SMSettings_Blizzy != null)
+                        SMSettings_Blizzy.Destroy();
+                }
                 //Reset Roster Window data
-                WindowRoster.resetRosterSize = true;
+                WindowRoster.OnCreate = false;
                 WindowRoster.SelectedKerbal = null;
                 WindowRoster.ToolTip = "";
-                Settings.ShowRoster = false;
+                //Settings.ShowRoster = false;
 
             }
             catch (Exception ex)
@@ -438,89 +482,13 @@ namespace ShipManifest
             }
         }
 
-        //Stock Toolbar button handlers
-        private void OnGUIAppLauncherReady()
-        {
-            Utilities.LogMessage("ShipManifestAddon.OnGUIAppLauncherReady active...", "Info", Settings.VerboseLogging);
-            try
-            {
-                if (ApplicationLauncher.Ready && HighLogic.LoadedSceneIsFlight && ShipManifestButton_Stock == null)
-                {
-                    ShipManifestButton_Stock = ApplicationLauncher.Instance.AddModApplication(
-                        OnAppLaunchToggleOn,
-                        OnAppLaunchToggleOff,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
-                        ApplicationLauncher.AppScenes.FLIGHT,
-                        (Texture)GameDatabase.Instance.GetTexture("ShipManifest/Plugins/IconOff_38", false));
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherReady.  " + ex.ToString(), "Error", true);
-            }
-        }
-        private void OnGUIAppLauncherDestroyed()
-        {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUIAppLauncherDestroyed");
-            try
-            {
-                if (ShipManifestButton_Stock != null)
-                {
-                    ApplicationLauncher.Instance.RemoveModApplication(ShipManifestButton_Stock);
-                    ShipManifestButton_Stock = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherDestroyed.  " + ex.ToString(), "Error", true);
-            }
-        }
-        private void OnAppLaunchToggleOn()
-        {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnAppLaunchToggleOn");
-            try
-            {
-                if (shouldToggle())
-                {
-                    Settings.ShowShipManifest = true;
-                    ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_38" : "ShipManifest/Plugins/IconOff_38", false));
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOn.  " + ex.ToString(), "Error", true);
-            }
-        }
-        private void OnAppLaunchToggleOff()
-        {
-            if (!SMAddon.crewXfer && !SMAddon.XferOn)
-            {
-                try
-                {
-                    if (shouldToggle())
-                    {
-                        Settings.ShowShipManifest = false;
-                        Settings.ShowShipManifest = false;
-                        SMAddon.smController.SelectedResource = null;
-                        SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
-                        ShipManifestButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_38" : "ShipManifest/Plugins/IconOff_38", false));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOff.  " + ex.ToString(), "Error", true);
-                }
-            }
-        }
-        private void CheckForToolbarToggle()
+        // Stock vs Blizzy Toolbar switch handler
+        private void CheckForToolbarTypeToggle()
         {
             if (Settings.EnableBlizzyToolbar && !Settings.prevEnableBlizzyToolbar)
             {
                 // Let't try to use Blizzy's toolbar
-                Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
+                Utilities.LogMessage("CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
                 if (!EnableBlizzyToolBar())
                 {
                     // We failed to activate the toolbar, so revert to stock
@@ -536,6 +504,13 @@ namespace ShipManifest
                     GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
                     GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGUIAppLauncherDestroyed);
                     Settings.prevEnableBlizzyToolbar = Settings.EnableBlizzyToolbar;
+                    if (HighLogic.LoadedSceneIsFlight)
+                        SMButton_Blizzy.Visible = true;
+                    if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    {
+                        SMRoster_Blizzy.Visible = true;
+                        SMSettings_Blizzy.Visible = true;
+                    }
                 }
 
             }
@@ -543,11 +518,175 @@ namespace ShipManifest
             {
                 // Use stock Toolbar
                 Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
-                ShipManifestButton_Blizzy.Visible = false;
+                if (HighLogic.LoadedSceneIsFlight)
+                    SMButton_Blizzy.Visible = false;
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                {
+                    SMRoster_Blizzy.Visible = false;
+                    SMSettings_Blizzy.Visible = false;
+                }
                 GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                 GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
                 OnGUIAppLauncherReady();
                 Settings.prevEnableBlizzyToolbar = Settings.EnableBlizzyToolbar;
+            }
+        }
+
+        // Stock Toolbar Startup and cleanup
+        private void OnGUIAppLauncherReady()
+        {
+            Utilities.LogMessage("ShipManifestAddon.OnGUIAppLauncherReady active...", "Info", Settings.VerboseLogging);
+            try
+            {
+                // Setup SM WIndow button
+                if (HighLogic.LoadedSceneIsFlight && SMButton_Stock == null)
+                {
+                    string Iconfile = "IconOff_38"; 
+                    SMButton_Stock = ApplicationLauncher.Instance.AddModApplication(
+                        OnSMButtonToggle,
+                        OnSMButtonToggle,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        ApplicationLauncher.AppScenes.FLIGHT,
+                        (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
+
+                    if (Settings.ShowShipManifest)
+                        SMButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? ImageFolder + "IconOn_38" : ImageFolder + "IconOff_38", false));
+                }
+
+                // Setup Settings Button
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMSettings_Stock == null)
+                {
+                    string Iconfile = "IconS_Off_38";
+                    SMSettings_Stock = ApplicationLauncher.Instance.AddModApplication(
+                        OnSMSettingsToggle,
+                        OnSMSettingsToggle,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        ApplicationLauncher.AppScenes.SPACECENTER,
+                        (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
+
+                    if (Settings.ShowSettings)
+                        SMSettings_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowSettings ? ImageFolder + "IconS_On_38" : ImageFolder + "IconS_Off_38", false));
+                }
+
+                // Setup Roster Button
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMRoster_Stock == null)
+                {
+                    string Iconfile = "IconR_Off_38";
+                    SMRoster_Stock = ApplicationLauncher.Instance.AddModApplication(
+                        OnSMRosterToggle,
+                        OnSMRosterToggle,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        DummyVoid,
+                        ApplicationLauncher.AppScenes.SPACECENTER,
+                        (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
+
+                    if (Settings.ShowRoster)
+                        SMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowRoster ? ImageFolder + "IconR_On_38" : ImageFolder + "IconR_Off_38", false));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherReady.  " + ex.ToString(), "Error", true);
+            }
+        }
+        private void OnGUIAppLauncherDestroyed()
+        {
+            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUIAppLauncherDestroyed");
+            try
+            {
+                if (SMButton_Stock != null)
+                {
+                    ApplicationLauncher.Instance.RemoveModApplication(SMButton_Stock);
+                    SMButton_Stock = null;
+                }
+                if (SMRoster_Stock != null)
+                {
+                    ApplicationLauncher.Instance.RemoveModApplication(SMRoster_Stock);
+                    SMRoster_Stock = null;
+                }
+                if (SMSettings_Stock != null)
+                {
+                    ApplicationLauncher.Instance.RemoveModApplication(SMSettings_Stock);
+                    SMSettings_Stock = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherDestroyed.  " + ex.ToString(), "Error", true);
+            }
+        }
+
+        //Toolbar button click handlers
+        internal static void OnSMButtonToggle()
+        {
+            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnAppLaunchToggleOn");
+            try
+            {
+                if (shouldToggle())
+                {
+                    if (Settings.ShowShipManifest && !SMAddon.crewXfer && !SMAddon.XferOn)
+                    {
+                        SMAddon.smController.SelectedResource = null;
+                        SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                    }
+                    Settings.ShowShipManifest = !Settings.ShowShipManifest;
+                    if (Settings.EnableBlizzyToolbar)
+                        SMButton_Blizzy.TexturePath = Settings.ShowShipManifest ? ImageFolder + "IconOn_24" : ImageFolder + "IconOff_24";
+                    else
+                        SMButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? ImageFolder + "IconOn_38" : ImageFolder + "IconOff_38", false));
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOn.  " + ex.ToString(), "Error", true);
+            }
+        }
+        internal static void OnSMRosterToggle()
+        {
+            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMRosterToggleOn");
+            try
+            {
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                {
+                    Settings.ShowRoster = !Settings.ShowRoster;
+                    if (Settings.EnableBlizzyToolbar)
+                        SMRoster_Blizzy.TexturePath = Settings.ShowRoster ? ImageFolder + "IconR_On_24" : ImageFolder + "IconR_Off_24";
+                    else
+                        SMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowRoster ? ImageFolder + "IconR_On_38" : ImageFolder + "IconR_Off_38", false));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMRosterToggleOn.  " + ex.ToString(), "Error", true);
+            }
+        }
+        internal static void OnSMSettingsToggle()
+        {
+            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnAppLaunchToggleOn");
+            try
+            {
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                {
+                    Settings.ShowSettings = !Settings.ShowSettings;
+                    if (Settings.EnableBlizzyToolbar)
+                        SMSettings_Blizzy.TexturePath = Settings.ShowSettings ? ImageFolder + "IconS_On_24" : ImageFolder + "IconS_Off_24";
+                    else
+                        SMSettings_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowSettings ? ImageFolder + "IconS_On_38" : ImageFolder + "IconS_Off_38", false));
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnAppLaunchToggleOn.  " + ex.ToString(), "Error", true);
             }
         }
 
@@ -659,16 +798,28 @@ namespace ShipManifest
 
         internal static bool CanShowShipManifest()
         {
-            if (Settings.ShowShipManifest
-                && HighLogic.LoadedScene == GameScenes.FLIGHT
-                && !vessel.isEVA
-                && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA 
-                )
-                return true;
-            else
+            try
             {
+                if (Settings.ShowShipManifest
+                    && HighLogic.LoadedScene == GameScenes.FLIGHT
+                    && !vessel.isEVA
+                    && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
+                    )
+                    return true;
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    frameErrTripped = true;
+                }
                 return false;
-           }
+            }
         }
         
         #endregion
@@ -708,8 +859,8 @@ namespace ShipManifest
                 {
                     if (newVessel.isEVA && !vessel.isEVA)
                     {
-                        Settings.ShowShipManifest = false;
-                        ToggleToolbar();
+                        if (Settings.ShowShipManifest == true)
+                            OnSMButtonToggle();
 
                         // kill selected resource and its associated highlighting.
                         smController.SelectedResource = null;
@@ -722,7 +873,10 @@ namespace ShipManifest
                 vessel = newVessel;
                 smController = SMController.GetInstance(vessel);
                 if (Settings.EnableCLS)
-                    UpdateCLSSpaces();
+                {
+                    if (GetCLSAddon())
+                        UpdateCLSSpaces();
+                }
             }
             catch (Exception ex)
             {
@@ -788,14 +942,24 @@ namespace ShipManifest
                 Utilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", Settings.VerboseLogging);
         }
 
+        internal static bool GetCLSAddon()
+        {
+            clsAddon = CLSClient.GetCLS();
+            if (clsAddon == null)
+            {
+                Utilities.LogMessage("GetCLSVessel - clsAddon is null.", "Info", Settings.VerboseLogging);
+                return false;
+            }
+            return true;
+        }
+
         internal static bool GetCLSVessel()
         {
             try
             {
                 Utilities.LogMessage("GetCLSVessel - Active.", "Info", Settings.VerboseLogging);
 
-                clsAddon = CLSClient.GetCLS();
-                if (clsAddon == null)
+                if (GetCLSAddon())
                 {
                     Utilities.LogMessage("GetCLSVessel - clsAddon is null.", "Info", Settings.VerboseLogging);
                     return false;
@@ -825,18 +989,38 @@ namespace ShipManifest
                 {
                     if (ToolbarManager.ToolbarAvailable)
                     {
-                        ShipManifestButton_Blizzy = ToolbarManager.Instance.add("ShipManifest", "ShipManifest");
-                        ShipManifestButton_Blizzy.TexturePath = "ShipManifest/Plugins/IconOff_24";
-                        ShipManifestButton_Blizzy.ToolTip = "Ship Manifest";
-                        ShipManifestButton_Blizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
-                        ShipManifestButton_Blizzy.OnClick += (e) =>
+                        if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                         {
-                            if (shouldToggle())
+                            SMButton_Blizzy = ToolbarManager.Instance.add("ShipManifest", "Manifest");
+                            SMButton_Blizzy.TexturePath = Settings.ShowShipManifest ? ImageFolder + "IconOn_24" : ImageFolder + "IconOff_24";
+                            SMButton_Blizzy.ToolTip = "Ship Manifest";
+                            SMButton_Blizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
+                            SMButton_Blizzy.OnClick += (e) =>
                             {
-                                ShipManifestButton_Blizzy.TexturePath = Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOff_24" : "ShipManifest/Plugins/IconOn_24";
-                                Settings.ShowShipManifest = !Settings.ShowShipManifest;
-                            }
-                        };
+                                OnSMButtonToggle();
+                            };
+                        }
+
+                        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                        {
+                            SMSettings_Blizzy = ToolbarManager.Instance.add("ShipManifest", "Settings");
+                            SMSettings_Blizzy.TexturePath = Settings.ShowSettings ? ImageFolder + "IconS_On_24" : ImageFolder + "IconS_Off_24";
+                            SMSettings_Blizzy.ToolTip = "Ship Manifest Settings Window";
+                            SMSettings_Blizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
+                            SMSettings_Blizzy.OnClick += (e) =>
+                            {
+                                OnSMSettingsToggle();
+                            };
+
+                            SMRoster_Blizzy = ToolbarManager.Instance.add("ShipManifest", "Roster");
+                            SMRoster_Blizzy.TexturePath = Settings.ShowRoster ? ImageFolder + "IconR_On_24" : ImageFolder + "IconR_Off_24";
+                            SMRoster_Blizzy.ToolTip = "Ship Manifest Roster Window";
+                            SMRoster_Blizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
+                            SMRoster_Blizzy.OnClick += (e) =>
+                            {
+                                OnSMRosterToggle();
+                            };
+                        }
                         Utilities.LogMessage("Blizzy Toolbar available!", "Info", Settings.VerboseLogging);
                         return true;
                     }
@@ -861,28 +1045,6 @@ namespace ShipManifest
             }
         }
 
-        internal static void ToggleToolbar()
-        {
-            if (!SMAddon.crewXfer && !SMAddon.XferOn)
-            {
-                // turn off SM at toolbar
-                if (Settings.EnableBlizzyToolbar)
-                    ToggleBlizzyToolBar();
-                else
-                {
-                    if (Settings.ShowShipManifest)
-                        ShipManifestButton_Stock.toggleButton.SetTrue();
-                    else
-                        ShipManifestButton_Stock.toggleButton.SetFalse();
-                }
-            }
-        }
-
-        internal static void ToggleBlizzyToolBar()
-        {
-            ShipManifestButton_Blizzy.TexturePath = Settings.ShowShipManifest ? "ShipManifest/Plugins/IconOn_24" : "ShipManifest/Plugins/IconOff_24";
-        }
-
         internal void Display()
         {
             string step = "";
@@ -894,7 +1056,27 @@ namespace ShipManifest
                 if (Settings.ShowDebugger)
                     Settings.DebuggerPosition = GUILayout.Window(398643, Settings.DebuggerPosition, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));
 
-                if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != vessel)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                {
+                    if (Settings.ShowSettings)
+                    {
+                        step = "4 - Show Settings";
+                        Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, WindowSettings.Display, "Ship Manifest Settings", GUILayout.MinHeight(20));
+                    }
+
+                    if (Settings.ShowRoster)
+                    {
+                        if (WindowRoster.resetRosterSize)
+                        {
+                            step = "5 - Reset Roster Size";
+                            Settings.RosterPosition.height = 270; //reset hight
+                        }
+
+                        step = "6 - Show Roster";
+                        Settings.RosterPosition = GUILayout.Window(398547, Settings.RosterPosition, WindowRoster.Display, "Ship Manifest Roster", GUILayout.MinHeight(20));
+                    }
+                }
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT && (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != vessel))
                 {
                     step = "0a - Vessel Change";
                     smController.SelectedPartSource = smController.SelectedPartTarget = null;
@@ -904,17 +1086,16 @@ namespace ShipManifest
 
                 step = "1 - Show Interface(s)";
                 // Is the scene one we want to be visible in?
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled)
                 {
-                    // why is this here?
-                    //UpdateHighlighting();
                     if (SMAddon.CanShowShipManifest())
                     {
-                        step = "2 - Show Manifest";
+                        step = "2 - Can Show Manifest - true";
                         Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, WindowManifest.Display, "Ship's Manifest - " + vessel.vesselName, GUILayout.MinHeight(20));
                     }
                     else
                     {
+                        step = "2 - Can Show Manifest = false";
                         if (Settings.EnableCLS && smController.SelectedResource == "Crew")
                             SMAddon.HighlightCLSVessel(false, true);  
                     }
@@ -926,26 +1107,6 @@ namespace ShipManifest
                         // Lets build the running totals for each resource for display in title...
                         string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResource);
                         Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
-                    }
-
-                    if (SMAddon.CanShowShipManifest() && Settings.ShowSettings)
-                    {
-                        step = "4 - Show Settings";
-                        Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, WindowSettings.Display, "Ship Manifest Settings", GUILayout.MinHeight(20));
-                    }
-
-                    if (WindowRoster.resetRosterSize)
-                    {
-                        step = "5 - Reset Roster Size";
-                        Settings.RosterPosition.height = 100; //reset hight
-                        Settings.RosterPosition.width = 400; //reset width
-                        WindowRoster.resetRosterSize = false;
-                    }
-
-                    if (Settings.ShowShipManifest && Settings.ShowRoster)
-                    {
-                        step = "6 - Show Roster";
-                        Settings.RosterPosition = GUILayout.Window(398547, Settings.RosterPosition, WindowRoster.Display, "Ship Manifest Roster", GUILayout.MinHeight(20));
                     }
 
                     if (Settings.ShowShipManifest && Settings.ShowHatch)
@@ -1337,6 +1498,8 @@ namespace ShipManifest
             GameEvents.onVesselChange.Fire(vessel);
         }
 
+        #endregion
+
         #region Highlighting methods
 
         /// <summary>
@@ -1395,7 +1558,6 @@ namespace ShipManifest
             }
         }
 
-        #endregion
         internal static void UpdateHighlighting()
         {
             string step = "";
@@ -1501,6 +1663,7 @@ namespace ShipManifest
         }
 
         #endregion
+
 
         internal enum XFERState
         {

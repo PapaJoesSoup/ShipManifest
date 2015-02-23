@@ -60,7 +60,6 @@ namespace ShipManifest
 
         internal bool CanDrawButton = false;
 
-        internal string saveMessage = string.Empty;
         #endregion
 
         #region Datasource properties

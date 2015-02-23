@@ -35,10 +35,7 @@ namespace ShipManifest
             Rect rect = new Rect(304, 4, 16, 16);
             if (GUI.Button(rect, label))
             {
-                Settings.ShowShipManifest = false;
-                SMAddon.smController.SelectedResource = null;
-                SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
-                SMAddon.ToggleToolbar();
+                SMAddon.OnSMButtonToggle();
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)

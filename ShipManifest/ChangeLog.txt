@@ -1,4 +1,17 @@
-﻿Version 0.90.0_4.1.0b - Release 19 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+﻿Version 0.90.0_4.2.0 - Release xx Feb, 2015 - Roster Expansion Edition.
+ - New:  Added Kerbal modification restrictions in Roster Window when Realism Mode is on.  Now you cannot change an existing Kerbal's profession or stats when in Realism Mode.
+ - New:  Expanded Kerbal information by click to show career, experience, etc.
+ - New:  Added Retruiter Tool.  Make a request, and Select from several Computer Generated Applicants with previous experience.
+ - New:  Added Hiring fee requirements for hiring experienced kerbals when in Career mode. and Realism is on.
+ - New:  
+
+Version 0.90.0_4.1.1 - Release 23 Feb, 2015 - Settings & Roster exposed Edition.
+ - New:  Expose the Roster window via toolbars in KSC.  Now you can get to the Kerbalnaut Roster from the Space Center!
+ - New:  Expose Settings window in KSC via toolbars.  Now you can get to SM Settings from the Space Center!
+ - New:  Refactored Window management with Toolbars.  Streamlined code and addressed some behavioral issues (2 clicks to close a window after switching toolbars from blizzy to stock, etc.)
+ - Bug:  When opening or closing a hatch (CLS installed), sometimes the hatch color change would not properly update when ship is currently highlighted.
+
+Version 0.90.0_4.1.0b - Release 19 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
  - Bug:  In the Roster Window, when editing an existing kerbal with Rename and Rename with Professions on in Settings, You cannot change the profession. You SHOULD be able to.
 
 Version 0.90.0_4.1.0a - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.

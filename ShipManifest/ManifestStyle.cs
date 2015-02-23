@@ -102,7 +102,8 @@ namespace ShipManifest
             LabelStyleGreen = new GUIStyle(LabelStyle);
             LabelStyleGreen.normal.textColor = Color.green;
 
-            ToolTipStyle = new GUIStyle(GUI.skin.name);
+            ToolTipStyle = new GUIStyle(GUI.skin.label);
+            ToolTipStyle.alignment = TextAnchor.MiddleLeft;
             ToolTipStyle.wordWrap = false;
             ToolTipStyle.fontStyle = FontStyle.Normal;
             ToolTipStyle.normal.textColor = Color.yellow;
