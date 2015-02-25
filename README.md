@@ -1,5 +1,34 @@
 ShipManifest
 ============
+Version 0.90.0_4.1.1 - Release 23 Feb, 2015 - Settings & Roster exposed Edition.
+ - New:  Expose the Roster window via toolbars in KSC.  Now you can get to the Kerbalnaut Roster from the Space Center!
+ - New:  Expose Settings window in KSC via toolbars.  Now you can get to SM Settings from the Space Center!
+ - New:  Refactored Window management with Toolbars.  Streamlined code and addressed some behavioral issues (2 clicks to close a window after switching toolbars from blizzy to stock, etc.)
+ - Bug:  When opening or closing a hatch (CLS installed), sometimes the hatch color change would not properly update when ship is currently highlighted.
+
+Version 0.90.0_4.1.0b - Release 19 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+ - Bug:  In the Roster Window, when editing an existing kerbal with Rename and Rename with Professions on in Settings, You cannot change the profession. You SHOULD be able to.
+
+Version 0.90.0_4.1.0a - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+ - Bug:  under certain conditions, GetCLSVessel generates a Space out of range error.  Troubleshooting code was left in by mistake.
+
+Version 0.90.0_4.1.0 - Release 18 Feb, 2015 - Solar Panels, Kerbal Renaming, Bugs, Mod Refactoring and More Edition.
+ - New:  Added Deployable Solar Panel Management Window.  Works like Hatch panel. In realism Mode, respects Rectractable = false.
+ - New:  Refactored Crew Transfer Display code, Hatch Panel code and data management.  Relocated some methods to more logical locations.
+ - New:  Added switch to allow renaming Kerbals. Added support for maintaining professions after rename.  Adds non printing chars to name, so use at your own risk.
+ - New:  Added autosave of settings on scene change or exiting game.
+ - Bug:  After switching scenes and selecting a part with CLS enabled an highlighting error occurs.
+ - Bug:  after switching scenes and using Hatch panel, an error occurs in highlighting.
+ - Bug:  After switching vessels, the hatch panel shows the old vessel info and is not updated. Additionally, CLS highlighting causes errors.   
+
+Version 0.90.0_4.0.2 - Release 13 Feb, 2015 - Bugs, Mod Refactoring and More Edition.
+ - New:  Resource Transfer display and setup system refactored.  Added ability to stop a transfer in progress.  
+ - New:  Exposed Resource Transfer Flow Rate Slider min and max values. You can now change the min and max flow rate.  
+ - New:  Added a maximum run time in seconds. SM will use the lesser duration of Xfer amount / flow rate or max time.
+ - New:  Added tool tips to  controls in the options section of the Settings Window.
+ - Bug:  When moving or transferring a kerbal, closing the transfer window, Manifest window or closing the manifest window from any toolbar while the action is in progress causes an error.
+ - Bug:  When closing the Transfer Window, internally resetting the selected resource causes an error.
+
 Version 0.90.0_4.0.1 - Release 08 Feb, 2015 - CLS Hatches, CLS Highlighting, Mod Refactoring and More Edition.
  - New:  4.0.1 - Added Create specific Kerbal Type:  Now you can choose Pilot, Engineer or Scientist!
  - New:  4.0.1 - Bug fix for unneeded debug log entry from tooltips
