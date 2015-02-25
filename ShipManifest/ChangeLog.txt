@@ -4,6 +4,7 @@
  - Bug:  Config.xml file distributed with non default window positions.   This could cause some users not to see the windows when opened.
  - Bug:  AVS version file out of date.  Updated local copy as well as server copy.
  - Bug:  When hot switching from stock to Blizzy toolbars, a scene change would still allow the stock button to appear in some scenes.
+ - Bug:  When CLS is not installed, method GetCLSVessel generates an error in flight.
 
 Version 0.90.0_4.1.1 - Release 23 Feb, 2015 - Settings & Roster exposed Edition.
  - New:  Expose the Roster window via toolbars in KSC.  Now you can get to the Kerbalnaut Roster from the Space Center!

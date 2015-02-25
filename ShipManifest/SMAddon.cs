@@ -179,22 +179,20 @@ namespace ShipManifest
                     smController = SMController.GetInstance(vessel);
 
                     // Is CLS installed and enabled?
-                    SMAddon.GetCLSVessel();
-                    if (clsAddon != null)
+                    if (GetCLSAddon())
                     {
                         Settings.CLSInstalled = true;
                         RunSave();
+                        UpdateCLSSpaces();
                     }
                     else
                     {
-                        Utilities.LogMessage("Start - clsAddon is null.", "Info", Settings.VerboseLogging);
+                        Utilities.LogMessage("Start - CLS is not installed.", "Info", Settings.VerboseLogging);
                         Settings.EnableCLS = false;
                         Settings.CLSInstalled = false;
                         RunSave();
                     }
                     Utilities.LogMessage("CLS Installed?  " + Settings.CLSInstalled.ToString(), "Info", Settings.VerboseLogging);
-                    if (Settings.EnableCLS)
-                        UpdateCLSSpaces();
                 }
             }
             catch (Exception ex)
