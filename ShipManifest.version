@@ -1,7 +1,11 @@
 {
   "NAME": "Ship Manifest",
   "URL": "https://raw.githubusercontent.com/PapaJoesSoup/ShipManifest/master/ShipManifest.version",
-  "VERSION": "0.90.0_4.1.2",
+  "VERSION":  {
+    "MAJOR": 4,
+    "MINOR": 1,
+    "PATCH": 2
+  }
   "KSP_VERSION": {
     "MAJOR": 0,
     "MINOR": 90,
