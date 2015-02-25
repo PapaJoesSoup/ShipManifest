@@ -1,4 +1,4 @@
-﻿Version 0.90.0_4.1.2 - Release 24 Feb, 2015 - Settings and Windows cleanup Edition.
+﻿Version 0.90.0_4.1.2 - Release 24 Feb, 2015 - Settings and Windows clean up Edition.
  - New:  Added support for deleting config.xml file.  Now properly reconstructs config.xml file from default settings.
  - New:  Added window boundary checker to ensure that windows cannot be opened beyond the screen.  (handles changes from higher to lower screen resolutions.)
  - Bug:  Config.xml file distributed with non default window positions.   This could cause some users not to see the windows when opened.
