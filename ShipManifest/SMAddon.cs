@@ -110,7 +110,7 @@ namespace ShipManifest
                     {
                         // Let't try to use Blizzy's toolbar
                         Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
-                        if (!EnableBlizzyToolBar())
+                        if (!ActivateBlizzyToolBar())
                         {
                             // We failed to activate the toolbar, so revert to stock
                             GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
@@ -489,7 +489,7 @@ namespace ShipManifest
             {
                 // Let't try to use Blizzy's toolbar
                 Utilities.LogMessage("CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
-                if (!EnableBlizzyToolBar())
+                if (!ActivateBlizzyToolBar())
                 {
                     // We failed to activate the toolbar, so revert to stock
                     GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
@@ -539,7 +539,7 @@ namespace ShipManifest
             try
             {
                 // Setup SM WIndow button
-                if (HighLogic.LoadedSceneIsFlight && SMButton_Stock == null)
+                if (HighLogic.LoadedSceneIsFlight && SMButton_Stock == null && !Settings.EnableBlizzyToolbar)
                 {
                     string Iconfile = "IconOff_38"; 
                     SMButton_Stock = ApplicationLauncher.Instance.AddModApplication(
@@ -557,7 +557,7 @@ namespace ShipManifest
                 }
 
                 // Setup Settings Button
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMSettings_Stock == null)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMSettings_Stock == null && !Settings.EnableBlizzyToolbar)
                 {
                     string Iconfile = "IconS_Off_38";
                     SMSettings_Stock = ApplicationLauncher.Instance.AddModApplication(
@@ -575,7 +575,7 @@ namespace ShipManifest
                 }
 
                 // Setup Roster Button
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMRoster_Stock == null)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && SMRoster_Stock == null && !Settings.EnableBlizzyToolbar)
                 {
                     string Iconfile = "IconR_Off_38";
                     SMRoster_Stock = ApplicationLauncher.Instance.AddModApplication(
@@ -981,7 +981,7 @@ namespace ShipManifest
             }          
         }
 
-        internal static bool EnableBlizzyToolBar()
+        internal static bool ActivateBlizzyToolBar()
         {
             if (Settings.EnableBlizzyToolbar)
             {
@@ -995,6 +995,7 @@ namespace ShipManifest
                             SMButton_Blizzy.TexturePath = Settings.ShowShipManifest ? ImageFolder + "IconOn_24" : ImageFolder + "IconOff_24";
                             SMButton_Blizzy.ToolTip = "Ship Manifest";
                             SMButton_Blizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
+                            SMButton_Blizzy.Visible = true;
                             SMButton_Blizzy.OnClick += (e) =>
                             {
                                 OnSMButtonToggle();
@@ -1003,10 +1004,12 @@ namespace ShipManifest
 
                         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                         {
+                            
                             SMSettings_Blizzy = ToolbarManager.Instance.add("ShipManifest", "Settings");
                             SMSettings_Blizzy.TexturePath = Settings.ShowSettings ? ImageFolder + "IconS_On_24" : ImageFolder + "IconS_Off_24";
                             SMSettings_Blizzy.ToolTip = "Ship Manifest Settings Window";
                             SMSettings_Blizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
+                            SMSettings_Blizzy.Visible = true;
                             SMSettings_Blizzy.OnClick += (e) =>
                             {
                                 OnSMSettingsToggle();
@@ -1016,6 +1019,7 @@ namespace ShipManifest
                             SMRoster_Blizzy.TexturePath = Settings.ShowRoster ? ImageFolder + "IconR_On_24" : ImageFolder + "IconR_Off_24";
                             SMRoster_Blizzy.ToolTip = "Ship Manifest Roster Window";
                             SMRoster_Blizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
+                            SMRoster_Blizzy.Visible = true;
                             SMRoster_Blizzy.OnClick += (e) =>
                             {
                                 OnSMRosterToggle();

@@ -13,14 +13,132 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string CurVersion = "0.90.0_4.1.1";
+        internal static string CurVersion = "0.90.0_4.1.2";
 
+        // Persisted properties
+        // Window Positions
         internal static Rect ManifestPosition;
         internal static Rect TransferPosition;
-        internal static Rect DebuggerPosition;
         internal static Rect RosterPosition;
         internal static Rect SettingsPosition;
+        internal static Rect HatchPosition;
+        internal static Rect PanelPosition;
+        internal static Rect DebuggerPosition;
 
+        // Realism Feature Options
+        internal static bool RealismMode = true;
+        internal static bool EnableCrew = true;
+        internal static bool EnableScience = true;
+        internal static bool EnableResources = true;
+        internal static bool EnablePFResources = true;
+        internal static bool EnableCLS = true;
+
+        //Resource Xfer flow rate options
+        internal static float FlowRate = 100;
+        internal static float MaxFlowRate = 1000;
+        internal static float MinFlowRate = 0;
+        internal static int MaxFlowTimeSec = 180;
+        internal static bool LockSettings = false;
+
+        internal static bool ShowDebugger = false;
+        internal static bool VerboseLogging = false;
+        internal static bool AutoDebug = false;
+        internal static bool SaveLogOnExit = false;
+
+        internal static bool AutoSave = false;
+        internal static float SaveIntervalSec = 60f;
+
+        //Highlighting Options
+        internal static bool EnableHighlighting = true;
+        internal static bool OnlySourceTarget = false;
+        internal static bool EnableCLSHighlighting = true;
+        internal static bool EnableBlizzyToolbar = false; // off by default
+        internal static bool EnableTextureReplacer = false;
+        internal static string SourcePartColor = "red";
+        internal static string TargetPartColor = "green";
+        internal static string TargetPartCrewColor = "blue";
+        internal static string CLS_SpaceColor = "green";
+        internal static string HatchOpenColor = "cyan";
+        internal static string HatchCloseColor = "red";
+        internal static string PanelExtendedColor = "cyan";
+        internal static string PanelRetractedColor = "red";
+
+        // Sound Options
+        internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
+        internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
+        internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
+        internal static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
+        internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
+        internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
+        internal static double PumpSoundVol = 3;
+        internal static double CrewSoundVol = 3;
+
+        internal static string ErrorLogLength = "1000";
+        internal static double IVATimeDelaySec = 5;
+        internal static bool ShowIVAUpdateBtn = false;
+
+        // Tooltip Options
+        internal static bool ShowToolTips = true;
+        internal static bool ManifestToolTips = true;
+        internal static bool TransferToolTips = true;
+        internal static bool SettingsToolTips = true;
+        internal static bool RosterToolTips = true;
+        internal static bool HatchToolTips = true;
+        internal static bool PanelToolTips = true;
+        internal static bool DebuggerToolTips = true;
+
+        // Roster Options
+        internal static bool EnableKerbalRename = false;
+        internal static bool RenameWithProfession = false;
+
+        // End Persisted Properties
+
+        // Settings Window Option storage for Cancel support
+        internal static bool prevVerboseLogging = false;
+        internal static bool prevShowDebugger = false;
+        internal static string prevErrorLogLength = "1000";
+        internal static bool prevSaveLogOnExit = true;
+        internal static bool prevAutoSave;
+        internal static float prevSaveIntervalSec = 60f;
+
+        internal static bool prevRealismMode = false;
+        internal static bool prevLockSettings = false;
+
+        internal static float prevFlowRate = 100;
+        internal static float prevMaxFlowRate = 1000;
+        internal static float prevMinFlowRate = 0;
+        internal static int prevMaxFlowTimeSec = 100;
+
+        internal static bool prevEnableHighlighting = true;
+        internal static bool prevOnlySourceTarget = false;
+        internal static bool prevEnableCLSHighlighting = true;
+        internal static bool prevEnableScience = true;
+        internal static bool prevEnableCrew = true;
+        internal static bool prevEnablePFResources = true;
+        internal static bool prevEnableCLS = true;
+        internal static bool prevEnableBlizzyToolbar = false;
+
+        internal static string prevPumpSoundStart = "";
+        internal static string prevPumpSoundRun = "";
+        internal static string prevPumpSoundStop = "";
+
+        internal static string prevCrewSoundStart = "";
+        internal static string prevCrewSoundRun = "";
+        internal static string prevCrewSoundStop = "";
+
+        internal static bool prevShowToolTips = true;
+        internal static bool prevManifestToolTips = true;
+        internal static bool prevTransferToolTips = true;
+        internal static bool prevSettingsToolTips = true;
+        internal static bool prevRosterToolTips = true;
+        internal static bool prevHatchToolTips = true;
+        internal static bool prevPanelToolTips = true;
+        internal static bool prevDebuggerToolTips = true;
+        internal static bool prevEnableKerbalRename = false;
+        internal static bool prevRenameWithProfession = false;
+        internal static bool prevEnableTextureReplacer = false;
+
+        // Internal properties for plugin management.  Not persisted, not user managed.
         // Flags to show windows
         internal static bool ShowTransferWindow { get; set; }
         private static bool _showShipManifest = false;
@@ -62,125 +180,16 @@ namespace ShipManifest
             }
         }
 
-        internal static bool VerboseLogging = false;
-        internal static bool prevVerboseLogging = false;
-
-        internal static bool ShowDebugger = false;
-        internal static bool prevShowDebugger = false;
-        internal static bool AutoDebug = false;
-        internal static string ErrorLogLength = "1000";
-        internal static string prevErrorLogLength = "1000";
-        internal static bool prevSaveLogOnExit = true;
-        internal static bool SaveLogOnExit = true;
-
-        internal static Rect HatchPosition;
         internal static bool ShowHatch { get; set; }
-
-        internal static Rect PanelPosition;
         internal static bool ShowPanel { get; set; }
 
         internal static string DebugLogPath = "\\Plugins\\PluginData\\";
-
-        internal static bool AutoSave;
-        internal static float SaveIntervalSec = 60f;
-        internal static bool prevAutoSave;
-        internal static float prevSaveIntervalSec = 60f;
-
-
-        internal static bool RealismMode = false;
-        internal static bool prevRealismMode = false;
-        internal static bool LockSettings = false;
-        internal static bool prevLockSettings = false;
-
-        //Resource Xfer flow rate options
-        internal static float FlowRate = 100;
-        internal static float prevFlowRate = 100;
-        internal static float MaxFlowRate = 1000;
-        internal static float prevMaxFlowRate = 1000;
-        internal static float MinFlowRate = 0;
-        internal static float prevMinFlowRate = 0;
-        internal static int MaxFlowTimeSec = 180;
-        internal static int prevMaxFlowTimeSec = 100;
-
-        // Feature Options
-        internal static bool EnableHighlighting = true;
-        internal static bool prevEnableHighlighting = true;
-        internal static bool OnlySourceTarget = false;
-        internal static bool prevOnlySourceTarget = false;
-        internal static bool EnableCLSHighlighting = true;
-        internal static bool prevEnableCLSHighlighting = true;
-        internal static bool EnableScience = true;
-        internal static bool EnableResources = true;
-        internal static bool EnableCrew = true;
-        internal static bool EnablePFResources = true;
-        internal static bool EnableCLS = false; // off by default
-        internal static bool prevEnableScience = true;
-        internal static bool prevEnableCrew = true;
-        internal static bool prevEnablePFResources = true;
-        internal static bool prevEnableCLS = true;
-        internal static bool EnableBlizzyToolbar = false; // off by default
-        internal static bool prevEnableBlizzyToolbar = false;
-
-        // Internal setting.  Not persisted.  Value is set when checking for presence of CLS.
+        internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
         internal static bool CLSInstalled = false;
 
-        internal static bool EnableTextureReplacer = false;
-        internal static bool prevEnableTextureReplacer = false;
-
-        internal static double IVATimeDelaySec = 5;
-        internal static bool ShowIVAUpdateBtn = false;
 
         // Default sound license: CC-By-SA
         // http://www.freesound.org/people/vibe_crc/sounds/59328/
-
-        internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
-        internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
-        internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
-        internal static string prevPumpSoundStart = "";
-        internal static string prevPumpSoundRun = "";
-        internal static string prevPumpSoundStop = "";
-
-        internal static double PumpSoundVol = 3;
-        internal static double CrewSoundVol = 3;
-
-        internal static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
-        internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
-        internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
-        internal static string prevCrewSoundStart = "";
-        internal static string prevCrewSoundRun = "";
-        internal static string prevCrewSoundStop = "";
-
-        internal static string SourcePartColor = "red";
-        internal static string TargetPartColor = "green";
-        internal static string TargetPartCrewColor = "blue";
-        internal static string CLS_SpaceColor = "green";
-        internal static string HatchColor = "cyan";
-        internal static string HatchOpenColor = "cyan";
-        internal static string HatchCloseColor = "red";
-        internal static string PanelExtendedColor = "cyan";
-        internal static string PanelRetractedColor = "red";
-        internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
-
-        internal static bool ShowToolTips = true;
-        internal static bool prevShowToolTips = true;
-        internal static bool ManifestToolTips = true;
-        internal static bool prevManifestToolTips = true;
-        internal static bool TransferToolTips = true;
-        internal static bool prevTransferToolTips = true;
-        internal static bool SettingsToolTips = true;
-        internal static bool prevSettingsToolTips = true;
-        internal static bool RosterToolTips = true;
-        internal static bool prevRosterToolTips = true;
-        internal static bool HatchToolTips = true;
-        internal static bool prevHatchToolTips = true;
-        internal static bool PanelToolTips = true;
-        internal static bool prevPanelToolTips = true;
-        internal static bool DebuggerToolTips = true;
-        internal static bool prevDebuggerToolTips = true;
-        internal static bool EnableKerbalRename = false;
-        internal static bool prevEnableKerbalRename = false;
-        internal static bool RenameWithProfession = false;
-        internal static bool prevRenameWithProfession = false;
 
         #endregion
 
@@ -194,74 +203,77 @@ namespace ShipManifest
             {
                 LoadColors();
 
-                // Interestingly, Floats seem to load fine.   Saves seem to be problematic.  attempts to save float are not persisted in the file...  
+                // Interestingly, Floats seem to load fine.   Saves seem to be problematic.  attempts to save float are not persisted in the file...
+                // Update:   to save floats. write the ToString value.
                 // So, FlowRate vars now use double and are converted at load
                 KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
                 configfile.load();
 
-                ManifestPosition = configfile.GetValue<Rect>("ManifestPosition");
-                TransferPosition = configfile.GetValue<Rect>("TransferPosition");
-                DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition");
-                SettingsPosition = configfile.GetValue<Rect>("SettingsPosition");
-                HatchPosition = configfile.GetValue<Rect>("HatchPosition");
-                PanelPosition = configfile.GetValue<Rect>("PanelPosition");
-                RosterPosition = configfile.GetValue<Rect>("RosterPosition");
-                ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
-                RealismMode = configfile.GetValue<bool>("RealismMode");
-                LockSettings = configfile.GetValue<bool>("LockSettings");
-                VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
-                AutoSave = configfile.GetValue<bool>("AutoSave");
-                SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
-                FlowRate = (float)configfile.GetValue<double>("FlowRate");
-                MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
-                MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
-                MaxFlowTimeSec = configfile.GetValue<int>("MaxFlowTimeSec");
-                PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
-                PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
-                PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
-                CrewSoundStart = configfile.GetValue<string>("CrewSoundStart");
-                CrewSoundRun = configfile.GetValue<string>("CrewSoundRun");
-                CrewSoundStop = configfile.GetValue<string>("CrewSoundStop");
+                ManifestPosition = configfile.GetValue<Rect>("ManifestPosition", ManifestPosition);
+                TransferPosition = configfile.GetValue<Rect>("TransferPosition", TransferPosition);
+                DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition", DebuggerPosition);
+                SettingsPosition = configfile.GetValue<Rect>("SettingsPosition", SettingsPosition);
+                HatchPosition = configfile.GetValue<Rect>("HatchPosition", HatchPosition);
+                PanelPosition = configfile.GetValue<Rect>("PanelPosition", PanelPosition);
+                RosterPosition = configfile.GetValue<Rect>("RosterPosition", RosterPosition);
+                ShowDebugger = configfile.GetValue<bool>("ShowDebugger", ShowDebugger);
+                RealismMode = configfile.GetValue<bool>("RealismMode", RealismMode);
+                LockSettings = configfile.GetValue<bool>("LockSettings", LockSettings);
+                VerboseLogging = configfile.GetValue<bool>("VerboseLogging", VerboseLogging);
+                AutoSave = configfile.GetValue<bool>("AutoSave", AutoSave);
+                SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec", SaveIntervalSec);
+                FlowRate = (float)configfile.GetValue<double>("FlowRate", FlowRate);
+                MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate", MinFlowRate);
+                MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate", MaxFlowRate);
+                MaxFlowTimeSec = configfile.GetValue<int>("MaxFlowTimeSec", MaxFlowTimeSec);
+                PumpSoundStart = configfile.GetValue<string>("PumpSoundStart", PumpSoundStart);
+                PumpSoundRun = configfile.GetValue<string>("PumpSoundRun", PumpSoundRun);
+                PumpSoundStop = configfile.GetValue<string>("PumpSoundStop", PumpSoundStop);
+                CrewSoundStart = configfile.GetValue<string>("CrewSoundStart", CrewSoundStart);
+                CrewSoundRun = configfile.GetValue<string>("CrewSoundRun", CrewSoundRun);
+                CrewSoundStop = configfile.GetValue<string>("CrewSoundStop", CrewSoundStop);
 
-                PumpSoundVol = configfile.GetValue<double>("PumpSoundVol");
-                CrewSoundVol = configfile.GetValue<double>("CrewSoundVol");
+                PumpSoundVol = configfile.GetValue<double>("PumpSoundVol", PumpSoundVol);
+                CrewSoundVol = configfile.GetValue<double>("CrewSoundVol", CrewSoundVol);
 
-                SourcePartColor = configfile.GetValue<string>("SourcePartColor");
-                TargetPartColor = configfile.GetValue<string>("TargetPartColor");
-                TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
-                HatchColor = configfile.GetValue<string>("HatchColor");
-                HatchOpenColor = configfile.GetValue<string>("HatchOpenColor");
-                HatchCloseColor = configfile.GetValue<string>("HatchCloseColor");
-                PanelExtendedColor = configfile.GetValue<string>("PanelExtendedColor");
-                PanelRetractedColor = configfile.GetValue<string>("PanelRetractedColor");
+                SourcePartColor = configfile.GetValue<string>("SourcePartColor", SourcePartColor);
+                TargetPartColor = configfile.GetValue<string>("TargetPartColor", TargetPartColor);
+                TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor", TargetPartCrewColor);
+                HatchOpenColor = configfile.GetValue<string>("HatchOpenColor", HatchOpenColor);
+                HatchCloseColor = configfile.GetValue<string>("HatchCloseColor", HatchCloseColor);
+                PanelExtendedColor = configfile.GetValue<string>("PanelExtendedColor", PanelExtendedColor);
+                PanelRetractedColor = configfile.GetValue<string>("PanelRetractedColor", PanelRetractedColor);
 
-                EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting");
-                OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget");
-                EnableCLSHighlighting = configfile.GetValue<bool>("EnableCLSHighlighting");
-                EnableCrew = configfile.GetValue<bool>("EnableCrew");
-                EnableScience = configfile.GetValue<bool>("EnableScience");
-                EnableResources = configfile.GetValue<bool>("EnableResources");
-                EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
-                EnableCLS = configfile.GetValue<bool>("EnableCLS");
-                EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar");
+                EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting", EnableHighlighting);
+                OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget", OnlySourceTarget);
+                EnableCLSHighlighting = configfile.GetValue<bool>("EnableCLSHighlighting", EnableCLSHighlighting);
+                EnableCrew = configfile.GetValue<bool>("EnableCrew", EnableCrew);
+                EnableScience = configfile.GetValue<bool>("EnableScience", EnableScience);
+                EnableResources = configfile.GetValue<bool>("EnableResources", EnableResources);
+                EnablePFResources = configfile.GetValue<bool>("EnablePFResources", EnablePFResources);
+                EnableCLS = configfile.GetValue<bool>("EnableCLS", EnableCLS);
+                EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar", EnableBlizzyToolbar);
 
-                IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
-                ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
-                AutoDebug = configfile.GetValue<bool>("AutoDebug");
-                DebugLogPath = configfile.GetValue<string>("DebugLogPath");
-                ErrorLogLength = configfile.GetValue<string>("ErrorLogLength");
-                SaveLogOnExit = configfile.GetValue<bool>("SaveLogOnExit");
-                EnableKerbalRename = configfile.GetValue<bool>("EnableKerbalRename");
-                RenameWithProfession = configfile.GetValue<bool>("RenameWithProfession");
-                EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer");
-                ShowToolTips = configfile.GetValue<bool>("ShowToolTips");
-                ManifestToolTips = configfile.GetValue<bool>("ManifestToolTips");
-                TransferToolTips = configfile.GetValue<bool>("TransferToolTips");
-                SettingsToolTips = configfile.GetValue<bool>("SettingsToolTips");
-                RosterToolTips = configfile.GetValue<bool>("RosterToolTips");
-                HatchToolTips = configfile.GetValue<bool>("HatchToolTips");
-                PanelToolTips = configfile.GetValue<bool>("PanelToolTips");
-                DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips");
+                IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec", IVATimeDelaySec);
+                ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
+                AutoDebug = configfile.GetValue<bool>("AutoDebug", AutoDebug);
+                DebugLogPath = configfile.GetValue<string>("DebugLogPath", DebugLogPath);
+                ErrorLogLength = configfile.GetValue<string>("ErrorLogLength", ErrorLogLength);
+                SaveLogOnExit = configfile.GetValue<bool>("SaveLogOnExit", SaveLogOnExit);
+                EnableKerbalRename = configfile.GetValue<bool>("EnableKerbalRename", EnableKerbalRename);
+                RenameWithProfession = configfile.GetValue<bool>("RenameWithProfession", RenameWithProfession);
+                EnableTextureReplacer = configfile.GetValue<bool>("EnableTextureReplacer", EnableTextureReplacer);
+                ShowToolTips = configfile.GetValue<bool>("ShowToolTips", ShowToolTips);
+                ManifestToolTips = configfile.GetValue<bool>("ManifestToolTips", ManifestToolTips);
+                TransferToolTips = configfile.GetValue<bool>("TransferToolTips", TransferToolTips);
+                SettingsToolTips = configfile.GetValue<bool>("SettingsToolTips", SettingsToolTips);
+                RosterToolTips = configfile.GetValue<bool>("RosterToolTips", RosterToolTips);
+                HatchToolTips = configfile.GetValue<bool>("HatchToolTips", HatchToolTips);
+                PanelToolTips = configfile.GetValue<bool>("PanelToolTips", PanelToolTips);
+                DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips", DebuggerToolTips);
+
+                // Lets make sure that the windows can be seen on the screen. (different resolutions)
+                ResetWindowPositions();
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -286,13 +298,6 @@ namespace ShipManifest
                     CrewSoundRun = "ShipManifest/Sounds/14214-2";
                 if (CrewSoundStop == "")
                     CrewSoundStop = "ShipManifest/Sounds/14214-3";
-
-                if (!Colors.Keys.Contains(SourcePartColor))
-                    SourcePartColor = "red";
-                if (!Colors.Keys.Contains(TargetPartColor))
-                    SourcePartColor = "green";
-                if (!Colors.Keys.Contains(HatchColor))
-                    SourcePartColor = "cyan";
 
                 Utilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
@@ -321,7 +326,6 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchColor Loaded: {0}", HatchColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchOpenColor Loaded: {0}", HatchOpenColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchCloseColor Loaded: {0}", HatchCloseColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("PanelExtendedColor Loaded: {0}", PanelExtendedColor), "Info", VerboseLogging);
@@ -352,7 +356,6 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("DebuggerToolTips Loaded: {0}", DebuggerToolTips), "Info", VerboseLogging);
                 Utilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
 
-                ValidateLoad();
             }
             catch (Exception ex)
             {
@@ -360,40 +363,43 @@ namespace ShipManifest
             }
         }
 
-        private static void ValidateLoad()
+        private static void ResetWindowPositions()
         {
-
-            //ShowDebugger = configfile.GetValue<bool>("ShowDebugger");
-            //RealismMode = configfile.GetValue<bool>("RealismMode");
-            //LockSettings = configfile.GetValue<bool>("LockSettings");
-            //VerboseLogging = configfile.GetValue<bool>("VerboseLogging");
-            //AutoSave = configfile.GetValue<bool>("AutoSave");
-            //SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec");
-            //FlowRate = (float)configfile.GetValue<double>("FlowRate");
-            //MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate");
-            //MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate");
-            //PumpSoundStart = configfile.GetValue<string>("PumpSoundStart");
-            //PumpSoundRun = configfile.GetValue<string>("PumpSoundRun");
-            //PumpSoundStop = configfile.GetValue<string>("PumpSoundStop");
-            //CrewSoundStart = configfile.GetValue<string>("CrewSoundStart");
-            //CrewSoundRun = configfile.GetValue<string>("CrewSoundRun");
-            //CrewSoundStop = configfile.GetValue<string>("CrewSoundStop");
-
-            //SourcePartColor = configfile.GetValue<string>("SourcePartColor");
-            //TargetPartColor = configfile.GetValue<string>("TargetPartColor");
-            //TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor");
-
-            //EnableScience = configfile.GetValue<bool>("EnableScience");
-            //EnableCrew = configfile.GetValue<bool>("EnableCrew");
-            //EnablePFResources = configfile.GetValue<bool>("EnablePFResources");
-            //EnableCLS = configfile.GetValue<bool>("EnableCLS");
-
-            //DebugLogPath = configfile.GetValue<string>("DebugLogPath");
-
-            //IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec");
-            //ShowIVAUpdateBtn = configfile.GetValue<bool>("ShowIVAUpdateBtn");
-            //AutoDebug = configfile.GetValue<bool>("AutoDebug");
-
+            if (ManifestPosition.xMax > Screen.currentResolution.width || ManifestPosition.yMax > Screen.currentResolution.height)
+            {
+                ManifestPosition.x = 0;
+                ManifestPosition.y = 0;
+            }
+            if (TransferPosition.xMax > Screen.currentResolution.width || TransferPosition.yMax > Screen.currentResolution.height)
+            {
+                TransferPosition.x = 0;
+                TransferPosition.y = 0;
+            }
+            if (DebuggerPosition.xMax > Screen.currentResolution.width || DebuggerPosition.yMax > Screen.currentResolution.height)
+            {
+                DebuggerPosition.x = 0;
+                DebuggerPosition.y = 0;
+            }
+            if (SettingsPosition.xMax > Screen.currentResolution.width || SettingsPosition.yMax > Screen.currentResolution.height)
+            {
+                SettingsPosition.x = 0;
+                SettingsPosition.y = 0;
+            }
+            if (HatchPosition.xMax > Screen.currentResolution.width || HatchPosition.yMax > Screen.currentResolution.height)
+            {
+                HatchPosition.x = 0;
+                HatchPosition.y = 0;
+            }
+            if (PanelPosition.xMax > Screen.currentResolution.width || PanelPosition.yMax > Screen.currentResolution.height)
+            {
+                PanelPosition.x = 0;
+                PanelPosition.y = 0;
+            }
+            if (RosterPosition.xMax > Screen.currentResolution.width || RosterPosition.yMax > Screen.currentResolution.height)
+            {
+                RosterPosition.x = 0;
+                RosterPosition.y = 0;
+            }
         }
 
         internal static void Save()
@@ -431,7 +437,6 @@ namespace ShipManifest
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
-                configfile.SetValue("HatchColor", HatchColor);
                 configfile.SetValue("HatchOpenColor", HatchOpenColor);
                 configfile.SetValue("HatchCloseColor", HatchCloseColor);
                 configfile.SetValue("PanelExtendedColor", PanelExtendedColor);
@@ -496,7 +501,6 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchColor Saved: {0}", HatchColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchOpenColor Saved: {0}", HatchOpenColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("HatchCloseColor Saved: {0}", HatchCloseColor), "Info", VerboseLogging);
                 Utilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
