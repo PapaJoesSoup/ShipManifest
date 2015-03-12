@@ -115,9 +115,6 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="ShipManifest.version" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-0-90-0\KSP_win\GameData\ShipManifest\Plugins\"</PostBuildEvent>
