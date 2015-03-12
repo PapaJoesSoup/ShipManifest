@@ -77,7 +77,7 @@
     <Compile Include="Hatch.cs" />
     <Compile Include="WindowHatch.cs" />
     <Compile Include="ManifestStyle.cs" />
-    <Compile Include="Models.cs" />
+    <Compile Include="KerbalModel.cs" />
     <Compile Include="WindowRoster.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="WindowSettings.cs" />

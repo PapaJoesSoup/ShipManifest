@@ -359,7 +359,7 @@ namespace ShipManifest
                     if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                     {
                         ToolTip = "";
-                        TransferCrewMember(crewMember, SelectedPartSource, SelectedPartSource);
+                        TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartSource);
                     }
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
@@ -379,7 +379,8 @@ namespace ShipManifest
 
                 if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                 {
-                    TransferCrewMember(crewMember, SelectedPartSource, SelectedPartTarget);
+                    SMAddon.smController.CrewXferMember = crewMember;
+                    TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartTarget);
                 }
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 {
@@ -700,16 +701,24 @@ namespace ShipManifest
             }
         }
 
-        private static void TransferCrewMember(ProtoCrewMember sourceMember, Part sourcePart, Part targetPart)
+        internal static void TransferCrewMemberBegin (ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
+        {
+            SMAddon.smController.CrewXferSource = sourcePart;
+            SMAddon.smController.CrewXferTarget = targetPart;
+            SMAddon.smController.CrewXferMember = crewMember;
+            SMAddon.crewXfer = true;
+        }
+
+        internal static void TransferCrewMemberComplete(ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
         {
             try
             {
                 if (sourcePart.internalModel != null && targetPart.internalModel != null)
                 {
                     // Build source and target seat indexes.
-                    int curIdx = sourceMember.seatIdx;
+                    int curIdx = crewMember.seatIdx;
                     int newIdx = curIdx;
-                    InternalSeat sourceSeat = sourceMember.seat;
+                    InternalSeat sourceSeat = crewMember.seat;
                     InternalSeat targetSeat = null;
                     if (sourcePart == targetPart)
                     {
@@ -755,36 +764,34 @@ namespace ShipManifest
                         ProtoCrewMember targetMember = targetSeat.kerbalRef.protoCrewMember;
 
                         // Remove the crew members from the part(s)...
-                        SMController.RemoveCrew(sourceMember, sourcePart);
-                        SMController.RemoveCrew(targetMember, targetPart);
-
-                        // At this point, the kerbals are in the "ether".
-                        // this may be why there is an issue with refreshing the internal view.. 
-                        // It may allow (or expect) a board call from an (invisible) eva object.   
-                        // If I can manage to properly trigger that call... then all should properly refresh...
-                        // I'll look into that...
+                        SMController.RemoveCrewMember(crewMember, sourcePart);
+                        SMController.RemoveCrewMember(targetMember, targetPart);
 
                         // Update:  Thanks to Extraplanetary LaunchPads for helping me solve this problem!
                         // Send the kerbal(s) eva.  This is the eva trigger I was looking for
                         // We will fie the board event when we are ready, in the update code.
-                        SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
-                        if (Settings.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
+                        //if (Settings.EnableTextureReplacer)
+                        //{
+                        //    SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        //    GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
+                        //}
 
                         // Add the crew members back into the part(s) at their new seats.
                         sourcePart.AddCrewmemberAt(targetMember, curIdx);
-                        targetPart.AddCrewmemberAt(sourceMember, newIdx);
+                        targetPart.AddCrewmemberAt(crewMember, newIdx);
                     }
                     else
                     {
                         // Just move.
-                        SMController.RemoveCrew(sourceMember, sourcePart);
-                        SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        SMController.RemoveCrewMember(crewMember, sourcePart);
 
-                        if (Settings.EnableTextureReplacer)
-                            GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
+                        //if (Settings.EnableTextureReplacer)
+                        //{                             
+                        //    SMAddon.smController.evaAction = new GameEvents.FromToAction<Part, Part>(sourcePart, targetPart);
+                        //    GameEvents.onCrewOnEva.Fire(SMAddon.smController.evaAction);
+                        //}
 
-                        targetPart.AddCrewmemberAt(sourceMember, newIdx);
+                        targetPart.AddCrewmemberAt(crewMember, newIdx);
                     }
 
                     // if moving within a part, set the seat2seat flag
@@ -792,17 +799,14 @@ namespace ShipManifest
                         SMAddon.isSeat2Seat = true;
                     else
                         SMAddon.isSeat2Seat = false;
-
-                    // set the crew transfer flag and wait forthe timeout before firing the board event.
-                    SMAddon.crewXfer = true;
                 }
                 else
                 {
                     // no portraits, so let's just move kerbals...
-                    SMController.RemoveCrew(sourceMember, sourcePart);
-                    SMController.AddCrew(sourceMember, targetPart);
-                    SMAddon.crewXfer = true;
+                    SMController.RemoveCrewMember(crewMember, sourcePart);
+                    SMController.AddCrewMember(crewMember, targetPart);
                 }
+                SMAddon.smController.RespawnCrew();
             }
             catch (Exception ex)
             {
@@ -894,8 +898,8 @@ namespace ShipManifest
                         else
                             SMAddon.XferMode = SMAddon.XFERMode.TargetToSource;
 
-                        // Calculate the actual flow rate, based on user settings...
-                        SMAddon.act_flow_rate = CalcActFlowRate(XferAmount);
+                        // Calculate the actual flow rate, based on source capacity and max flow time setting...
+                        SMAddon.act_flow_rate = CalcActFlowRate(source.Resources[SMAddon.smController.SelectedResource].maxAmount);
 
                         // Start the process
                         SMAddon.XferOn = true;

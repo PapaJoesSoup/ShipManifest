@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using KSP.IO;
+using System.Reflection;
 
 namespace ShipManifest
 {
@@ -13,7 +14,9 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string CurVersion = "0.90.0_4.1.2";
+        internal static string KSP_Ver = Versioning.GetVersionString();
+        internal static string SM_Ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        internal static string CurVersion = KSP_Ver + "_" + SM_Ver;
 
         // Persisted properties
         // Window Positions
@@ -32,6 +35,7 @@ namespace ShipManifest
         internal static bool EnableResources = true;
         internal static bool EnablePFResources = true;
         internal static bool EnableCLS = true;
+        internal static bool OverrideStockCrewXfer = true;
 
         //Resource Xfer flow rate options
         internal static float FlowRate = 100;
@@ -74,7 +78,7 @@ namespace ShipManifest
         internal static double CrewSoundVol = 3;
 
         internal static string ErrorLogLength = "1000";
-        internal static double IVATimeDelaySec = 5;
+        internal static double IVATimeDelaySec = 7;
         internal static bool ShowIVAUpdateBtn = false;
 
         // Tooltip Options
@@ -114,6 +118,7 @@ namespace ShipManifest
         internal static bool prevEnableCLSHighlighting = true;
         internal static bool prevEnableScience = true;
         internal static bool prevEnableCrew = true;
+        internal static bool prevOverrideStockCrewXfer = true;
         internal static bool prevEnablePFResources = true;
         internal static bool prevEnableCLS = true;
         internal static bool prevEnableBlizzyToolbar = false;
@@ -252,6 +257,7 @@ namespace ShipManifest
                 EnableResources = configfile.GetValue<bool>("EnableResources", EnableResources);
                 EnablePFResources = configfile.GetValue<bool>("EnablePFResources", EnablePFResources);
                 EnableCLS = configfile.GetValue<bool>("EnableCLS", EnableCLS);
+                OverrideStockCrewXfer = configfile.GetValue<bool>("OverrideStockCrewXfer", OverrideStockCrewXfer);
                 EnableBlizzyToolbar = configfile.GetValue<bool>("EnableBlizzyToolbar", EnableBlizzyToolbar);
 
                 IVATimeDelaySec = configfile.GetValue<double>("IVATimeDelaySec", IVATimeDelaySec);
@@ -299,62 +305,7 @@ namespace ShipManifest
                 if (CrewSoundStop == "")
                     CrewSoundStop = "ShipManifest/Sounds/14214-3";
 
-                Utilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchPosition Loaded: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("LockSettings Loaded: {0}", LockSettings.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SaveIntervalSec Loaded: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MaxFlowTimeSec Loaded: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundVol Loaded: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundStart Loaded: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundRun Loaded: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundStop Loaded: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundVol Loaded: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchOpenColor Loaded: {0}", HatchOpenColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchCloseColor Loaded: {0}", HatchCloseColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PanelExtendedColor Loaded: {0}", PanelExtendedColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PanelRetractedColor Loaded: {0}", PanelRetractedColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCLSHighlighting Loaded: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableResources Loaded: {0}", EnableResources), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCLS Loaded: {0}", EnableCLS), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ErrorLogLength Loaded: {0}", ErrorLogLength), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SaveLogOnExit Loaded: {0}", SaveLogOnExit), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableKerbalRename Loaded: {0}", EnableKerbalRename), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RenameWithProfession Loaded: {0}", RenameWithProfession), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowToolTips Loaded: {0}", ShowToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ManifestToolTips Loaded: {0}", ManifestToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TransferToolTips Loaded: {0}", TransferToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SettingsToolTips Loaded: {0}", SettingsToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RosterToolTips Loaded: {0}", RosterToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchToolTips Loaded: {0}", HatchToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("DebuggerToolTips Loaded: {0}", DebuggerToolTips), "Info", VerboseLogging);
-                Utilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
+                LogSettingsLoad();
 
             }
             catch (Exception ex)
@@ -450,6 +401,7 @@ namespace ShipManifest
                 configfile.SetValue("EnableResources", EnableResources);
                 configfile.SetValue("EnablePFResources", EnablePFResources);
                 configfile.SetValue("EnableCLS", EnableCLS);
+                configfile.SetValue("OverrideStockCrewXfer", OverrideStockCrewXfer);
 
                 configfile.SetValue("DebugLogPath", DebugLogPath);
 
@@ -473,61 +425,7 @@ namespace ShipManifest
 
                 configfile.save();
 
-                Utilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchPosition Saved: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PanelPosition Saved: {0}, {1}, {2}, {3}", PanelPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SaveIntervalSec Saved: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("MaxFlowTimeSec Saved: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("PumpSoundVol Saved: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundStart Saved: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundRun Saved: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundStop Saved: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("CrewSoundVol Saved: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchOpenColor Saved: {0}", HatchOpenColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchCloseColor Saved: {0}", HatchCloseColor), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("OnlySourceTarget Saved: {0}", OnlySourceTarget), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCLSHighlighting Saved: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableCLS Saved: {0}", EnableCLS), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ErrorListLength Saved: {0}", ErrorLogLength.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SaveLogOnExit Saved: {0}", SaveLogOnExit.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableKerbalRename Saved: {0}", EnableKerbalRename.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RenameWithProfession Saved: {0}", RenameWithProfession.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ShowToolTips Saved: {0}", ShowToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("ManifestToolTips Saved: {0}", ManifestToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("TransferToolTips Saved: {0}", TransferToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("SettingsToolTips Saved: {0}", SettingsToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("RosterToolTips Saved: {0}", RosterToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("HatchToolTips Saved: {0}", HatchToolTips.ToString()), "Info", VerboseLogging);
-                Utilities.LogMessage(string.Format("DebuggerToolTips Saved: {0}", DebuggerToolTips.ToString()), "Info", VerboseLogging);
+                LogSettingsSave();
             }
             catch (Exception ex)
             {
@@ -575,6 +473,7 @@ namespace ShipManifest
             prevEnableCrew = EnableCrew;
             prevEnablePFResources = EnablePFResources;
             prevEnableCLS = EnableCLS;
+            prevOverrideStockCrewXfer = OverrideStockCrewXfer;
             prevEnableKerbalRename = EnableKerbalRename;
             prevRenameWithProfession = RenameWithProfession;
             prevEnableTextureReplacer = EnableTextureReplacer;
@@ -620,6 +519,7 @@ namespace ShipManifest
             EnableCrew = prevEnableCrew;
             EnablePFResources = prevEnablePFResources;
             EnableCLS = prevEnableCLS;
+            OverrideStockCrewXfer = prevOverrideStockCrewXfer;
             EnableKerbalRename = prevEnableKerbalRename;
             RenameWithProfession = prevRenameWithProfession;
             EnableTextureReplacer = prevEnableTextureReplacer;
@@ -637,6 +537,127 @@ namespace ShipManifest
 
             //debugger Settings
             prevErrorLogLength = ErrorLogLength;
+        }
+
+        private static void LogSettingsLoad()
+        {
+            Utilities.LogMessage(string.Format("ManifestPosition Loaded: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TransferPosition Loaded: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchPosition Loaded: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("LockSettings Loaded: {0}", LockSettings.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("VerboseLogging Loaded: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SaveIntervalSec Loaded: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MaxFlowTimeSec Loaded: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundVol Loaded: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundStart Loaded: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundRun Loaded: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundStop Loaded: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundVol Loaded: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchOpenColor Loaded: {0}", HatchOpenColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchCloseColor Loaded: {0}", HatchCloseColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PanelExtendedColor Loaded: {0}", PanelExtendedColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PanelRetractedColor Loaded: {0}", PanelRetractedColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCLSHighlighting Loaded: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableScience Loaded: {0}", EnableScience), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableResources Loaded: {0}", EnableResources), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnablePFResources Loaded: {0}", EnablePFResources), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCLS Loaded: {0}", EnableCLS), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("OverrideStockCrewXfer Loaded: {0}", OverrideStockCrewXfer), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("IVATimeDelaySec Loaded: {0}", IVATimeDelaySec), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowIVAUpdateBtn Loaded: {0}", ShowIVAUpdateBtn), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AutoDebug Loaded: {0}", AutoDebug), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ErrorLogLength Loaded: {0}", ErrorLogLength), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SaveLogOnExit Loaded: {0}", SaveLogOnExit), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableKerbalRename Loaded: {0}", EnableKerbalRename), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RenameWithProfession Loaded: {0}", RenameWithProfession), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableTextureReplacer Loaded: {0}", EnableTextureReplacer), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableBlizzyToolbar Loaded: {0}", EnableBlizzyToolbar), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowToolTips Loaded: {0}", ShowToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ManifestToolTips Loaded: {0}", ManifestToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TransferToolTips Loaded: {0}", TransferToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SettingsToolTips Loaded: {0}", SettingsToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RosterToolTips Loaded: {0}", RosterToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchToolTips Loaded: {0}", HatchToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("DebuggerToolTips Loaded: {0}", DebuggerToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
+        }
+
+        private static void LogSettingsSave()
+        {
+            Utilities.LogMessage(string.Format("ManifestPosition Saved: {0}, {1}, {2}, {3}", ManifestPosition.xMin, ManifestPosition.xMax, ManifestPosition.yMin, ManifestPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TransferPosition Saved: {0}, {1}, {2}, {3}", TransferPosition.xMin, TransferPosition.xMax, TransferPosition.yMin, TransferPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchPosition Saved: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PanelPosition Saved: {0}, {1}, {2}, {3}", PanelPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("VerboseLogging Saved: {0}", VerboseLogging.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SaveIntervalSec Saved: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MaxFlowTimeSec Saved: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PumpSoundVol Saved: {0}", PumpSoundVol.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundStart Saved: {0}", CrewSoundStart.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundRun Saved: {0}", CrewSoundRun.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundStop Saved: {0}", CrewSoundStop.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("CrewSoundVol Saved: {0}", CrewSoundVol.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchOpenColor Saved: {0}", HatchOpenColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchCloseColor Saved: {0}", HatchCloseColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("OnlySourceTarget Saved: {0}", OnlySourceTarget), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCLSHighlighting Saved: {0}", EnableCLSHighlighting), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCrew Saved: {0}", EnableCrew), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableScience Saved: {0}", EnableScience.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableResources Saved: {0}", EnableResources), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnablePFResources Saved: {0}", EnablePFResources), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableCLS Saved: {0}", EnableCLS), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("OverrideStockCrewXfer Saved: {0}", OverrideStockCrewXfer), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("DebugLogPath Saved: {0}", DebugLogPath.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("IVATimeDelaySec Saved: {0}", IVATimeDelaySec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowIVAUpdateBtn Saved: {0}", ShowIVAUpdateBtn.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AutoDebug Saved: {0}", AutoDebug.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ErrorListLength Saved: {0}", ErrorLogLength.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SaveLogOnExit Saved: {0}", SaveLogOnExit.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableKerbalRename Saved: {0}", EnableKerbalRename.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RenameWithProfession Saved: {0}", RenameWithProfession.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableTextureReplacer Saved: {0}", EnableTextureReplacer.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableBlizzyToolbar Saved: {0}", EnableBlizzyToolbar.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ShowToolTips Saved: {0}", ShowToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ManifestToolTips Saved: {0}", ManifestToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("TransferToolTips Saved: {0}", TransferToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("SettingsToolTips Saved: {0}", SettingsToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("RosterToolTips Saved: {0}", RosterToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchToolTips Saved: {0}", HatchToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("DebuggerToolTips Saved: {0}", DebuggerToolTips.ToString()), "Info", VerboseLogging);
         }
 
         #endregion

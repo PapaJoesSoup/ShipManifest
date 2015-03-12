@@ -32,7 +32,7 @@ namespace ShipManifest
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
             }
-            Rect rect = new Rect(304, 4, 16, 16);
+            Rect rect = new Rect(300, 4, 16, 16);
             if (GUI.Button(rect, label))
             {
                 SMAddon.OnSMButtonToggle();
@@ -198,7 +198,8 @@ namespace ShipManifest
                                 if (SMAddon.smController.SelectedResource != resourceName)
                                 {
                                     SMAddon.smController.SelectedResource = resourceName;
-                                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                                    if (!SMAddon.smController.SelectedPartSource.Resources.Contains(resourceName) || !SMAddon.smController.SelectedPartTarget.Resources.Contains(resourceName))
+                                        SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                                 }
                                 else if (SMAddon.smController.SelectedResource == resourceName)
                                 {

@@ -54,6 +54,7 @@ namespace ShipManifest
 
         // crew xfer vars
         internal static bool crewXfer = false;
+        internal static bool stockXfer = false;
         internal static double crewXferDelaySec = Settings.IVATimeDelaySec;
         internal static bool isSeat2Seat = false;
         internal static double Seat2SeatXferDelaySec = 2;
@@ -89,8 +90,10 @@ namespace ShipManifest
                 _hatches = value;
             }
         }
-        
+
         #region Event handlers
+
+        void DummyHandler() { }
 
         // Addon state event handlers
         internal void Awake()
@@ -173,6 +176,7 @@ namespace ShipManifest
                     GameEvents.onVesselLoaded.Add(OnVesselLoaded);
                     GameEvents.onVesselTerminated.Add(OnVesselTerminated);
                     GameEvents.onFlightReady.Add(OnFlightReady);
+                    GameEvents.onCrewTransferred.Add(OnCrewTransferred);
 
                     // get the current Vessel data
                     vessel = FlightGlobals.ActiveVessel;
@@ -200,88 +204,6 @@ namespace ShipManifest
                 Utilities.LogMessage("Error in:  ShipManifestAddon.Start.  " + ex.ToString(), "Error", true);
             }
         }
-        internal void OnGUI()
-        {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
-            try
-            {
-                Display();
-
-                Utilities.ShowToolTips();
-
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUI.  " + ex.ToString(), "Error", true);
-            }
-        }
-        internal void Update()
-        {
-            try
-            {
-                CheckForToolbarTypeToggle();
-
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT)
-                {
-                    if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
-                    {
-                        //Instantiate the controller for the active vessel.
-
-                        smController = SMController.GetInstance(vessel);
-                        smController.CanDrawButton = true;
-                        UpdateHighlighting();
-
-                        // Realism Mode Resource transfer operation (real time)
-                        // XferOn is flagged in the Resource Controller
-                        if (XferOn)
-                        {
-                            RealModePumpXfer();
-                        }
-
-                        if (crewXfer)
-                        {
-                            RealModeCrewXfer();
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!frameErrTripped)
-                {
-                    Utilities.LogMessage(string.Format(" in Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    frameErrTripped = true;
-                }
-            }
-        }
-
-        void DummyVoid() { }
-
-        //Vessel state handlers
-        internal void OnVesselWasModified(Vessel modVessel)
-        {
-            Utilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
-            try
-            {
-                UpdateSMcontroller(modVessel);
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselWasModified.  " + ex.ToString(), "Error", true);
-            }
-        }
-        internal void OnVesselChange(Vessel newVessel)
-        {
-            Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
-            try
-            {
-                UpdateSMcontroller(newVessel);
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
         internal void OnDestroy()
         {
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
@@ -302,6 +224,7 @@ namespace ShipManifest
                 GameEvents.onVesselTerminated.Remove(OnVesselTerminated);
                 GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
                 GameEvents.onFlightReady.Remove(OnFlightReady);
+                GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
 
                 CancelInvoke("RunSave");
 
@@ -348,6 +271,125 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  ShipManifestAddon.OnDestroy.  " + ex.ToString(), "Error", true);
+            }
+        }
+        internal void OnGUI()
+        {
+            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
+            try
+            {
+                Display();
+
+                Utilities.ShowToolTips();
+
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUI.  " + ex.ToString(), "Error", true);
+            }
+        }
+        internal void Update()
+        {
+            try
+            {
+                CheckForToolbarTypeToggle();
+
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+                {
+                    if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
+                    {
+                        //Instantiate the controller for the active vessel.
+                        smController = SMController.GetInstance(vessel);
+                        smController.CanDrawButton = true;
+                        UpdateHighlighting();
+
+                        // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
+                        if (stockXfer && !crewXfer)
+                        {
+                            smController.CrewXferTarget.RemoveCrewmember(smController.CrewXferMember);
+                            smController.CrewXferSource.AddCrewmember(smController.CrewXferMember);
+                            smController.RespawnCrew();
+                            WindowTransfer.TransferCrewMemberBegin(smController.CrewXferMember, smController.CrewXferSource, smController.CrewXferTarget);
+                        }
+               
+                        // Realism Mode Resource transfer operation (real time)
+                        // XferOn is flagged in the Resource Controller
+                        if (XferOn)
+                            RealModePumpXfer();
+
+                        // Realism Mode Crew transfer operation (real time)
+                        // XferOn is flagged in the Resource Controller
+                        if (crewXfer)
+                            RealModeCrewXfer();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    frameErrTripped = true;
+                }
+            }
+        }
+
+        // Crew Event handlers
+        internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
+        {
+            if (!Settings.OverrideStockCrewXfer ||
+                action.to.Modules.Cast<PartModule>().Any(x => x is KerbalEVA) ||
+                action.from.Modules.Cast<PartModule>().Any(x => x is KerbalEVA))
+            {
+                // Non override and EVAs require no action
+                return;
+            }
+
+            // store data from event.
+            smController.CrewXferSource = action.from;
+            smController.CrewXferTarget = action.to;
+            smController.CrewXferMember = action.host;
+            if (smController.CrewXferSource != null && smController.CrewXferTarget != null)
+            {
+
+                var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+
+                // Remove the transfer message that stock displayed. 
+                var messages = FindObjectOfType<ScreenMessages>();
+                if (messages != null)
+                {
+                    var messagesToRemove = messages.activeMessages.Where(x => x.startTime == message.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+                    foreach (var m in messagesToRemove)
+                        ScreenMessages.RemoveMessage(m);
+                }
+                stockXfer = true;
+                //smController.RespawnCrew();
+            }
+        }
+
+        //Vessel state handlers
+        internal void OnVesselWasModified(Vessel modVessel)
+        {
+            Utilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
+            try
+            {
+                UpdateSMcontroller(modVessel);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselWasModified.  " + ex.ToString(), "Error", true);
+            }
+        }
+        internal void OnVesselChange(Vessel newVessel)
+        {
+            Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
+            try
+            {
+                UpdateSMcontroller(newVessel);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
         private void OnFlightReady()
@@ -543,10 +585,10 @@ namespace ShipManifest
                     SMButton_Stock = ApplicationLauncher.Instance.AddModApplication(
                         OnSMButtonToggle,
                         OnSMButtonToggle,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
                         ApplicationLauncher.AppScenes.FLIGHT,
                         (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
 
@@ -561,10 +603,10 @@ namespace ShipManifest
                     SMSettings_Stock = ApplicationLauncher.Instance.AddModApplication(
                         OnSMSettingsToggle,
                         OnSMSettingsToggle,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
                         ApplicationLauncher.AppScenes.SPACECENTER,
                         (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
 
@@ -579,10 +621,10 @@ namespace ShipManifest
                     SMRoster_Stock = ApplicationLauncher.Instance.AddModApplication(
                         OnSMRosterToggle,
                         OnSMRosterToggle,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
-                        DummyVoid,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
+                        DummyHandler,
                         ApplicationLauncher.AppScenes.SPACECENTER,
                         (Texture)GameDatabase.Instance.GetTexture(ImageFolder + Iconfile, false));
 
@@ -862,7 +904,7 @@ namespace ShipManifest
 
                         // kill selected resource and its associated highlighting.
                         smController.SelectedResource = null;
-                        smController.SelectedResourceParts = null;
+                        //smController.SelectedResourceParts = null;
                         Utilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", Settings.VerboseLogging);
                     }
                 }
@@ -1290,6 +1332,9 @@ namespace ShipManifest
             {
                 if (crewXfer)
                 {
+                    Part PartSource = smController.CrewXferSource;
+                    Part PartTarget = smController.CrewXferTarget;
+                    ProtoCrewMember pKerbal = smController.CrewXferMember;
                     if (!Settings.RealismMode)
                     {
                         if (timestamp != 0)
@@ -1298,17 +1343,17 @@ namespace ShipManifest
                         if (elapsed > 1)
                         {
                             // Fire Board event for Texture Replacer.
-                            if (Settings.EnableTextureReplacer)
-                                GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
+                            //if (Settings.EnableTextureReplacer)
+                                //GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
 
                             // Spawn crew in parts and in vessel.
-                            if (smController.SelectedPartSource == null)
-                                smController.SelectedPartSource = smController.SelectedPartTarget;
-                            if (smController.SelectedPartTarget == null)
-                                smController.SelectedPartTarget = smController.SelectedPartSource;
+                            if (PartSource == null)
+                                PartSource = PartTarget;
+                            if (PartTarget == null)
+                                PartTarget = PartSource;
 
-                            smController.SelectedPartSource.vessel.SpawnCrew();
-                            smController.SelectedPartTarget.vessel.SpawnCrew();
+                            PartSource.vessel.SpawnCrew();
+                            PartTarget.vessel.SpawnCrew();
                             smController.RespawnCrew();
 
                             FireEventTriggers();
@@ -1364,31 +1409,33 @@ namespace ShipManifest
 
                             case XFERState.Stop:
 
-                                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", Settings.VerboseLogging);
-
                                 // Spawn crew in parts and in vessel.
-                                if (smController.SelectedPartSource == null)
-                                    smController.SelectedPartSource = smController.SelectedPartTarget;
-                                if (smController.SelectedPartTarget == null)
-                                    smController.SelectedPartTarget = smController.SelectedPartSource;
+                                if (PartSource == null)
+                                    PartSource = PartTarget;
+                                if (PartTarget == null)
+                                    PartTarget = PartSource;
 
-                                smController.SelectedPartSource.vessel.SpawnCrew();
-                                smController.SelectedPartTarget.vessel.SpawnCrew();
-                                smController.RespawnCrew();
                                 // play crew sit.
                                 source2.Stop();
                                 source3.Play();
                                 SMAddon.timestamp = elapsed = 0;
                                 XferState = XFERState.Off;
+                                WindowTransfer.TransferCrewMemberComplete(smController.CrewXferMember, PartSource, PartTarget);
                                 crewXfer = false;
                                 isSeat2Seat = false;
+                                if (stockXfer)
+                                { 
+                                    var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+                                    ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", smController.CrewXferMember.name, PartTarget.partInfo.title), message, true);
+                                }
+                                stockXfer = false;
 
                                 // Fire Board event for Texture Replacer.
-                                if (Settings.EnableTextureReplacer)
-                                    GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
+                                //if (Settings.EnableTextureReplacer)
+                                //    GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
 
                                 // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
-                                FireEventTriggers();
+                                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", Settings.VerboseLogging);
                                 break;
                         }
                         Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
@@ -1604,11 +1651,14 @@ namespace ShipManifest
                             partColor = Color.green;
 
                         step = "Set Resource Part Colors";
-                        foreach (Part thispart in smController.SelectedResourceParts)
+                        if (smController.SelectedResource != null && smController.SelectedResource != "")
                         {
-                            if (thispart != smController.SelectedPartSource && thispart != smController.SelectedPartTarget && !Settings.OnlySourceTarget)
+                            foreach (Part thispart in smController._partsByResource[smController.SelectedResource])
                             {
-                                SetPartHighlight(thispart, partColor);
+                                if (thispart != smController.SelectedPartSource && thispart != smController.SelectedPartTarget && !Settings.OnlySourceTarget)
+                                {
+                                    SetPartHighlight(thispart, partColor);
+                                }
                             }
                         }
                     }

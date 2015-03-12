@@ -14,6 +14,7 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = Settings.SettingsToolTips;
+        internal static string txtSaveInterval = Settings.SaveIntervalSec.ToString();
 
         private static Vector2 ScrollViewerPosition = Vector2.zero;
         internal static void Display(int windowId)
@@ -40,6 +41,8 @@ namespace ShipManifest
             Settings.StoreTempSettings();
 
             GUILayout.BeginVertical();
+            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
+            GUILayout.BeginVertical();
 
             DisplayOptions();
 
@@ -52,6 +55,23 @@ namespace ShipManifest
             DisplayConfiguration();
 
             GUILayout.EndVertical();
+            GUILayout.EndScrollView();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Save"))
+            {
+                Settings.SaveIntervalSec = float.Parse(txtSaveInterval);
+                Settings.Save();
+                Settings.ShowSettings = false;
+            }
+            if (GUILayout.Button("Cancel"))
+            {
+                // We've canclled, so restore original settings.
+                Settings.RestoreTempSettings();
+                Settings.ShowSettings = false;
+            }
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
 
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
@@ -62,7 +82,6 @@ namespace ShipManifest
             string label = "";
             string toolTip = "";
 
-            string txtSaveInterval = Settings.SaveIntervalSec.ToString();
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             GUILayout.Label("Configuraton", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
@@ -81,8 +100,8 @@ namespace ShipManifest
 
             GUI.enabled = true;
             // TextureReplacer Mode
-            label = "Enable Texture Replacer Events";
-            Settings.EnableTextureReplacer = GUILayout.Toggle(Settings.EnableTextureReplacer, label, GUILayout.Width(300));
+            //label = "Enable Texture Replacer Events";
+            //Settings.EnableTextureReplacer = GUILayout.Toggle(Settings.EnableTextureReplacer, label, GUILayout.Width(300));
 
             label = "Enable Debug Window";
             Settings.ShowDebugger = GUILayout.Toggle(Settings.ShowDebugger, label, GUILayout.Width(300));
@@ -132,23 +151,6 @@ namespace ShipManifest
             GUILayout.Label("(sec)", GUILayout.Width(40));
             GUILayout.EndHorizontal();
 
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save"))
-            {
-                Settings.SaveIntervalSec = float.Parse(txtSaveInterval);
-                Settings.Save();
-                Settings.ShowSettings = false;
-            }
-            if (GUILayout.Button("Cancel"))
-            {
-                // We've canclled, so restore original settings.
-                Settings.RestoreTempSettings();
-                Settings.ShowSettings = false;
-            }
-            GUILayout.EndHorizontal();
         }
 
         private static void DisplaySounds()
@@ -314,8 +316,6 @@ namespace ShipManifest
         private static void DisplayOptions()
         {
             Rect rect = new Rect();
-            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
-            GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             if (!Settings.LockSettings)
@@ -353,6 +353,18 @@ namespace ShipManifest
                     Settings.ShowTransferWindow = false;
                 }
             }
+
+            // Enable stock Crew Xfer Override
+            GUI.enabled = isEnabled;
+            GUILayout.BeginHorizontal();
+            guiLabel = new GUIContent("Override Stock Crew Xfers", "Turns on/off Overriding the stock Crew Transfer mechanism with the SM style.\r\nWhen ON (along with Realism Mode),\r\nstock crew transfers (Tweakable) will behave like SM style transfers.\r\nWhen Off (or Realism is off), Stock Crew transfers behave normally.");
+            GUILayout.Space(20);
+            Settings.OverrideStockCrewXfer = GUILayout.Toggle(Settings.OverrideStockCrewXfer, guiLabel, GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
+            GUILayout.EndHorizontal();
 
             // EnableCLS Mode
             GUILayout.BeginHorizontal();

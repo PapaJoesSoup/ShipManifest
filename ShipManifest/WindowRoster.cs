@@ -180,7 +180,7 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
 
-                    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource != null && !SMController.PartCrewIsFull(SMAddon.smController.SelectedPartSource))
+                    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource != null && !SMController.CrewPartIsFull(SMAddon.smController.SelectedPartSource))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -220,15 +220,15 @@ namespace ShipManifest
                     if (GUILayout.Button(new GUIContent(buttonText,buttonToolTip), GUILayout.Width(60)))
                     {
                         if (buttonText == "Add")
-                            SMController.AddCrew(kerbal, SMAddon.smController.SelectedPartSource);
+                            SMController.AddCrewMember(kerbal, SMAddon.smController.SelectedPartSource);
                         else if (buttonText == "Respawn")
                             SMController.RespawnKerbal(kerbal);
                         else if (buttonText == "Remove")
                         {
                             // get part...
-                            Part part = SMAddon.smController.FindPart(kerbal);
+                            Part part = SMAddon.smController.FindKerbalPart(kerbal);
                             if (part != null)
-                                SMController.RemoveCrew(kerbal, part);
+                                SMController.RemoveCrewMember(kerbal, part);
                         }
                     }
                     Rect rect2 = GUILayoutUtility.GetLastRect();

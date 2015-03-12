@@ -1,4 +1,12 @@
-﻿Version 0.90.0_4.1.2 - Release 24 Feb, 2015 - Settings and Windows clean up Edition.
+﻿Version 0.90.0_4.1.3 - Release 12 Mar, 2015 - Better Behaviours Edition.
+ - New:  Revised SM original Crew transfers to delay the actual transfer of a kerbal to the end of the wait period.
+ - New:  Added support SM style Crew transfers when using the stock Crew transfer.  You now get crew movement sounds, and the same delay for crewmember transfers when in realism mode. Can be disabled.
+ - New:  Better support for multiple resource transfers.  If both previously selected source and target parts contain a newly selected resource, parts will now remain selected.
+ - New:  Revised resource movement duration algorithm.  Now using a flow rate, based on source part capacity and max flow time setting.  Now max time is based on pumping (pushing) a full tank.
+ - New:  More Refactoring.  Removed redundant part lists (SelectedResourceParts), refactored & renamed FindKerbalpart method.  Removed TextureReplacer event option (not aware of anyone needing this).
+ - Bug:  When in KSC & Roster Window, if you respawned a Kerbal (bring them back to life), Exception Detector would report errors from some other mods)
+
+Version 0.90.0_4.1.2 - Release 24 Feb, 2015 - Settings and Windows clean up Edition.
  - New:  Added support for deleting config.xml file.  Now properly reconstructs config.xml file from default settings.
  - New:  Added window boundary checker to ensure that windows cannot be opened beyond the screen.  (handles changes from higher to lower screen resolutions.)
  - Bug:  Config.xml file distributed with non default window positions.   This could cause some users not to see the windows when opened.

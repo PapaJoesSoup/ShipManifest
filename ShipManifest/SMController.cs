@@ -194,37 +194,15 @@ namespace ShipManifest
             {
                 try
                 {
-                    SMAddon.ClearResourceHighlighting(SelectedResourceParts);
+                    if (_selectedResource != null && _selectedResource != "")
+                        SMAddon.ClearResourceHighlighting(_partsByResource[_selectedResource]);
                     _prevSelectedResource = _selectedResource;
                     _selectedResource = value;
-
-                    if (value == null)
-                        SelectedResourceParts = new List<Part>();
-                    else
-                        SelectedResourceParts = _partsByResource[_selectedResource];
                 }
                 catch (Exception ex)
                 {
                     Utilities.LogMessage(string.Format(" in Set SelectedResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
-            }
-        }
-
-        // Provides a list of parts for a given resource.
-        // Used to maintain Add/Remove of OnMouseExit handlers
-        private List<Part> _selectedResourceParts;
-        internal List<Part> SelectedResourceParts
-        {
-            get
-            {
-                if (_selectedResourceParts == null)
-                    _selectedResourceParts = new List<Part>();
-                return _selectedResourceParts;
-            }
-            set
-            {
-                SMAddon.ClearResourceHighlighting(_selectedResourceParts);
-                _selectedResourceParts = value;
             }
         }
 
@@ -261,6 +239,10 @@ namespace ShipManifest
                     // reset transfer amount (for resource xfer slider control)
                     SMAddon.smController.sXferAmount = 0;
                     SMAddon.smController.tXferAmount = 0;
+                    if (_selectedResource == "Crew")
+                    {
+
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -308,6 +290,11 @@ namespace ShipManifest
             }
         }
 
+        // Stock Crew transfer part storage
+        internal Part CrewXferSource;
+        internal Part CrewXferTarget;
+        internal ProtoCrewMember CrewXferMember;
+
         internal PartModule SelectedModuleSource;
         internal PartModule SelectedModuleTarget;
 
@@ -332,7 +319,7 @@ namespace ShipManifest
             }
         }
 
-        internal GameEvents.FromToAction<Part, Part> evaAction;
+        //internal GameEvents.FromToAction<Part, Part> evaAction;
 
         #endregion
 
@@ -342,9 +329,9 @@ namespace ShipManifest
 
         #region Action Methods
 
-        private void AddCrew(int count, Part part)
+        private void FillPartCrew(int count, Part part)
         {
-            if (IsPreLaunch && !PartCrewIsFull(part))
+            if (IsPreLaunch && !CrewPartIsFull(part))
             {
                 for (int i = 0; i < part.CrewCapacity && i < count; i++)
                 {
@@ -357,7 +344,7 @@ namespace ShipManifest
             }
         }
 
-        internal static void AddCrew(ProtoCrewMember kerbal, Part part)
+        internal static void AddCrewMember(ProtoCrewMember kerbal, Part part)
         {
             part.AddCrewmember(kerbal);
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
@@ -369,36 +356,28 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        internal static bool PartCrewIsFull(Part part)
-        {
-            return !(part.protoModuleCrew.Count < part.CrewCapacity);
-        }
-
-        internal Part FindPart(ProtoCrewMember kerbal)
-        {
-            foreach (Part part in FlightGlobals.ActiveVessel.Parts)
-            {
-                foreach (ProtoCrewMember curkerbal in part.protoModuleCrew)
-                {
-                    if (curkerbal == kerbal)
-                    {
-                        return part;
-                    }
-                }
-            }
-            return null;
-        }
-
-        internal static void RemoveCrew(ProtoCrewMember member, Part part)
+        internal static void RemoveCrewMember(ProtoCrewMember member, Part part)
         {
             part.RemoveCrewmember(member);
             member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         }
 
+        internal static bool CrewPartIsFull(Part part)
+        {
+            return !(part.protoModuleCrew.Count < part.CrewCapacity);
+        }
+
+        internal Part FindKerbalPart(ProtoCrewMember pKerbal)
+        {
+            Part kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
+            return kPart;
+        }
+
         internal static void RespawnKerbal(ProtoCrewMember kerbal)
         {
             kerbal.SetTimeForRespawn(0);
-            kerbal.Spawn();
+            // This call causes issues in KSC scene, and is not needed.
+            //kerbal.Spawn();
             kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
             HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
         }
@@ -413,7 +392,7 @@ namespace ShipManifest
         {
             foreach (var part in _partsByResource["Crew"])
             {
-                AddCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
+                FillPartCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
             }
             SMAddon.FireEventTriggers();
         }
@@ -424,7 +403,7 @@ namespace ShipManifest
             {
                 for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
                 {
-                    RemoveCrew(part.protoModuleCrew[i], part);
+                    RemoveCrewMember(part.protoModuleCrew[i], part);
                 }
                 SMAddon.FireEventTriggers();
             }
