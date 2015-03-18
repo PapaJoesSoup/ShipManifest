@@ -104,7 +104,7 @@ namespace ShipManifest
                 {
                     DontDestroyOnLoad(this);
                     Settings.Load();
-                    Utilities.LogMessage("ShipManifestAddon.Awake Active...", "info", Settings.VerboseLogging);
+                    Utilities.LogMessage("SMAddon.Awake Active...", "info", Settings.VerboseLogging);
 
                     if (Settings.AutoSave)
                         InvokeRepeating("RunSave", Settings.SaveIntervalSec, Settings.SaveIntervalSec);
@@ -112,19 +112,19 @@ namespace ShipManifest
                     if (Settings.EnableBlizzyToolbar)
                     {
                         // Let't try to use Blizzy's toolbar
-                        Utilities.LogMessage("ShipManifestAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
+                        Utilities.LogMessage("SMAddon.Awake - Blizzy Toolbar Selected.", "Info", Settings.VerboseLogging);
                         if (!ActivateBlizzyToolBar())
                         {
                             // We failed to activate the toolbar, so revert to stock
                             GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                             GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
-                            Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                            Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
                         }
                     }
                     else
                     {
                         // Use stock Toolbar
-                        Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                        Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
                         GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                         GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
                     }
@@ -137,7 +137,7 @@ namespace ShipManifest
         }
         internal void Start()
         {
-            Utilities.LogMessage("ShipManifestAddon.Start.", "Info", Settings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.Start.", "Info", Settings.VerboseLogging);
             try
             {
                 if (WindowRoster.resetRosterSize)
@@ -370,7 +370,7 @@ namespace ShipManifest
         //Vessel state handlers
         internal void OnVesselWasModified(Vessel modVessel)
         {
-            Utilities.LogMessage("ShipManifestAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.OnVesselWasModified.", "Info", Settings.VerboseLogging);
             try
             {
                 UpdateSMcontroller(modVessel);
@@ -382,14 +382,14 @@ namespace ShipManifest
         }
         internal void OnVesselChange(Vessel newVessel)
         {
-            Utilities.LogMessage("ShipManifestAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.OnVesselChange active...", "Info", Settings.VerboseLogging);
             try
             {
                 UpdateSMcontroller(newVessel);
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
         private void OnFlightReady()
@@ -406,14 +406,14 @@ namespace ShipManifest
         }
         private void OnVesselLoaded(Vessel data)
         {
-            //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselLoaded");
+            Utilities.LogMessage("SMAddon.OnVesselLoaded active...", "Info", Settings.VerboseLogging);
             try
             {
                 UpdateSMcontroller(data);
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselLoaded.  " + ex.ToString(), "Error", true);
+                Utilities.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex.ToString(), "Error", true);
             }
         }
         private void OnVesselTerminated(ProtoVessel data)
@@ -535,7 +535,7 @@ namespace ShipManifest
                     GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
                     GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
 
-                    Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
                     Settings.EnableBlizzyToolbar = Settings.prevEnableBlizzyToolbar;
                 }
                 else
@@ -557,7 +557,7 @@ namespace ShipManifest
             else if (!Settings.EnableBlizzyToolbar && Settings.prevEnableBlizzyToolbar)
             {
                 // Use stock Toolbar
-                Utilities.LogMessage("ShipManifestAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
+                Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", Settings.VerboseLogging);
                 if (HighLogic.LoadedSceneIsFlight)
                     SMButton_Blizzy.Visible = false;
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -575,7 +575,7 @@ namespace ShipManifest
         // Stock Toolbar Startup and cleanup
         private void OnGUIAppLauncherReady()
         {
-            Utilities.LogMessage("ShipManifestAddon.OnGUIAppLauncherReady active...", "Info", Settings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.OnGUIAppLauncherReady active...", "Info", Settings.VerboseLogging);
             try
             {
                 // Setup SM WIndow button
@@ -679,10 +679,15 @@ namespace ShipManifest
                         SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
                     }
                     Settings.ShowShipManifest = !Settings.ShowShipManifest;
-                    if (Settings.EnableBlizzyToolbar)
-                        SMButton_Blizzy.TexturePath = Settings.ShowShipManifest ? ImageFolder + "IconOn_24" : ImageFolder + "IconOff_24";
+                    if (Settings.ShowShipManifest && !SMAddon.CanShowShipManifest())
+                        return;
                     else
-                        SMButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? ImageFolder + "IconOn_38" : ImageFolder + "IconOff_38", false));
+                    {
+                        if (Settings.EnableBlizzyToolbar)
+                            SMButton_Blizzy.TexturePath = Settings.ShowShipManifest ? ImageFolder + "IconOn_24" : ImageFolder + "IconOff_24";
+                        else
+                            SMButton_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(Settings.ShowShipManifest ? ImageFolder + "IconOn_38" : ImageFolder + "IconOff_38", false));
+                    }
                 }
             }
             catch (Exception ex)
@@ -842,7 +847,8 @@ namespace ShipManifest
             {
                 if (Settings.ShowShipManifest
                     && HighLogic.LoadedScene == GameScenes.FLIGHT
-                    && !vessel.isEVA
+                    && !vessel.isEVA && vessel.vesselType != VesselType.Flag && vessel.vesselType != VesselType.Debris
+                    && vessel.vesselType != VesselType.Unknown
                     && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
                     )
                     return true;
@@ -912,7 +918,7 @@ namespace ShipManifest
                 // Now let's update the current vessel view...
                 vessel = newVessel;
                 smController = SMController.GetInstance(vessel);
-                if (Settings.EnableCLS)
+                if (Settings.EnableCLS && SMAddon.CanShowShipManifest())
                 {
                     if (GetCLSAddon())
                         UpdateCLSSpaces();
@@ -926,8 +932,8 @@ namespace ShipManifest
         
         internal static void UpdateCLSSpaces()
         {
-            SMAddon.GetCLSVessel();
-            if (SMAddon.clsAddon.Vessel != null)
+            GetCLSVessel();
+            if (clsAddon.Vessel != null)
             {
                 try
                 {
@@ -999,11 +1005,6 @@ namespace ShipManifest
             {
                 Utilities.LogMessage("GetCLSVessel - Active.", "Info", Settings.VerboseLogging);
 
-                if (GetCLSAddon())
-                {
-                    Utilities.LogMessage("GetCLSVessel - clsAddon is null.", "Info", Settings.VerboseLogging);
-                    return false;
-                }
                 if (SMAddon.clsAddon.Vessel != null)
                 {
                     return true;
@@ -1134,34 +1135,35 @@ namespace ShipManifest
                 {
                     if (SMAddon.CanShowShipManifest())
                     {
+                        // What windows do we want to show?
                         step = "2 - Can Show Manifest - true";
                         Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, WindowManifest.Display, "Ship's Manifest - " + vessel.vesselName, GUILayout.MinHeight(20));
+                        
+                        if (Settings.ShowTransferWindow && smController.SelectedResource != null)
+                        {
+                            step = "3 - Show Transfer";
+                            // Lets build the running totals for each resource for display in title...
+                            string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResource);
+                            Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
+                        }
+
+                        if (Settings.ShowShipManifest && Settings.ShowHatch)
+                        {
+                            step = "7 - Show Hatches";
+                            Settings.HatchPosition = GUILayout.Window(398548, Settings.HatchPosition, WindowHatch.Display, "Ship Manifest Hatches", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                        }
+                        if (Settings.ShowShipManifest && Settings.ShowPanel)
+                        {
+                            step = "8 - Show Solar Panels";
+                            Settings.PanelPosition = GUILayout.Window(398549, Settings.PanelPosition, WindowSolarPanel.Display, "Ship Manifest Solar Panels", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                        }
                     }
                     else
                     {
                         step = "2 - Can Show Manifest = false";
-                        if (Settings.EnableCLS && smController.SelectedResource == "Crew")
-                            SMAddon.HighlightCLSVessel(false, true);  
-                    }
-
-                    // What windows do we want to show?
-                    if (SMAddon.CanShowShipManifest() && Settings.ShowTransferWindow && smController.SelectedResource != null)
-                    {
-                        step = "3 - Show Transfer";
-                        // Lets build the running totals for each resource for display in title...
-                        string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResource);
-                        Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
-                    }
-
-                    if (Settings.ShowShipManifest && Settings.ShowHatch)
-                    {
-                        step = "7 - Show Hatches";
-                        Settings.HatchPosition = GUILayout.Window(398548, Settings.HatchPosition, WindowHatch.Display, "Ship Manifest Hatches", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
-                    }
-                    if (Settings.ShowShipManifest && Settings.ShowPanel)
-                    {
-                        step = "8 - Show Solar Panels";
-                        Settings.PanelPosition = GUILayout.Window(398549, Settings.PanelPosition, WindowSolarPanel.Display, "Ship Manifest Solar Panels", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                        if (Settings.EnableCLS && smController != null)
+                            if (smController.SelectedResource == "Crew")
+                                SMAddon.HighlightCLSVessel(false, true);  
                     }
                 }
             }

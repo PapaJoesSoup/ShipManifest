@@ -250,7 +250,6 @@ namespace ShipManifest
 
         private static void CreateKerbalViewer()
         {
-            Rect rect = new Rect();
             DisplaySelectProfession();
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Create", GUILayout.MaxWidth(80)))

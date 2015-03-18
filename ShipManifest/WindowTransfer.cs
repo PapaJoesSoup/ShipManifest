@@ -376,16 +376,23 @@ namespace ShipManifest
                 }
                 else
                     GUI.enabled = false;
-
-                if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                if (SMAddon.smController.CrewXferMember == crewMember && (SMAddon.crewXfer || SMAddon.XferOn))
                 {
-                    SMAddon.smController.CrewXferMember = crewMember;
-                    TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartTarget);
+                    GUI.enabled = true;
+                    GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
                 }
-                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                else
                 {
-                    Rect rect = GUILayoutUtility.GetLastRect();
-                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                    if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    {
+                        SMAddon.smController.CrewXferMember = crewMember;
+                        TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartTarget);
+                    }
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                    }
                 }
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();

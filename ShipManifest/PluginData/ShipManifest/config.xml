@@ -30,6 +30,12 @@
     <ymin>0</ymin>
     <ymax>0</ymax>
   </rect>
+  <rect name="PanelPosition">
+    <xmin>0</xmin>
+    <xmax>0</xmax>
+    <ymin>0</ymin>
+    <ymax>0</ymax>
+  </rect>
   <rect name="DebuggerPosition">
     <xmin>0</xmin>
     <xmax>0</xmax>
@@ -41,7 +47,7 @@
   <bool name="LockSettings">0</bool>
   <bool name="VerboseLogging">0</bool>
   <bool name="AutoSave">0</bool>
-  <double name="SaveIntervalSec">180</double>
+  <double name="SaveIntervalSec">60</double>
   <double name="FlowRate">100</double>
   <double name="MinFlowRate">0</double>
   <double name="MaxFlowRate">1000</double>
@@ -53,13 +59,14 @@
   <string name="CrewSoundStart">ShipManifest/Sounds/14214-1</string>
   <string name="CrewSoundRun">ShipManifest/Sounds/14214-2</string>
   <string name="CrewSoundStop">ShipManifest/Sounds/14214-3</string>
-  <double name="CrewSound1Vol">3</double>
+  <double name="CrewSoundVol">3</double>
   <string name="SourcePartColor">red</string>
   <string name="TargetPartColor">green</string>
   <string name="TargetPartCrewColor">blue</string>
-  <string name="HatchColor">cyan</string>
-  <string name="HatchOpenColor">cyan</string>
+  <string name="HatchOpenColor">blue</string>
   <string name="HatchCloseColor">red</string>
+  <string name="PanelExtendedColor">green</string>
+  <string name="PanelRetractedColor">red</string>
   <bool name="EnableHighlighting">1</bool>
   <bool name="OnlySourceTarget">0</bool>
   <bool name="EnableCLSHighlighting">1</bool>
@@ -67,16 +74,17 @@
   <bool name="EnableScience">1</bool>
   <bool name="EnableResources">1</bool>
   <bool name="EnablePFResources">1</bool>
-  <bool name="EnableCLS">0</bool>
+  <bool name="EnableCLS">1</bool>
+  <bool name="OverrideStockCrewXfer">1</bool>
   <string name="DebugLogPath">Plugins\PluginData\</string>
-  <double name="IVATimeDelaySec">5</double>
+  <double name="IVATimeDelaySec">7</double>
   <bool name="ShowIVAUpdateBtn">0</bool>
   <bool name="AutoDebug">0</bool>
   <string name="ErrorLogLength">1000</string>
+  <bool name="SaveLogOnExit">0</bool>
   <bool name="EnableKerbalRename">0</bool>
   <bool name="RenameWithProfession">0</bool>
   <bool name="EnableTextureReplacer">0</bool>
-  <bool name="CLSInstalled">0</bool>
   <bool name="EnableBlizzyToolbar">0</bool>
   <bool name="ShowToolTips">1</bool>
   <bool name="ManifestToolTips">1</bool>
@@ -84,5 +92,6 @@
   <bool name="SettingsToolTips">1</bool>
   <bool name="RosterToolTips">1</bool>
   <bool name="HatchToolTips">1</bool>
+  <bool name="PanelToolTips">1</bool>
   <bool name="DebuggerToolTips">1</bool>
 </config>
