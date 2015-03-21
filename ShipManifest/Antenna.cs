@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    class SolarPanel
+    class Antenna
     {
-        private PartModule _panelModule;
-        internal PartModule PanelModule
+        private PartModule _antennaModule;
+        internal PartModule AntennaModule
         {
-            get { return _panelModule; }
-            set { _panelModule = value; }
+            get { return _antennaModule; }
+            set { _antennaModule = value; }
         }
 
         private Part _spart;
@@ -22,35 +22,30 @@ namespace ShipManifest
             set { _spart = value; }
         }
 
-        internal ModuleDeployableSolarPanel.panelStates PanelState
-        {
-            get { return iModule.panelState; }
-        }
-
-        internal string PanelStatus
-        {
-            get { return iModule.stateString; }
-        }
-
-        internal bool Retractable
-        {
-            get { return iModule.retractable; }
-        }
-
-        internal bool CanBeRetracted
+        internal bool Extended
         {
             get
             {
-                if (Settings.RealismMode && !this.Retractable && (this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED || this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
-                    return false;
-                else
+                if (iModule.Events["Toggle"].guiName == "Retract")
                     return true;
+                else
+                    return false;
             }
         }
 
+        internal string AntennaStatus
+        {
+            get
+            {
+                if (iModule.Events["Toggle"].guiName == "Extend")
+                    return "Retracted";
+                else
+                    return "Extended";
+            }
+        }
         internal string Title
         {
-            get 
+            get
             {
                 string title = "";
                 try
@@ -61,30 +56,32 @@ namespace ShipManifest
                 {
                     title = "Unknown";
                 }
-                return title; 
+                return title;
             }
         }
 
-        private ModuleDeployableSolarPanel iModule
+        private ModuleAnimateGeneric iModule
         {
-            get { return (ModuleDeployableSolarPanel)this.PanelModule; }
+            get { return (ModuleAnimateGeneric)this.AntennaModule; }
         }
 
-        internal SolarPanel() { }
-        internal SolarPanel(PartModule pModule, Part iPart)
+        internal Antenna() { }
+        internal Antenna(PartModule pModule, Part iPart)
         {
-            this.PanelModule = pModule;
+            this.AntennaModule = pModule;
             this.SPart = iPart;
         }
 
-        internal void ExtendPanel()
+        internal void ExtendAntenna()
         {
-            iModule.Extend();
+            if (iModule.Events["Toggle"].guiName == "Extend")
+                iModule.Toggle();
         }
 
-        internal void RetractPanel()
+        internal void RetractAntenna()
         {
-            iModule.Retract();
+            if (iModule.Events["Toggle"].guiName == "Retract")
+                iModule.Toggle();
         }
 
         internal void Highlight(Rect rect)
@@ -95,7 +92,7 @@ namespace ShipManifest
                 if (rect.Contains(Event.current.mousePosition))
                 {
                     step = "inside box - panel Extended/retracted?";
-                        iModule.part.SetHighlightColor(Settings.Colors[Settings.PanelExtendedColor]);
+                    iModule.part.SetHighlightColor(Settings.Colors[Settings.PanelExtendedColor]);
                     step = "highlight on";
                     iModule.part.SetHighlight(true, false);
                 }

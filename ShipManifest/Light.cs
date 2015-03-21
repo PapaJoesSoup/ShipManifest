@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    class SolarPanel
+    class Light
     {
-        private PartModule _panelModule;
-        internal PartModule PanelModule
+        private PartModule _lightModule;
+        internal PartModule LightModule
         {
-            get { return _panelModule; }
-            set { _panelModule = value; }
+            get { return _lightModule; }
+            set { _lightModule = value; }
         }
 
         private Part _spart;
@@ -22,35 +22,9 @@ namespace ShipManifest
             set { _spart = value; }
         }
 
-        internal ModuleDeployableSolarPanel.panelStates PanelState
-        {
-            get { return iModule.panelState; }
-        }
-
-        internal string PanelStatus
-        {
-            get { return iModule.stateString; }
-        }
-
-        internal bool Retractable
-        {
-            get { return iModule.retractable; }
-        }
-
-        internal bool CanBeRetracted
-        {
-            get
-            {
-                if (Settings.RealismMode && !this.Retractable && (this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED || this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
-                    return false;
-                else
-                    return true;
-            }
-        }
-
         internal string Title
         {
-            get 
+            get
             {
                 string title = "";
                 try
@@ -61,30 +35,49 @@ namespace ShipManifest
                 {
                     title = "Unknown";
                 }
-                return title; 
+                return title;
             }
         }
 
-        private ModuleDeployableSolarPanel iModule
+        internal bool isOn
         {
-            get { return (ModuleDeployableSolarPanel)this.PanelModule; }
+            get
+            {
+                return iModule.isOn;
+            }
         }
 
-        internal SolarPanel() { }
-        internal SolarPanel(PartModule pModule, Part iPart)
+        internal string Status
         {
-            this.PanelModule = pModule;
+            get
+            {
+                if (iModule.isOn)
+                    return "ON";
+                else
+                    return "OFF";
+            }
+        }
+
+        private ModuleLight iModule
+        {
+            get { return (ModuleLight)this.LightModule; }
+        }
+
+        internal Light() { }
+        internal Light(PartModule pModule, Part iPart)
+        {
+            this.LightModule = pModule;
             this.SPart = iPart;
         }
 
-        internal void ExtendPanel()
+        internal void TurnOnLight()
         {
-            iModule.Extend();
+            iModule.LightsOn();
         }
 
-        internal void RetractPanel()
+        internal void TurnOffLight()
         {
-            iModule.Retract();
+            iModule.LightsOff();
         }
 
         internal void Highlight(Rect rect)
@@ -95,7 +88,7 @@ namespace ShipManifest
                 if (rect.Contains(Event.current.mousePosition))
                 {
                     step = "inside box - panel Extended/retracted?";
-                        iModule.part.SetHighlightColor(Settings.Colors[Settings.PanelExtendedColor]);
+                    iModule.part.SetHighlightColor(Settings.Colors[Settings.PanelExtendedColor]);
                     step = "highlight on";
                     iModule.part.SetHighlight(true, false);
                 }
@@ -113,7 +106,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in SolarPanel.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
             }
         }
     }

@@ -24,13 +24,7 @@
     <ymin>0</ymin>
     <ymax>0</ymax>
   </rect>
-  <rect name="HatchPosition">
-    <xmin>0</xmin>
-    <xmax>0</xmax>
-    <ymin>0</ymin>
-    <ymax>0</ymax>
-  </rect>
-  <rect name="PanelPosition">
+  <rect name="ControlPosition">
     <xmin>0</xmin>
     <xmax>0</xmax>
     <ymin>0</ymin>
@@ -79,7 +73,7 @@
   <string name="DebugLogPath">Plugins\PluginData\</string>
   <double name="IVATimeDelaySec">7</double>
   <bool name="ShowIVAUpdateBtn">0</bool>
-  <bool name="AutoDebug">0</bool>
+  <bool name="AutoDebug">1</bool>
   <string name="ErrorLogLength">1000</string>
   <bool name="SaveLogOnExit">0</bool>
   <bool name="EnableKerbalRename">0</bool>
@@ -93,5 +87,7 @@
   <bool name="RosterToolTips">1</bool>
   <bool name="HatchToolTips">1</bool>
   <bool name="PanelToolTips">1</bool>
+  <bool name="AntennaToolTips">1</bool>
+  <bool name="LightToolTips">1</bool>
   <bool name="DebuggerToolTips">1</bool>
 </config>

@@ -1147,15 +1147,10 @@ namespace ShipManifest
                             Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
                         }
 
-                        if (Settings.ShowShipManifest && Settings.ShowHatch)
+                        if (Settings.ShowShipManifest && Settings.ShowControl)
                         {
                             step = "7 - Show Hatches";
-                            Settings.HatchPosition = GUILayout.Window(398548, Settings.HatchPosition, WindowHatch.Display, "Ship Manifest Hatches", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
-                        }
-                        if (Settings.ShowShipManifest && Settings.ShowPanel)
-                        {
-                            step = "8 - Show Solar Panels";
-                            Settings.PanelPosition = GUILayout.Window(398549, Settings.PanelPosition, WindowSolarPanel.Display, "Ship Manifest Solar Panels", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                            Settings.ControlPosition = GUILayout.Window(398548, Settings.ControlPosition, WindowControl.Display, "Ship Manifest Part Control", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
                         }
                     }
                     else
@@ -1235,62 +1230,71 @@ namespace ShipManifest
                             }
                             Utilities.LogMessage("11. DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
 
-                            // Lets increment the AmtXferred....
-                            smController.AmtXferred += (float)deltaAmt;
-                            Utilities.LogMessage("11a. AmtXferred = " + smController.AmtXferred.ToString(), "Info", Settings.VerboseLogging);
-
-                            // Drain source...
-                            // and let's make sure we can move the amount requested or adjust it and stop the flow after the move.
-                            if (XferMode == XFERMode.TargetToSource)
+                            // Consume electricity
+                            double deltaCharge = deltaT * act_flow_rate * Settings.FlowCost;
+                            if (!ConsumeCharge(deltaCharge))
                             {
-                                // Source is target on Interface...
-                                // if the amount to move exceeds either the balance of the source or the capacity of the target, reduce it.
-                                if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount - deltaAmt < 0)
-                                {
-                                    deltaAmt = smController.SelectedPartTarget.Resources[smController.SelectedResource].amount;
-                                    XferState = XFERState.Stop;
-                                }
-                                else if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount + deltaAmt > smController.SelectedPartSource.Resources[smController.SelectedResource].maxAmount)
-                                {
-                                    deltaAmt = smController.SelectedPartSource.Resources[smController.SelectedResource].maxAmount - smController.SelectedPartSource.Resources[smController.SelectedResource].amount;
-                                    XferState = XFERState.Stop;
-                                }
-
-                                smController.SelectedPartTarget.Resources[smController.SelectedResource].amount -= deltaAmt;
-                                if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount < 0)
-                                    smController.SelectedPartTarget.Resources[smController.SelectedResource].amount = 0;
+                                XferState = XFERState.Stop;
                             }
                             else
                             {
-                                // Source is source on Interface...
-                                if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount - deltaAmt < 0)
+                                // We had enough electricity, so lets increment the AmtXferred....
+                                smController.AmtXferred += (float)deltaAmt;
+                                Utilities.LogMessage("11a. AmtXferred = " + smController.AmtXferred.ToString(), "Info", Settings.VerboseLogging);
+
+                                // Drain source...
+                                // and let's make sure we can move the amount requested or adjust it and stop the flow after the move.
+                                if (XferMode == XFERMode.TargetToSource)
                                 {
-                                    deltaAmt = smController.SelectedPartSource.Resources[smController.SelectedResource].amount;
-                                    XferState = XFERState.Stop;
+                                    // Source is target on Interface...
+                                    // if the amount to move exceeds either the balance of the source or the capacity of the target, reduce it.
+                                    if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount - deltaAmt < 0)
+                                    {
+                                        deltaAmt = smController.SelectedPartTarget.Resources[smController.SelectedResource].amount;
+                                        XferState = XFERState.Stop;
+                                    }
+                                    else if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount + deltaAmt > smController.SelectedPartSource.Resources[smController.SelectedResource].maxAmount)
+                                    {
+                                        deltaAmt = smController.SelectedPartSource.Resources[smController.SelectedResource].maxAmount - smController.SelectedPartSource.Resources[smController.SelectedResource].amount;
+                                        XferState = XFERState.Stop;
+                                    }
+
+                                    smController.SelectedPartTarget.Resources[smController.SelectedResource].amount -= deltaAmt;
+                                    if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount < 0)
+                                        smController.SelectedPartTarget.Resources[smController.SelectedResource].amount = 0;
                                 }
-                                else if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount + deltaAmt > smController.SelectedPartTarget.Resources[smController.SelectedResource].maxAmount)
+                                else
                                 {
-                                    deltaAmt = smController.SelectedPartTarget.Resources[smController.SelectedResource].maxAmount - smController.SelectedPartTarget.Resources[smController.SelectedResource].amount;
-                                    XferState = XFERState.Stop;
+                                    // Source is source on Interface...
+                                    if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount - deltaAmt < 0)
+                                    {
+                                        deltaAmt = smController.SelectedPartSource.Resources[smController.SelectedResource].amount;
+                                        XferState = XFERState.Stop;
+                                    }
+                                    else if (smController.SelectedPartTarget.Resources[smController.SelectedResource].amount + deltaAmt > smController.SelectedPartTarget.Resources[smController.SelectedResource].maxAmount)
+                                    {
+                                        deltaAmt = smController.SelectedPartTarget.Resources[smController.SelectedResource].maxAmount - smController.SelectedPartTarget.Resources[smController.SelectedResource].amount;
+                                        XferState = XFERState.Stop;
+                                    }
+
+                                    smController.SelectedPartSource.Resources[smController.SelectedResource].amount -= deltaAmt;
+                                    if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount < 0)
+                                        smController.SelectedPartSource.Resources[smController.SelectedResource].amount = 0;
                                 }
 
-                                smController.SelectedPartSource.Resources[smController.SelectedResource].amount -= deltaAmt;
-                                if (smController.SelectedPartSource.Resources[smController.SelectedResource].amount < 0)
-                                    smController.SelectedPartSource.Resources[smController.SelectedResource].amount = 0;
+
+                                Utilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+
+                                // Fill target
+                                if (XferMode == XFERMode.TargetToSource)
+                                    smController.SelectedPartSource.Resources[smController.SelectedResource].amount += deltaAmt;
+                                else
+                                    smController.SelectedPartTarget.Resources[smController.SelectedResource].amount += deltaAmt;
+
+                                Utilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+
+                                Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
                             }
-
-
-                            Utilities.LogMessage("12. Drain Source Part = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
-
-                            // Fill target
-                            if (XferMode == XFERMode.TargetToSource)
-                                smController.SelectedPartSource.Resources[smController.SelectedResource].amount += deltaAmt;
-                            else
-                                smController.SelectedPartTarget.Resources[smController.SelectedResource].amount += deltaAmt;
-
-                            Utilities.LogMessage("13. Fill Target Part = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
-
-                            Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
                             break;
 
                         case XFERState.Stop:
@@ -1460,6 +1464,33 @@ namespace ShipManifest
             }
         }
 
+        private bool ConsumeCharge(double deltaCharge)
+        {
+            if (smController.SelectedResource != "ElectricCharge" && Settings.EnableXferCost)
+            {
+                foreach (Part iPart in smController._partsByResource["ElectricCharge"])
+                {
+                    if (iPart.Resources["ElectricCharge"].amount >= deltaCharge)
+                    {
+                        iPart.Resources["ElectricCharge"].amount -= deltaCharge;
+                        deltaCharge = 0;
+                        break;
+                    }
+                    else
+                    {
+                        deltaCharge -= iPart.Resources["ElectricCharge"].amount;
+                        iPart.Resources["ElectricCharge"].amount = 0;
+                    }
+                }
+                if (deltaCharge > 0)
+                    return false;
+                else
+                    return true;
+            }
+            else
+                return true;
+        }
+        
         private void LoadSounds(string SoundType, string path1, string path2, string path3, double dblVol)
         {
             try

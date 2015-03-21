@@ -16,6 +16,80 @@ namespace ShipManifest
         internal static bool ShowToolTips = Settings.SettingsToolTips;
         internal static string txtSaveInterval = Settings.SaveIntervalSec.ToString();
 
+        internal static bool _showRealismTab = true;
+        internal static bool _showHighlightTab = false;
+        internal static bool _showConfigTab = false;
+        internal static bool _showSoundsTab = false;
+        internal static bool _showToolTipTab = false;
+
+        internal static bool ShowRealismTab
+        {
+            get
+            { 
+                return _showRealismTab; 
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showRealismTab = value;
+            }
+        }
+        internal static bool ShowHighlightTab
+        {
+            get
+            { 
+                return _showHighlightTab; 
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showHighlightTab = value;
+            }
+        }
+        internal static bool ShowConfigTab
+        {
+            get
+            { 
+                return _showConfigTab; 
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showConfigTab = value;
+            }
+        }
+        internal static bool ShowSoundsTab
+        {
+            get
+            { 
+                return _showSoundsTab; 
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showSoundsTab = value;
+            }
+        }
+        internal static bool ShowToolTipTab
+        {
+            get
+            { 
+                return _showToolTipTab; 
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showToolTipTab = value;
+            }
+        }
+
+        internal static string strFlowCost = "0";
+
         private static Vector2 ScrollViewerPosition = Vector2.zero;
         internal static void Display(int windowId)
         {
@@ -37,22 +111,14 @@ namespace ShipManifest
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
 
-            // Store settings in case we cancel later...
-            Settings.StoreTempSettings();
-
             GUILayout.BeginVertical();
+
+            DisplayTabButtons();
+
             ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
             GUILayout.BeginVertical();
 
-            DisplayOptions();
-
-            DisplayHighlighting();
-
-            DisplayToolTips();
-
-            DisplaySounds();
-
-            DisplayConfiguration();
+            DisplaySelectedTab();
 
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
@@ -76,7 +142,54 @@ namespace ShipManifest
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
 
-        private static void DisplayConfiguration()
+        private static void DisplayTabButtons()
+        {
+            GUILayout.BeginHorizontal();
+
+            var realismStyle = ShowRealismTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Realism", realismStyle, GUILayout.Height(20)))
+            {
+                ShowRealismTab = true;
+            }
+            GUI.enabled = true;
+            var highlightStyle = ShowHighlightTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Highlighting", highlightStyle, GUILayout.Height(20)))
+            {
+                ShowHighlightTab = true;
+            }
+            var tooltipStyle = ShowToolTipTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("ToolTips", tooltipStyle, GUILayout.Height(20)))
+            {
+                ShowToolTipTab = true;
+            }
+            var soundStyle = ShowSoundsTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Sounds", soundStyle, GUILayout.Height(20)))
+            {
+                ShowSoundsTab = true;
+            }
+            var configStyle = ShowConfigTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            if (GUILayout.Button("Config", configStyle, GUILayout.Height(20)))
+            {
+                ShowConfigTab = true;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        internal static void DisplaySelectedTab()
+        {
+            if (ShowRealismTab)
+                DisplayRealism();
+            else if (ShowHighlightTab)
+                DisplayHighlighting();
+            else if (ShowSoundsTab)
+                DisplaySounds();
+            else if (ShowToolTipTab)
+                DisplayToolTips();
+            else if (ShowConfigTab)
+                DisplayConfig();
+        }
+
+        private static void DisplayConfig()
         {
             Rect rect = new Rect();
             string label = "";
@@ -238,6 +351,21 @@ namespace ShipManifest
             GUILayout.Space(20);
             Settings.HatchToolTips = GUILayout.Toggle(Settings.HatchToolTips, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
+            label = "Solar Panel Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.PanelToolTips = GUILayout.Toggle(Settings.PanelToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Antenna Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.AntennaToolTips = GUILayout.Toggle(Settings.AntennaToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            label = "Light Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            Settings.LightToolTips = GUILayout.Toggle(Settings.LightToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
             label = "Debugger Window Tool Tips";
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
@@ -313,15 +441,15 @@ namespace ShipManifest
             }
         }
 
-        private static void DisplayOptions()
+        private static void DisplayRealism()
         {
             Rect rect = new Rect();
             GUI.enabled = true;
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             if (!Settings.LockSettings)
-                GUILayout.Label("Settings / Options", GUILayout.Height(10));
+                GUILayout.Label("Realism Settings / Options", GUILayout.Height(10));
             else
-                GUILayout.Label("Settings / Options  (Locked.  Unlock in Config file)", GUILayout.Height(10));
+                GUILayout.Label("Realism Settings / Options  (Locked.  Unlock in Config file)", GUILayout.Height(10));
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
             bool isEnabled = (!Settings.LockSettings);
@@ -436,6 +564,43 @@ namespace ShipManifest
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
             GUILayout.EndHorizontal();
 
+            // EnableXferCost Mode
+            GUILayout.BeginHorizontal();
+            GUI.enabled = isEnabled;
+            guiLabel = new GUIContent("Enable Resource Xfer Costs", "Turns on/off ElectricCharge cost forResource Xfers.\r\nWhen on, Resource transfers will cost ElectricCharge.\r\nWhen Off, Resources Xfers are Free (original SM behavior).");
+            Settings.EnableXferCost = GUILayout.Toggle(Settings.EnableXferCost, guiLabel, GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            GUILayout.EndHorizontal();
+
+            float newCost = 0;
+            GUILayout.BeginHorizontal();
+            guiLabel = new GUIContent("Resource Flow Cost:", "Sets the Electrical cost of resource Xfers when Realism Mode is on.\r\nThe higher the number the more ElectricCharge used.");
+            GUILayout.Space(20);
+            GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
+            // Lets parse the string to allow decimal points.
+            strFlowCost = Settings.FlowCost.ToString();
+            // add the decimal point if it was typed.
+            strFlowCost = Utilities.GetStringDecimal(strFlowCost);
+            // add the zero if it was typed.
+            strFlowCost = Utilities.GetStringZero(strFlowCost);
+            
+            strFlowCost = GUILayout.TextField(strFlowCost, 20, GUILayout.Height(20), GUILayout.Width(80));
+            GUILayout.EndHorizontal();
+
+            // update decimal bool 
+            Utilities.SetStringDecimal(strFlowCost);
+            //update zero bool 
+            Utilities.SetStringZero(strFlowCost);
+
+            if (float.TryParse(strFlowCost, out newCost))
+                Settings.FlowCost = newCost;
+
             // create xfer Flow Rate slider;
             // Lets parse the string to allow decimal points.
             string strFlowRate = Settings.FlowRate.ToString();
@@ -446,7 +611,7 @@ namespace ShipManifest
             float newRate = 0;
 
             GUILayout.BeginHorizontal();
-            guiLabel = new GUIContent("Resource Flow Rate:","Sets the rate that resources Xfer when Realism Mode is on.\r\nThe higher the number the faster resources move.\r\nWhen on, Resource transfers are possible and show up in the Resource list.");
+            guiLabel = new GUIContent("Resource Flow Rate:","Sets the rate that resources Xfer when Realism Mode is on.\r\nThe higher the number the faster resources move.");
             GUILayout.Label(guiLabel, GUILayout.Width(130), GUILayout.Height(20));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -501,6 +666,11 @@ namespace ShipManifest
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Settings.SettingsPosition, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+        }
+
+        private static void ResetTabs()
+        {
+            _showRealismTab = _showHighlightTab = _showToolTipTab = _showSoundsTab = _showConfigTab = false;
         }
 
         #endregion

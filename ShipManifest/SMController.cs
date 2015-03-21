@@ -303,6 +303,7 @@ namespace ShipManifest
         internal ICLSSpace clsSpaceSource;
         internal ICLSSpace clsSpaceTarget;
 
+        // Control Window parts
         private List<SolarPanel> _solarPanels = new List<SolarPanel>();
         internal List<SolarPanel> SolarPanels
         {
@@ -316,6 +317,38 @@ namespace ShipManifest
             {
                 _solarPanels.Clear();
                 _solarPanels = value;
+            }
+        }
+
+        private List<Light> _lights = new List<Light>();
+        internal List<Light> Lights
+        {
+            get
+            {
+                if (_lights == null)
+                    _lights = new List<Light>();
+                return _lights;
+            }
+            set
+            {
+                _lights.Clear();
+                _lights = value;
+            }
+        }
+
+        private List<Antenna> _antennas = new List<Antenna>();
+        internal List<Antenna> Antennas
+        {
+            get
+            {
+                if (_antennas == null)
+                    _antennas = new List<Antenna>();
+                return _antennas;
+            }
+            set
+            {
+                _antennas.Clear();
+                _antennas = value;
             }
         }
 
@@ -510,6 +543,7 @@ namespace ShipManifest
                         {
                             SolarPanel pPanel = new SolarPanel();
                             pPanel.PanelModule = pModule;
+                            pPanel.SPart = pPart;
                             _solarPanels.Add(pPanel);
                         }
                     }
@@ -518,6 +552,59 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 Utilities.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex.ToString()), "Error", true);
+            }
+        }
+
+        internal void GetAntennas()
+        {
+            _antennas.Clear();
+            try
+            {
+                foreach (Part pPart in SMAddon.vessel.Parts)
+                {
+                    if (pPart.Modules.Contains("ModuleDataTransmitter"))
+                        foreach (PartModule pModule in pPart.Modules)
+                        {
+                            if (pModule.moduleName == "ModuleAnimateGeneric" && (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
+                            {
+                                Antenna pAntenna = new Antenna();
+                                pAntenna.AntennaModule = pModule;
+                                pAntenna.SPart = pPart;
+                                _antennas.Add(pAntenna);
+                                break;
+                            }
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetAntennas().\r\nError:  {0}", ex.ToString()), "Error", true);
+            }
+        }
+
+        internal void GetLights()
+        {
+            _lights.Clear();
+            try
+            {
+                foreach (Part pPart in SMAddon.vessel.Parts)
+                {
+                    foreach (PartModule pModule in pPart.Modules)
+                    {
+                        if (pModule.moduleName == "ModuleLight")
+                        {
+                            Light pLight = new Light();
+                            pLight.LightModule = pModule;
+                            pLight.SPart = pPart;
+                            _lights.Add(pLight);
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex.ToString()), "Error", true);
             }
         }
 

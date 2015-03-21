@@ -518,26 +518,28 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             GUILayout.Label(string.Format("({0}/{1})", thisResource.amount.ToString("#######0.####"), thisResource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
             GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
-            if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
+            if (SMAddon.vessel.IsControllable)
             {
-                if (flowbool)
+                if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
                 {
-                    thisResource.flowState = false;
-                    flowtext = "Off";
+                    if (flowbool)
+                    {
+                        thisResource.flowState = false;
+                        flowtext = "Off";
+                    }
+                    else
+                    {
+                        thisResource.flowState = true;
+                        flowtext = "On";
+                    }
                 }
-                else
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 {
-                    thisResource.flowState = true;
-                    flowtext = "On";
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
                 }
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-            {
-                Rect rect = GUILayoutUtility.GetLastRect();
-                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
             }
             GUILayout.EndHorizontal();
-
             // Xfer Controls Display
             // let's determine how much of a resource we can move to the target.
             double maxXferAmount = CalcMaxXferAmt(selectedResource, partSource, partTarget);
@@ -583,7 +585,7 @@ namespace ShipManifest
                     xferContent = new GUIContent("Xfer", "Transfers the selected resource\r\nto the selected " + strTarget + " Part");
                 else
                     xferContent = new GUIContent("Stop", "Halts the Transfer of the selected resource\r\nto the selected " + strTarget + " Part");
-                if ((!SMAddon.XferOn && maxXferAmount > 0) || (SMAddon.XferOn && SMAddon.XferMode == thisXferMode))
+                if (ShipIsControllable() && ResourceCanBeXferred(thisXferMode, maxXferAmount))
                     if (GUILayout.Button(xferContent, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         if (!SMAddon.crewXfer && !SMAddon.XferOn)
@@ -614,6 +616,11 @@ namespace ShipManifest
 
         #region Methods
 
+        internal static bool ShipIsControllable()
+        {
+            return ((SMAddon.vessel.IsControllable && Settings.RealismMode) || !Settings.RealismMode);
+        }
+
         internal static double CalcMaxXferAmt(string resource, Part Source, Part Target)
         {
             double maxXferAmount = 0;
@@ -640,72 +647,6 @@ namespace ShipManifest
                 actFlowRate = Settings.FlowRate;
 
             return actFlowRate;
-        }
-
-        private static string GetStringDecimal(string strXferAmount, SMAddon.XFERMode thisXferMode)
-        {
-            if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
-            {
-                if (SMAddon.smController.sXferAmountHasDecimal)
-                    strXferAmount += ".";
-            }
-            else
-            {
-                if (SMAddon.smController.tXferAmountHasDecimal)
-                    strXferAmount += ".";
-            }
-            return strXferAmount;
-        }
-
-        private static string GetStringZero(string strXferAmount, SMAddon.XFERMode thisXferMode)
-        {
-            if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
-            {
-                if (SMAddon.smController.sXferAmountHasZero)
-                    strXferAmount += "0";
-            }
-            else
-            {
-                if (SMAddon.smController.tXferAmountHasZero)
-                    strXferAmount += "0";
-            }
-            return strXferAmount;
-        }
-
-        private static void SetStringZero(string strXferAmount, SMAddon.XFERMode xferMode)
-        {
-            if (xferMode == SMAddon.XFERMode.SourceToTarget)
-            {
-                if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
-                    SMAddon.smController.sXferAmountHasZero = true;
-                else
-                    SMAddon.smController.sXferAmountHasZero = false;
-            }
-            else
-            {
-                if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
-                    SMAddon.smController.tXferAmountHasZero = true;
-                else
-                    SMAddon.smController.tXferAmountHasZero = false;
-            }
-        }
-
-        private static void SetStringDecimal(string strXferAmount, SMAddon.XFERMode xferMode)
-        {
-            if (xferMode == SMAddon.XFERMode.SourceToTarget)
-            {
-                if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
-                    SMAddon.smController.sXferAmountHasDecimal = true;
-                else
-                    SMAddon.smController.sXferAmountHasDecimal = false;
-            }
-            else
-            {
-                if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
-                    SMAddon.smController.tXferAmountHasDecimal = true;
-                else
-                    SMAddon.smController.tXferAmountHasDecimal = false;
-            }
         }
 
         internal static void TransferCrewMemberBegin (ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
@@ -818,6 +759,77 @@ namespace ShipManifest
             catch (Exception ex)
             {
                 Utilities.LogMessage(string.Format("Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
+        private static bool ResourceCanBeXferred(SMAddon.XFERMode thisXferMode, double maxXferAmount)
+        {
+            return ((!SMAddon.XferOn && maxXferAmount > 0) || (SMAddon.XferOn && SMAddon.XferMode == thisXferMode));
+        }
+
+        internal static string GetStringDecimal(string strXferAmount, SMAddon.XFERMode thisXferMode)
+        {
+            if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (SMAddon.smController.sXferAmountHasDecimal)
+                    strXferAmount += ".";
+            }
+            else
+            {
+                if (SMAddon.smController.tXferAmountHasDecimal)
+                    strXferAmount += ".";
+            }
+            return strXferAmount;
+        }
+
+        internal static string GetStringZero(string strXferAmount, SMAddon.XFERMode thisXferMode)
+        {
+            if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (SMAddon.smController.sXferAmountHasZero)
+                    strXferAmount += "0";
+            }
+            else
+            {
+                if (SMAddon.smController.tXferAmountHasZero)
+                    strXferAmount += "0";
+            }
+            return strXferAmount;
+        }
+
+        internal static void SetStringZero(string strXferAmount, SMAddon.XFERMode xferMode)
+        {
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
+                    SMAddon.smController.sXferAmountHasZero = true;
+                else
+                    SMAddon.smController.sXferAmountHasZero = false;
+            }
+            else
+            {
+                if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
+                    SMAddon.smController.tXferAmountHasZero = true;
+                else
+                    SMAddon.smController.tXferAmountHasZero = false;
+            }
+        }
+
+        internal static void SetStringDecimal(string strXferAmount, SMAddon.XFERMode xferMode)
+        {
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
+                    SMAddon.smController.sXferAmountHasDecimal = true;
+                else
+                    SMAddon.smController.sXferAmountHasDecimal = false;
+            }
+            else
+            {
+                if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
+                    SMAddon.smController.tXferAmountHasDecimal = true;
+                else
+                    SMAddon.smController.tXferAmountHasDecimal = false;
             }
         }
 

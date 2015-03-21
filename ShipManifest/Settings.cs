@@ -24,8 +24,7 @@ namespace ShipManifest
         internal static Rect TransferPosition;
         internal static Rect RosterPosition;
         internal static Rect SettingsPosition;
-        internal static Rect HatchPosition;
-        internal static Rect PanelPosition;
+        internal static Rect ControlPosition;
         internal static Rect DebuggerPosition;
 
         // Realism Feature Options
@@ -39,10 +38,12 @@ namespace ShipManifest
 
         //Resource Xfer flow rate options
         internal static float FlowRate = 100;
+        internal static float FlowCost = 0.0015f;
         internal static float MaxFlowRate = 1000;
         internal static float MinFlowRate = 0;
         internal static int MaxFlowTimeSec = 180;
         internal static bool LockSettings = false;
+        internal static bool EnableXferCost = true;
 
         internal static bool ShowDebugger = false;
         internal static bool VerboseLogging = false;
@@ -89,6 +90,8 @@ namespace ShipManifest
         internal static bool RosterToolTips = true;
         internal static bool HatchToolTips = true;
         internal static bool PanelToolTips = true;
+        internal static bool AntennaToolTips = true;
+        internal static bool LightToolTips = true;
         internal static bool DebuggerToolTips = true;
 
         // Roster Options
@@ -109,9 +112,11 @@ namespace ShipManifest
         internal static bool prevLockSettings = false;
 
         internal static float prevFlowRate = 100;
+        internal static float prevFlowCost = 0.0015f;
         internal static float prevMaxFlowRate = 1000;
         internal static float prevMinFlowRate = 0;
         internal static int prevMaxFlowTimeSec = 100;
+        internal static bool prevEnableXferCost = true;
 
         internal static bool prevEnableHighlighting = true;
         internal static bool prevOnlySourceTarget = false;
@@ -138,6 +143,8 @@ namespace ShipManifest
         internal static bool prevRosterToolTips = true;
         internal static bool prevHatchToolTips = true;
         internal static bool prevPanelToolTips = true;
+        internal static bool prevAntennaToolTips = true;
+        internal static bool prevLightToolTips = true;
         internal static bool prevDebuggerToolTips = true;
         internal static bool prevEnableKerbalRename = false;
         internal static bool prevRenameWithProfession = false;
@@ -185,8 +192,7 @@ namespace ShipManifest
             }
         }
 
-        internal static bool ShowHatch { get; set; }
-        internal static bool ShowPanel { get; set; }
+        internal static bool ShowControl { get; set; }
 
         internal static string DebugLogPath = "\\Plugins\\PluginData\\";
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
@@ -218,8 +224,7 @@ namespace ShipManifest
                 TransferPosition = configfile.GetValue<Rect>("TransferPosition", TransferPosition);
                 DebuggerPosition = configfile.GetValue<Rect>("DebuggerPosition", DebuggerPosition);
                 SettingsPosition = configfile.GetValue<Rect>("SettingsPosition", SettingsPosition);
-                HatchPosition = configfile.GetValue<Rect>("HatchPosition", HatchPosition);
-                PanelPosition = configfile.GetValue<Rect>("PanelPosition", PanelPosition);
+                ControlPosition = configfile.GetValue<Rect>("ControlPosition", ControlPosition);
                 RosterPosition = configfile.GetValue<Rect>("RosterPosition", RosterPosition);
                 ShowDebugger = configfile.GetValue<bool>("ShowDebugger", ShowDebugger);
                 RealismMode = configfile.GetValue<bool>("RealismMode", RealismMode);
@@ -228,9 +233,12 @@ namespace ShipManifest
                 AutoSave = configfile.GetValue<bool>("AutoSave", AutoSave);
                 SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec", SaveIntervalSec);
                 FlowRate = (float)configfile.GetValue<double>("FlowRate", FlowRate);
+                FlowCost = (float)configfile.GetValue<double>("FlowCost", FlowCost);
                 MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate", MinFlowRate);
                 MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate", MaxFlowRate);
                 MaxFlowTimeSec = configfile.GetValue<int>("MaxFlowTimeSec", MaxFlowTimeSec);
+                EnableXferCost = configfile.GetValue<bool>("EnableXferCost", EnableXferCost);
+
                 PumpSoundStart = configfile.GetValue<string>("PumpSoundStart", PumpSoundStart);
                 PumpSoundRun = configfile.GetValue<string>("PumpSoundRun", PumpSoundRun);
                 PumpSoundStop = configfile.GetValue<string>("PumpSoundStop", PumpSoundStop);
@@ -276,6 +284,8 @@ namespace ShipManifest
                 RosterToolTips = configfile.GetValue<bool>("RosterToolTips", RosterToolTips);
                 HatchToolTips = configfile.GetValue<bool>("HatchToolTips", HatchToolTips);
                 PanelToolTips = configfile.GetValue<bool>("PanelToolTips", PanelToolTips);
+                AntennaToolTips = configfile.GetValue<bool>("AntennaToolTips", AntennaToolTips);
+                LightToolTips = configfile.GetValue<bool>("LightToolTips", LightToolTips);
                 DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips", DebuggerToolTips);
 
                 // Lets make sure that the windows can be seen on the screen. (different resolutions)
@@ -336,15 +346,10 @@ namespace ShipManifest
                 SettingsPosition.x = 0;
                 SettingsPosition.y = 0;
             }
-            if (HatchPosition.xMax > Screen.currentResolution.width || HatchPosition.yMax > Screen.currentResolution.height)
+            if (ControlPosition.xMax > Screen.currentResolution.width || ControlPosition.yMax > Screen.currentResolution.height)
             {
-                HatchPosition.x = 0;
-                HatchPosition.y = 0;
-            }
-            if (PanelPosition.xMax > Screen.currentResolution.width || PanelPosition.yMax > Screen.currentResolution.height)
-            {
-                PanelPosition.x = 0;
-                PanelPosition.y = 0;
+                ControlPosition.x = 0;
+                ControlPosition.y = 0;
             }
             if (RosterPosition.xMax > Screen.currentResolution.width || RosterPosition.yMax > Screen.currentResolution.height)
             {
@@ -360,31 +365,34 @@ namespace ShipManifest
                 // For some reason, saving floats does not seem to work.  (maybe I just don't know enough, but converted flowrates to doubles and it works.
                 KSP.IO.PluginConfiguration configfile = KSP.IO.PluginConfiguration.CreateForType<ShipManifestModule>();
 
+                // Window settings
                 configfile.SetValue("ManifestPosition", ManifestPosition);
                 configfile.SetValue("TransferPosition", TransferPosition);
                 configfile.SetValue("RosterPosition", SettingsPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
-                configfile.SetValue("HatchPosition", HatchPosition);
-                configfile.SetValue("PanelPosition", PanelPosition);
+                configfile.SetValue("ControlPosition", ControlPosition);
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);
-                configfile.SetValue("ShowDebugger", ShowDebugger);
+
+                // Realism settings
                 configfile.SetValue("RealismMode", RealismMode);
-                configfile.SetValue("LockSettings", LockSettings);
-                configfile.SetValue("VerboseLogging", VerboseLogging);
-                configfile.SetValue("AutoSave", AutoSave);
-                configfile.SetValue("SaveIntervalSec", (double)SaveIntervalSec);
+                configfile.SetValue("EnableCrew", EnableCrew);
+                configfile.SetValue("OverrideStockCrewXfer", OverrideStockCrewXfer);
+                configfile.SetValue("EnableCLS", EnableCLS);
+                configfile.SetValue("EnableScience", EnableScience);
+                configfile.SetValue("EnableResources", EnableResources);
+                configfile.SetValue("EnablePFResources", EnablePFResources);
+                configfile.SetValue("EnableXferCost", EnableXferCost);
+                configfile.SetValue("FlowCost", (double)FlowCost);
                 configfile.SetValue("FlowRate", (double)FlowRate);
                 configfile.SetValue("MinFlowRate", (double)MinFlowRate);
                 configfile.SetValue("MaxFlowRate", (double)MaxFlowRate);
                 configfile.SetValue("MaxFlowTimeSec", MaxFlowTimeSec);
-                configfile.SetValue("PumpSoundStart", PumpSoundStart);
-                configfile.SetValue("PumpSoundRun", PumpSoundRun);
-                configfile.SetValue("PumpSoundStop", PumpSoundStop);
-                configfile.SetValue("PumpSoundVol", PumpSoundVol);
-                configfile.SetValue("CrewSoundStart", CrewSoundStart);
-                configfile.SetValue("CrewSoundRun", CrewSoundRun);
-                configfile.SetValue("CrewSoundStop", CrewSoundStop);
-                configfile.SetValue("CrewSoundVol", CrewSoundVol);
+                configfile.SetValue("LockSettings", LockSettings);
+
+                //Highlighting Settings
+                configfile.SetValue("EnableHighlighting", EnableHighlighting);
+                configfile.SetValue("OnlySourceTarget", OnlySourceTarget);
+                configfile.SetValue("EnableCLSHighlighting", EnableCLSHighlighting);
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
@@ -393,27 +401,7 @@ namespace ShipManifest
                 configfile.SetValue("PanelExtendedColor", PanelExtendedColor);
                 configfile.SetValue("PanelRetractedColor", PanelRetractedColor);
 
-                configfile.SetValue("EnableHighlighting", EnableHighlighting);
-                configfile.SetValue("OnlySourceTarget", OnlySourceTarget);
-                configfile.SetValue("EnableCLSHighlighting", EnableCLSHighlighting);
-                configfile.SetValue("EnableCrew", EnableCrew);
-                configfile.SetValue("EnableScience", EnableScience);
-                configfile.SetValue("EnableResources", EnableResources);
-                configfile.SetValue("EnablePFResources", EnablePFResources);
-                configfile.SetValue("EnableCLS", EnableCLS);
-                configfile.SetValue("OverrideStockCrewXfer", OverrideStockCrewXfer);
-
-                configfile.SetValue("DebugLogPath", DebugLogPath);
-
-                configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
-                configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
-                configfile.SetValue("AutoDebug", AutoDebug);
-                configfile.SetValue("ErrorLogLength", ErrorLogLength);
-                configfile.SetValue("SaveLogOnExit", SaveLogOnExit);
-                configfile.SetValue("EnableKerbalRename", EnableKerbalRename);
-                configfile.SetValue("RenameWithProfession", RenameWithProfession);
-                configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
-                configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
+                // ToolTip settings
                 configfile.SetValue("ShowToolTips", ShowToolTips);
                 configfile.SetValue("ManifestToolTips", ManifestToolTips);
                 configfile.SetValue("TransferToolTips", TransferToolTips);
@@ -421,10 +409,37 @@ namespace ShipManifest
                 configfile.SetValue("RosterToolTips", RosterToolTips);
                 configfile.SetValue("HatchToolTips", HatchToolTips);
                 configfile.SetValue("PanelToolTips", PanelToolTips);
+                configfile.SetValue("AntennaToolTips", AntennaToolTips);
+                configfile.SetValue("LightToolTips", LightToolTips);
                 configfile.SetValue("DebuggerToolTips", DebuggerToolTips);
 
-                configfile.save();
+                // Sound Settings
+                configfile.SetValue("PumpSoundStart", PumpSoundStart);
+                configfile.SetValue("PumpSoundRun", PumpSoundRun);
+                configfile.SetValue("PumpSoundStop", PumpSoundStop);
+                configfile.SetValue("PumpSoundVol", PumpSoundVol);
+                configfile.SetValue("CrewSoundStart", CrewSoundStart);
+                configfile.SetValue("CrewSoundRun", CrewSoundRun);
+                configfile.SetValue("CrewSoundStop", CrewSoundStop);
+                configfile.SetValue("CrewSoundVol", CrewSoundVol);
 
+                // Configuration settings.
+                configfile.SetValue("EnableBlizzyToolbar", EnableBlizzyToolbar);
+                configfile.SetValue("ShowDebugger", ShowDebugger);
+                configfile.SetValue("VerboseLogging", VerboseLogging);
+                configfile.SetValue("AutoDebug", AutoDebug);
+                configfile.SetValue("SaveLogOnExit", SaveLogOnExit);
+                configfile.SetValue("ErrorLogLength", ErrorLogLength);
+                configfile.SetValue("EnableKerbalRename", EnableKerbalRename);
+                configfile.SetValue("RenameWithProfession", RenameWithProfession);
+                configfile.SetValue("AutoSave", AutoSave);
+                configfile.SetValue("SaveIntervalSec", (double)SaveIntervalSec);
+                configfile.SetValue("DebugLogPath", DebugLogPath);
+                configfile.SetValue("IVATimeDelaySec", IVATimeDelaySec);
+                configfile.SetValue("ShowIVAUpdateBtn", ShowIVAUpdateBtn);
+                configfile.SetValue("EnableTextureReplacer", EnableTextureReplacer);
+
+                configfile.save();
                 LogSettingsSave();
             }
             catch (Exception ex)
@@ -457,9 +472,11 @@ namespace ShipManifest
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
             prevFlowRate = FlowRate;
+            prevFlowCost = FlowCost;
             prevMinFlowRate = MinFlowRate;
             prevMaxFlowRate = MaxFlowRate;
             prevMaxFlowTimeSec = MaxFlowTimeSec;
+            prevEnableXferCost = EnableXferCost;
             prevPumpSoundStart = PumpSoundStart;
             prevPumpSoundRun = PumpSoundRun;
             prevPumpSoundStop = PumpSoundStop;
@@ -487,6 +504,8 @@ namespace ShipManifest
             prevRosterToolTips = RosterToolTips;
             prevHatchToolTips = HatchToolTips;
             prevPanelToolTips = PanelToolTips;
+            prevAntennaToolTips = AntennaToolTips;
+            prevLightToolTips = LightToolTips;
             prevDebuggerToolTips = DebuggerToolTips;
 
             // sounds
@@ -503,9 +522,11 @@ namespace ShipManifest
             AutoSave = prevAutoSave;
             SaveIntervalSec = prevSaveIntervalSec;
             FlowRate = prevFlowRate;
+            FlowCost = prevFlowCost;
             MinFlowRate = prevMinFlowRate;
             MaxFlowRate = prevMaxFlowRate;
             MaxFlowTimeSec = prevMaxFlowTimeSec;
+            EnableXferCost = prevEnableXferCost;
             PumpSoundStart = prevPumpSoundStart;
             PumpSoundRun = prevPumpSoundRun;
             PumpSoundStop = prevPumpSoundStop;
@@ -533,6 +554,8 @@ namespace ShipManifest
             RosterToolTips = prevRosterToolTips;
             HatchToolTips = prevHatchToolTips;
             PanelToolTips = prevPanelToolTips;
+            AntennaToolTips = prevAntennaToolTips;
+            LightToolTips = prevLightToolTips;
             DebuggerToolTips = prevDebuggerToolTips;
 
             //debugger Settings
@@ -546,7 +569,7 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("ResourceDebuggerPosition Loaded: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RosterPosition Loaded: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("SettingsPosition Loaded: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchPosition Loaded: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("HatchPosition Loaded: {0}, {1}, {2}, {3}", ControlPosition.xMin, ControlPosition.xMax, ControlPosition.yMin, ControlPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("ShowDebugger Loaded: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RealismMode Loaded: {0}", RealismMode.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("LockSettings Loaded: {0}", LockSettings.ToString()), "Info", VerboseLogging);
@@ -554,9 +577,11 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("AutoSave Loaded: {0}", AutoSave.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("SaveIntervalSec Loaded: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("FlowRate Loaded: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("FlowCost Loaded: {0}", FlowCost.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MinFlowRate Loaded: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MaxFlowRate Loaded: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MaxFlowTimeSec Loaded: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableXferCost Loaded: {0}", EnableXferCost.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundStart Loaded: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundRun Loaded: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundStop Loaded: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
@@ -596,6 +621,9 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("SettingsToolTips Loaded: {0}", SettingsToolTips), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RosterToolTips Loaded: {0}", RosterToolTips), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("HatchToolTips Loaded: {0}", HatchToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PanelToolTips Loaded: {0}", PanelToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AntennaToolTips Loaded: {0}", AntennaToolTips), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("LightToolTips Loaded: {0}", LightToolTips), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("DebuggerToolTips Loaded: {0}", DebuggerToolTips), "Info", VerboseLogging);
             Utilities.LogMessage("Load Settings Complete", "Info", VerboseLogging);
         }
@@ -607,8 +635,7 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("SettingsPosition Saved: {0}, {1}, {2}, {3}", SettingsPosition.xMin, SettingsPosition.xMax, SettingsPosition.yMin, SettingsPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RosterPosition Saved: {0}, {1}, {2}, {3}", RosterPosition.xMin, RosterPosition.xMax, RosterPosition.yMin, RosterPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("DebuggerPosition Saved: {0}, {1}, {2}, {3}", DebuggerPosition.xMin, DebuggerPosition.xMax, DebuggerPosition.yMin, DebuggerPosition.yMax), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchPosition Saved: {0}, {1}, {2}, {3}", HatchPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("PanelPosition Saved: {0}, {1}, {2}, {3}", PanelPosition.xMin, HatchPosition.xMax, HatchPosition.yMin, HatchPosition.yMax), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("ControlPosition Saved: {0}, {1}, {2}, {3}", ControlPosition.xMin, ControlPosition.xMax, ControlPosition.yMin, ControlPosition.yMax), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("ShowDebugger Saved: {0}", ShowDebugger.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RealismMode Saved: {0}", RealismMode.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("LockSettings Saved: {0}", LockSettings.ToString()), "Info", VerboseLogging);
@@ -616,9 +643,11 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("AutoSave Saved: {0}", AutoSave.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("SaveIntervalSec Saved: {0}", SaveIntervalSec.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("FlowRate Saved: {0}", FlowRate.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("FlowCost Saved: {0}", FlowCost.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MinFlowRate Saved: {0}", MinFlowRate.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MaxFlowRate Saved: {0}", MaxFlowRate.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("MaxFlowTimeSec Saved: {0}", MaxFlowTimeSec.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("EnableXferCost Saved: {0}", EnableXferCost.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundStart Saved: {0}", PumpSoundStart.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundRun Saved: {0}", PumpSoundRun.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("PumpSoundStop Saved: {0}", PumpSoundStop.ToString()), "Info", VerboseLogging);
@@ -657,6 +686,9 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("SettingsToolTips Saved: {0}", SettingsToolTips.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("RosterToolTips Saved: {0}", RosterToolTips.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("HatchToolTips Saved: {0}", HatchToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("PanelToolTips Saved: {0}", PanelToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("AntennaToolTips Saved: {0}", AntennaToolTips.ToString()), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("LightToolTips Saved: {0}", LightToolTips.ToString()), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("DebuggerToolTips Saved: {0}", DebuggerToolTips.ToString()), "Info", VerboseLogging);
         }
 

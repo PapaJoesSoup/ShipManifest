@@ -7,35 +7,23 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    static class WindowHatch
+    static class TabHatch
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = Settings.HatchToolTips;
 
         private static Vector2 DisplayViewerPosition = Vector2.zero;
-        internal static void Display(int windowId)
+        internal static void Display()
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.HatchToolTips;
+            ShowToolTips = Settings.ShowToolTips;
 
-            Rect rect = new Rect(366, 4, 16, 16);
-            if (GUI.Button(rect, new GUIContent("", "Close Window")))
-            {
-                Settings.ShowHatch = false;
-                ToolTip = "";
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Settings.HatchPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
-
-            // This is a scroll panel (we are using it to make button lists...)
-            GUILayout.BeginVertical();
-            DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, GUILayout.Height(200), GUILayout.Width(370));
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Hatch Control Panel ", GUILayout.Height(10));
+            GUILayout.Label("Hatch Control Center ", GUILayout.Height(10));
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
             string step = "start";
             try
@@ -70,22 +58,11 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in Hatches Window at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in Hatches Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
             }
             GUI.enabled = true;
             GUILayout.EndVertical();
-            GUILayout.EndScrollView();
 
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Close All Hatches", GUILayout.Height(20)))
-                CloseAllHatches();
-
-            if (GUILayout.Button("Open All Hatches", GUILayout.Height(20)))
-                OpenAllHatches();
-
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         }
 
         internal static void OpenAllHatches()

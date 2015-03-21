@@ -66,11 +66,16 @@ namespace ShipManifest
                 GUILayout.BeginHorizontal();
 
                 var settingsStyle = Settings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Settings", settingsStyle, GUILayout.Width(70), GUILayout.Height(20)))
+                if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
                 {
                     try
                     {
                         Settings.ShowSettings = !Settings.ShowSettings;
+                        if (Settings.ShowSettings)
+                        {
+                            // Store settings in case we cancel later...
+                            Settings.StoreTempSettings();
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -79,7 +84,7 @@ namespace ShipManifest
                 }
 
                 var rosterStyle = Settings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Roster", rosterStyle, GUILayout.Width(70), GUILayout.Height(20)))
+                if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
                 {
                     try
                     {
@@ -98,32 +103,16 @@ namespace ShipManifest
 
                 if (!Settings.EnableCLS)
                     GUI.enabled = false;
-                var hatchesStyle = Settings.ShowHatch ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Width(70), GUILayout.Height(20)))
+                var controlStyle = Settings.ShowControl ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
                 {
                     try
                     {
-                        SMAddon.UpdateCLSSpaces();
-                        SMAddon.GetHatches();
-                        Settings.ShowHatch = !Settings.ShowHatch;
+                        Settings.ShowControl = !Settings.ShowControl;
                     }
                     catch (Exception ex)
                     {
-                        Utilities.LogMessage(string.Format(" opening Hatches Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    }
-                }
-                GUI.enabled = true;
-                var panelsStyle = Settings.ShowPanel ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
-                if (GUILayout.Button("Solar Panels", panelsStyle, GUILayout.Width(80), GUILayout.Height(20)))
-                {
-                    try
-                    {
-                        SMAddon.smController.GetSolarPanels();
-                        Settings.ShowPanel = !Settings.ShowPanel;
-                    }
-                    catch (Exception ex)
-                    {
-                        Utilities.LogMessage(string.Format(" opening Solar Panels Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                        Utilities.LogMessage(string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     }
                 }
                 GUILayout.EndHorizontal();

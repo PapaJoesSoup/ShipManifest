@@ -13,6 +13,11 @@ namespace ShipManifest
         internal static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
         internal static Vector2 DebugScrollPosition = Vector2.zero;
 
+        // decimal string handlers for tex box
+        internal static bool strHasDecimal;
+        internal static bool strHasZero;
+
+
         private static List<string> _errors = new List<string>();
         internal static List<string> Errors
         {
@@ -111,10 +116,10 @@ namespace ShipManifest
                 ToolTip = WindowManifest.ToolTip;
             if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
                 ToolTip = WindowSettings.ToolTip;
-            if (WindowHatch.ToolTip != null && WindowHatch.ToolTip.Trim().Length > 0)
-                ToolTip = WindowHatch.ToolTip;
-            if (WindowSolarPanel.ToolTip != null && WindowSolarPanel.ToolTip.Trim().Length > 0)
-                ToolTip = WindowSolarPanel.ToolTip;
+            if (TabHatch.ToolTip != null && TabHatch.ToolTip.Trim().Length > 0)
+                ToolTip = TabHatch.ToolTip;
+            if (TabSolarPanel.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
+                ToolTip = TabSolarPanel.ToolTip;
 
             // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
             // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with onGUI callback functions)
@@ -159,5 +164,36 @@ namespace ShipManifest
 
         private static void EmptyWindow(int windowId)
         { }
+
+        internal static string GetStringDecimal(string strValue)
+        {
+            if (strHasDecimal)
+                strValue += ".";
+            return strValue;
+        }
+
+        internal static string GetStringZero(string strValue)
+        {
+            if (strHasZero)
+                strValue += "0";
+            return strValue;
+        }
+
+        internal static void SetStringZero(string strValue)
+        {
+            if (strValue.Contains(".") && strValue.EndsWith("0"))
+                strHasZero = true;
+            else
+                strHasZero = false;
+        }
+
+        internal static void SetStringDecimal(string strValue)
+        {
+            if (strValue.EndsWith(".") || strValue.EndsWith(".0"))
+                strHasDecimal = true;
+            else
+                strHasDecimal = false;
+        }
+
     }
 }
