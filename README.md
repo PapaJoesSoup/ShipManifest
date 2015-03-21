@@ -1,5 +1,14 @@
 ShipManifest
 ============
+Version 0.90.0_4.1.4.0 - Release 21 Mar, 2015 - More Control & Realism Tweaks Edition.
+ - New:  Added Antenna control support.
+ - New:  Added Light control support.  
+ - New:  Reworked Hatches, Solar Panels, Antennas and Lights into a single management window called Control
+ - New:  Reworked Settings Window to behave the same as the Control Window.  Tabbed sections for less scrolling :)
+ - New:  Added Electrical cost for Resource Xfers in realism mode, based on Actual Flow Rate, and Cost per unit setting in config.
+ - New:  Added Settings switch for Resource Xfer Electricl Cost in Realism.   Turn off if you don't wan't THAT much realism :)
+ - New:  Added support for vessel control state in realism mode.  Resource transfers not possible when controlable = false.
+
 Version 0.90.0_4.1.3.1 - Release 18 Mar, 2015 - Better Behaviours Edition.
  - New:  Revised SM Crew transfer display to show "Moving" in place of the Xfer button for the kerbal being moved when the crew transfer is in progress.   Helps with Xfer process visibility.
  - Bug:  Exceptions reported by SMAddon.CanShowShipManifest method when loading directly into a vessel on the pad from KSC.
