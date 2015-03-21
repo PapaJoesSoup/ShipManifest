@@ -1,5 +1,10 @@
 ShipManifest
 ============
+Version 0.90.0_4.1.3.1 - Release 18 Mar, 2015 - Better Behaviours Edition.
+ - New:  Revised SM Crew transfer display to show "Moving" in place of the Xfer button for the kerbal being moved when the crew transfer is in progress.   Helps with Xfer process visibility.
+ - Bug:  Exceptions reported by SMAddon.CanShowShipManifest method when loading directly into a vessel on the pad from KSC.
+ - Bug:  Frame rate slow down issues reported when planting a flag, coming near debris in flight mode.  Issue was introduced in version 4.1.0
+
 Version 0.90.0_4.1.3 - Release 12 Mar, 2015 - Better Behaviours Edition.
  - New:  Revised SM original Crew transfers to delay the actual transfer of a kerbal to the end of the wait period.
  - New:  Added support SM style Crew transfers when using the stock Crew transfer.  You now get crew movement sounds, and the same delay for crewmember transfers when in realism mode. Can be disabled.
