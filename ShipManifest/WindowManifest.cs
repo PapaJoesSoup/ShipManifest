@@ -32,7 +32,7 @@ namespace ShipManifest
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
             }
-            Rect rect = new Rect(300, 4, 16, 16);
+            Rect rect = new Rect(296, 4, 16, 16);
             if (GUI.Button(rect, label))
             {
                 SMAddon.OnSMButtonToggle();

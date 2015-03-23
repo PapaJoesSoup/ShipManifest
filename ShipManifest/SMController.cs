@@ -541,10 +541,14 @@ namespace ShipManifest
                     {
                         if (pModule.moduleName == "ModuleDeployableSolarPanel")
                         {
-                            SolarPanel pPanel = new SolarPanel();
-                            pPanel.PanelModule = pModule;
-                            pPanel.SPart = pPart;
-                            _solarPanels.Add(pPanel);
+                            ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)pModule;
+                            if (iModule.Events["Extend"].active || iModule.Events["Retract"].active)
+                            {
+                                SolarPanel pPanel = new SolarPanel();
+                                pPanel.PanelModule = pModule;
+                                pPanel.SPart = pPart;
+                                _solarPanels.Add(pPanel);
+                            }
                         }
                     }
                 }
@@ -560,20 +564,26 @@ namespace ShipManifest
             _antennas.Clear();
             try
             {
+                // Added support for RemoteTech antennas
                 foreach (Part pPart in SMAddon.vessel.Parts)
                 {
-                    if (pPart.Modules.Contains("ModuleDataTransmitter"))
+                    if (pPart.Modules.Contains("ModuleDataTransmitter") || pPart.Modules.Contains("ModuleRTAntenna"))
+                    {
+                        Antenna pAntenna = new Antenna();
+                        pAntenna.SPart = pPart;
                         foreach (PartModule pModule in pPart.Modules)
                         {
+                            if (pModule.moduleName == "ModuleDataTransmitter" || pModule.moduleName == "ModuleRTAntenna")
+                            {
+                                pAntenna.XmitterModule = pModule;
+                            }
                             if (pModule.moduleName == "ModuleAnimateGeneric" && (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
                             {
-                                Antenna pAntenna = new Antenna();
-                                pAntenna.AntennaModule = pModule;
-                                pAntenna.SPart = pPart;
-                                _antennas.Add(pAntenna);
-                                break;
+                                pAntenna.AnimateModule = pModule;
                             }
                         }
+                        _antennas.Add(pAntenna);
+                    }
                 }
             }
             catch (Exception ex)

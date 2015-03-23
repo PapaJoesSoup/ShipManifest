@@ -1150,7 +1150,7 @@ namespace ShipManifest
                         if (Settings.ShowShipManifest && Settings.ShowControl)
                         {
                             step = "7 - Show Hatches";
-                            Settings.ControlPosition = GUILayout.Window(398548, Settings.ControlPosition, WindowControl.Display, "Ship Manifest Part Control", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+                            Settings.ControlPosition = GUILayout.Window(398548, Settings.ControlPosition, WindowControl.Display, "Ship Manifest Part Control Center", GUILayout.MinWidth(350), GUILayout.MinHeight(20));
                         }
                     }
                     else

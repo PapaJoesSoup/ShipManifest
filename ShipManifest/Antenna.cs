@@ -8,11 +8,18 @@ namespace ShipManifest
 {
     class Antenna
     {
-        private PartModule _antennaModule;
-        internal PartModule AntennaModule
+        private PartModule _xmitterModule;
+        internal PartModule XmitterModule
         {
-            get { return _antennaModule; }
-            set { _antennaModule = value; }
+            get { return _xmitterModule; }
+            set { _xmitterModule = value; }
+        }
+
+        private PartModule _animaeModule;
+        internal PartModule AnimateModule
+        {
+            get { return _animaeModule; }
+            set { _animaeModule = value; }
         }
 
         private Part _spart;
@@ -22,14 +29,25 @@ namespace ShipManifest
             set { _spart = value; }
         }
 
+        internal bool isRTModule
+        {
+            get
+            {
+                if (XmitterModule.moduleName == "ModuleRTAntenna")
+                    return true;
+                else
+                    return false;
+            }
+        }
+
         internal bool Extended
         {
             get
             {
-                if (iModule.Events["Toggle"].guiName == "Retract")
-                    return true;
+                if (isRTModule)
+                    return XmitterModule.Events["EventClose"].active;
                 else
-                    return false;
+                    return iModule.Events["Toggle"].guiName == "Retract";
             }
         }
 
@@ -37,12 +55,24 @@ namespace ShipManifest
         {
             get
             {
-                if (iModule.Events["Toggle"].guiName == "Extend")
-                    return "Retracted";
+                // RT support:
+                if (isRTModule)
+                {
+                    if (XmitterModule.Events["EventClose"].active)
+                        return "Activated";
+                    else
+                        return "Deactivated";
+                }
                 else
-                    return "Extended";
+                {
+                    if (iModule.Events["Toggle"].guiName == "Retract")
+                        return "Extended";
+                    else
+                        return "Retracted";
+                }
             }
         }
+
         internal string Title
         {
             get
@@ -62,25 +92,33 @@ namespace ShipManifest
 
         private ModuleAnimateGeneric iModule
         {
-            get { return (ModuleAnimateGeneric)this.AntennaModule; }
+            get { return (ModuleAnimateGeneric)this.AnimateModule; }
         }
 
         internal Antenna() { }
-        internal Antenna(PartModule pModule, Part iPart)
+
+        internal Antenna(PartModule xModule, PartModule pModule, Part iPart)
         {
-            this.AntennaModule = pModule;
+            this.XmitterModule = xModule;
+            this.AnimateModule = pModule;
             this.SPart = iPart;
         }
 
         internal void ExtendAntenna()
         {
-            if (iModule.Events["Toggle"].guiName == "Extend")
+            // RT support:
+            if (isRTModule)
+                XmitterModule.Events["EventOpen"].Invoke();
+            else if (iModule.Events["Toggle"].guiName == "Extend")
                 iModule.Toggle();
         }
 
         internal void RetractAntenna()
         {
-            if (iModule.Events["Toggle"].guiName == "Retract")
+            // RT support:
+            if (isRTModule)
+                XmitterModule.Events["EventClose"].Invoke();
+            else if (iModule.Events["Toggle"].guiName == "Retract")
                 iModule.Toggle();
         }
 
