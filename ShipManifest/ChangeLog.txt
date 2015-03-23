@@ -1,5 +1,5 @@
 ﻿Version 0.90.0_4.1.4.1 - Release 22 Mar, 2015 - RT Antenna Integration Edition.
- - New:  Added Antenna control support.
+ - New:  Added Remote Tech (RT) Antenna control support.
  - Bug:  Undeployable Solar panels incorrectly show up in Solar panel list and generate an unmanaged error when Extended or Retracted.
 
 Version 0.90.0_4.1.4.0 - Release 21 Mar, 2015 - More Control & Realism Tweaks Edition.
