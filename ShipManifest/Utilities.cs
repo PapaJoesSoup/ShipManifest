@@ -116,13 +116,19 @@ namespace ShipManifest
                 ToolTip = WindowManifest.ToolTip;
             if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
                 ToolTip = WindowSettings.ToolTip;
+
+            // Control WIndow Tab switches
             if (TabHatch.ToolTip != null && TabHatch.ToolTip.Trim().Length > 0)
                 ToolTip = TabHatch.ToolTip;
             if (TabSolarPanel.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
                 ToolTip = TabSolarPanel.ToolTip;
+            if (TabAntenna.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
+                ToolTip = TabAntenna.ToolTip;
+            if (TabLight.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
+                ToolTip = TabLight.ToolTip;
 
             // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
-            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with onGUI callback functions)
+            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity uses onGUI callbacks so we need to allow for the callback)
             SMAddon.toolTip = ToolTip;
         }
 
@@ -130,9 +136,9 @@ namespace ShipManifest
         {
             if (Settings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
             {
-                Vector2 size = ManifestStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
+                Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
                 Rect rect = new Rect(toolTipPos.x + 20, toolTipPos.y - 4, size.x, size.y);
-                GUI.Window(0, rect, EmptyWindow, ToolTip, ManifestStyle.ToolTipStyle);
+                GUI.Window(0, rect, EmptyWindow, ToolTip, SMStyle.ToolTipStyle);
                 GUI.BringWindowToFront(0);
                 //Utilities.LogMessage(string.Format("ShowToolTip: \r\nRectangle data:  {0} \r\nToolTip:  {1}\r\nToolTipPos:  {2}", rect.ToString(), ToolTip, toolTipPos.ToString()), "Info", true);
             }

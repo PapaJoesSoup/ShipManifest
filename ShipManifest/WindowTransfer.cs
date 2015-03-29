@@ -67,7 +67,7 @@ namespace ShipManifest
                 {
                     GUILayout.BeginHorizontal();
                     GUILayout.Label(SMAddon.smController.SelectedPartSource != null ? string.Format("{0}", SMAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
-                    if (GUILayout.Button("Update Portraits", ManifestStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
+                    if (GUILayout.Button("Update Portraits", SMStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
                     {
                         SMAddon.smController.RespawnCrew();
                     }
@@ -139,7 +139,7 @@ namespace ShipManifest
                     int btnWidth = 265;
                     if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                         btnWidth = 180;
-                    var style = SMAddon.smController.SelectedPartSource == part ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                    var style = SMAddon.smController.SelectedPartSource == part ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
@@ -157,8 +157,8 @@ namespace ShipManifest
                     }
                     if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                     {
-                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
-                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledSourceStyle : ManifestStyle.ButtonSourceStyle;
+                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
+                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
@@ -228,13 +228,13 @@ namespace ShipManifest
                 // Adjust style colors for part selectors when using/not using CLS highlighting
                 if (Settings.EnableCLSHighlighting)
                 {
-                    ManifestStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartCrewColor];
-                    ManifestStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartColor];
+                    SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartCrewColor];
+                    SMStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartColor];
                 }
                 else
                 {
-                    ManifestStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
-                    ManifestStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartCrewColor];
+                    SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
+                    SMStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartCrewColor];
                 }
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
@@ -261,7 +261,7 @@ namespace ShipManifest
                     int btnWidth = 265;
                     if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                         btnWidth = 180;
-                    var style = SMAddon.smController.SelectedPartTarget == part ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                    var style = SMAddon.smController.SelectedPartTarget == part ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
                     {
@@ -278,8 +278,8 @@ namespace ShipManifest
                     }
                     if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
                     {
-                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
-                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonTargetStyle;
+                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
+                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
 
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
@@ -356,7 +356,7 @@ namespace ShipManifest
                     if (SMAddon.crewXfer || SMAddon.XferOn)
                         GUI.enabled = false;
 
-                    if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), ManifestStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                     {
                         ToolTip = "";
                         TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartSource);
@@ -383,7 +383,7 @@ namespace ShipManifest
                 }
                 else
                 {
-                    if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         SMAddon.smController.CrewXferMember = crewMember;
                         TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartTarget);
@@ -427,7 +427,7 @@ namespace ShipManifest
                     else
                         toolTip = "Experiment/data is transferable";
 
-                    if (GUILayout.Button(new GUIContent("Xfer", toolTip), ManifestStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         SMAddon.smController.SelectedModuleSource = pm;
                         TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
@@ -469,7 +469,7 @@ namespace ShipManifest
                     else if (count == 1)
                         ShowReceive = true;
                     //SelectedModuleTarget = pm;
-                    var style = ShowReceive ? ManifestStyle.ButtonToggledTargetStyle : ManifestStyle.ButtonStyle;
+                    var style = ShowReceive ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonStyle;
                     if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(50), GUILayout.Height(20)))
                     {
                         SMAddon.smController.SelectedModuleTarget = pm;
@@ -562,7 +562,7 @@ namespace ShipManifest
                     if (SMAddon.XferMode == thisXferMode)
                     {
                         GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
-                        GUILayout.Label((thisXferAmount - SMAddon.smController.AmtXferred).ToString(), ManifestStyle.LabelStyleBold, GUILayout.Width(85));
+                        GUILayout.Label((thisXferAmount - SMAddon.smController.AmtXferred).ToString(), SMStyle.LabelStyleBold, GUILayout.Width(85));
                     }
                 }
                 else

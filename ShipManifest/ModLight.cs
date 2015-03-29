@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    class Light
+    class ModLight
     {
         private PartModule _lightModule;
         internal PartModule LightModule
@@ -29,11 +29,11 @@ namespace ShipManifest
                 string title = "";
                 try
                 {
-                    title = iModule.part.parent.partInfo.title;
+                    title = iModule.part.partInfo.title + "\r\n on " + iModule.part.parent.partInfo.title;
                 }
                 catch
                 {
-                    title = "Unknown";
+                    title = iModule.part.partInfo.title;
                 }
                 return title;
             }
@@ -63,8 +63,8 @@ namespace ShipManifest
             get { return (ModuleLight)this.LightModule; }
         }
 
-        internal Light() { }
-        internal Light(PartModule pModule, Part iPart)
+        internal ModLight() { }
+        internal ModLight(PartModule pModule, Part iPart)
         {
             this.LightModule = pModule;
             this.SPart = iPart;

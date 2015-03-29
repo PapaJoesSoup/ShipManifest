@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    class SolarPanel
+    class ModSolarPanel
     {
         private PartModule _panelModule;
         internal PartModule PanelModule
@@ -55,11 +55,11 @@ namespace ShipManifest
                 string title = "";
                 try
                 {
-                    title = iModule.part.parent.partInfo.title;
+                    title = iModule.part.partInfo.title + "\r\n on " + iModule.part.parent.partInfo.title;
                 }
                 catch
                 {
-                    title = "Unknown";
+                    title = iModule.part.partInfo.title;
                 }
                 return title; 
             }
@@ -70,8 +70,8 @@ namespace ShipManifest
             get { return (ModuleDeployableSolarPanel)this.PanelModule; }
         }
 
-        internal SolarPanel() { }
-        internal SolarPanel(PartModule pModule, Part iPart)
+        internal ModSolarPanel() { }
+        internal ModSolarPanel(PartModule pModule, Part iPart)
         {
             this.PanelModule = pModule;
             this.SPart = iPart;

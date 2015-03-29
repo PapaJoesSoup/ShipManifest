@@ -146,28 +146,28 @@ namespace ShipManifest
         {
             GUILayout.BeginHorizontal();
 
-            var realismStyle = ShowRealismTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var realismStyle = ShowRealismTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Realism", realismStyle, GUILayout.Height(20)))
             {
                 ShowRealismTab = true;
             }
             GUI.enabled = true;
-            var highlightStyle = ShowHighlightTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var highlightStyle = ShowHighlightTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Highlighting", highlightStyle, GUILayout.Height(20)))
             {
                 ShowHighlightTab = true;
             }
-            var tooltipStyle = ShowToolTipTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var tooltipStyle = ShowToolTipTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("ToolTips", tooltipStyle, GUILayout.Height(20)))
             {
                 ShowToolTipTab = true;
             }
-            var soundStyle = ShowSoundsTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var soundStyle = ShowSoundsTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Sounds", soundStyle, GUILayout.Height(20)))
             {
                 ShowSoundsTab = true;
             }
-            var configStyle = ShowConfigTab ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var configStyle = ShowConfigTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Config", configStyle, GUILayout.Height(20)))
             {
                 ShowConfigTab = true;

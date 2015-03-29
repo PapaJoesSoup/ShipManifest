@@ -7,7 +7,7 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    internal class Hatch
+    internal class ModHatch
     {
         private PartModule _hatchModule;
         internal PartModule HatchModule
@@ -61,8 +61,8 @@ namespace ShipManifest
             get { return (IModuleDockingHatch)this.HatchModule; }
         }
 
-        internal Hatch() { }
-        internal Hatch(PartModule pModule, ICLSPart iPart)
+        internal ModHatch() { }
+        internal ModHatch(PartModule pModule, ICLSPart iPart)
         {
             this.HatchModule = pModule;
             this.CLSPart = iPart;

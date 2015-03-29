@@ -69,6 +69,9 @@ namespace ShipManifest
         internal static string PanelRetractedColor = "red";
 
         // Sound Options
+        // Default sound license: CC-By-SA
+        // http://www.freesound.org/people/vibe_crc/sounds/59328/
+
         internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
         internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
         internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
@@ -195,12 +198,8 @@ namespace ShipManifest
         internal static bool ShowControl { get; set; }
 
         internal static string DebugLogPath = "\\Plugins\\PluginData\\";
-        internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
         internal static bool CLSInstalled = false;
 
-
-        // Default sound license: CC-By-SA
-        // http://www.freesound.org/people/vibe_crc/sounds/59328/
 
         #endregion
 
@@ -451,7 +450,6 @@ namespace ShipManifest
         internal static void LoadColors()
         {
             Colors = new Dictionary<string, Color>();
-
             Colors.Add("black", Color.black);
             Colors.Add("blue", Color.blue);
             Colors.Add("clea", Color.clear);
@@ -462,6 +460,7 @@ namespace ShipManifest
             Colors.Add("red", Color.red);
             Colors.Add("white", Color.white);
             Colors.Add("yellow", Color.yellow);
+            Colors.Add("default", new Color(0.478f, 0.698f, 0.478f, 0.698f));
         }
 
         internal static void StoreTempSettings()

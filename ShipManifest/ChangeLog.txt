@@ -1,4 +1,8 @@
-﻿Version 4.1.4.1 - Release 22 Mar, 2015 - RT Antenna Integration Edition.
+﻿Version 4.1.4.2 - Release 29 Mar, 2015 - Control Window Tweaks Edition.
+- New: Added part name to description for Antennas, Solar Panels, and Lights in Control Window.
+- Fixed: If CLS is not installed, or CLS is disabled, Control Button is grayed out and Manifest Window is stuck in one position on screen. 
+
+Version 4.1.4.1 - Release 22 Mar, 2015 - RT Antenna Integration Edition.
  - New:  Added Remote Tech (RT) Antenna control support.
  - Fixed:  Undeployable Solar panels incorrectly show up in Solar panel list and generate an unmanaged error when Extended or Retracted.
 

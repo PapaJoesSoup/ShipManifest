@@ -65,7 +65,7 @@ namespace ShipManifest
 
                 GUILayout.BeginHorizontal();
 
-                var settingsStyle = Settings.ShowSettings ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var settingsStyle = Settings.ShowSettings ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
                 {
                     try
@@ -83,7 +83,7 @@ namespace ShipManifest
                     }
                 }
 
-                var rosterStyle = Settings.ShowRoster ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var rosterStyle = Settings.ShowRoster ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
                 {
                     try
@@ -101,9 +101,7 @@ namespace ShipManifest
                     }
                 }
 
-                if (!Settings.EnableCLS)
-                    GUI.enabled = false;
-                var controlStyle = Settings.ShowControl ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                var controlStyle = Settings.ShowControl ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
                 {
                     try
@@ -134,11 +132,11 @@ namespace ShipManifest
             try
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button(string.Format("Fill Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Fill Crew"), SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     SMAddon.smController.FillVesselCrew();
                 }
-                if (GUILayout.Button(string.Format("Empty Crew"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                if (GUILayout.Button(string.Format("Empty Crew"), SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                 {
                     SMAddon.smController.EmptyVesselCrew();
                 }
@@ -147,11 +145,11 @@ namespace ShipManifest
                 if (Settings.EnablePFResources)
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(string.Format("Fill Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                    if (GUILayout.Button(string.Format("Fill Resources"), SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
                         SMAddon.smController.FillVesselResources();
                     }
-                    if (GUILayout.Button(string.Format("Empty Resources"), ManifestStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+                    if (GUILayout.Button(string.Format("Empty Resources"), SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
                     {
                         SMAddon.smController.EmptyVesselResources();
                     }
@@ -176,7 +174,7 @@ namespace ShipManifest
                         width = 175;
 
                     string DisplayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
-                    var style = SMAddon.smController.SelectedResource == resourceName ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+                    var style = SMAddon.smController.SelectedResource == resourceName ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName + DisplayAmounts), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {
                         try
@@ -216,11 +214,11 @@ namespace ShipManifest
                     }
                     if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
-                        if (GUILayout.Button(string.Format("{0}", "Dump"), ManifestStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
+                        if (GUILayout.Button(string.Format("{0}", "Dump"), SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
                             SMAddon.smController.DumpResource(resourceName);
                         }
-                        if (GUILayout.Button(string.Format("{0}", "Fill"), ManifestStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
                         {
                             SMAddon.smController.FillResource(resourceName);
                         }

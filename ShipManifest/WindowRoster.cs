@@ -42,8 +42,8 @@ namespace ShipManifest
             }
         }
 
-        private static KerbalModel _selectedKerbal;
-        internal static KerbalModel SelectedKerbal
+        private static ModKerbal _selectedKerbal;
+        internal static ModKerbal SelectedKerbal
         {
             get { return _selectedKerbal; }
             set
@@ -120,11 +120,11 @@ namespace ShipManifest
                 {
                     GUIStyle labelStyle = null;
                     if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
-                        labelStyle = ManifestStyle.LabelStyleRed;
+                        labelStyle = SMStyle.LabelStyleRed;
                     else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
-                        labelStyle = ManifestStyle.LabelStyleYellow;
+                        labelStyle = SMStyle.LabelStyleYellow;
                     else
-                        labelStyle = ManifestStyle.LabelStyle;
+                        labelStyle = SMStyle.LabelStyle;
 
                     // What vessel is this Kerbal Assigned to?
                     string vesselName = "";
@@ -168,7 +168,7 @@ namespace ShipManifest
                     {
                         if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                         {
-                            SelectedKerbal = new KerbalModel(kerbal, false);
+                            SelectedKerbal = new ModKerbal(kerbal, false);
                             SetProfessionFlag();
                         }
                         else
@@ -257,7 +257,7 @@ namespace ShipManifest
                 bool kerbalFound = false;
                 while (!kerbalFound)
                 {
-                    SelectedKerbal = KerbalModel.CreateKerbal();
+                    SelectedKerbal = ModKerbal.CreateKerbal();
                     if (SelectedKerbal.Title == KerbalProfession)
                         kerbalFound = true;
                 }
@@ -285,11 +285,11 @@ namespace ShipManifest
                 GUILayout.EndHorizontal();
             }
             else
-                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", ManifestStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", SMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
 
             if (!string.IsNullOrEmpty(SMAddon.saveMessage))
             {
-                GUILayout.Label(SMAddon.saveMessage, ManifestStyle.ErrorLabelRedStyle);
+                GUILayout.Label(SMAddon.saveMessage, SMStyle.ErrorLabelRedStyle);
             }
             if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
             {

@@ -23,17 +23,17 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Antennas Control Center ", GUILayout.Height(10));
+            GUILayout.Label("Antenna Control Center ", GUILayout.Height(10));
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
             string step = "start";
             try
             {
                 // Display all hatches
-                foreach (Antenna iAntenna in SMAddon.smController.Antennas)
+                foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
                 {
                     string label = iAntenna.AntennaStatus + " - " + iAntenna.Title;
                     bool open = iAntenna.Extended;
-                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330));
+                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330), GUILayout.Height(40));
                     step = "button toggle check";
                     if (!open && newOpen)
                         iAntenna.ExtendAntenna();
@@ -55,7 +55,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Antenna iAntenna in SMAddon.smController.Antennas)
+            foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
             {
                 iAntenna.ExtendAntenna();
             }
@@ -65,7 +65,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Antenna iAntenna in SMAddon.smController.Antennas)
+            foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
             {
                 iAntenna.RetractAntenna();
             }

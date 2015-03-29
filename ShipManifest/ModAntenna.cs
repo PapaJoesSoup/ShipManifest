@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    class Antenna
+    class ModAntenna
     {
         private PartModule _xmitterModule;
         internal PartModule XmitterModule
@@ -80,11 +80,11 @@ namespace ShipManifest
                 string title = "";
                 try
                 {
-                    title = iModule.part.parent.partInfo.title;
+                    title = iModule.part.partInfo.title + "\r\n on " + iModule.part.parent.partInfo.title;
                 }
                 catch
                 {
-                    title = "Unknown";
+                    title = iModule.part.partInfo.title;
                 }
                 return title;
             }
@@ -95,9 +95,9 @@ namespace ShipManifest
             get { return (ModuleAnimateGeneric)this.AnimateModule; }
         }
 
-        internal Antenna() { }
+        internal ModAntenna() { }
 
-        internal Antenna(PartModule xModule, PartModule pModule, Part iPart)
+        internal ModAntenna(PartModule xModule, PartModule pModule, Part iPart)
         {
             this.XmitterModule = xModule;
             this.AnimateModule = pModule;

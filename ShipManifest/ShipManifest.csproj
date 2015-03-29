@@ -71,17 +71,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Antenna.cs" />
+    <Compile Include="ModAntenna.cs" />
     <Compile Include="CLSClient.cs" />
-    <Compile Include="Light.cs" />
-    <Compile Include="SolarPanel.cs" />
+    <Compile Include="ModLight.cs" />
+    <Compile Include="ModSolarPanel.cs" />
     <Compile Include="TabAntenna.cs" />
+    <Compile Include="UtilsGui.cs" />
     <Compile Include="WindowControl.cs" />
     <Compile Include="WindowDebugger.cs" />
-    <Compile Include="Hatch.cs" />
+    <Compile Include="ModHatch.cs" />
     <Compile Include="TabHatch.cs" />
-    <Compile Include="ManifestStyle.cs" />
-    <Compile Include="KerbalModel.cs" />
+    <Compile Include="SMStyle.cs" />
+    <Compile Include="ModKerbal.cs" />
     <Compile Include="TabLight.cs" />
     <Compile Include="WindowRoster.cs" />
     <Compile Include="Settings.cs" />

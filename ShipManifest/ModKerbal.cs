@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    public class KerbalModel
+    public class ModKerbal
     {
         public ProtoCrewMember Kerbal { get; set; }
         public bool IsNew { get; set; }
@@ -17,7 +17,7 @@ namespace ShipManifest
         public string Name;
         public string Title;
 
-        public KerbalModel(ProtoCrewMember kerbal, bool isNew)
+        public ModKerbal(ProtoCrewMember kerbal, bool isNew)
         {
             this.Kerbal = kerbal;
             Name = kerbal.name;
@@ -48,10 +48,10 @@ namespace ShipManifest
             return string.Empty;
         }
 
-        public static KerbalModel CreateKerbal()
+        public static ModKerbal CreateKerbal()
         {
             ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
-            return new KerbalModel(kerbal, true);
+            return new ModKerbal(kerbal, true);
         }
 
         public void SyncKerbal()

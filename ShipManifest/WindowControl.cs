@@ -106,7 +106,7 @@ namespace ShipManifest
 
             if (!Settings.EnableCLS)
                 GUI.enabled = false;
-            var hatchesStyle = ShowHatch ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var hatchesStyle = ShowHatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))
             {
                 try
@@ -121,7 +121,7 @@ namespace ShipManifest
                 }
             }
             GUI.enabled = true;
-            var panelsStyle = ShowPanel ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var panelsStyle = ShowPanel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Solar Panels", panelsStyle, GUILayout.Height(20)))
             {
                 try
@@ -134,7 +134,7 @@ namespace ShipManifest
                     Utilities.LogMessage(string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
-            var antennaStyle = ShowAntenna ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var antennaStyle = ShowAntenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Antennas", antennaStyle, GUILayout.Height(20)))
             {
                 try
@@ -147,7 +147,7 @@ namespace ShipManifest
                     Utilities.LogMessage(string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
-            var lightsStyle = ShowLight ? ManifestStyle.ButtonToggledStyle : ManifestStyle.ButtonStyle;
+            var lightsStyle = ShowLight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Lights", lightsStyle, GUILayout.Height(20)))
             {
                 try

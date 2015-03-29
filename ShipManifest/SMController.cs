@@ -304,13 +304,13 @@ namespace ShipManifest
         internal ICLSSpace clsSpaceTarget;
 
         // Control Window parts
-        private List<SolarPanel> _solarPanels = new List<SolarPanel>();
-        internal List<SolarPanel> SolarPanels
+        private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
+        internal List<ModSolarPanel> SolarPanels
         {
             get
             {
                 if (_solarPanels == null)
-                    _solarPanels = new List<SolarPanel>();
+                    _solarPanels = new List<ModSolarPanel>();
                 return _solarPanels;
             }
             set
@@ -320,13 +320,13 @@ namespace ShipManifest
             }
         }
 
-        private List<Light> _lights = new List<Light>();
-        internal List<Light> Lights
+        private List<ModLight> _lights = new List<ModLight>();
+        internal List<ModLight> Lights
         {
             get
             {
                 if (_lights == null)
-                    _lights = new List<Light>();
+                    _lights = new List<ModLight>();
                 return _lights;
             }
             set
@@ -336,13 +336,13 @@ namespace ShipManifest
             }
         }
 
-        private List<Antenna> _antennas = new List<Antenna>();
-        internal List<Antenna> Antennas
+        private List<ModAntenna> _antennas = new List<ModAntenna>();
+        internal List<ModAntenna> Antennas
         {
             get
             {
                 if (_antennas == null)
-                    _antennas = new List<Antenna>();
+                    _antennas = new List<ModAntenna>();
                 return _antennas;
             }
             set
@@ -544,7 +544,7 @@ namespace ShipManifest
                             ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)pModule;
                             if (iModule.Events["Extend"].active || iModule.Events["Retract"].active)
                             {
-                                SolarPanel pPanel = new SolarPanel();
+                                ModSolarPanel pPanel = new ModSolarPanel();
                                 pPanel.PanelModule = pModule;
                                 pPanel.SPart = pPart;
                                 _solarPanels.Add(pPanel);
@@ -569,7 +569,7 @@ namespace ShipManifest
                 {
                     if (pPart.Modules.Contains("ModuleDataTransmitter") || pPart.Modules.Contains("ModuleRTAntenna"))
                     {
-                        Antenna pAntenna = new Antenna();
+                        ModAntenna pAntenna = new ModAntenna();
                         pAntenna.SPart = pPart;
                         foreach (PartModule pModule in pPart.Modules)
                         {
@@ -603,7 +603,7 @@ namespace ShipManifest
                     {
                         if (pModule.moduleName == "ModuleLight")
                         {
-                            Light pLight = new Light();
+                            ModLight pLight = new ModLight();
                             pLight.LightModule = pModule;
                             pLight.SPart = pPart;
                             _lights.Add(pLight);

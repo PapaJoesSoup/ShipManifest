@@ -29,7 +29,7 @@ namespace ShipManifest
             try
             {
                 // Display all hatches
-                foreach (Hatch iHatch in SMAddon.Hatches)
+                foreach (ModHatch iHatch in SMAddon.Hatches)
                 {
                     bool isEnabled = true;
                     bool open = false;
@@ -69,7 +69,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Hatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -86,7 +86,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Hatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -101,7 +101,7 @@ namespace ShipManifest
 
         internal static void HighlightAllHatches(bool enable)
         {
-            foreach (Hatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (enable)

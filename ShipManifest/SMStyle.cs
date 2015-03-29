@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-    internal static class ManifestStyle
+    internal static class SMStyle
     {
         internal static GUIStyle WindowStyle;
         internal static GUIStyle IconStyle;

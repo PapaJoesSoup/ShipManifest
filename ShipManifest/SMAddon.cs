@@ -75,13 +75,13 @@ namespace ShipManifest
 
         #endregion
 
-        private static List<Hatch> _hatches = new List<Hatch>();
-        internal static List<Hatch> Hatches
+        private static List<ModHatch> _hatches = new List<ModHatch>();
+        internal static List<ModHatch> Hatches
         {
             get
             {
                 if (_hatches == null)
-                    _hatches = new List<Hatch>();
+                    _hatches = new List<ModHatch>();
                 return _hatches;
             }
             set
@@ -883,7 +883,7 @@ namespace ShipManifest
                     {
                         if (pModule.moduleName == "ModuleDockingHatch")
                         {
-                            Hatch pHatch = new Hatch();
+                            ModHatch pHatch = new ModHatch();
                             pHatch.HatchModule = pModule;
                             pHatch.CLSPart = iPart;
                             _hatches.Add(pHatch);
@@ -1096,7 +1096,7 @@ namespace ShipManifest
             try
             {
                 step = "0 - Start";
-                ManifestStyle.SetupGUI();
+                SMStyle.SetupGUI();
 
                 if (Settings.ShowDebugger)
                     Settings.DebuggerPosition = GUILayout.Window(398643, Settings.DebuggerPosition, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + Settings.CurVersion, GUILayout.MinHeight(20));

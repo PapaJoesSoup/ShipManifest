@@ -23,17 +23,17 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("External Lights Control Center ", GUILayout.Height(10));
+            GUILayout.Label("External Light Control Center ", GUILayout.Height(10));
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
             string step = "start";
             try
             {
                 // Display all Lights
-                foreach (Light iLight in SMAddon.smController.Lights)
+                foreach (ModLight iLight in SMAddon.smController.Lights)
                 {
                     string label = iLight.Status + " - " + iLight.Title;
                     bool OnState = iLight.isOn;
-                    bool newOnState = GUILayout.Toggle(OnState, label, GUILayout.Width(330));
+                    bool newOnState = GUILayout.Toggle(OnState, label, GUILayout.Width(330), GUILayout.Height(40));
                     step = "button toggle check";
                     if (!OnState && newOnState)
                         iLight.TurnOnLight();
@@ -55,7 +55,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Light iLight in SMAddon.smController.Lights)
+            foreach (ModLight iLight in SMAddon.smController.Lights)
             {
                 iLight.TurnOnLight();
             }
@@ -65,7 +65,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (Light iLight in SMAddon.smController.Lights)
+            foreach (ModLight iLight in SMAddon.smController.Lights)
             {
                 iLight.TurnOffLight();
             }

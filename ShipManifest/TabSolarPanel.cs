@@ -29,7 +29,7 @@ namespace ShipManifest
             try
             {
                 // Display all hatches
-                foreach (SolarPanel iPanel in SMAddon.smController.SolarPanels)
+                foreach (ModSolarPanel iPanel in SMAddon.smController.SolarPanels)
                 {
                     bool isEnabled = true;
                     string label = iPanel.PanelStatus + " - " + iPanel.Title;
@@ -49,7 +49,7 @@ namespace ShipManifest
                         label = iPanel.PanelStatus + " - (Locked) - " + iPanel.Title;;
                         isEnabled = false;
                     }
-                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330));
+                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330), GUILayout.Height(40));
                     step = "button toggle check";
                     if (!open && newOpen)
                         iPanel.ExtendPanel();
@@ -71,7 +71,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (SolarPanel iPanel in SMAddon.smController.SolarPanels)
+            foreach (ModSolarPanel iPanel in SMAddon.smController.SolarPanels)
             {
                 ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)iPanel.PanelModule;
                 if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.RETRACTED)
@@ -85,7 +85,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (SolarPanel iPanel in SMAddon.smController.SolarPanels)
+            foreach (ModSolarPanel iPanel in SMAddon.smController.SolarPanels)
             {
                 ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)iPanel.PanelModule;
                 if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.EXTENDED)
