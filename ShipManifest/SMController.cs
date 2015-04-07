@@ -89,7 +89,6 @@ namespace ShipManifest
                         foreach (Part part in Vessel.Parts)
                         {
                             // First let's Get any Crew, if desired...
-                            Utilities.LogMessage(string.Format(" part.ClassName:  {0}", part.ClassName), "Info", true);
                             if (Settings.EnableCrew && (part.CrewCapacity > 0 && part.partInfo.name != "kerbalEVA"))
                             {
                                 bool vResourceFound = false;
