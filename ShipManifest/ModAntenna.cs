@@ -80,11 +80,11 @@ namespace ShipManifest
                 string title = "";
                 try
                 {
-                    title = iModule.part.partInfo.title + "\r\n on " + iModule.part.parent.partInfo.title;
+                    title = _spart.partInfo.title + "\r\n on " + _spart.parent.partInfo.title;
                 }
                 catch
                 {
-                    title = iModule.part.partInfo.title;
+                    title = _spart.partInfo.title;
                 }
                 return title;
             }
@@ -129,26 +129,26 @@ namespace ShipManifest
             {
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    step = "inside box - panel Extended/retracted?";
-                    iModule.part.SetHighlightColor(Settings.Colors[Settings.PanelExtendedColor]);
+                    step = "inside box - antenna Extended/retracted?";
+                    _spart.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
                     step = "highlight on";
-                    iModule.part.SetHighlight(true, false);
+                    _spart.SetHighlight(true, false);
                 }
                 else
                 {
                     step = "outside box - highlight off";
-                    if (iModule.part.highlightColor == Settings.Colors[Settings.PanelExtendedColor] || iModule.part.highlightColor == Settings.Colors[Settings.PanelRetractedColor])
+                    if (_spart.highlightColor == Settings.Colors[Settings.MouseOverColor])
                     {
                         step = "highlight off - turning off highlighting";
-                        iModule.part.SetHighlight(false, false);
-                        iModule.part.SetHighlightDefault();
-                        iModule.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                        _spart.SetHighlight(false, false);
+                        _spart.SetHighlightDefault();
+                        _spart.SetHighlightType(Part.HighlightType.OnMouseOver);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in SolarPanel.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+                Utilities.LogMessage(string.Format(" in modAntenna.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
             }
         }
     }

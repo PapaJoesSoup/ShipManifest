@@ -14,9 +14,7 @@ namespace ShipManifest
 
         internal static Dictionary<string, Color> Colors;
 
-        internal static string KSP_Ver = Versioning.GetVersionString();
-        internal static string SM_Ver = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        internal static string CurVersion = KSP_Ver + "_" + SM_Ver;
+        internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         // Persisted properties
         // Window Positions
@@ -63,10 +61,7 @@ namespace ShipManifest
         internal static string TargetPartColor = "green";
         internal static string TargetPartCrewColor = "blue";
         internal static string CLS_SpaceColor = "green";
-        internal static string HatchOpenColor = "cyan";
-        internal static string HatchCloseColor = "red";
-        internal static string PanelExtendedColor = "cyan";
-        internal static string PanelRetractedColor = "red";
+        internal static string MouseOverColor = "green";
 
         // Sound Options
         // Default sound license: CC-By-SA
@@ -251,10 +246,7 @@ namespace ShipManifest
                 SourcePartColor = configfile.GetValue<string>("SourcePartColor", SourcePartColor);
                 TargetPartColor = configfile.GetValue<string>("TargetPartColor", TargetPartColor);
                 TargetPartCrewColor = configfile.GetValue<string>("TargetPartCrewColor", TargetPartCrewColor);
-                HatchOpenColor = configfile.GetValue<string>("HatchOpenColor", HatchOpenColor);
-                HatchCloseColor = configfile.GetValue<string>("HatchCloseColor", HatchCloseColor);
-                PanelExtendedColor = configfile.GetValue<string>("PanelExtendedColor", PanelExtendedColor);
-                PanelRetractedColor = configfile.GetValue<string>("PanelRetractedColor", PanelRetractedColor);
+                MouseOverColor = configfile.GetValue<string>("MouseOverColor", MouseOverColor);
 
                 EnableHighlighting = configfile.GetValue<bool>("EnableHighlighting", EnableHighlighting);
                 OnlySourceTarget = configfile.GetValue<bool>("OnlySourceTarget", OnlySourceTarget);
@@ -395,10 +387,7 @@ namespace ShipManifest
                 configfile.SetValue("SourcePartColor", SourcePartColor);
                 configfile.SetValue("TargetPartColor", TargetPartColor);
                 configfile.SetValue("TargetPartCrewColor", TargetPartCrewColor);
-                configfile.SetValue("HatchOpenColor", HatchOpenColor);
-                configfile.SetValue("HatchCloseColor", HatchCloseColor);
-                configfile.SetValue("PanelExtendedColor", PanelExtendedColor);
-                configfile.SetValue("PanelRetractedColor", PanelRetractedColor);
+                configfile.SetValue("MouseOverColor", MouseOverColor);
 
                 // ToolTip settings
                 configfile.SetValue("ShowToolTips", ShowToolTips);
@@ -592,10 +581,7 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("SourcePartColor Loaded: {0}", SourcePartColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("TargetPartColor Loaded: {0}", TargetPartColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("TargetPartCrewColor Loaded: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchOpenColor Loaded: {0}", HatchOpenColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchCloseColor Loaded: {0}", HatchCloseColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("PanelExtendedColor Loaded: {0}", PanelExtendedColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("PanelRetractedColor Loaded: {0}", PanelRetractedColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MouseOverColor Loaded: {0}", MouseOverColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("EnableCrew Loaded: {0}", EnableCrew), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("EnableHighlighting Loaded: {0}", EnableHighlighting), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("OnlySourceTarget Loaded: {0}", OnlySourceTarget), "Info", VerboseLogging);
@@ -658,8 +644,7 @@ namespace ShipManifest
             Utilities.LogMessage(string.Format("SourcePartColor Saved: {0}", SourcePartColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("TargetPartColor Saved: {0}", TargetPartColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("TargetPartCrewColor Saved: {0}", TargetPartCrewColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchOpenColor Saved: {0}", HatchOpenColor), "Info", VerboseLogging);
-            Utilities.LogMessage(string.Format("HatchCloseColor Saved: {0}", HatchCloseColor), "Info", VerboseLogging);
+            Utilities.LogMessage(string.Format("MouseOverColor Saved: {0}", MouseOverColor), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("EnableHighlighting Saved: {0}", EnableHighlighting), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("OnlySourceTarget Saved: {0}", OnlySourceTarget), "Info", VerboseLogging);
             Utilities.LogMessage(string.Format("EnableCLSHighlighting Saved: {0}", EnableCLSHighlighting), "Info", VerboseLogging);

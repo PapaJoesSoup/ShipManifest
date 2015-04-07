@@ -12,6 +12,7 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = Settings.PanelToolTips;
+        internal static bool isRTAntennas = false;
 
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display()
@@ -31,6 +32,9 @@ namespace ShipManifest
                 // Display all hatches
                 foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
                 {
+                    if (!isRTAntennas && iAntenna.isRTModule)
+                        isRTAntennas = true;
+                    step = "get Antenna label";
                     string label = iAntenna.AntennaStatus + " - " + iAntenna.Title;
                     bool open = iAntenna.Extended;
                     bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330), GUILayout.Height(40));
@@ -46,7 +50,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
             }
             GUILayout.EndVertical();
         }

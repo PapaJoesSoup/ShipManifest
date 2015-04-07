@@ -46,7 +46,10 @@ namespace ShipManifest
                 string title = "";
                 try
                 {
-                    title = iModule.ModDockNode.part.parent.partInfo.title;
+                    if (null != _clsPart.Part.parent)
+                        title = _clsPart.Part.parent.partInfo.title;
+                    else
+                        title = _clsPart.Part.partInfo.title;
                 }
                 catch
                 {
@@ -89,15 +92,12 @@ namespace ShipManifest
             {
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    if (iModule.HatchOpen)
-                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchOpenColor]);
-                    else
-                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchCloseColor]);
-                    iModule.ModDockNode.part.SetHighlight(true, false);
+                    _clsPart.Part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
+                    _clsPart.Part.SetHighlight(true, false);
                 }
                 else
                 {
-                    if (iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchOpenColor] || iModule.ModDockNode.part.highlightColor == Settings.Colors[Settings.HatchCloseColor])
+                    if (_clsPart.Part.highlightColor == Settings.Colors[Settings.MouseOverColor])
                     {
                         if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
                         {
@@ -105,16 +105,16 @@ namespace ShipManifest
                                 CLSPart.Highlight(true, true);
                             else
                             {
-                                iModule.ModDockNode.part.SetHighlight(false, false);
-                                iModule.ModDockNode.part.SetHighlightDefault();
-                                iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                                _clsPart.Part.SetHighlight(false, false);
+                                _clsPart.Part.SetHighlightDefault();
+                                _clsPart.Part.SetHighlightType(Part.HighlightType.OnMouseOver);
                             }
                         }
                         else
                         {
-                            iModule.ModDockNode.part.SetHighlight(false, false);
-                            iModule.ModDockNode.part.SetHighlightDefault();
-                            iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                            _clsPart.Part.SetHighlight(false, false);
+                            _clsPart.Part.SetHighlightDefault();
+                            _clsPart.Part.SetHighlightType(Part.HighlightType.OnMouseOver);
                         }
                     }
                 }

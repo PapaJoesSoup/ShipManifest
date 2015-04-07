@@ -57,10 +57,7 @@
   <string name="SourcePartColor">red</string>
   <string name="TargetPartColor">green</string>
   <string name="TargetPartCrewColor">blue</string>
-  <string name="HatchOpenColor">blue</string>
-  <string name="HatchCloseColor">red</string>
-  <string name="PanelExtendedColor">green</string>
-  <string name="PanelRetractedColor">red</string>
+  <string name="MouseOverColor">green</string>
   <bool name="EnableHighlighting">1</bool>
   <bool name="OnlySourceTarget">0</bool>
   <bool name="EnableCLSHighlighting">1</bool>

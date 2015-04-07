@@ -106,10 +106,7 @@ namespace ShipManifest
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (enable)
                 {
-                    if (iModule.HatchOpen)
-                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchOpenColor]);
-                    else
-                        iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.HatchCloseColor]);
+                    iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
                     iModule.ModDockNode.part.SetHighlight(true, false);
                 }
                 else

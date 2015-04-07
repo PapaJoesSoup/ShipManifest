@@ -50,6 +50,28 @@ namespace ShipManifest
                 {
                     currAmount = (double)SMAddon.smController.Vessel.GetCrewCount();
                     totAmount = (double)SMAddon.smController.Vessel.GetCrewCapacity();
+
+                    // Now check for occupied external seats
+                    // external seats that are occupied will show up in getcrewcount and getcrewcapacity
+                    // Since we cannot yet xfer external crew, we need to remove them from the count..
+                    foreach (Part iPart in SMAddon.smController.Vessel.parts)
+                    {
+                        if (iPart.Modules.Contains("KerbalSeat"))
+                        {
+                            foreach (PartModule iModule in iPart.Modules)
+                            {
+                                if (iModule.ClassName == "KerbalSeat")
+                                {
+                                    KerbalSeat kSeat = (KerbalSeat)iModule;
+                                    if (kSeat.Occupant != null)
+                                    {
+                                        currAmount -= 1;
+                                        totAmount -= 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else if (selectedResource == "Science")
                 {
