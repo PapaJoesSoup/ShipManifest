@@ -12,7 +12,10 @@ namespace ShipManifest
     {
         #region Properties
 
+        internal static bool Loaded = false;
+        
         internal static Dictionary<string, Color> Colors;
+
 
         internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
@@ -150,6 +153,18 @@ namespace ShipManifest
 
         // Internal properties for plugin management.  Not persisted, not user managed.
         // Flags to show windows
+
+        internal static bool _ShowUI = true;
+        internal static bool ShowUI {
+            get
+            {
+                return _ShowUI;
+            }
+            set
+            {
+                _ShowUI = value;
+            }
+        }
         internal static bool ShowTransferWindow { get; set; }
         private static bool _showShipManifest = false;
         internal static bool ShowShipManifest
@@ -280,7 +295,7 @@ namespace ShipManifest
                 DebuggerToolTips = configfile.GetValue<bool>("DebuggerToolTips", DebuggerToolTips);
 
                 // Lets make sure that the windows can be seen on the screen. (different resolutions)
-                ResetWindowPositions();
+                RepositionWindows();
 
                 // Default values for Flow rates
                 if (FlowRate == 0)
@@ -307,7 +322,7 @@ namespace ShipManifest
                     CrewSoundStop = "ShipManifest/Sounds/14214-3";
 
                 LogSettingsLoad();
-
+                Loaded = true;
             }
             catch (Exception ex)
             {
@@ -315,38 +330,37 @@ namespace ShipManifest
             }
         }
 
-        private static void ResetWindowPositions()
+        private static void RepositionWindows()
         {
-            if (ManifestPosition.xMax > Screen.currentResolution.width || ManifestPosition.yMax > Screen.currentResolution.height)
-            {
-                ManifestPosition.x = 0;
-                ManifestPosition.y = 0;
-            }
-            if (TransferPosition.xMax > Screen.currentResolution.width || TransferPosition.yMax > Screen.currentResolution.height)
-            {
-                TransferPosition.x = 0;
-                TransferPosition.y = 0;
-            }
-            if (DebuggerPosition.xMax > Screen.currentResolution.width || DebuggerPosition.yMax > Screen.currentResolution.height)
-            {
-                DebuggerPosition.x = 0;
-                DebuggerPosition.y = 0;
-            }
-            if (SettingsPosition.xMax > Screen.currentResolution.width || SettingsPosition.yMax > Screen.currentResolution.height)
-            {
-                SettingsPosition.x = 0;
-                SettingsPosition.y = 0;
-            }
-            if (ControlPosition.xMax > Screen.currentResolution.width || ControlPosition.yMax > Screen.currentResolution.height)
-            {
-                ControlPosition.x = 0;
-                ControlPosition.y = 0;
-            }
-            if (RosterPosition.xMax > Screen.currentResolution.width || RosterPosition.yMax > Screen.currentResolution.height)
-            {
-                RosterPosition.x = 0;
-                RosterPosition.y = 0;
-            }
+            if (ManifestPosition.xMax > Screen.currentResolution.width)
+                ManifestPosition.x = Screen.currentResolution.width - ManifestPosition.width;
+            if (ManifestPosition.yMax > Screen.currentResolution.height)
+                ManifestPosition.y = Screen.currentResolution.height - ManifestPosition.height;
+
+            if (TransferPosition.xMax > Screen.currentResolution.width)
+                TransferPosition.x = Screen.currentResolution.width - TransferPosition.width;
+            if (TransferPosition.yMax > Screen.currentResolution.height)
+                TransferPosition.y = Screen.currentResolution.height - TransferPosition.height;
+
+            if (DebuggerPosition.xMax > Screen.currentResolution.width)
+                DebuggerPosition.x = Screen.currentResolution.width - DebuggerPosition.width;
+            if (DebuggerPosition.yMax > Screen.currentResolution.height)
+                DebuggerPosition.y = Screen.currentResolution.height - DebuggerPosition.height;
+
+            if (SettingsPosition.xMax > Screen.currentResolution.width)
+                SettingsPosition.x = Screen.currentResolution.width - SettingsPosition.width;
+            if (SettingsPosition.yMax > Screen.currentResolution.height)
+                SettingsPosition.y = Screen.currentResolution.height - SettingsPosition.height;
+
+            if (ControlPosition.xMax > Screen.currentResolution.width)
+                ControlPosition.x = Screen.currentResolution.width - ControlPosition.width;
+            if (ControlPosition.yMax > Screen.currentResolution.height)
+                ControlPosition.y = Screen.currentResolution.height - ControlPosition.height;
+
+            if (RosterPosition.xMax > Screen.currentResolution.width)
+                RosterPosition.x = Screen.currentResolution.width - RosterPosition.width;
+            if (RosterPosition.yMax > Screen.currentResolution.height)
+                RosterPosition.y = Screen.currentResolution.height - RosterPosition.height;
         }
 
         internal static void Save()
@@ -359,7 +373,7 @@ namespace ShipManifest
                 // Window settings
                 configfile.SetValue("ManifestPosition", ManifestPosition);
                 configfile.SetValue("TransferPosition", TransferPosition);
-                configfile.SetValue("RosterPosition", SettingsPosition);
+                configfile.SetValue("RosterPosition", RosterPosition);
                 configfile.SetValue("SettingsPosition", SettingsPosition);
                 configfile.SetValue("ControlPosition", ControlPosition);
                 configfile.SetValue("DebuggerPosition", DebuggerPosition);

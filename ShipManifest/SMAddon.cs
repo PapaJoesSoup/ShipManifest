@@ -150,19 +150,19 @@ namespace ShipManifest
                     if (GetCLSAddon())
                     {
                         Settings.CLSInstalled = true;
-                        RunSave();
                     }
                     else
                     {
                         Settings.EnableCLS = false;
                         Settings.CLSInstalled = false;
-                        RunSave();
                     }
+                    RunSave();
                 }
 
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     // Instantiate Event handlers
+                    GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
                     GameEvents.onVesselChange.Add(OnVesselChange);
                     GameEvents.onPartDie.Add(OnPartDie);
                     GameEvents.onPartExplode.Add(OnPartExplode);
@@ -177,6 +177,8 @@ namespace ShipManifest
                     GameEvents.onVesselTerminated.Add(OnVesselTerminated);
                     GameEvents.onFlightReady.Add(OnFlightReady);
                     GameEvents.onCrewTransferred.Add(OnCrewTransferred);
+                    GameEvents.onShowUI.Add(OnShowUI);
+                    GameEvents.onHideUI.Add(OnHideUI);
 
                     // get the current Vessel data
                     vessel = FlightGlobals.ActiveVessel;
@@ -209,7 +211,9 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
             try
             {
-                Save();
+                if (Settings.Loaded)
+                    RunSave();
+                GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
                 GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onVesselChange.Remove(OnVesselChange);
                 GameEvents.onPartDie.Remove(OnPartDie);
@@ -225,6 +229,8 @@ namespace ShipManifest
                 GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
                 GameEvents.onFlightReady.Remove(OnFlightReady);
                 GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
+                GameEvents.onHideUI.Remove(OnHideUI);
+                GameEvents.onShowUI.Remove(OnShowUI);
 
                 CancelInvoke("RunSave");
 
@@ -332,6 +338,26 @@ namespace ShipManifest
                     frameErrTripped = true;
                 }
             }
+        }
+
+        // save settings on scene changes
+        private void OnGameSceneLoadRequested(GameScenes RequestedScene)
+        {
+            Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGameSceneLoadRequested");
+            if (Settings.Loaded)
+                RunSave();
+        }
+
+        // UI visible state handlers
+        private void OnShowUI()
+        {
+            Debug.Log("[ShipManifest]:  ShipManifestAddon.OnShowUI");
+            Settings.ShowUI = true;
+        }
+        private void OnHideUI()
+        {
+            Debug.Log("[ShipManifest]:  ShipManifestAddon.OnHideUI");
+            Settings.ShowUI = false;
         }
 
         // Crew Event handlers
@@ -735,6 +761,7 @@ namespace ShipManifest
             }
         }
 
+        
         #endregion
 
         #region Logic Methods
@@ -847,7 +874,10 @@ namespace ShipManifest
             {
                 if (Settings.ShowShipManifest
                     && HighLogic.LoadedScene == GameScenes.FLIGHT
-                    && !vessel.isEVA && vessel.vesselType != VesselType.Flag && vessel.vesselType != VesselType.Debris
+                    && Settings.ShowUI
+                    && !vessel.isEVA 
+                    && vessel.vesselType != VesselType.Flag 
+                    && vessel.vesselType != VesselType.Debris
                     && vessel.vesselType != VesselType.Unknown
                     && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
                     )
@@ -1103,13 +1133,13 @@ namespace ShipManifest
 
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
-                    if (Settings.ShowSettings)
+                    if (Settings.ShowSettings && Settings.ShowUI)
                     {
                         step = "4 - Show Settings";
                         Settings.SettingsPosition = GUILayout.Window(398546, Settings.SettingsPosition, WindowSettings.Display, "Ship Manifest Settings", GUILayout.MinHeight(20));
                     }
 
-                    if (Settings.ShowRoster)
+                    if (Settings.ShowRoster && Settings.ShowUI)
                     {
                         if (WindowRoster.resetRosterSize)
                         {
@@ -1358,13 +1388,10 @@ namespace ShipManifest
                             if (PartTarget == null)
                                 PartTarget = PartSource;
 
-                            PartSource.vessel.SpawnCrew();
-                            PartTarget.vessel.SpawnCrew();
-                            smController.RespawnCrew();
-
-                            FireEventTriggers();
                             elapsed = timestamp = 0;
                             crewXfer = false;
+                            WindowTransfer.TransferCrewMemberComplete(smController.CrewXferMember, PartSource, PartTarget);
+
                             Utilities.LogMessage("crewXfer State:  " + crewXfer.ToString() + "...", "Info", Settings.VerboseLogging);
                         }
                         if (crewXfer)
@@ -1559,7 +1586,7 @@ namespace ShipManifest
         {
             try
             {
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT && FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     Utilities.LogMessage("Save in progress...", "info", Settings.VerboseLogging);
                     Settings.Save();

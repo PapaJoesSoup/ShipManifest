@@ -206,6 +206,19 @@ namespace ShipManifest
             }
         }
 
+        internal Dictionary<List<string>, List<Part>> _MultiResourceParts = null;
+        internal Dictionary<List<string>, List<Part>> MultiResourceParts
+        {
+            get
+            {
+                return _MultiResourceParts;
+            }
+            set
+            {
+                _MultiResourceParts = value;
+            }
+        }
+
         private Part _selectedPartSource;
         internal Part SelectedPartSource
         {
