@@ -1,5 +1,18 @@
 ShipManifest
 ============
+Version 4.1.4.3 - Release 06 Apr, 2015 - RT bug, External crew bug and control display fixes.
+- Fixed: When using RemoteTech, not all RemoteTech antennas would display in Control window list.
+- Fixed: Sometimes when displaying part info in Antennas, Solar Panels, hatches and Lights, a null exception would occur and "unknown" would be displayed in part parent info.
+- Fixed: Crew in external seats were not properly handled in SM. Attempts to transfer will generate unhanded errors, and could possibly corrupt the game save, requiring the vessel to be deleted.  Removed Crew members in external seats from xfer list.
+
+Version 4.1.4.2 - Release 29 Mar, 2015 - Control Window Tweaks Edition.
+- New: Added part name to description for Antennas, Solar Panels, and Lights in Control Window.
+- Fixed: If CLS is not installed, or CLS is disabled, Control Button is grayed out and Manifest Window is stuck in one position on screen. 
+
+Version 4.1.4.1 - Release 22 Mar, 2015 - RT Antenna Integration Edition.
+ - New:  Added Remote Tech (RT) Antenna control support.
+ - Fixed:  Undeployable Solar panels incorrectly show up in Solar panel list and generate an unmanaged error when Extended or Retracted.
+
 Version 0.90.0_4.1.4.0 - Release 21 Mar, 2015 - More Control & Realism Tweaks Edition.
  - New:  Added Antenna control support.
  - New:  Added Light control support.  
