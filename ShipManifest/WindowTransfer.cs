@@ -470,7 +470,6 @@ namespace ShipManifest
             if (partsSource.Count > 0)
             {
                 // these calls are to determine if resource can be transferred by rules, so only the first part is needed.
-                //PartResource thisResource = partsSource[0].Resources[selectedResource];
                 PartResource.FlowMode flowmode = partsSource[0].Resources[selectedResource].flowMode;
                 bool flowbool = partsSource[0].Resources[selectedResource].flowState;
 
@@ -504,18 +503,9 @@ namespace ShipManifest
                 {
                     if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        if (flowbool)
-                        {
-                            foreach (Part part in partsSource)
-                                part.Resources[selectedResource].flowState = false;
-                            flowtext = "Off";
-                        }
-                        else
-                        {
-                            foreach (Part part in partsSource)
-                                part.Resources[selectedResource].flowState = true;
-                            flowtext = "On";
-                        }
+                        foreach (Part part in partsSource)
+                            part.Resources[selectedResource].flowState = !flowbool;
+                        flowtext = flowbool ? "Off" : "On";
                     }
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
