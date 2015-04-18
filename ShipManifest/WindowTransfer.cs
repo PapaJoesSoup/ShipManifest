@@ -470,7 +470,7 @@ namespace ShipManifest
             if (partsSource.Count > 0)
             {
                 // these calls are to determine if resource can be transferred by rules, so only the first part is needed.
-                PartResource thisResource = partsSource[0].Resources[selectedResource];
+                //PartResource thisResource = partsSource[0].Resources[selectedResource];
                 PartResource.FlowMode flowmode = partsSource[0].Resources[selectedResource].flowMode;
                 bool flowbool = partsSource[0].Resources[selectedResource].flowState;
 
@@ -506,12 +506,14 @@ namespace ShipManifest
                     {
                         if (flowbool)
                         {
-                            thisResource.flowState = false;
+                            foreach (Part part in partsSource)
+                                part.Resources[selectedResource].flowState = false;
                             flowtext = "Off";
                         }
                         else
                         {
-                            thisResource.flowState = true;
+                            foreach (Part part in partsSource)
+                                part.Resources[selectedResource].flowState = true;
                             flowtext = "On";
                         }
                     }
