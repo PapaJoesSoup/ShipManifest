@@ -29,7 +29,7 @@ namespace ShipManifest
             try
             {
                 // Display all hatches
-                foreach (ModHatch iHatch in SMAddon.Hatches)
+                foreach (ModHatch iHatch in SMAddon.smController.Hatches)
                 {
                     bool isEnabled = true;
                     bool open = false;
@@ -69,7 +69,7 @@ namespace ShipManifest
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (ModHatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.smController.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -79,14 +79,13 @@ namespace ShipManifest
                     iModule.HatchOpen = true;
                 }
             }
-            //SMAddon.FireEventTriggers();
         }
 
         internal static void CloseAllHatches()
         {
             // iterate thru the hatch parts and open hatches
             // TODO: for realism, add a delay and a closing/opening sound
-            foreach (ModHatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.smController.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (iModule.IsDocked)
@@ -96,12 +95,11 @@ namespace ShipManifest
                     iModule.HatchOpen = false;
                 }
             }
-            //SMAddon.FireEventTriggers();
         }
 
         internal static void HighlightAllHatches(bool enable)
         {
-            foreach (ModHatch iHatch in SMAddon.Hatches)
+            foreach (ModHatch iHatch in SMAddon.smController.Hatches)
             {
                 IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
                 if (enable)

@@ -69,8 +69,10 @@ namespace ShipManifest
                 string filename = "DebugLog_" + DateTime.Now.ToString().Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
 
                 string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
-                if (Settings.DebugLogPath.StartsWith(@"\"))
+                if (Settings.DebugLogPath.StartsWith(@"\\"))
                     Settings.DebugLogPath = Settings.DebugLogPath.Substring(2, Settings.DebugLogPath.Length - 2);
+                else if (Settings.DebugLogPath.StartsWith(@"\"))
+                    Settings.DebugLogPath = Settings.DebugLogPath.Substring(1, Settings.DebugLogPath.Length - 1);
 
                 if (!Settings.DebugLogPath.EndsWith(@"\"))
                     Settings.DebugLogPath += @"\";

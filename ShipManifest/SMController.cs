@@ -40,13 +40,13 @@ namespace ShipManifest
         #region Properties
 
         // variables used for moving resources.
-        internal float sXferAmount = 0f;
+        internal double sXferAmount = 0;
         internal bool sXferAmountHasDecimal = false;
         internal bool sXferAmountHasZero = false;
-        internal float tXferAmount = 0f;
+        internal double tXferAmount = 0;
         internal bool tXferAmountHasDecimal = false;
         internal bool tXferAmountHasZero = false;
-        internal float AmtXferred = 0f;
+        internal double AmtXferred = 0;
 
         internal Vessel Vessel
         {
@@ -58,7 +58,6 @@ namespace ShipManifest
             get { return Vessel.landedAt == "LaunchPad" || Vessel.landedAt == "Runway"; }
         }
 
-        internal bool CanDrawButton = false;
 
         #endregion
 
@@ -206,30 +205,38 @@ namespace ShipManifest
             }
         }
 
-        internal Dictionary<List<string>, List<Part>> _MultiResourceParts = null;
-        internal Dictionary<List<string>, List<Part>> MultiResourceParts
+        // Multi-Part Xfer Storage
+        internal Dictionary<List<string>, List<Part>> _selectedResourcesParts = null;
+        internal Dictionary<List<string>, List<Part>> SelectedResourcesParts
         {
             get
             {
-                return _MultiResourceParts;
+                return _selectedResourcesParts;
             }
             set
             {
-                _MultiResourceParts = value;
+                _selectedResourcesParts = value;
             }
         }
 
-        private Part _selectedPartSource;
-        internal Part SelectedPartSource
+        private List<Part> _selectedPartsSource = new List<Part>();
+        internal List<Part> SelectedPartsSource
         {
             get
             {
                 try
                 {
-                    if (_selectedPartSource != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartSource))
-                        _selectedPartSource = null;
-
-                    return _selectedPartSource;
+                    if (_selectedPartsSource == null)
+                        _selectedPartsSource = new List<Part>();
+                    foreach (Part part in _selectedPartsSource)
+                    {
+                        if (!FlightGlobals.ActiveVessel.Parts.Contains(part))
+                        {
+                            _selectedPartsSource = new List<Part>();
+                            break;
+                        }
+                    }
+                    return _selectedPartsSource;
                 }
                 catch (Exception ex)
                 {
@@ -241,9 +248,9 @@ namespace ShipManifest
             {
                 try
                 {
-                    if (value != _selectedPartSource)
-                        SMAddon.ClearPartHighlight(_selectedPartSource);
-                    _selectedPartSource = value;
+                    if (value != _selectedPartsSource)
+                        SMAddon.ClearPartsHighlight(_selectedPartsSource);
+                    _selectedPartsSource = value;
                     if (Settings.EnableCLS)
                     {
                         SMAddon.UpdateCLSSpaces();
@@ -252,33 +259,37 @@ namespace ShipManifest
                     // reset transfer amount (for resource xfer slider control)
                     SMAddon.smController.sXferAmount = 0;
                     SMAddon.smController.tXferAmount = 0;
-                    if (_selectedResource == "Crew")
-                    {
-
-                    }
                 }
                 catch (Exception ex)
                 {
-                    Utilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Set SelectedPartsSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
-                //Utilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
+                //Utilities.LogMessage("Set SelectedPartsSource.", "Info", SettingsManager.VerboseLogging);
             }
         }
 
-        private Part _selectedPartTarget;
-        internal Part SelectedPartTarget
+        private List<Part> _selectedPartsTarget = new List<Part>();
+        internal List<Part> SelectedPartsTarget
         {
             get
             {
                 try
                 {
-                    if (_selectedPartTarget != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartTarget))
-                        _selectedPartTarget = null;
-                    return _selectedPartTarget;
+                    if (_selectedPartsTarget == null)
+                        _selectedPartsTarget = new List<Part>();
+                    foreach (Part part in _selectedPartsTarget)
+                    {
+                        if (!FlightGlobals.ActiveVessel.Parts.Contains(part))
+                        {
+                            _selectedPartsTarget = new List<Part>();
+                            break;
+                        }
+                    }
+                    return _selectedPartsTarget;
                 }
                 catch (Exception ex)
                 {
-                    Utilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Get SelectedPartsTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     return null;
                 }
             }
@@ -286,24 +297,110 @@ namespace ShipManifest
             {
                 try
                 {
-                    if (value != _selectedPartTarget)
-                        SMAddon.ClearPartHighlight(_selectedPartTarget);
-                    _selectedPartTarget = value;
+                    if (value != _selectedPartsTarget)
+                        SMAddon.ClearPartsHighlight(_selectedPartsTarget);
+                    _selectedPartsTarget = value;
                     if (Settings.EnableCLS)
                         SMAddon.UpdateCLSSpaces();
 
                     // reset transfer amount (for resource xfer slider control)
-                    SMAddon.smController.sXferAmount = 0f;
-                    SMAddon.smController.tXferAmount = 0f;
+                    SMAddon.smController.sXferAmount = 0;
+                    SMAddon.smController.tXferAmount = 0;
                 }
                 catch (Exception ex)
                 {
-                    Utilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in Set SelectedPartsTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                 }
             }
         }
 
+        // Single Part Xfer Storage
+        //private Part _selectedPartSource;
+        //internal Part SelectedPartSource
+        //{
+        //    get
+        //    {
+        //        try
+        //        {
+        //            if (_selectedPartSource != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartSource))
+        //                _selectedPartSource = null;
+
+        //            return _selectedPartSource;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Utilities.LogMessage(string.Format(" in Get SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //            return null;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        try
+        //        {
+        //            if (value != _selectedPartSource)
+        //                SMAddon.ClearPartHighlight(_selectedPartSource);
+        //            _selectedPartSource = value;
+        //            if (Settings.EnableCLS)
+        //            {
+        //                SMAddon.UpdateCLSSpaces();
+        //            }
+
+        //            // reset transfer amount (for resource xfer slider control)
+        //            SMAddon.smController.sXferAmount = 0;
+        //            SMAddon.smController.tXferAmount = 0;
+        //            if (_selectedResource == "Crew")
+        //            {
+
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Utilities.LogMessage(string.Format(" in Set SelectedPartSource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //        }
+        //        //Utilities.LogMessage("Set SelectedPartSource.", "Info", SettingsManager.VerboseLogging);
+        //    }
+        //}
+
+        //private Part _selectedPartTarget;
+        //internal Part SelectedPartTarget
+        //{
+        //    get
+        //    {
+        //        try
+        //        {
+        //            if (_selectedPartTarget != null && !FlightGlobals.ActiveVessel.Parts.Contains(_selectedPartTarget))
+        //                _selectedPartTarget = null;
+        //            return _selectedPartTarget;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Utilities.LogMessage(string.Format(" in Get SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //            return null;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        try
+        //        {
+        //            if (value != _selectedPartTarget)
+        //                SMAddon.ClearPartHighlight(_selectedPartTarget);
+        //            _selectedPartTarget = value;
+        //            if (Settings.EnableCLS)
+        //                SMAddon.UpdateCLSSpaces();
+
+        //            // reset transfer amount (for resource xfer slider control)
+        //            SMAddon.smController.sXferAmount = 0;
+        //            SMAddon.smController.tXferAmount = 0;
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            Utilities.LogMessage(string.Format(" in Set SelectedPartTarget.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //        }
+        //    }
+        //}
+
         // Stock Crew transfer part storage
+
         internal Part CrewXferSource;
         internal Part CrewXferTarget;
         internal ProtoCrewMember CrewXferMember;
@@ -317,6 +414,22 @@ namespace ShipManifest
         internal ICLSSpace clsSpaceTarget;
 
         // Control Window parts
+        private List<ModHatch> _hatches = new List<ModHatch>();
+        internal List<ModHatch> Hatches
+        {
+            get
+            {
+                if (_hatches == null)
+                    _hatches = new List<ModHatch>();
+                return _hatches;
+            }
+            set
+            {
+                _hatches.Clear();
+                _hatches = value;
+            }
+        }
+
         private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
         internal List<ModSolarPanel> SolarPanels
         {
@@ -540,6 +653,31 @@ namespace ShipManifest
                 {
                     resource.amount = resource.maxAmount;
                 }
+            }
+        }
+
+        internal void GetHatches()
+        {
+            _hatches.Clear();
+            try
+            {
+                foreach (ICLSPart iPart in SMAddon.clsAddon.Vessel.Parts)
+                {
+                    foreach (PartModule pModule in iPart.Part.Modules)
+                    {
+                        if (pModule.moduleName == "ModuleDockingHatch")
+                        {
+                            ModHatch pHatch = new ModHatch();
+                            pHatch.HatchModule = pModule;
+                            pHatch.CLSPart = iPart;
+                            _hatches.Add(pHatch);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex.ToString()), "Error", true);
             }
         }
 

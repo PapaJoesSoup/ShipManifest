@@ -126,7 +126,7 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save"))
             {
-                Settings.SaveIntervalSec = float.Parse(txtSaveInterval);
+                Settings.SaveIntervalSec = int.Parse(txtSaveInterval);
                 Settings.Save();
                 Settings.ShowSettings = false;
             }
@@ -392,7 +392,7 @@ namespace ShipManifest
             GUILayout.BeginHorizontal();
             GUILayout.Space(30);
             GUILayout.Label(Settings.MinFlowRate.ToString(), GUILayout.Width(10), GUILayout.Height(20));
-            Settings.FlowRate = GUILayout.HorizontalSlider(Settings.FlowRate, Settings.MinFlowRate, Settings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
+            Settings.FlowRate = (double)GUILayout.HorizontalSlider((float)Settings.FlowRate, (float)Settings.MinFlowRate, (float)Settings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
             guiLabel = new GUIContent(Settings.MaxFlowRate.ToString(), "Slide control to change the Resource Flow Rate shown above.");
             GUILayout.Label(guiLabel, GUILayout.Width(40), GUILayout.Height(20));
             rect = GUILayoutUtility.GetLastRect();

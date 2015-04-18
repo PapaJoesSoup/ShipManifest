@@ -38,10 +38,10 @@ namespace ShipManifest
         internal static bool OverrideStockCrewXfer = true;
 
         //Resource Xfer flow rate options
-        internal static float FlowRate = 100;
-        internal static float FlowCost = 0.0015f;
-        internal static float MaxFlowRate = 1000;
-        internal static float MinFlowRate = 0;
+        internal static double FlowRate = 100;
+        internal static double FlowCost = 0.0015;
+        internal static double MaxFlowRate = 1000;
+        internal static double MinFlowRate = 0;
         internal static int MaxFlowTimeSec = 180;
         internal static bool LockSettings = false;
         internal static bool EnableXferCost = true;
@@ -52,7 +52,7 @@ namespace ShipManifest
         internal static bool SaveLogOnExit = false;
 
         internal static bool AutoSave = false;
-        internal static float SaveIntervalSec = 60f;
+        internal static int SaveIntervalSec = 60;
 
         //Highlighting Options
         internal static bool EnableHighlighting = true;
@@ -107,15 +107,15 @@ namespace ShipManifest
         internal static string prevErrorLogLength = "1000";
         internal static bool prevSaveLogOnExit = true;
         internal static bool prevAutoSave;
-        internal static float prevSaveIntervalSec = 60f;
+        internal static int prevSaveIntervalSec = 60;
 
         internal static bool prevRealismMode = false;
         internal static bool prevLockSettings = false;
 
-        internal static float prevFlowRate = 100;
-        internal static float prevFlowCost = 0.0015f;
-        internal static float prevMaxFlowRate = 1000;
-        internal static float prevMinFlowRate = 0;
+        internal static double prevFlowRate = 100;
+        internal static double prevFlowCost = 0.0015;
+        internal static double prevMaxFlowRate = 1000;
+        internal static double prevMinFlowRate = 0;
         internal static int prevMaxFlowTimeSec = 100;
         internal static bool prevEnableXferCost = true;
 
@@ -207,7 +207,7 @@ namespace ShipManifest
 
         internal static bool ShowControl { get; set; }
 
-        internal static string DebugLogPath = "\\Plugins\\PluginData\\";
+        internal static string DebugLogPath = @"Plugins\PluginData\";
         internal static bool CLSInstalled = false;
 
 
@@ -240,11 +240,11 @@ namespace ShipManifest
                 LockSettings = configfile.GetValue<bool>("LockSettings", LockSettings);
                 VerboseLogging = configfile.GetValue<bool>("VerboseLogging", VerboseLogging);
                 AutoSave = configfile.GetValue<bool>("AutoSave", AutoSave);
-                SaveIntervalSec = (float)configfile.GetValue<double>("SaveIntervalSec", SaveIntervalSec);
-                FlowRate = (float)configfile.GetValue<double>("FlowRate", FlowRate);
-                FlowCost = (float)configfile.GetValue<double>("FlowCost", FlowCost);
-                MinFlowRate = (float)configfile.GetValue<double>("MinFlowRate", MinFlowRate);
-                MaxFlowRate = (float)configfile.GetValue<double>("MaxFlowRate", MaxFlowRate);
+                SaveIntervalSec = configfile.GetValue<int>("SaveIntervalSec", SaveIntervalSec);
+                FlowRate = configfile.GetValue<double>("FlowRate", FlowRate);
+                FlowCost = configfile.GetValue<double>("FlowCost", FlowCost);
+                MinFlowRate = configfile.GetValue<double>("MinFlowRate", MinFlowRate);
+                MaxFlowRate = configfile.GetValue<double>("MaxFlowRate", MaxFlowRate);
                 MaxFlowTimeSec = configfile.GetValue<int>("MaxFlowTimeSec", MaxFlowTimeSec);
                 EnableXferCost = configfile.GetValue<bool>("EnableXferCost", EnableXferCost);
 

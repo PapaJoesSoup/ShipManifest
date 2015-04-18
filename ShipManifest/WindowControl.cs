@@ -112,7 +112,7 @@ namespace ShipManifest
                 try
                 {
                     SMAddon.UpdateCLSSpaces();
-                    SMAddon.GetHatches();
+                    SMAddon.smController.GetHatches();
                     ShowHatch = !ShowHatch;
                 }
                 catch (Exception ex)

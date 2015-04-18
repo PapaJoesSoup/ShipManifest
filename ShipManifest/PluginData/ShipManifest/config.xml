@@ -41,7 +41,7 @@
   <bool name="LockSettings">0</bool>
   <bool name="VerboseLogging">0</bool>
   <bool name="AutoSave">0</bool>
-  <double name="SaveIntervalSec">60</double>
+  <int name="SaveIntervalSec">60</int>
   <double name="FlowRate">100</double>
   <double name="MinFlowRate">0</double>
   <double name="MaxFlowRate">1000</double>

@@ -185,17 +185,17 @@ namespace ShipManifest
                                 if (SMAddon.smController.SelectedResource != resourceName)
                                 {
                                     SMAddon.smController.SelectedResource = resourceName;
-                                    if (SMAddon.smController.SelectedPartSource != null)
-                                        if (!SMAddon.smController.SelectedPartSource.Resources.Contains(resourceName))
-                                            SMAddon.smController.SelectedPartSource = null;
-                                    if (SMAddon.smController.SelectedPartTarget != null)
-                                        if (!SMAddon.smController.SelectedPartTarget.Resources.Contains(resourceName))
-                                            SMAddon.smController.SelectedPartTarget = null;
+                                    if (SMAddon.smController.SelectedPartsSource.Count > 0)
+                                        if (!SMAddon.smController.SelectedPartsSource[0].Resources.Contains(resourceName))
+                                            SMAddon.smController.SelectedPartsSource = new List<Part>();
+                                    if (SMAddon.smController.SelectedPartsTarget.Count > 0)
+                                        if (!SMAddon.smController.SelectedPartsTarget[0].Resources.Contains(resourceName))
+                                            SMAddon.smController.SelectedPartsTarget = new List<Part>();
                                 }
                                 else if (SMAddon.smController.SelectedResource == resourceName)
                                 {
                                     SMAddon.smController.SelectedResource = null;
-                                    SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                                    SMAddon.smController.SelectedPartsSource = SMAddon.smController.SelectedPartsTarget = new List<Part>();
                                 }
                                 if (SMAddon.smController.SelectedResource != null)
                                 {

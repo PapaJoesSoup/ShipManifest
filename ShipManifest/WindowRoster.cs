@@ -180,7 +180,7 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
 
-                    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource != null && !SMController.CrewPartIsFull(SMAddon.smController.SelectedPartSource))
+                    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count > 0 && !SMController.CrewPartIsFull(SMAddon.smController.SelectedPartsSource[0]))
                     {
                         GUI.enabled = true;
                         buttonText = "Add";
@@ -198,7 +198,7 @@ namespace ShipManifest
                         buttonText = "Remove";
                         buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
                     }
-                    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartSource == null)
+                    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((Settings.RealismMode && SMAddon.smController.IsPreLaunch) || !Settings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count == 0)
                     {
                         GUI.enabled = false;
                         buttonText = "Add";
@@ -220,7 +220,7 @@ namespace ShipManifest
                     if (GUILayout.Button(new GUIContent(buttonText,buttonToolTip), GUILayout.Width(60)))
                     {
                         if (buttonText == "Add")
-                            SMController.AddCrewMember(kerbal, SMAddon.smController.SelectedPartSource);
+                            SMController.AddCrewMember(kerbal, SMAddon.smController.SelectedPartsSource[0]);
                         else if (buttonText == "Respawn")
                             SMController.RespawnKerbal(kerbal);
                         else if (buttonText == "Remove")

@@ -64,7 +64,6 @@ namespace ShipManifest
             ButtonToggledSourceStyle.normal.textColor = Settings.Colors[Settings.SourcePartColor];
             ButtonToggledSourceStyle.fontSize = 14;
             ButtonToggledSourceStyle.hover.textColor = Color.blue;
-            ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
             ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
             ButtonToggledSourceStyle.alignment = TextAnchor.UpperLeft;

@@ -1,4 +1,12 @@
-﻿Version 4.1.4.4 - Release 10 Apr, 2015 - Bug fixes.
+﻿Version 4.2.0.0 - Release xx Apr, 2015 - Transfer Expansion Edtion.  External Crew, Multi-Resources, Multi-Parts.
+x New: When using External Seats, crew can be transferred from seat to seat.
+x New: You can now "link" 2 resources together, by simply Shift+clicking on a Second Resource.  All parts that contain both resources will be displayed, and xfers will be linked. A ratio box will appear to adjust ratios as needed.
+- New: You can now link multiple parts in the Transfer window, and move resources from 1:N, N:N and N:1 parts.  Will not overfill a target part, and will fill all equally (you can top off multiple parts)
+x New: RT command queue is now respected.  Antenna switching from the Control Window will now be queued.
+- Fixed:  When  near debris, SM window sometimes fails to display when icon is clicked from either toolbar.
+- Fixed:  With CLS enabled, target part text incorrectly displayed in Target Crew Color instead of Target Part color when target part was selected.
+
+Version 4.1.4.4 - Release 10 Apr, 2015 - Bug fixes.
 - Fixed:  Crew transfers fail when Realism Mode is Off.
 - Fixed:  SM windows do not hide when the F2 key is toggled to hide UI.
 - Fixed:  SM window positions are not automatically saved between scenes.

@@ -44,7 +44,7 @@ namespace ShipManifest
             {
                 Settings.ShowTransferWindow = false;
                 SMAddon.smController.SelectedResource = null;
-                SMAddon.smController.SelectedPartSource = SMAddon.smController.SelectedPartTarget = null;
+                SMAddon.smController.SelectedPartsSource = SMAddon.smController.SelectedPartsTarget = new List<Part>();
                 ToolTip = "";
                 return;
             }
@@ -63,20 +63,7 @@ namespace ShipManifest
                 SourceTransferViewer();
 
                 // Text above Source Details. (Between viewers)
-                if (SMAddon.smController.SelectedResource == "Crew" && Settings.ShowIVAUpdateBtn)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(SMAddon.smController.SelectedPartSource != null ? string.Format("{0}", SMAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
-                    if (GUILayout.Button("Update Portraits", SMStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
-                    {
-                        SMAddon.smController.RespawnCrew();
-                    }
-                    GUILayout.EndHorizontal();
-                }
-                else
-                {
-                    GUILayout.Label(SMAddon.smController.SelectedPartSource != null ? string.Format("{0}", SMAddon.smController.SelectedPartSource.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
-                }
+                TextBetweenViewers(SMAddon.smController.SelectedPartsSource);
 
                 // Build Details ScrollViewer
                 SourceDetailsViewer();
@@ -91,7 +78,7 @@ namespace ShipManifest
                 TargetTransferViewer();
 
                 // Text between viewers
-                GUILayout.Label(SMAddon.smController.SelectedPartTarget != null ? string.Format("{0}", SMAddon.smController.SelectedPartTarget.partInfo.title) : "No Part Selected", GUILayout.Width(300), GUILayout.Height(20));
+                TextBetweenViewers(SMAddon.smController.SelectedPartsTarget);
 
                 // Build Target details Viewer
                 TargetDetailsViewer();
@@ -106,7 +93,35 @@ namespace ShipManifest
             }
         }
 
-        #region Source Viewers GUI Layout)
+        private static void TextBetweenViewers(List<Part> SelectedParts)
+        {
+            if (SMAddon.smController.SelectedResource == "Crew" && Settings.ShowIVAUpdateBtn)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(SelectedParts != null ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
+                if (GUILayout.Button("Update Portraits", SMStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
+                {
+                    SMAddon.smController.RespawnCrew();
+                }
+                GUILayout.EndHorizontal();
+            }
+            else
+            {
+                if (SelectedParts != null)
+                {
+                    if (SelectedParts.Count > 1)
+                    {
+                        GUILayout.Label(string.Format("{0}", "Multiple Parts Selected"), GUILayout.Width(300), GUILayout.Height(20));
+                    }
+                    else if (SelectedParts.Count == 1)
+                        GUILayout.Label(string.Format("{0}", SelectedParts[0].partInfo.title), GUILayout.Width(300), GUILayout.Height(20));
+                    else
+                        GUILayout.Label(string.Format("{0}", "No Part Selected"), GUILayout.Width(300), GUILayout.Height(20));
+                }
+            }
+        }
+
+        #region Source Viewers (GUI Layout)
         // Transfer Window components
         private static Vector2 SourceTransferViewerScrollPosition = Vector2.zero;
         internal static void SourceTransferViewer()
@@ -117,60 +132,7 @@ namespace ShipManifest
                 SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
-                {
-                    // Build the part button title...
-                    string strDescription = "";
-                    switch (SMAddon.smController.SelectedResource)
-                    {
-                        case "Crew":
-                            strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
-                            break;
-                        case "Science":
-                            int cntScience = GetScienceCount(part, false);
-                            strDescription = cntScience.ToString() + " - " + part.partInfo.title;
-                            break;
-                        default:
-                            strDescription = part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
-                            break;
-                    }
-
-                    // set the conditions for a button style change.
-                    int btnWidth = 265;
-                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                        btnWidth = 180;
-                    var style = SMAddon.smController.SelectedPartSource == part ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
-                    GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
-                    {
-                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
-                        {
-                            SMAddon.smController.SelectedModuleSource = null;
-                            SMAddon.smController.SelectedPartSource = part;
-                            if (SMAddon.smController.SelectedPartTarget != null && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                            {
-                                SMAddon.smController.sXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedResource, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
-                                SMAddon.smController.tXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedResource, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
-                            }
-                            Utilities.LogMessage("SelectedPartSource...", "Info", Settings.VerboseLogging);
-                        }
-                    }
-                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                    {
-                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
-                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
-
-                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
-                        {
-                            SMController.DumpPartResource(part, SMAddon.smController.SelectedResource);
-                        }
-                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
-                        {
-                            SMController.FillPartResource(part, SMAddon.smController.SelectedResource);
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-                }
+                TransferViewer(SMAddon.smController.SelectedResource, SMAddon.XFERMode.SourceToTarget);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -191,21 +153,18 @@ namespace ShipManifest
                 SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (SMAddon.smController.SelectedPartSource != null)
+                if (SMAddon.smController.SelectedResource == "Crew")
                 {
-                    if (SMAddon.smController.SelectedResource == "Crew")
-                    {
-                        CrewDetails(SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget, SMAddon.XFERMode.SourceToTarget, SourceDetailsViewerScrollPosition);
-                    }
-                    else if (SMAddon.smController.SelectedResource == "Science")
-                    {
-                        ScienceDetailsSource();
-                    }
-                    else
-                    {
-                        // resources are left....
-                        ResourceDetails(SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget, SMAddon.XFERMode.SourceToTarget, SMAddon.smController.sXferAmount, SourceDetailsViewerScrollPosition);
-                    }
+                    CrewDetails(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, SMAddon.XFERMode.SourceToTarget, SourceDetailsViewerScrollPosition);
+                }
+                else if (SMAddon.smController.SelectedResource == "Science")
+                {
+                    ScienceDetailsSource();
+                }
+                else
+                {
+                    // resources are left....
+                    ResourceDetails(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, SMAddon.XFERMode.SourceToTarget, SMAddon.smController.sXferAmount, SourceDetailsViewerScrollPosition);
                 }
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -218,80 +177,24 @@ namespace ShipManifest
 
         #endregion
 
-        #region Target Viewers GUI Layout)
+        #region Target Viewers (GUI Layout)
 
         private static Vector2 TargetTransferViewerScrollPosition = Vector2.zero;
         private static void TargetTransferViewer()
         {
             try
             {
-                // Adjust style colors for part selectors when using/not using CLS highlighting
-                if (Settings.EnableCLSHighlighting)
-                {
+                // Adjust target style colors for part selectors when using/not using CLS highlighting
+                if (Settings.EnableCLSHighlighting && SMAddon.smController.SelectedResource == "Crew")
                     SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartCrewColor];
-                    SMStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartColor];
-                }
                 else
-                {
                     SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
-                    SMStyle.ButtonToggledTargetStyle.hover.textColor = Settings.Colors[Settings.TargetPartCrewColor];
-                }
+
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
-                foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
-                {
-                    // Build the part button title...
-                    string strDescription = "";
-                    switch (SMAddon.smController.SelectedResource)
-                    {
-                        case "Crew":
-                            strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
-                            break;
-                        case "Science":
-                            int cntScience = GetScienceCount(part, false);
-                            strDescription = cntScience.ToString() + " - " + part.partInfo.title;
-                            break;
-                        default:
-                            strDescription = part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
-                            break;
-                    }
 
-                    // set the conditions for a button style change.
-                    int btnWidth = 265;
-                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                        btnWidth = 180;
-                    var style = SMAddon.smController.SelectedPartTarget == part ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
-                    GUILayout.BeginHorizontal();
-                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
-                    {
-                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
-                        {
-                            SMAddon.smController.SelectedPartTarget = part;
-                            if (SMAddon.smController.SelectedPartSource != null && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                            {
-                                SMAddon.smController.sXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedResource, SMAddon.smController.SelectedPartSource, SMAddon.smController.SelectedPartTarget);
-                                SMAddon.smController.tXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedResource, SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource);
-                            }
-                            Utilities.LogMessage("SelectedPartTarget...", "Info", Settings.VerboseLogging);
-                        }
-                    }
-                    if (!Settings.RealismMode && SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
-                    {
-                        var style1 = part.Resources[SMAddon.smController.SelectedResource].amount == 0 ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
-                        var style2 = part.Resources[SMAddon.smController.SelectedResource].amount == part.Resources[SMAddon.smController.SelectedResource].maxAmount ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
-
-                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
-                        {
-                            SMController.DumpPartResource(part, SMAddon.smController.SelectedResource);
-                        }
-                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
-                        {
-                            SMController.FillPartResource(part, SMAddon.smController.SelectedResource);
-                        }
-                    }
-                    GUILayout.EndHorizontal();
-                }
+                TransferViewer(SMAddon.smController.SelectedResource, SMAddon.XFERMode.TargetToSource);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -312,20 +215,17 @@ namespace ShipManifest
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
-                if (SMAddon.smController.SelectedPartTarget != null)
+                if (SMAddon.smController.SelectedResource == "Crew")
                 {
-                    if (SMAddon.smController.SelectedResource == "Crew")
-                    {
-                        CrewDetails(SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource, SMAddon.XFERMode.TargetToSource, TargetDetailsViewerScrollPosition);
-                    }
-                    else if (SMAddon.smController.SelectedResource == "Science")
-                    {
-                        ScienceDetailsTarget();
-                    }
-                    else
-                    {
-                        ResourceDetails(SMAddon.smController.SelectedPartTarget, SMAddon.smController.SelectedPartSource, SMAddon.XFERMode.TargetToSource, SMAddon.smController.tXferAmount, TargetDetailsViewerScrollPosition);
-                    }
+                    CrewDetails(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, SMAddon.XFERMode.TargetToSource, TargetDetailsViewerScrollPosition);
+                }
+                else if (SMAddon.smController.SelectedResource == "Science")
+                {
+                    ScienceDetailsTarget();
+                }
+                else
+                {
+                    ResourceDetails(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, SMAddon.XFERMode.TargetToSource, SMAddon.smController.tXferAmount, TargetDetailsViewerScrollPosition);
                 }
                 // --------------------------------------------------------------------------
                 GUILayout.EndVertical();
@@ -338,274 +238,359 @@ namespace ShipManifest
         }
         #endregion
 
-        #region Viewer Details
+        #region Viewer Details (GUI Layout)
 
-        private static void CrewDetails(Part SelectedPartSource, Part SelectedPartTarget, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
+        private static void TransferViewer(string SelectedResource, SMAddon.XFERMode xferMode)
         {
+            string step = "begin";
+            try
+            {
+                step = "begin button loop";
+                foreach (Part part in SMAddon.smController.PartsByResource[SelectedResource])
+                {
+                    // Build the part button title...
+                    step = "part button title";
+                    string strDescription = GetResourceDescription(SelectedResource, part);
+
+                    // set the conditions for a button style change.
+                    int btnWidth = 265;
+                    if (!Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                        btnWidth = 180;
+
+                    // Set style based on viewer and toggled state.
+                    step = "Set style";
+                    GUIStyle style = GetPartButtonStyle(xferMode, part);
+
+                    GUILayout.BeginHorizontal();
+
+                    // Now let's account for any target buttons already pressed. (sources and targets for resources cannot be the same)
+                    GUI.enabled = IsPartSelectable(SelectedResource, xferMode, part);
+
+                    step = "Render part Buttons";
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
+                    {
+                        step = "Button Toggled";
+                        PartButtonToggled(SelectedResource, xferMode, step, part);
+                    }
+
+                    // Reset Button enabling.
+                    GUI.enabled = true;
+
+                    step = "Render dump/fill buttons";
+                    if (!Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
+                    {
+                        GUI.enabled = part.Resources[SelectedResource].amount > 0 ? true : false;
+                        var style1 = GetDumpButtonStyle(SelectedResource, part, xferMode);
+                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
+                        {
+                            SMController.DumpPartResource(part, SelectedResource);
+                        }
+
+                        var style2 = GetFillButtonStyle(SelectedResource, part, xferMode);
+                        GUI.enabled = part.Resources[SelectedResource].amount < part.Resources[SelectedResource].maxAmount ? true : false;
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
+                        {
+                            SMController.FillPartResource(part, SelectedResource);
+                        }
+                        GUI.enabled = true;
+                    }
+                    GUILayout.EndHorizontal();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage("Error in Windowtransfer.TransferViewer (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
+        }
+
+        private static void CrewDetails(List<Part> SelectedPartsSource, List<Part> SelectedPartsTarget, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
+        {
+            // Since only one Crew Part can be selected, all lists will use an index of [0].
             int scrollX = 20;
             if (xferMode == SMAddon.XFERMode.TargetToSource)
                 scrollX = 320;
 
-            List<ProtoCrewMember> crewMembers = SelectedPartSource.protoModuleCrew;
-            for (int x = 0; x < SelectedPartSource.protoModuleCrew.Count(); x++)
+            if (SelectedPartsSource.Count > 0)
             {
-                ProtoCrewMember crewMember = SelectedPartSource.protoModuleCrew[x];
-                GUILayout.BeginHorizontal();
-                if (crewMember.seat != null)
+                List<ProtoCrewMember> crewMembers = SelectedPartsSource[0].protoModuleCrew;
+                for (int x = 0; x < SelectedPartsSource[0].protoModuleCrew.Count(); x++)
                 {
-                    if (SMAddon.crewXfer || SMAddon.XferOn)
-                        GUI.enabled = false;
+                    ProtoCrewMember crewMember = SelectedPartsSource[0].protoModuleCrew[x];
+                    GUILayout.BeginHorizontal();
+                    if (crewMember.seat != null)
+                    {
+                        if (SMAddon.crewXfer || SMAddon.XferOn)
+                            GUI.enabled = false;
 
-                    if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
-                    {
-                        ToolTip = "";
-                        TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartSource);
+                        if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
+                        {
+                            ToolTip = "";
+                            TransferCrewMemberBegin(crewMember, SelectedPartsSource[0], SelectedPartsSource[0]);
+                        }
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        {
+                            Rect rect = GUILayoutUtility.GetLastRect();
+                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                        }
+                        GUI.enabled = true;
                     }
-                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
+                    if (SMAddon.CanKerbalsBeXferred(SelectedPartsSource, SelectedPartsTarget))
                     {
-                        Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                        if (SMAddon.crewXfer || SMAddon.XferOn)
+                            GUI.enabled = false;
                     }
-                    GUI.enabled = true;
-                }
-                GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
-                if (SMAddon.CanKerbalsBeXferred(SelectedPartSource))
-                {
-                    if (SMAddon.crewXfer || SMAddon.XferOn)
+                    else
                         GUI.enabled = false;
-                }
-                else
-                    GUI.enabled = false;
-                if (SMAddon.smController.CrewXferMember == crewMember && (SMAddon.crewXfer || SMAddon.XferOn))
-                {
+                    if (SMAddon.smController.CrewXferMember == crewMember && (SMAddon.crewXfer || SMAddon.XferOn))
+                    {
+                        GUI.enabled = true;
+                        GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
+                    }
+                    else
+                    {
+                        if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            SMAddon.smController.CrewXferMember = crewMember;
+                            TransferCrewMemberBegin(crewMember, SelectedPartsSource[0], SelectedPartsTarget[0]);
+                        }
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        {
+                            Rect rect = GUILayoutUtility.GetLastRect();
+                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                        }
+                    }
                     GUI.enabled = true;
-                    GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
+                    GUILayout.EndHorizontal();
                 }
-                else
-                {
-                    if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-                    {
-                        SMAddon.smController.CrewXferMember = crewMember;
-                        TransferCrewMemberBegin(crewMember, SelectedPartSource, SelectedPartTarget);
-                    }
-                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    {
-                        Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
-                    }
-                }
-                GUI.enabled = true;
-                GUILayout.EndHorizontal();
             }
         }
 
         private static void ScienceDetailsSource()
         {
-            IScienceDataContainer[] modules = SMAddon.smController.SelectedPartSource.FindModulesImplementing<IScienceDataContainer>().ToArray();
-            foreach (PartModule pm in modules)
+            if (SMAddon.smController.SelectedPartsSource.Count > 0)
             {
-                // Containers.
-                int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
-                bool isCollectable = true;
-                if (pm.moduleName == "ModuleScienceContainer")
-                    isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
-                else if (pm.moduleName == "ModuleScienceExperiment")
-                    isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
-
-                // If we have target selected, it is not the same as the source, there is science to xfer.
-                if ((SMAddon.smController.SelectedModuleTarget != null && pm != SMAddon.smController.SelectedModuleTarget) && scienceCount > 0)
+                IScienceDataContainer[] modules = SMAddon.smController.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
+                foreach (PartModule pm in modules)
                 {
-                    string toolTip = "";
-                    if (Settings.RealismMode && !isCollectable)
-                    {
-                        GUI.enabled = false;
-                        toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is not transferable";
-                    }
-                    else
-                        toolTip = "Experiment/data is transferable";
+                    // Containers.
+                    int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+                    bool isCollectable = true;
+                    if (pm.moduleName == "ModuleScienceContainer")
+                        isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
+                    else if (pm.moduleName == "ModuleScienceExperiment")
+                        isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
 
-                    if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
+
+                    // If we have target selected, it is not the same as the source, there is science to xfer.
+                    if ((SMAddon.smController.SelectedModuleTarget != null && pm != SMAddon.smController.SelectedModuleTarget) && scienceCount > 0)
                     {
-                        SMAddon.smController.SelectedModuleSource = pm;
-                        TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
-                        SMAddon.smController.SelectedModuleSource = null;
+                        string toolTip = "";
+                        if (Settings.RealismMode && !isCollectable)
+                        {
+                            GUI.enabled = false;
+                            toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is not transferable";
+                        }
+                        else
+                            toolTip = "Experiment/data is transferable";
+
+                        if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            SMAddon.smController.SelectedModuleSource = pm;
+                            TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
+                            SMAddon.smController.SelectedModuleSource = null;
+                        }
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        {
+                            Rect rect = GUILayoutUtility.GetLastRect();
+                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                        }
+                        GUI.enabled = true;
                     }
-                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    {
-                        Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
-                    }
-                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
                 }
-                GUILayout.EndHorizontal();
             }
         }
 
         private static void ScienceDetailsTarget()
         {
-            int count = 0;
-            foreach (PartModule tpm in SMAddon.smController.SelectedPartTarget.Modules)
+            if (SMAddon.smController.SelectedPartsTarget.Count > 0)
             {
-                if (tpm is IScienceDataContainer)
-                    count += 1;
-            }
-
-            foreach (PartModule pm in SMAddon.smController.SelectedPartTarget.Modules)
-            {
-                // Containers.
-                int scienceCount = 0;
-                if (pm is IScienceDataContainer)
+                int count = 0;
+                foreach (PartModule tpm in SMAddon.smController.SelectedPartsTarget[0].Modules)
                 {
-                    scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
-                    // set the conditions for a button style change.
-                    bool ShowReceive = false;
-                    if (pm == SMAddon.smController.SelectedModuleTarget)
-                        ShowReceive = true;
-                    else if (count == 1)
-                        ShowReceive = true;
-                    //SelectedModuleTarget = pm;
-                    var style = ShowReceive ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonStyle;
-                    if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(50), GUILayout.Height(20)))
+                    if (tpm is IScienceDataContainer)
+                        count += 1;
+                }
+
+                foreach (PartModule pm in SMAddon.smController.SelectedPartsTarget[0].Modules)
+                {
+                    // Containers.
+                    int scienceCount = 0;
+                    if (pm is IScienceDataContainer)
                     {
-                        SMAddon.smController.SelectedModuleTarget = pm;
+                        scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
+                        // set the conditions for a button style change.
+                        bool ShowReceive = false;
+                        if (pm == SMAddon.smController.SelectedModuleTarget)
+                            ShowReceive = true;
+                        else if (count == 1)
+                            ShowReceive = true;
+                        //SelectedModuleTarget = pm;
+                        var style = ShowReceive ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonStyle;
+                        if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            SMAddon.smController.SelectedModuleTarget = pm;
+                        }
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        {
+                            Rect rect = GUILayoutUtility.GetLastRect();
+                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
+                        }
+                        GUILayout.EndHorizontal();
                     }
-                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    {
-                        Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
-                    }
-                    GUILayout.EndHorizontal();
                 }
             }
         }
 
-        private static void ResourceDetails(Part partSource, Part partTarget, SMAddon.XFERMode thisXferMode, float thisXferAmount, Vector2 scrollPosition)
+        private static void ResourceDetails(List<Part> partsSource, List<Part> partsTarget, SMAddon.XFERMode thisXferMode, double thisXferAmount, Vector2 scrollPosition)
         {
             // This routine assumes that a resource has been selected on the Resource manifest window.
             // Pass in static vars to improve readability.
             string selectedResource = SMAddon.smController.SelectedResource;
-            PartResource thisResource = partSource.Resources[selectedResource];
-            PartResource.FlowMode flowmode = partSource.Resources[selectedResource].flowMode;
-            bool flowbool = partSource.Resources[selectedResource].flowState;
-            string strXferAmount = thisXferAmount.ToString();
 
-            // Set scrollX offsets for left and right viewers
-            string strTarget = "";
-            int scrollX = 30;
-            if (thisXferMode == SMAddon.XFERMode.TargetToSource)
-                scrollX = 330;
-
-            int scrollY = 180;
-
-            // Set tooltips directional data
-            if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
-                strTarget = "Target";
-            else
-                strTarget = "Source";
-
-            string flowtext = "Off";
-            if (flowbool)
-                flowtext = "On";
-            else
-                flowtext = "Off";
-
-            // Flow control Display
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(string.Format("({0}/{1})", thisResource.amount.ToString("#######0.####"), thisResource.maxAmount.ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
-            GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
-            if (SMAddon.vessel.IsControllable)
+            if (partsSource.Count > 0)
             {
-                if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
+                // these calls are to determine if resource can be transferred by rules, so only the first part is needed.
+                PartResource thisResource = partsSource[0].Resources[selectedResource];
+                PartResource.FlowMode flowmode = partsSource[0].Resources[selectedResource].flowMode;
+                bool flowbool = partsSource[0].Resources[selectedResource].flowState;
+
+                string strXferAmount = thisXferAmount.ToString();
+
+                // Set scrollX offsets for left and right viewers
+                string strTarget = "";
+                int scrollX = 30;
+                if (thisXferMode == SMAddon.XFERMode.TargetToSource)
+                    scrollX = 330;
+
+                int scrollY = 180;
+
+                // Set tooltips directional data
+                if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
+                    strTarget = "Target";
+                else
+                    strTarget = "Source";
+
+                string flowtext = "Off";
+                if (flowbool)
+                    flowtext = "On";
+                else
+                    flowtext = "Off";
+
+                // Flow control Display
+                GUILayout.BeginHorizontal();
+                GUILayout.Label(string.Format("({0}/{1})", CalcResourceRemaining(partsSource, selectedResource).ToString("#######0.####"), CalcResourceCapacity(partsSource, selectedResource).ToString("######0.####")), GUILayout.Width(175), GUILayout.Height(20));
+                GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(30), GUILayout.Height(20));
+                if (SMAddon.vessel.IsControllable)
                 {
-                    if (flowbool)
+                    if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource from this part."), GUILayout.Width(50), GUILayout.Height(20)))
                     {
-                        thisResource.flowState = false;
-                        flowtext = "Off";
+                        if (flowbool)
+                        {
+                            thisResource.flowState = false;
+                            flowtext = "Off";
+                        }
+                        else
+                        {
+                            thisResource.flowState = true;
+                            flowtext = "On";
+                        }
+                    }
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+                    }
+                }
+                GUILayout.EndHorizontal();
+
+                // Xfer Controls Display
+                // let's determine how much of a resource we can move to the target.
+                double maxXferAmount = CalcMaxXferAmt(partsSource, partsTarget, selectedResource);
+                if (maxXferAmount > 0 && (partsSource != partsTarget))
+                {
+                    // Lets parse the string to allow decimal points.
+                    strXferAmount = thisXferAmount.ToString();
+
+                    // add the decimal point if it was typed.
+                    strXferAmount = GetStringDecimal(strXferAmount, thisXferMode);
+                    // add the zero if it was typed.
+                    strXferAmount = GetStringZero(strXferAmount, thisXferMode);
+                    // Now update the static var
+                    SetXferAmountString(strXferAmount, thisXferMode);
+
+                    GUILayout.BeginHorizontal();
+                    if (SMAddon.XferOn)
+                    {
+                        // We want to show this during transfer if the direction is correct...
+                        if (SMAddon.XferMode == thisXferMode)
+                        {
+                            GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
+                            GUILayout.Label((thisXferAmount - SMAddon.smController.AmtXferred).ToString(), SMStyle.LabelStyleBold, GUILayout.Width(85));
+                        }
                     }
                     else
                     {
-                        thisResource.flowState = true;
-                        flowtext = "On";
+                        GUILayout.Label("Enter Xfer Amt:", GUILayout.Width(100));
+                        strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
                     }
-                }
-                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                {
-                    Rect rect = GUILayoutUtility.GetLastRect();
-                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
-                }
-            }
-            GUILayout.EndHorizontal();
-            // Xfer Controls Display
-            // let's determine how much of a resource we can move to the target.
-            double maxXferAmount = CalcMaxXferAmt(selectedResource, partSource, partTarget);
-            if (maxXferAmount > 0 && (partSource != partTarget))
-            {
-                // Lets parse the string to allow decimal points.
-                strXferAmount = thisXferAmount.ToString();
 
-                // add the decimal point if it was typed.
-                strXferAmount = GetStringDecimal(strXferAmount, thisXferMode);
-                // add the zero if it was typed.
-                strXferAmount = GetStringZero(strXferAmount, thisXferMode);
-                // Now update the static var
-                SetXferAmountString(strXferAmount, thisXferMode);
+                    // update decimal bool 
+                    SetStringDecimal(strXferAmount, thisXferMode);
 
-                GUILayout.BeginHorizontal();
-                if (SMAddon.crewXfer || SMAddon.XferOn)
-                {
-                    // We want to show this during transfer if the direction is correct...
-                    if (SMAddon.XferMode == thisXferMode)
+                    //update zero bool 
+                    SetStringZero(strXferAmount, thisXferMode);
+
+                    // Update static Xfer Amount var
+                    thisXferAmount = UpdateXferAmount(strXferAmount, thisXferMode);
+
+                    GUIContent xferContent = null;
+                    if (!SMAddon.XferOn)
+                        xferContent = new GUIContent("Xfer", "Transfers the selected resource\r\nto the selected " + strTarget + " Part");
+                    else
+                        xferContent = new GUIContent("Stop", "Halts the Transfer of the selected resource\r\nto the selected " + strTarget + " Part");
+                    // set button style
+                    if (IsShipControllable() && CanResourceBeXferred(thisXferMode, maxXferAmount))
+                        if (GUILayout.Button(xferContent, GUILayout.Width(50), GUILayout.Height(20)))
+                        {
+                            if (!SMAddon.XferOn)
+                                TransferResource(partsSource, partsTarget, thisXferAmount, selectedResource);
+                            else if (SMAddon.XferOn && Settings.RealismMode)
+                                SMAddon.XferState = SMAddon.XFERState.Stop;
+                        }
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
-                        GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
-                        GUILayout.Label((thisXferAmount - SMAddon.smController.AmtXferred).ToString(), SMStyle.LabelStyleBold, GUILayout.Width(85));
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
                     }
-                }
-                else
-                {
-                    GUILayout.Label("Enter Xfer Amt:", GUILayout.Width(100));
-                    strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(105));
-                }
-
-                // update decimal bool 
-                SetStringDecimal(strXferAmount, thisXferMode);
-
-                //update zero bool 
-                SetStringZero(strXferAmount, thisXferMode);
-
-                // Update static Xfer Amount var
-                thisXferAmount = UpdateXferAmount(strXferAmount, thisXferMode);
-
-                GUIContent xferContent = null;
-                if (!SMAddon.crewXfer && !SMAddon.XferOn)
-                    xferContent = new GUIContent("Xfer", "Transfers the selected resource\r\nto the selected " + strTarget + " Part");
-                else
-                    xferContent = new GUIContent("Stop", "Halts the Transfer of the selected resource\r\nto the selected " + strTarget + " Part");
-                if (ShipIsControllable() && ResourceCanBeXferred(thisXferMode, maxXferAmount))
-                    if (GUILayout.Button(xferContent, GUILayout.Width(50), GUILayout.Height(20)))
-                    {
-                        if (!SMAddon.crewXfer && !SMAddon.XferOn)
-                            TransferResource(partSource, partTarget, (double)thisXferAmount);
-                        else if (SMAddon.XferOn && Settings.RealismMode)
-                            SMAddon.XferState = SMAddon.XFERState.Stop;
-                    }
-                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                {
-                    Rect rect = GUILayoutUtility.GetLastRect();
-                    ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
-                }
-                GUILayout.EndHorizontal();
-                if (!SMAddon.XferOn)
-                {
-                    GUILayout.BeginHorizontal();
-                    GUILayout.Label("Xfer:  ", GUILayout.Width(50), GUILayout.Height(20));
-                    thisXferAmount = GUILayout.HorizontalSlider(thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
                     GUILayout.EndHorizontal();
-                    UpdateXferAmount(thisXferAmount.ToString(), thisXferMode);
+                    if (!SMAddon.XferOn)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("Xfer:  ", GUILayout.Width(50), GUILayout.Height(20));
+                        thisXferAmount = (double)GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(210));
+                        GUILayout.EndHorizontal();
+                        UpdateXferAmount(thisXferAmount.ToString(), thisXferMode);
+                    }
                 }
             }
         }
@@ -616,40 +601,77 @@ namespace ShipManifest
 
         #region Methods
 
-        internal static bool ShipIsControllable()
+        private static void PartButtonToggled(string SelectedResource, SMAddon.XFERMode xferMode, string step, Part part)
         {
-            return ((SMAddon.vessel.IsControllable && Settings.RealismMode) || !Settings.RealismMode);
-        }
-
-        internal static double CalcMaxXferAmt(string resource, Part Source, Part Target)
-        {
-            double maxXferAmount = 0;
-            if (Source == null || Target == null || (resource == null || resource == ""))
-                maxXferAmount = 0;
-            else
+            try
             {
-                maxXferAmount = Target.Resources[resource].maxAmount - Target.Resources[resource].amount;
-                if (maxXferAmount > Source.Resources[resource].amount)
-                    maxXferAmount = Source.Resources[resource].amount;
-                if (maxXferAmount < 0.0001)
-                    maxXferAmount = 0;
+                if (!SMAddon.crewXfer && !SMAddon.XferOn)
+                {
+                    if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                    {
+                        if (SMAddon.smController.SelectedPartsSource.Contains(part))
+                        {
+                            if (SelectedResource == "Crew" || SelectedResource == "Science")
+                                SMAddon.smController.SelectedPartsSource = new List<Part>();
+                            else
+                            {
+                                if (SMAddon.smController.SelectedPartsSource.Count < 2)
+                                    SMAddon.smController.SelectedPartsSource = new List<Part>();
+                                else
+                                    SMAddon.smController.SelectedPartsSource.Remove(part);
+                            }
+                        }
+                        else
+                        {
+                            if (SelectedResource == "Crew" || SelectedResource == "Science")
+                                SMAddon.smController.SelectedPartsSource = new List<Part>();
+                            SMAddon.smController.SelectedPartsSource.Add(part);
+                        }
+                        SMAddon.smController.SelectedModuleSource = null;
+                    }
+                    else
+                    {
+                        if (SMAddon.smController.SelectedPartsTarget.Contains(part))
+                        {
+                            if (SelectedResource == "Crew" || SelectedResource == "Science")
+                                SMAddon.smController.SelectedPartsTarget = new List<Part>();
+                            else
+                            {
+                                if (SMAddon.smController.SelectedPartsTarget.Count < 2)
+                                    SMAddon.smController.SelectedPartsTarget = new List<Part>();
+                                else
+                                    SMAddon.smController.SelectedPartsTarget.Remove(part);
+                            }
+                        }
+                        else
+                        {
+                            if (SelectedResource == "Crew" || SelectedResource == "Science")
+                                SMAddon.smController.SelectedPartsTarget = new List<Part>();
+                            SMAddon.smController.SelectedPartsTarget.Add(part);
+                        }
+                        SMAddon.smController.SelectedModuleTarget = null;
+                    }
+                    step = "Set Xfer amounts?";
+                    if (SelectedResource != "Crew" && SelectedResource != "Science")
+                    {
+                        step = "Set Xfer amounts = yes";
+                        SMAddon.smController.sXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, SelectedResource);
+                        SMAddon.smController.tXferAmount = (float)CalcMaxXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, SelectedResource);
+                    }
+                    Utilities.LogMessage("SelectedPartSource...", "Info", Settings.VerboseLogging);
+                }
             }
-            return maxXferAmount;
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage("Error in Windowtransfer.PartButtonToggled (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
         }
 
-        internal static double CalcActFlowRate(double XferAmount)
-        {
-            double actFlowRate = 0;
-            double flowTime = XferAmount / Settings.FlowRate;
-            if (flowTime > Settings.MaxFlowTimeSec)
-                actFlowRate = XferAmount / Settings.MaxFlowTimeSec;
-            else 
-                actFlowRate = Settings.FlowRate;
-
-            return actFlowRate;
-        }
-
-        internal static void TransferCrewMemberBegin (ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
+        internal static void TransferCrewMemberBegin(ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
         {
             SMAddon.smController.CrewXferSource = sourcePart;
             SMAddon.smController.CrewXferTarget = targetPart;
@@ -762,9 +784,181 @@ namespace ShipManifest
             }
         }
 
-        private static bool ResourceCanBeXferred(SMAddon.XFERMode thisXferMode, double maxXferAmount)
+        private static void TransferScience(PartModule source, PartModule target)
+        {
+            ScienceData[] moduleScience = null;
+            try
+            {
+                if (((IScienceDataContainer)source) != null)
+                    moduleScience = ((IScienceDataContainer)source).GetData();
+                else
+                    moduleScience = null;
+
+                if (moduleScience != null && moduleScience.Length > 0)
+                {
+                    Utilities.LogMessage(string.Format("moduleScience has data..."), "Info", Settings.VerboseLogging);
+
+                    if (((IScienceDataContainer)target) != null)
+                    {
+                        // Lets store the data from the source.
+                        if (((ModuleScienceContainer)target).StoreData( new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
+                        {
+                            Utilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", Settings.VerboseLogging);
+                            foreach (ScienceData data in moduleScience)
+                            {
+                                ((IScienceDataContainer)source).DumpData(data);
+                            }
+
+                            if (Settings.RealismMode)
+                            {
+                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", Settings.VerboseLogging);
+                            }
+                            else
+                            {
+                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", Settings.VerboseLogging);
+                                ((ModuleScienceExperiment)source).ResetExperiment();
+                            }
+                        }
+                        else
+                        {
+                            Utilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", Settings.VerboseLogging);
+                        }
+                    }
+                    else
+                    {
+                        Utilities.LogMessage(string.Format("((IScienceDataContainer)target) is null"), "Info", Settings.VerboseLogging);
+                    }
+                    Utilities.LogMessage(string.Format("Transfer Complete."), "Info", Settings.VerboseLogging);
+                }
+                else if (moduleScience == null)
+                {
+                    Utilities.LogMessage(string.Format("moduleScience is null..."), "Info", Settings.VerboseLogging);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(" in TransferScience:  Error:  " + ex.ToString(), "Info", Settings.VerboseLogging);
+            }
+        }
+
+        private static void TransferResource(List<Part> source, List<Part> target, double XferAmount, string SelectedResource)
+        {
+            try
+            {
+                if (source[0].Resources.Contains(SMAddon.smController.SelectedResource) && target[0].Resources.Contains(SelectedResource))
+                {
+                    if (XferAmount <= 0)
+                        return;
+                    double AmtRemaining = CalcResourceRemaining(source, SelectedResource);
+                    double AmtRemianCapacity = CalcRemainingCapacity(target, SelectedResource);
+                    double AmtCapacity = CalcResourceCapacity(source, SelectedResource);
+                    if (XferAmount > AmtRemaining)
+                        XferAmount = AmtRemaining;
+                    if (XferAmount > AmtRemianCapacity)
+                        XferAmount = AmtRemianCapacity;
+
+                    if (Settings.RealismMode)
+                    {
+                        // now lets make some noise and simulate the pumping process...
+                        Utilities.LogMessage("Playing pump sound...", "Info", Settings.VerboseLogging);
+
+                        // This flag enables the Update handler in SMAddon and sets the direction
+                        if (source == SMAddon.smController.SelectedPartsSource)
+                            SMAddon.XferMode = SMAddon.XFERMode.SourceToTarget;
+                        else
+                            SMAddon.XferMode = SMAddon.XFERMode.TargetToSource;
+
+                        // Calculate the actual flow rate, based on source capacity and max flow time setting...
+                        SMAddon.act_flow_rate = CalcActFlowRate(AmtCapacity);
+
+                        // Start the process
+                        SMAddon.XferOn = true;
+                    }
+                    else
+                    {
+                        //Not in Realism mode, so just move the resource...
+                        SMAddon.XferResource(source, SelectedResource, XferAmount, true);
+                        SMAddon.XferResource(target, SelectedResource, XferAmount, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in  TransferResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
+        private static void SetXferAmountString(string xferAmount, SMAddon.XFERMode xferMode)
+        {
+            if (xferMode == SMAddon.XFERMode.TargetToSource)
+                strSXferAmount = xferAmount;
+            else
+                strTXferAmount = xferAmount;
+        }
+
+        private static float UpdateXferAmount(string strXferAmount, SMAddon.XFERMode xferMode)
+        {
+            float newAmount = 0;
+            if (float.TryParse(strXferAmount, out newAmount))
+                if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                    SMAddon.smController.sXferAmount = newAmount;
+                else
+                    SMAddon.smController.tXferAmount = newAmount;
+            return newAmount;
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private static bool CanResourceBeXferred(SMAddon.XFERMode thisXferMode, double maxXferAmount)
         {
             return ((!SMAddon.XferOn && maxXferAmount > 0) || (SMAddon.XferOn && SMAddon.XferMode == thisXferMode));
+        }
+
+        internal static bool IsShipControllable()
+        {
+            return ((SMAddon.vessel.IsControllable && Settings.RealismMode) || !Settings.RealismMode);
+        }
+
+        private static bool IsPartSelectable(string SelectedResource, SMAddon.XFERMode xferMode, Part part)
+        {
+            bool isSelectable = true;
+            if (SelectedResource != "Crew" && SelectedResource != "Science")
+            {
+                if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                {
+                    if (SMAddon.smController.SelectedPartsTarget.Contains(part))
+                        isSelectable = false;
+                }
+                else
+                {
+                    if (SMAddon.smController.SelectedPartsSource.Contains(part))
+                        isSelectable = false;
+                }
+            }
+            return isSelectable;
+        }
+
+        private static GUIStyle GetFillButtonStyle(string SelectedResource, Part part, SMAddon.XFERMode xferMode)
+        {
+            GUIStyle style;
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                style = SMStyle.ButtonSourceStyle;
+            else
+                style = SMStyle.ButtonTargetStyle;
+            return style;
+        }
+
+        private static GUIStyle GetDumpButtonStyle(string SelectedResource, Part part, SMAddon.XFERMode xferMode)
+        {
+            GUIStyle style;
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                style = SMStyle.ButtonSourceStyle;
+            else
+                style = SMStyle.ButtonTargetStyle;
+            GUI.enabled = part.Resources[SelectedResource].amount > 0 ? true : false;
+            return style;
         }
 
         internal static string GetStringDecimal(string strXferAmount, SMAddon.XFERMode thisXferMode)
@@ -833,133 +1027,6 @@ namespace ShipManifest
             }
         }
 
-        private static void TransferScience(PartModule source, PartModule target)
-        {
-            ScienceData[] moduleScience = null;
-            try
-            {
-                if (((IScienceDataContainer)source) != null)
-                    moduleScience = ((IScienceDataContainer)source).GetData();
-                else
-                    moduleScience = null;
-
-                if (moduleScience != null && moduleScience.Length > 0)
-                {
-                    Utilities.LogMessage(string.Format("moduleScience has data..."), "Info", Settings.VerboseLogging);
-
-                    if (((IScienceDataContainer)target) != null)
-                    {
-                        // Lets store the data from the source.
-                        if (((ModuleScienceContainer)target).StoreData( new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
-                        {
-                            Utilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", Settings.VerboseLogging);
-                            foreach (ScienceData data in moduleScience)
-                            {
-                                ((IScienceDataContainer)source).DumpData(data);
-                            }
-
-                            if (Settings.RealismMode)
-                            {
-                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", Settings.VerboseLogging);
-                            }
-                            else
-                            {
-                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", Settings.VerboseLogging);
-                                ((ModuleScienceExperiment)source).ResetExperiment();
-                            }
-                        }
-                        else
-                        {
-                            Utilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", Settings.VerboseLogging);
-                        }
-                    }
-                    else
-                    {
-                        Utilities.LogMessage(string.Format("((IScienceDataContainer)target) is null"), "Info", Settings.VerboseLogging);
-                    }
-                    Utilities.LogMessage(string.Format("Transfer Complete."), "Info", Settings.VerboseLogging);
-                }
-                else if (moduleScience == null)
-                {
-                    Utilities.LogMessage(string.Format("moduleScience is null..."), "Info", Settings.VerboseLogging);
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(" in TransferScience:  Error:  " + ex.ToString(), "Info", Settings.VerboseLogging);
-            }
-        }
-
-        private static void TransferResource(Part source, Part target, double XferAmount)
-        {
-            try
-            {
-                if (source.Resources.Contains(SMAddon.smController.SelectedResource) && target.Resources.Contains(SMAddon.smController.SelectedResource))
-                {
-                    if (XferAmount <= 0)
-                        return;
-                    double maxAmount = target.Resources[SMAddon.smController.SelectedResource].maxAmount;
-                    double sourceAmount = source.Resources[SMAddon.smController.SelectedResource].amount;
-                    double targetAmount = target.Resources[SMAddon.smController.SelectedResource].amount;
-
-                    // make sure we have enough to transfer, or adjust the amount...
-                    if (XferAmount > sourceAmount)
-                        XferAmount = sourceAmount;
-
-                    if (Settings.RealismMode)
-                    {
-                        // now lets make some noise and simulate the pumping process...
-                        Utilities.LogMessage("Playing pump sound...", "Info", Settings.VerboseLogging);
-
-                        // This flag enables the Update handler in SMAddon and sets the direction
-                        if (source == SMAddon.smController.SelectedPartSource)
-                            SMAddon.XferMode = SMAddon.XFERMode.SourceToTarget;
-                        else
-                            SMAddon.XferMode = SMAddon.XFERMode.TargetToSource;
-
-                        // Calculate the actual flow rate, based on source capacity and max flow time setting...
-                        SMAddon.act_flow_rate = CalcActFlowRate(source.Resources[SMAddon.smController.SelectedResource].maxAmount);
-
-                        // Start the process
-                        SMAddon.XferOn = true;
-                    }
-                    else
-                    {
-                        //Not in Realism mode, so just move the resource...
-
-                        // Fill target
-                        target.Resources[SMAddon.smController.SelectedResource].amount += XferAmount;
-
-                        // Drain source...
-                        source.Resources[SMAddon.smController.SelectedResource].amount -= XferAmount;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in  TransferResource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
-        private static void SetXferAmountString(string xferAmount, SMAddon.XFERMode xferMode)
-        {
-            if (xferMode == SMAddon.XFERMode.TargetToSource)
-                strSXferAmount = xferAmount;
-            else
-                strTXferAmount = xferAmount;
-        }
-
-        private static float UpdateXferAmount(string strXferAmount, SMAddon.XFERMode xferMode)
-        {
-            float newAmount = 0;
-            if (float.TryParse(strXferAmount, out newAmount))
-                if (xferMode == SMAddon.XFERMode.SourceToTarget)
-                    SMAddon.smController.sXferAmount = newAmount;
-                else
-                    SMAddon.smController.tXferAmount = newAmount;
-            return newAmount;
-        }
-
         private static int GetScienceCount(Part part, bool IsCapacity)
         {
             try
@@ -982,6 +1049,111 @@ namespace ShipManifest
             }
         }
 
+        private static GUIStyle GetPartButtonStyle(SMAddon.XFERMode xferMode, Part part)
+        {
+            GUIStyle style = SMStyle.ButtonSourceStyle;
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (SMAddon.smController.SelectedPartsSource.Contains(part))
+                    style = SMStyle.ButtonToggledSourceStyle;
+                else
+                    style = SMStyle.ButtonSourceStyle;
+            }
+            else
+            {
+                if (SMAddon.smController.SelectedPartsTarget.Contains(part))
+                    style = SMStyle.ButtonToggledTargetStyle;
+                else
+                    style = SMStyle.ButtonTargetStyle;
+            }
+            return style;
+        }
+
+        private static string GetResourceDescription(string SelectedResource, Part part)
+        {
+            string strDescription = "";
+
+            switch (SelectedResource)
+            {
+                case "Crew":
+                    strDescription = part.protoModuleCrew.Count.ToString() + " - " + part.partInfo.title;
+                    break;
+                case "Science":
+                    int cntScience = GetScienceCount(part, false);
+                    strDescription = cntScience.ToString() + " - " + part.partInfo.title;
+                    break;
+                default:
+                    strDescription = part.Resources[SelectedResource].amount.ToString("######0.##") + " - " + part.partInfo.title;
+                    break;
+            }
+            return strDescription;
+        }
+
+        internal static double CalcResourceRemaining(List<Part> parts, string SelectedResource)
+        {
+            double amount = 0;
+            if (parts != null)
+                foreach (Part part in parts)
+                    amount += part.Resources[SelectedResource].amount;
+            return amount;
+        }
+
+        internal static double CalcResourceCapacity(List<Part> parts, string SelectedResource)
+        {
+            double amount = 0;
+            if (parts != null)
+                foreach (Part part in parts)
+                    amount += part.Resources[SelectedResource].maxAmount;
+            return amount;
+        }
+
+        internal static double CalcRemainingCapacity(List<Part> parts, string SelectedResource)
+        {
+            double amount = 0;
+            if (parts != null)
+                foreach (Part part in parts)
+                    amount += (part.Resources[SelectedResource].maxAmount - part.Resources[SelectedResource].amount);
+            return amount;
+        }
+
+        internal static double CalcMaxXferAmt(List<Part> Sources, List<Part> Targets, string SelectedResource)
+        {
+            double maxXferAmount = 0;
+            if (Sources == null || Targets == null || (SelectedResource == null || SelectedResource == ""))
+                maxXferAmount = 0;
+            else
+            {
+                double maxSourceAmount = 0;
+                foreach (Part Source in Sources)
+                {
+                    maxSourceAmount += Source.Resources[SelectedResource].amount;
+                }
+                maxXferAmount = 0;
+                foreach (Part Target in Targets)
+                {
+                    maxXferAmount += (Target.Resources[SelectedResource].maxAmount - Target.Resources[SelectedResource].amount);
+                    if (maxXferAmount > maxSourceAmount)
+                        maxXferAmount = maxSourceAmount;
+                    if (maxXferAmount < 0.0001)
+                        maxXferAmount = 0;
+                }
+            }
+            return maxXferAmount;
+        }
+
+        internal static double CalcActFlowRate(double XferAmount)
+        {
+            double actFlowRate = 0;
+            double flowTime = XferAmount / Settings.FlowRate;
+            if (flowTime > Settings.MaxFlowTimeSec)
+                actFlowRate = XferAmount / Settings.MaxFlowTimeSec;
+            else
+                actFlowRate = Settings.FlowRate;
+
+            return actFlowRate;
+        }
+
         #endregion
+
     }
 }
