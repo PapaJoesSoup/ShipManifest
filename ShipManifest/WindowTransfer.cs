@@ -280,13 +280,13 @@ namespace ShipManifest
                     if (!Settings.RealismMode && SelectedResource != "Crew" && SelectedResource != "Science")
                     {
                         GUI.enabled = part.Resources[SelectedResource].amount > 0 ? true : false;
-                        var style1 = GetDumpButtonStyle(SelectedResource, part, xferMode);
+                        var style1 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
                             SMController.DumpPartResource(part, SelectedResource);
                         }
 
-                        var style2 = GetFillButtonStyle(SelectedResource, part, xferMode);
+                        var style2 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
                         GUI.enabled = part.Resources[SelectedResource].amount < part.Resources[SelectedResource].maxAmount ? true : false;
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
@@ -484,16 +484,9 @@ namespace ShipManifest
                 int scrollY = 180;
 
                 // Set tooltips directional data
-                if (thisXferMode == SMAddon.XFERMode.SourceToTarget)
-                    strTarget = "Target";
-                else
-                    strTarget = "Source";
+                strTarget = thisXferMode == SMAddon.XFERMode.SourceToTarget ? "Target" : "Source";
 
-                string flowtext = "Off";
-                if (flowbool)
-                    flowtext = "On";
-                else
-                    flowtext = "Off";
+                string flowtext = flowbool ? "On" : "Off";
 
                 // Flow control Display
                 GUILayout.BeginHorizontal();
@@ -685,10 +678,8 @@ namespace ShipManifest
                     if (sourcePart == targetPart)
                     {
                         // Must be a move...
-                        if (newIdx + 1 >= sourcePart.CrewCapacity)
-                            newIdx = 0;
-                        else
-                            newIdx += 1;
+                        newIdx += newIdx + 1 >= sourcePart.CrewCapacity ? 0 : 1;
+
                         // get target seat from part's inernal model
                         targetSeat = sourcePart.internalModel.seats[newIdx];
                     }
@@ -757,10 +748,7 @@ namespace ShipManifest
                     }
 
                     // if moving within a part, set the seat2seat flag
-                    if (sourcePart == targetPart)
-                        SMAddon.isSeat2Seat = true;
-                    else
-                        SMAddon.isSeat2Seat = false;
+                    SMAddon.isSeat2Seat = sourcePart == targetPart ? true : false;
                 }
                 else
                 {
@@ -781,10 +769,7 @@ namespace ShipManifest
             ScienceData[] moduleScience = null;
             try
             {
-                if (((IScienceDataContainer)source) != null)
-                    moduleScience = ((IScienceDataContainer)source).GetData();
-                else
-                    moduleScience = null;
+                moduleScience = ((IScienceDataContainer)source) != null ? ((IScienceDataContainer)source).GetData() : null;
 
                 if (moduleScience != null && moduleScience.Length > 0)
                 {
@@ -855,13 +840,10 @@ namespace ShipManifest
                         Utilities.LogMessage("Playing pump sound...", "Info", Settings.VerboseLogging);
 
                         // This flag enables the Update handler in SMAddon and sets the direction
-                        if (source == SMAddon.smController.SelectedPartsSource)
-                            SMAddon.XferMode = SMAddon.XFERMode.SourceToTarget;
-                        else
-                            SMAddon.XferMode = SMAddon.XFERMode.TargetToSource;
+                        SMAddon.XferMode = source == SMAddon.smController.SelectedPartsSource ? SMAddon.XFERMode.SourceToTarget : SMAddon.XFERMode.TargetToSource;
 
                         // Calculate the actual flow rate, based on source capacity and max flow time setting...
-                        SMAddon.act_flow_rate = CalcActFlowRate(AmtCapacity);
+                        SMAddon.act_flow_rate = AmtCapacity / Settings.FlowRate > Settings.MaxFlowTimeSec ? AmtCapacity / Settings.MaxFlowTimeSec : Settings.FlowRate;
 
                         // Start the process
                         SMAddon.XferOn = true;
@@ -882,6 +864,7 @@ namespace ShipManifest
 
         private static void SetXferAmountString(string xferAmount, SMAddon.XFERMode xferMode)
         {
+            // Needed so we can alter slider controls on both the source and target windows.
             if (xferMode == SMAddon.XFERMode.TargetToSource)
                 strSXferAmount = xferAmount;
             else
@@ -890,6 +873,7 @@ namespace ShipManifest
 
         private static float UpdateXferAmount(string strXferAmount, SMAddon.XFERMode xferMode)
         {
+            // Needed so we can alter slider controls on both the source and target windows.
             float newAmount = 0;
             if (float.TryParse(strXferAmount, out newAmount))
                 if (xferMode == SMAddon.XFERMode.SourceToTarget)
@@ -930,27 +914,6 @@ namespace ShipManifest
                 }
             }
             return isSelectable;
-        }
-
-        private static GUIStyle GetFillButtonStyle(string SelectedResource, Part part, SMAddon.XFERMode xferMode)
-        {
-            GUIStyle style;
-            if (xferMode == SMAddon.XFERMode.SourceToTarget)
-                style = SMStyle.ButtonSourceStyle;
-            else
-                style = SMStyle.ButtonTargetStyle;
-            return style;
-        }
-
-        private static GUIStyle GetDumpButtonStyle(string SelectedResource, Part part, SMAddon.XFERMode xferMode)
-        {
-            GUIStyle style;
-            if (xferMode == SMAddon.XFERMode.SourceToTarget)
-                style = SMStyle.ButtonSourceStyle;
-            else
-                style = SMStyle.ButtonTargetStyle;
-            GUI.enabled = part.Resources[SelectedResource].amount > 0 ? true : false;
-            return style;
         }
 
         internal static string GetStringDecimal(string strXferAmount, SMAddon.XFERMode thisXferMode)
@@ -1131,18 +1094,6 @@ namespace ShipManifest
                 }
             }
             return maxXferAmount;
-        }
-
-        internal static double CalcActFlowRate(double XferAmount)
-        {
-            double actFlowRate = 0;
-            double flowTime = XferAmount / Settings.FlowRate;
-            if (flowTime > Settings.MaxFlowTimeSec)
-                actFlowRate = XferAmount / Settings.MaxFlowTimeSec;
-            else
-                actFlowRate = Settings.FlowRate;
-
-            return actFlowRate;
         }
 
         #endregion
