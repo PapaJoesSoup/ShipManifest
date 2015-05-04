@@ -29,8 +29,9 @@ namespace ShipManifest
             try
             {
                 // Display all hatches
-                foreach (ModHatch iHatch in SMAddon.smController.Hatches)
+                for (int x = 0; x < SMAddon.smController.Hatches.Count; x++)
                 {
+                    ModHatch iHatch = SMAddon.smController.Hatches[x];
                     bool isEnabled = true;
                     bool open = false;
 
@@ -46,11 +47,11 @@ namespace ShipManifest
                     step = "button toggle check";
                     if (!open && newOpen)
                     {
-                        iHatch.OpenHatch();
+                        iHatch.OpenHatch(true);
                     }
                     else if (open && !newOpen)
                     {
-                        iHatch.CloseHatch();
+                        iHatch.CloseHatch(true);
                     }
                     if (Event.current.type == EventType.Repaint)
                         iHatch.Highlight(GUILayoutUtility.GetLastRect());
@@ -79,6 +80,7 @@ namespace ShipManifest
                     iModule.HatchOpen = true;
                 }
             }
+            SMAddon.FireEventTriggers();
         }
 
         internal static void CloseAllHatches()
@@ -95,6 +97,7 @@ namespace ShipManifest
                     iModule.HatchOpen = false;
                 }
             }
+            SMAddon.FireEventTriggers();
         }
 
         internal static void HighlightAllHatches(bool enable)
@@ -109,7 +112,7 @@ namespace ShipManifest
                 }
                 else
                 {
-                    if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                    if (Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
                     {
                         iHatch.CLSPart.Highlight(true, true);
                     }

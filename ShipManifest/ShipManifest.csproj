@@ -53,21 +53,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\KSP_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="CLSInterfaces">
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="Toolbar">
-      <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\GameData\000_Toolbar\Toolbar.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\ksp-win-0-90-0\KSP_win\KSP_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\KSP_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +72,7 @@
     <Compile Include="CLSClient.cs" />
     <Compile Include="ModLight.cs" />
     <Compile Include="ModSolarPanel.cs" />
+    <Compile Include="ModXferResource.cs" />
     <Compile Include="TabAntenna.cs" />
     <Compile Include="UtilsGui.cs" />
     <Compile Include="WindowControl.cs" />
@@ -109,9 +107,6 @@
     <Content Include="Images\IconS_Off_38.png" />
     <Content Include="Images\IconS_On_24.png" />
     <Content Include="Images\IconS_On_38.png" />
-    <Content Include="PluginData\ShipManifest\config.xml">
-      <SubType>Designer</SubType>
-    </Content>
     <Content Include="Images\IconOff_24.png" />
     <Content Include="Images\IconOn_24.png" />
     <Content Include="Sounds\59328-1.wav" />
@@ -121,9 +116,12 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PluginData\SMSettings.dat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-0-90-0\KSP_win\GameData\ShipManifest\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

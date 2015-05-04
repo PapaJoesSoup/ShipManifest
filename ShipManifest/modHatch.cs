@@ -71,19 +71,21 @@ namespace ShipManifest
             this.CLSPart = iPart;
         }
 
-        internal void OpenHatch()
+        internal void OpenHatch(bool fireEvent = false)
         {
             iModule.HatchEvents["CloseHatch"].active = true;
             iModule.HatchEvents["OpenHatch"].active = false;
             iModule.HatchOpen = true;
-            //SMAddon.FireEventTriggers();
+            if (fireEvent)
+                SMAddon.FireEventTriggers();
         }
-        internal void CloseHatch()
+        internal void CloseHatch(bool fireEvent = false)
         {
             iModule.HatchEvents["CloseHatch"].active = false;
             iModule.HatchEvents["OpenHatch"].active = true;
             iModule.HatchOpen = false;
-            //SMAddon.FireEventTriggers();
+            if (fireEvent)
+                SMAddon.FireEventTriggers();
         }
 
         internal void Highlight(Rect rect)
@@ -99,7 +101,7 @@ namespace ShipManifest
                 {
                     if (_clsPart.Part.highlightColor == Settings.Colors[Settings.MouseOverColor])
                     {
-                        if (Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+                        if (Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
                         {
                             if (CLSPart.Space != null)
                                 CLSPart.Highlight(true, true);

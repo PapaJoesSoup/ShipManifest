@@ -94,10 +94,23 @@ namespace ShipManifest
                 }
                 else
                 {
+                    GUILayout.BeginHorizontal();
                     if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
                     {
                         OnCreate = true;
                     }
+                    if (Settings.RenameWithProfession)
+                    {
+                        string toolTip = "This action resets all renamed Kerbals to their KSP default professions.\r\nIt removes any non printing chars used to maintain a specific profession.\r\nUse this when you wish to revert a game save to be compatabile with KerbalStats\r\n or some other mod that creates custom professions.";
+                        if (GUILayout.Button(new GUIContent("Reset Professions", toolTip), GUILayout.MaxWidth(120)))
+                        {
+                            ResetKerbalProfessions();
+                        }
+                    }
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        ToolTip = Utilities.SetActiveTooltip(rect, Settings.RosterPosition, GUI.tooltip, ref ToolTipActive, 30, 20 - ScrollViewerPosition.y);
+                    GUILayout.EndHorizontal();
                 }
 
                 GUILayout.EndVertical();
@@ -295,6 +308,13 @@ namespace ShipManifest
             {
                 DisplaySelectProfession();
             }
+            bool isMale = ProtoCrewMember.Gender.Male.ToString() == SelectedKerbal.Gender ? true : false;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Gender");
+            isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
+            isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
+            SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Male.ToString() : ProtoCrewMember.Gender.Female.ToString();
+            GUILayout.EndHorizontal();
 
             GUILayout.Label("Courage");
             SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
@@ -381,5 +401,16 @@ namespace ShipManifest
             GUILayout.EndHorizontal();
         }
 
+        private static void ResetKerbalProfessions()
+        {
+            foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+            {
+                if (kerbal.name.Contains(char.ConvertFromUtf32(1)))
+                {
+                    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+                    KerbalRoster.SetExperienceTrait(kerbal);
+                }
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ namespace ShipManifest
         #region Properties
 
         //Game object that keeps us running
-        internal static GameObject GameObjectInstance;  
+        //internal static GameObject GameObjectInstance;  
         internal static SMController smController;
         internal static string ImageFolder = "ShipManifest/Images/";
         internal static string saveMessage = string.Empty;
@@ -59,6 +59,11 @@ namespace ShipManifest
         internal static bool isSeat2Seat = false;
         internal static double Seat2SeatXferDelaySec = 2;
 
+        // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
+        // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
+        internal static int ivaPortraitDelay = 0;
+        internal static bool ivaDelayActive = false;
+
         // Toolbar Integration.
         private static IButton SMButton_Blizzy = null;
         private static IButton SMSettings_Blizzy = null;
@@ -88,7 +93,7 @@ namespace ShipManifest
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     DontDestroyOnLoad(this);
-                    Settings.Load();
+                    Settings.ApplySettings();
                     Utilities.LogMessage("SMAddon.Awake Active...", "info", Settings.VerboseLogging);
 
                     if (Settings.AutoSave)
@@ -199,7 +204,10 @@ namespace ShipManifest
             try
             {
                 if (Settings.Loaded)
+                {
                     RunSave();
+                    Settings.SaveSettings();
+                }
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
                 GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onVesselChange.Remove(OnVesselChange);
@@ -300,6 +308,9 @@ namespace ShipManifest
                         {
                             smController.CrewXferTarget.RemoveCrewmember(smController.CrewXferMember);
                             smController.CrewXferSource.AddCrewmember(smController.CrewXferMember);
+                            if (smController.CrewXferMember.seat != null)
+                                smController.CrewXferMember.seat.SpawnCrew();
+
                             smController.RespawnCrew();
                             WindowTransfer.TransferCrewMemberBegin(smController.CrewXferMember, smController.CrewXferSource, smController.CrewXferTarget);
                         }
@@ -313,6 +324,16 @@ namespace ShipManifest
                         // XferOn is flagged in the Resource Controller
                         if (crewXfer)
                             RealModeCrewXfer();
+
+                        // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
+                        if (ivaDelayActive && ivaPortraitDelay >= 20)
+                        {
+                            ivaDelayActive = false;
+                            ivaPortraitDelay = 0;
+                            smController.RespawnCrew();
+                        }
+                        else if (ivaDelayActive && ivaPortraitDelay < 20)
+                            ivaPortraitDelay += 1;
                     }
                 }
             }
@@ -331,7 +352,10 @@ namespace ShipManifest
         {
             Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGameSceneLoadRequested");
             if (Settings.Loaded)
+            {
                 RunSave();
+                Settings.SaveSettings();
+            }
         }
 
         // UI visible state handlers
@@ -471,13 +495,13 @@ namespace ShipManifest
             try
             {
                 Utilities.LogMessage("OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", Settings.VerboseLogging);
-                if (smController.SelectedResource == "Crew")
+                if (smController.SelectedResources.Contains("Crew"))
                 {
                     if (Settings.EnableCLS)
                         SMAddon.clsAddon.Vessel.Highlight(false);
                     else
                     {
-                        smController.SelectedResource = null;
+                        smController.SelectedResources.Clear();
                         UpdateHighlighting();
                     }
                 }
@@ -690,8 +714,10 @@ namespace ShipManifest
                     if (SMAddon.crewXfer || SMAddon.XferOn)
                         return;
 
-                    SMAddon.smController.SelectedResource = null;
-                    SMAddon.smController.SelectedPartsSource = SMAddon.smController.SelectedPartsTarget = new List<Part>();
+                    SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedResourcesParts);
+                    SMAddon.smController.SelectedResources.Clear();
+                    SMAddon.smController.SelectedPartsSource.Clear();
+                    SMAddon.smController.SelectedPartsTarget.Clear();
                     Settings.ShowShipManifest = !Settings.ShowShipManifest;
                 }
                 else
@@ -768,12 +794,25 @@ namespace ShipManifest
                     WindowTransfer.xferToolTip = "Transfer in progress.  Xfers disabled.";
                     return results;
                 }
-                // Are the parts capable of holding kerbals and are there kerbals to move?
-                if ((SelectedPartsTarget.Count > 0 && SelectedPartsSource[0] != SelectedPartsTarget[0]) && SelectedPartsSource[0].protoModuleCrew.Count > 0)
+                if (SelectedPartsSource.Count == 0 || SelectedPartsTarget.Count == 0)
                 {
-                    // now if realism mode, are the parts connected to each other in the same living space?
-                    results = IsCLSInSameSpace(SelectedPartsSource[0], SelectedPartsTarget[0]);
+                    WindowTransfer.xferToolTip = "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
+                    return results;
                 }
+                if (SelectedPartsSource[0] == SelectedPartsTarget[0])
+                {
+                    WindowTransfer.xferToolTip = "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
+                    return results;
+                }
+
+                // Are there kerbals to move?
+                if (SelectedPartsSource[0].protoModuleCrew.Count == 0)
+                {
+                    WindowTransfer.xferToolTip = "No Kerbals to Move.";
+                    return results;
+                }
+                // now if realism mode, are the parts connected to each other in the same living space?
+                results = IsCLSInSameSpace(SelectedPartsSource[0], SelectedPartsTarget[0]);
             }
             catch (Exception ex)
             {
@@ -798,21 +837,12 @@ namespace ShipManifest
             bool results = false;
             try
             {
-                if (SelectedPartSource == null || SelectedPartTarget == null)
-                {
-                    WindowTransfer.xferToolTip = "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
-                    return false;
-                }
-                if (SelectedPartSource == SelectedPartTarget)
-                {
-                    WindowTransfer.xferToolTip = "Source and Target Part are the same.\r\nyou may Transfer, or use Move Kerbal to the left instead.";
-                    return true;
-                }
-                    
                 if (Settings.EnableCLS && Settings.RealismMode)
                 {
                     if (SMAddon.clsAddon.Vessel != null)
                     {
+                        if (smController.clsSpaceSource == null || smController.clsSpaceTarget == null)
+                            UpdateCLSSpaces();
                         if (smController.clsSpaceSource != null && smController.clsSpaceTarget != null)
                         {
                             if (smController.clsSpaceSource == smController.clsSpaceTarget)
@@ -824,14 +854,14 @@ namespace ShipManifest
                                 WindowTransfer.xferToolTip = "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
                         }
                         else
-                            WindowTransfer.xferToolTip = "Either the Source or Target Part is not selected.\r\nPlease Select a Source AND Target part.";
+                            WindowTransfer.xferToolTip = "You should NOT be seeing this, as Source or Target Space is missing.\r\nPlease reselect source or target part.";
                     }
                     else
                         WindowTransfer.xferToolTip = "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
                 }
                 else
                 {
-                    WindowTransfer.xferToolTip = "Realism or CLS are disabled.\r\nXfers anywhere are Allowed.";
+                    WindowTransfer.xferToolTip = "Realism and/or CLS disabled.\r\nXfers anywhere are allowed.";
                     results = true;
                 }
             }
@@ -931,8 +961,7 @@ namespace ShipManifest
                             OnSMButtonToggle();
 
                         // kill selected resource and its associated highlighting.
-                        smController.SelectedResource = null;
-                        //smController.SelectedResourceParts = null;
+                        smController.SelectedResources.Clear();
                         Utilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", Settings.VerboseLogging);
                     }
                 }
@@ -954,45 +983,36 @@ namespace ShipManifest
         
         internal static void UpdateCLSSpaces()
         {
-            GetCLSVessel();
-            if (clsAddon.Vessel != null)
+            if (GetCLSVessel())
             {
                 try
                 {
                     smController.clsPartSource = null;
                     smController.clsSpaceSource = null;
+                    smController.clsPartTarget = null;
+                    smController.clsSpaceTarget = null;
                     foreach (ICLSSpace sSpace in SMAddon.clsAddon.Vessel.Spaces)
                     {
                         foreach (ICLSPart sPart in sSpace.Parts)
                         {
-                            if (smController.SelectedPartsSource.Contains(sPart.Part))
+                            if (smController.SelectedPartsSource.Contains(sPart.Part) && smController.clsPartSource == null)
                             {
                                 smController.clsPartSource = sPart;
                                 smController.clsSpaceSource = sSpace;
                                 Utilities.LogMessage("UpdateCLSSpaces - clsPartSource found;", "info", Settings.VerboseLogging);
-                                break;
                             }
-                        }
-                        if (smController.clsSpaceSource == null)
-                            Utilities.LogMessage("UpdateCLSSpaces - clsSpaceSource is null.", "info", Settings.VerboseLogging);
-                    }
-                    smController.clsPartTarget = null;
-                    smController.clsSpaceTarget = null;
-                    foreach (ICLSSpace tSpace in SMAddon.clsAddon.Vessel.Spaces)
-                    {
-                        foreach (ICLSPart tPart in tSpace.Parts)
-                        {
-                            if (smController.SelectedPartsTarget.Contains(tPart.Part))
+                            if (smController.SelectedPartsTarget.Contains(sPart.Part) && smController.clsPartTarget == null)
                             {
-                                smController.clsPartTarget = tPart;
-                                smController.clsSpaceTarget = tSpace;
+                                smController.clsPartTarget = sPart;
+                                smController.clsSpaceTarget = sSpace;
                                 Utilities.LogMessage("UpdateCLSSpaces - clsPartTarget found;", "info", Settings.VerboseLogging);
-                                break;
                             }
+                            if (smController.clsPartSource != null && smController.clsPartTarget != null)
+                                break;
                         }
+                        if (smController.clsSpaceSource != null && smController.clsSpaceTarget != null)
+                            break;
                     }
-                    if (smController.clsSpaceTarget == null)
-                        Utilities.LogMessage("UpdateCLSSpaces - clsSpaceTarget is null.", "info", Settings.VerboseLogging);
                     smController.GetHatches();
                 }
                 catch (Exception ex)
@@ -1140,8 +1160,9 @@ namespace ShipManifest
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT && (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel != vessel))
                 {
                     step = "0a - Vessel Change";
-                    smController.SelectedPartsSource = smController.SelectedPartsTarget = new List<Part>();
-                    smController.SelectedResource = null;
+                    smController.SelectedPartsSource.Clear();
+                    smController.SelectedPartsTarget.Clear();
+                    smController.SelectedResources.Clear();
                     return;
                 }
 
@@ -1153,11 +1174,11 @@ namespace ShipManifest
                     step = "2 - Can Show Manifest - true";
                     Settings.ManifestPosition = GUILayout.Window(398544, Settings.ManifestPosition, WindowManifest.Display, "Ship's Manifest - " + vessel.vesselName, GUILayout.MinHeight(20));
                         
-                    if (Settings.ShowTransferWindow && smController.SelectedResource != null)
+                    if (Settings.ShowTransferWindow && smController.SelectedResources.Count > 0)
                     {
                         step = "3 - Show Transfer";
                         // Lets build the running totals for each resource for display in title...
-                        string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResource);
+                        string DisplayAmounts = Utilities.DisplayVesselResourceTotals(smController.SelectedResources[0]);
                         Settings.TransferPosition = GUILayout.Window(398545, Settings.TransferPosition, WindowTransfer.Display, "Transfer - " + vessel.vesselName + DisplayAmounts, GUILayout.MinHeight(20));
                     }
 
@@ -1171,13 +1192,17 @@ namespace ShipManifest
                 {
                     step = "2 - Can Show Manifest = false";
                     if (Settings.EnableCLS && smController != null)
-                        if (smController.SelectedResource == "Crew")
+                        if (smController.SelectedResources.Contains("Crew"))
                             SMAddon.HighlightCLSVessel(false, true);  
                 }
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                if (!frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    frameErrTripped = true;
+                }
             }
         }
 
@@ -1224,59 +1249,59 @@ namespace ShipManifest
                         case XFERState.Run:
 
                             deltaT = Planetarium.GetUniversalTime() - timestamp;
-
-                            double deltaAmt = deltaT * act_flow_rate;
-                            Utilities.LogMessage("1. DeltaT = " + deltaT.ToString() + "\r\n    FlowRate = " + act_flow_rate.ToString() + "\r\n    DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
-
-                            // This adjusts the delta when we get to the end of the xfer.
-                            double XferAmount = smController.sXferAmount;
-                            // which way we going?
-                            if (XferMode == XFERMode.TargetToSource)
-                                XferAmount = smController.tXferAmount;
-
-                            if (smController.AmtXferred + deltaAmt >= XferAmount)
+                            if (deltaT > 0)
                             {
-                                deltaAmt = XferAmount - smController.AmtXferred;
-                                XferState = XFERState.Stop;
-                                Utilities.LogMessage("2. Adjusted DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
-                            }
-                            Utilities.LogMessage("3. DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+                                double deltaAmt = deltaT * act_flow_rate;
+                                Utilities.LogMessage("RealModePumpXfer - 1. DeltaT = " + deltaT.ToString() + "\r\n    FlowRate = " + act_flow_rate.ToString() + "\r\n    DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
 
-                            // Consume electricity
-                            double deltaCharge = deltaT * act_flow_rate * Settings.FlowCost;
-                            if (!ConsumeCharge(deltaCharge))
-                            {
-                                XferState = XFERState.Stop;
+                                // Consume electricity
+                                double deltaCharge = deltaT * act_flow_rate * Settings.FlowCost;
+                                if (!ConsumeCharge(deltaCharge))
+                                {
+                                    XferState = XFERState.Stop;
+                                }
+                                else
+                                {
+                                    // We had enough electricity, so lets move the resource....
+                                    List<Part> PartsSource = smController.SelectedPartsSource;
+                                    List<Part> PartsTarget = smController.SelectedPartsTarget;
+                                    if (XferMode == XFERMode.TargetToSource)
+                                    {
+                                        // Source is target on Interface...
+                                        PartsSource = smController.SelectedPartsTarget;
+                                        PartsTarget = smController.SelectedPartsSource;
+                                    }
+                                    foreach (ModXferResource modResource in smController.ResourcesToXfer)
+                                    {
+                                        deltaAmt = deltaT * act_flow_rate * modResource.XferRatio;
+                                        Utilities.LogMessage("RealModePumpXfer - 2a. Resource:  " + modResource.ResourceName + ", DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+                                        double SrcAmtRemaining = modResource.SourceAmtRemaining(XferMode);
+                                        double TgtAmtRemianCapacity = modResource.TargetCapacityRemaining(XferMode);
+                                        if (deltaAmt > SrcAmtRemaining)
+                                            deltaAmt = SrcAmtRemaining;
+                                        if (deltaAmt > TgtAmtRemianCapacity)
+                                            deltaAmt = TgtAmtRemianCapacity;
+
+                                        Utilities.LogMessage("RealModePumpXfer - 2b. Resource:  " + modResource.ResourceName + ", Adj deltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+                                        if (deltaAmt > 0)
+                                        {
+                                            Utilities.LogMessage("RealModePumpXfer - 3a. Resource:  " + modResource.ResourceName + ", Xferring DeltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
+                                            ModXferResource.XferResource(PartsSource, modResource, deltaAmt, XferMode, true);
+                                            ModXferResource.XferResource(PartsTarget, modResource, deltaAmt, XferMode, false);
+                                            modResource.AmtXferred += deltaAmt;
+                                        }
+                                        Utilities.LogMessage("RealModePumpXfer - 3b. Resource:  " + modResource.ResourceName + ", AmtXferred = " + modResource.AmtXferred.ToString(), "Info", Settings.VerboseLogging);
+                                        Utilities.LogMessage("RealModePumpXfer - 3c. Resource:  " + modResource.ResourceName + ", SrcAmtRemaining = " + modResource.SourceAmtRemaining(XferMode).ToString() + ", TgtCapRemaining = " + modResource.TargetCapacityRemaining(XferMode), "Info", Settings.VerboseLogging);
+                                    }
+
+                                    // Are we done?
+                                    if (isXferComplete())
+                                        XferState = XFERState.Stop;
+                                }
                             }
                             else
                             {
-                                // We had enough electricity, so lets move the resource....
-                                List<Part> PartsSource = smController.SelectedPartsSource;
-                                List<Part> PartsTarget = smController.SelectedPartsTarget;
-                                if (XferMode == XFERMode.TargetToSource)
-                                {
-                                    // Source is target on Interface...
-                                    PartsSource = smController.SelectedPartsTarget;
-                                    PartsTarget = smController.SelectedPartsSource;
-                                }
-                                Utilities.LogMessage("4. AmtXferred = " + smController.AmtXferred.ToString(), "Info", Settings.VerboseLogging);
-
-                                double AmtRemaining = WindowTransfer.CalcResourceRemaining(PartsSource, smController.SelectedResource);
-                                double AmtRemianCapacity = WindowTransfer.CalcRemainingCapacity(PartsTarget, smController.SelectedResource);
-                                if (deltaAmt > AmtRemaining)
-                                    deltaAmt = AmtRemaining;
-                                if (deltaAmt > AmtRemianCapacity)
-                                    deltaAmt = AmtRemianCapacity;
-
-                                Utilities.LogMessage("5. Adjusted deltaAmt = " + deltaAmt.ToString(), "Info", Settings.VerboseLogging);
-                                if (deltaAmt > 0)
-                                {
-                                    XferResource(PartsSource, smController.SelectedResource, deltaAmt, true);
-                                    XferResource(PartsTarget, smController.SelectedResource, deltaAmt, false);
-                                    smController.AmtXferred += deltaAmt;
-                                }
-                                else if (smController.AmtXferred == XferAmount)
-                                    XferState = XFERState.Stop;
+                                Utilities.LogMessage("RealModePumpXfer - 4. DeltaT = 0", "Info", Settings.VerboseLogging);
                             }
                             break;
 
@@ -1287,19 +1312,22 @@ namespace ShipManifest
                             source3.Play();
                             timestamp = elapsed = 0;
                             XferState = XFERState.Off;
-                            smController.AmtXferred = 0;
-                            smController.sXferAmount = WindowTransfer.CalcMaxXferAmt(smController.SelectedPartsSource, smController.SelectedPartsTarget, SMAddon.smController.SelectedResource);
-                            if (smController.sXferAmount < 0.0001)
-                                smController.sXferAmount = 0;
-                            WindowTransfer.strTXferAmount = smController.sXferAmount.ToString();
-                            smController.tXferAmount = WindowTransfer.CalcMaxXferAmt(smController.SelectedPartsTarget, smController.SelectedPartsSource, SMAddon.smController.SelectedResource);
-                            if (smController.tXferAmount < 0.0001)
-                                smController.tXferAmount = 0;
-                            WindowTransfer.strTXferAmount = smController.tXferAmount.ToString();
+                            foreach (ModXferResource modResource in smController.ResourcesToXfer)
+                            {
+                                modResource.AmtXferred = 0;
+                                modResource.sXferAmount = ModXferResource.CalcMaxXferAmt(smController.SelectedPartsSource, smController.SelectedPartsTarget, SMAddon.smController.SelectedResources);
+                                if (modResource.sXferAmount < 0.0001)
+                                    modResource.sXferAmount = 0;
+                                modResource.strTXferAmount = modResource.sXferAmount.ToString();
+                                modResource.tXferAmount = ModXferResource.CalcMaxXferAmt(smController.SelectedPartsTarget, smController.SelectedPartsSource, SMAddon.smController.SelectedResources);
+                                if (modResource.tXferAmount < 0.0001)
+                                    modResource.tXferAmount = 0;
+                                modResource.strTXferAmount = modResource.tXferAmount.ToString();
+                            }
                             XferOn = false;
                             break;
                     }
-                    Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage("RealModePumpXfer - 5.  Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
                     if (XferState != XFERState.Off)
                         timestamp = Planetarium.GetUniversalTime();
                 }
@@ -1312,6 +1340,34 @@ namespace ShipManifest
                     frameErrTripped = true;
                     throw ex;
                 }
+            }
+        }
+
+        private static bool isXferComplete()
+        {
+            if (smController.ResourcesToXfer.Count > 1)
+            {
+                Utilities.LogMessage("isXferComplete - A1. Resource:  " + smController.ResourcesToXfer[0].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[0].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[0].AmtXferred.ToString(), "Info", Settings.VerboseLogging);
+                Utilities.LogMessage("isXferComplete - A2 Resource:  " + smController.ResourcesToXfer[1].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[1].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[1].AmtXferred.ToString(), "Info", Settings.VerboseLogging);
+                if (smController.ResourcesToXfer[0].SourceAmtRemaining(XferMode) == 0 && smController.ResourcesToXfer[1].SourceAmtRemaining(XferMode) == 0)
+                    return true;
+                if (smController.ResourcesToXfer[0].TargetCapacityRemaining(XferMode) == 0 && smController.ResourcesToXfer[1].TargetCapacityRemaining(XferMode) == 0)
+                    return true;
+                if ((smController.ResourcesToXfer[0].AmtXferred >= smController.ResourcesToXfer[0].XferAmount(XferMode)) &&
+                    (smController.ResourcesToXfer[1].AmtXferred >= smController.ResourcesToXfer[1].XferAmount(XferMode)))
+                    return true;
+                return false;
+            }
+            else
+            {
+                Utilities.LogMessage("isXferComplete - B. Resource:  " + smController.ResourcesToXfer[0].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[0].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[0].AmtXferred.ToString(), "Info", Settings.VerboseLogging);
+                if (smController.ResourcesToXfer[0].SourceAmtRemaining(XferMode) == 0)
+                    return true;
+                if (smController.ResourcesToXfer[0].TargetCapacityRemaining(XferMode) == 0)
+                    return true;
+                if (smController.ResourcesToXfer[0].AmtXferred >= smController.ResourcesToXfer[0].XferAmount(XferMode))
+                    return true;
+                return false;
             }
         }
 
@@ -1419,9 +1475,6 @@ namespace ShipManifest
                                 // Fire Board event for Texture Replacer.
                                 //if (Settings.EnableTextureReplacer)
                                 //    GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
-
-                                // Notify Mods requiring it to update (Texture Replacer Kerbal (IVA) textures, ConnectedLivingSpaces.
-                                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", Settings.VerboseLogging);
                                 break;
                         }
                         Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);
@@ -1446,7 +1499,7 @@ namespace ShipManifest
 
         private bool ConsumeCharge(double deltaCharge)
         {
-            if (smController.SelectedResource != "ElectricCharge" && Settings.EnableXferCost)
+            if (!smController.SelectedResources.Contains("ElectricCharge") && Settings.EnableXferCost)
             {
                 foreach (Part iPart in smController._partsByResource["ElectricCharge"])
                 {
@@ -1469,45 +1522,6 @@ namespace ShipManifest
             }
             else
                 return true;
-        }
-
-        internal static void XferResource(List<Part> XferParts, string SelectedResource, double XferAmount, bool isSource)
-        {
-
-            // This var keeps track of what we actually moved..
-            double XferBalance = XferAmount;
-
-            // Not all parts will have enough resource to meet the SrcPartAmt to move.   We need to account for that.
-            while (XferBalance > 0)
-            {
-                // Lets account for any empty/full containers
-                int PartCount = 0;
-                foreach (Part part in XferParts)
-                    if ((isSource && part.Resources[SelectedResource].amount > 0) || (!isSource && part.Resources[SelectedResource].amount < part.Resources[SelectedResource].maxAmount))
-                        PartCount += 1;
-
-                // now split up the xfer amount evenly across the number of tanks that can send/receive resources
-                double PartAmt = XferAmount / PartCount;
-
-                // Calculate Xfer amounts for each part and move.
-                foreach (Part part in XferParts)
-                {
-                    double AmtToMove = 0;
-                    if (isSource)
-                    {
-                        AmtToMove = part.Resources[SelectedResource].amount >= PartAmt ? PartAmt : part.Resources[SelectedResource].amount;
-                        part.Resources[SelectedResource].amount -= AmtToMove;
-                    }
-                    else
-                    {
-                        double CapacityAvail = part.Resources[SelectedResource].maxAmount - part.Resources[SelectedResource].amount;
-                        AmtToMove = CapacityAvail >= PartAmt ? PartAmt : CapacityAvail;
-                        part.Resources[SelectedResource].amount += AmtToMove;
-                    }
-                    // Report ramaining balance after Transfer.
-                    XferBalance -= AmtToMove;
-                }
-            }
         }
 
         private void LoadSounds(string SoundType, string path1, string path2, string path3, double dblVol)
@@ -1581,7 +1595,7 @@ namespace ShipManifest
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     Utilities.LogMessage("Save in progress...", "info", Settings.VerboseLogging);
-                    Settings.Save();
+                    Settings.SaveSettings();
                     Utilities.LogMessage("Save comlete.", "info", Settings.VerboseLogging);
                 }
             }
@@ -1697,7 +1711,7 @@ namespace ShipManifest
                     {
                         if (Settings.EnableCLS && Settings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null)
                         {
-                            if (smController.SelectedResource == "Crew")
+                            if (smController.SelectedResources.Contains("Crew"))
                             {
                                 step = "Highlight CLS vessel";
                                 HighlightCLSVessel(true);
@@ -1712,7 +1726,7 @@ namespace ShipManifest
 
                         step = "Set Selected Part Colors";
                         SMAddon.SetPartsHighlight(smController.SelectedPartsSource, Settings.Colors[Settings.SourcePartColor]);
-                        if (smController.SelectedResource == "Crew" && Settings.EnableCLS)
+                        if (smController.SelectedResources.Contains("Crew") && Settings.EnableCLS)
                             SetPartsHighlight(smController.SelectedPartsTarget, Settings.Colors[Settings.TargetPartCrewColor]);
                         else
                             SetPartsHighlight(smController.SelectedPartsTarget, Settings.Colors[Settings.TargetPartColor]);
@@ -1722,13 +1736,13 @@ namespace ShipManifest
                         Color partColor = Color.yellow;
 
                         // match color used by CLS if active
-                        if (smController.SelectedResource == "Crew" && Settings.EnableCLS)
+                        if (smController.SelectedResources.Contains("Crew") && Settings.EnableCLS)
                             partColor = Color.green;
 
                         step = "Set Resource Part Colors";
-                        if (smController.SelectedResource != null && smController.SelectedResource != "")
+                        if (smController.SelectedResources != null && smController.SelectedResources.Count > 0)
                         {
-                            foreach (Part thispart in smController._partsByResource[smController.SelectedResource])
+                            foreach (Part thispart in smController.SelectedResourcesParts)
                             {
                                 if (!Settings.OnlySourceTarget)
                                 {

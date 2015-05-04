@@ -127,7 +127,7 @@ namespace ShipManifest
             if (GUILayout.Button("Save"))
             {
                 Settings.SaveIntervalSec = int.Parse(txtSaveInterval);
-                Settings.Save();
+                Settings.SaveSettings();
                 Settings.ShowSettings = false;
             }
             if (GUILayout.Button("Cancel"))
@@ -222,10 +222,10 @@ namespace ShipManifest
 
             if (!Settings.EnableCrew && HighLogic.LoadedSceneIsFlight)
             {
-                if (SMAddon.smController.SelectedResource == "Crew")
+                if (SMAddon.smController.SelectedResources.Contains("Crew"))
                 {
                     // Clear Resource selection.
-                    SMAddon.smController.SelectedResource = null;
+                    SMAddon.smController.SelectedResources.Clear();
                     Settings.ShowTransferWindow = false;
                 }
             }
@@ -260,11 +260,12 @@ namespace ShipManifest
             {
                 if (!Settings.EnableCLS)
                     SMAddon.HighlightCLSVessel(false, true);
-                else if (SMAddon.smController.SelectedResource == "Crew")
+                else if (SMAddon.smController.SelectedResources.Contains("Crew"))
                 {
                     // Update spaces and reassign the resource to observe new settings.
                     SMAddon.UpdateCLSSpaces();
-                    SMAddon.smController.SelectedResource = "Crew";
+                    SMAddon.smController.SelectedResources.Clear();
+                    SMAddon.smController.SelectedResources.Add("Crew");
                 }
             }
 
@@ -281,8 +282,8 @@ namespace ShipManifest
             if (!Settings.EnableScience && HighLogic.LoadedSceneIsFlight)
             {
                 // Clear Resource selection.
-                if (SMAddon.smController.SelectedResource == "Science")
-                    SMAddon.smController.SelectedResource = null;
+                if (SMAddon.smController.SelectedResources.Contains("Science"))
+                    SMAddon.smController.SelectedResources.Clear();
             }
 
             // EnableResources Mode
@@ -298,8 +299,8 @@ namespace ShipManifest
             if (!Settings.EnableResources && HighLogic.LoadedSceneIsFlight)
             {
                 // Clear Resource selection.
-                if (SMAddon.smController.SelectedResource == "Resources")
-                    SMAddon.smController.SelectedResource = null;
+                if (SMAddon.smController.SelectedResources.Count > 0 && !SMAddon.smController.SelectedResources.Contains("Crew") && !SMAddon.smController.SelectedResources.Contains("Science"))
+                    SMAddon.smController.SelectedResources.Clear();
             }
 
             // Set Gui.enabled for child settings to resources...
@@ -482,12 +483,13 @@ namespace ShipManifest
             {
                 if (Settings.EnableCLS)
                 {
-                    if (SMAddon.smController.SelectedResource == "Crew")
+                    if (SMAddon.smController.SelectedResources.Contains("Crew"))
                     {
                         SMAddon.HighlightCLSVessel(Settings.EnableHighlighting, true);
                         // Update spaces and reassign the resource to observe new settings.
                         SMAddon.UpdateCLSSpaces();
-                        SMAddon.smController.SelectedResource = "Crew";
+                        SMAddon.smController.SelectedResources.Clear();
+                        SMAddon.smController.SelectedResources.Add("Crew");
                     }
                 }
             }
@@ -506,12 +508,13 @@ namespace ShipManifest
             if (Settings.OnlySourceTarget && !Settings.prevOnlySourceTarget)
             {
                 Settings.EnableCLSHighlighting = false;
-                if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew")
+                if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew"))
                 {
                     SMAddon.HighlightCLSVessel(false, true);
                     // Update spaces and reassign the resource to observe new settings.
                     SMAddon.UpdateCLSSpaces();
-                    SMAddon.smController.SelectedResource = "Crew";
+                    SMAddon.smController.SelectedResources.Clear();
+                    SMAddon.smController.SelectedResources.Add("Crew");
                 }
             }
             if (!Settings.EnableHighlighting || !Settings.EnableCLS)
@@ -525,7 +528,7 @@ namespace ShipManifest
             GUILayout.EndHorizontal();
             if (Settings.EnableCLSHighlighting && !Settings.prevEnableCLSHighlighting)
                 Settings.OnlySourceTarget = false;
-            if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResource == "Crew" && Settings.ShowTransferWindow)
+            if (HighLogic.LoadedSceneIsFlight && Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
             {
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
                     SMAddon.HighlightCLSVessel(Settings.EnableCLSHighlighting);

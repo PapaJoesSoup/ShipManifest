@@ -23,6 +23,8 @@ namespace ShipManifest
         internal static GUIStyle LabelStyleRed;
         internal static GUIStyle LabelStyleYellow;
         internal static GUIStyle LabelStyleGreen;
+        internal static GUIStyle LabelStyleNoWrap;
+        internal static GUIStyle LabelStyleNoPad;
         internal static GUIStyle ToolTipStyle;
 
         internal static void SetupGUI()
@@ -87,6 +89,14 @@ namespace ShipManifest
             ErrorLabelRedStyle.normal.textColor = Color.red;
 
             LabelStyle = new GUIStyle(GUI.skin.label);
+
+            LabelStyleNoWrap = new GUIStyle(GUI.skin.label);
+            LabelStyleNoWrap.wordWrap = false;
+
+            LabelStyleNoPad = new GUIStyle(GUI.skin.label);
+            LabelStyleNoPad.padding.top = 0;
+            LabelStyleNoPad.padding.bottom = 0;
+            LabelStyleNoPad.wordWrap = false;
 
             LabelStyleBold = new GUIStyle(GUI.skin.label);
             LabelStyleBold.fontSize = 18;

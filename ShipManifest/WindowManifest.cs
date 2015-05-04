@@ -57,8 +57,12 @@ namespace ShipManifest
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
-
-                GUILayout.Label(SMAddon.smController.SelectedResource != null ? string.Format("{0}", SMAddon.smController.SelectedResource) : "No Resource Selected", GUILayout.Width(300), GUILayout.Height(20));
+                string resLabel = "No Resource Selected";
+                if (SMAddon.smController.SelectedResources.Count == 1)
+                    resLabel = SMAddon.smController.SelectedResources[0];
+                else if (SMAddon.smController.SelectedResources.Count == 2)
+                    resLabel = "Multiple Resources selected";
+                GUILayout.Label(string.Format("{0}", resLabel), GUILayout.Width(300), GUILayout.Height(20));
 
                 // Resource Details List Viewer
                 ResourceDetailsViewer();
@@ -174,43 +178,10 @@ namespace ShipManifest
                         width = 175;
 
                     string DisplayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
-                    var style = SMAddon.smController.SelectedResource == resourceName ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+                    var style = SMAddon.smController.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                     if (GUILayout.Button(string.Format("{0}", resourceName + DisplayAmounts), style, GUILayout.Width(width), GUILayout.Height(20)))
                     {
-                        try
-                        {
-                            if (!SMAddon.crewXfer && !SMAddon.XferOn)
-                            {
-                                // Now let's update our lists...
-                                if (SMAddon.smController.SelectedResource != resourceName)
-                                {
-                                    SMAddon.smController.SelectedResource = resourceName;
-                                    if (SMAddon.smController.SelectedPartsSource.Count > 0)
-                                        if (!SMAddon.smController.SelectedPartsSource[0].Resources.Contains(resourceName))
-                                            SMAddon.smController.SelectedPartsSource = new List<Part>();
-                                    if (SMAddon.smController.SelectedPartsTarget.Count > 0)
-                                        if (!SMAddon.smController.SelectedPartsTarget[0].Resources.Contains(resourceName))
-                                            SMAddon.smController.SelectedPartsTarget = new List<Part>();
-                                }
-                                else if (SMAddon.smController.SelectedResource == resourceName)
-                                {
-                                    SMAddon.smController.SelectedResource = null;
-                                    SMAddon.smController.SelectedPartsSource = SMAddon.smController.SelectedPartsTarget = new List<Part>();
-                                }
-                                if (SMAddon.smController.SelectedResource != null)
-                                {
-                                    Settings.ShowTransferWindow = true;
-                                }
-                                else
-                                {
-                                    Settings.ShowTransferWindow = false;
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Utilities.LogMessage(string.Format("Error selecting Resource.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                        }
+                        ResourceButtonToggled(resourceName);
                     }
                     if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
@@ -232,6 +203,116 @@ namespace ShipManifest
             }
         }
 
+        private static void ResourceButtonToggled(string resourceName)
+        {
+            try
+            {
+                if (!SMAddon.crewXfer && !SMAddon.XferOn)
+                {
+                    // First, lets clear any highlighting...
+                    SMAddon.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
+
+                    // Now let's update our lists...
+                    if (!SMAddon.smController.SelectedResources.Contains(resourceName))
+                    {
+                        // now lets determine what to do with selection
+                        if (resourceName == "Crew" || resourceName == "Science" || resourceName == "ElectricCharge")
+                        {
+                            SMAddon.smController.SelectedResources.Clear();
+                            SMAddon.smController.SelectedResources.Add(resourceName);
+                        }
+                        else
+                        {
+                            if (SMAddon.smController.SelectedResources.Contains("Crew") || SMAddon.smController.SelectedResources.Contains("Science") || SMAddon.smController.SelectedResources.Contains("ElectricCharge"))
+                            {
+                                SMAddon.smController.SelectedResources.Clear();
+                                SMAddon.smController.SelectedResources.Add(resourceName);
+                            }
+                            else if (SMAddon.smController.SelectedResources.Count > 1)
+                            {
+                                SMAddon.smController.SelectedResources.RemoveRange(0, 1);
+                                SMAddon.smController.SelectedResources.Add(resourceName);
+                            }
+                            else
+                                SMAddon.smController.SelectedResources.Add(resourceName);
+                        }
+                    }
+                    else if (SMAddon.smController.SelectedResources.Contains(resourceName))
+                    {
+                        SMAddon.smController.SelectedResources.Remove(resourceName);
+                    }
+
+                    // Now, refresh the resources parts list
+                    SMAddon.smController.GetSelectedResourcesParts();
+
+                    // now lets reconcile the selected parts based on the new list of resources...
+                    ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
+
+                    // Now lets update the Xfer Objects...
+                    SMAddon.smController.ResourcesToXfer.Clear();
+                    foreach (string resource in SMAddon.smController.SelectedResources)
+                    {
+                        // Lets create a Xfer Object for managing xfer options and data.
+                        ModXferResource modResource = new ModXferResource(resource);
+                        modResource.sXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
+                        modResource.tXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
+                        SMAddon.smController.ResourcesToXfer.Add(modResource);
+                    }
+
+                    // Now, based on the resourceselection, do we show the Transfer window?
+                    if (SMAddon.smController.SelectedResources.Count > 0)
+                        Settings.ShowTransferWindow = true;
+                    else
+                        Settings.ShowTransferWindow = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
+
+        private static void ReconcileSelectedXferParts(List<string> resourceNames)
+        {
+            if (resourceNames.Count > 0)
+            {
+                List<Part> newSources = new List<Part>();
+                List<Part> newTargets = new List<Part>();
+                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
+                foreach (Part part in SMAddon.smController.SelectedPartsSource)
+                {
+                    if (resourceNames.Count > 1)
+                    {
+                        if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                            newSources.Add(part);
+                    }
+                    else if (part.Resources.Contains(resourceNames[0]))
+                        newSources.Add(part);
+                }
+
+                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
+                foreach (Part part in SMAddon.smController.SelectedPartsTarget)
+                {
+                    if (resourceNames.Count > 1)
+                    {
+                        if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                            newTargets.Add(part);
+                    }
+                    else if (part.Resources.Contains(resourceNames[0]))
+                        newTargets.Add(part);
+                }
+                SMAddon.smController.SelectedPartsSource.Clear();
+                SMAddon.smController.SelectedPartsSource = newSources;
+                SMAddon.smController.SelectedPartsTarget.Clear();
+                SMAddon.smController.SelectedPartsTarget = newTargets;
+            }
+            else
+            {
+                SMAddon.smController.SelectedPartsSource.Clear();
+                SMAddon.smController.SelectedPartsTarget.Clear();
+            }
+        }
+
         private static void ResourceDetailsViewer()
         {
             try
@@ -239,28 +320,26 @@ namespace ShipManifest
                 ResourceScrollViewerPosition = GUILayout.BeginScrollView(ResourceScrollViewerPosition, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                if (SMAddon.smController.SelectedResource != null)
+                if (SMAddon.smController.SelectedResources.Count > 0)
                 {
-                    foreach (Part part in SMAddon.smController.PartsByResource[SMAddon.smController.SelectedResource])
+                    foreach (Part part in SMAddon.smController.SelectedResourcesParts)
                     {
-                        string resourcename = "";
-                        if (SMAddon.smController.SelectedResource != "Crew" && SMAddon.smController.SelectedResource != "Science")
+                        if (!SMAddon.smController.SelectedResources.Contains("Crew") && !SMAddon.smController.SelectedResources.Contains("Science"))
                         {
-                            resourcename = part.Resources[SMAddon.smController.SelectedResource].info.name;
+                            GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
+                            GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265), GUILayout.Height(18));
+                            GUIStyle noPad = SMStyle.LabelStyleNoPad;
+                            foreach (string resource in SMAddon.smController.SelectedResources)
+                                GUILayout.Label(string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"), part.Resources[resource].maxAmount.ToString("######0.####")), noPad,GUILayout.Width(265), GUILayout.Height(16));
+                        }
+                        else if (SMAddon.smController.SelectedResources.Contains("Crew"))
+                        {
                             GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.Resources[SMAddon.smController.SelectedResource].amount.ToString("######0.####"), part.Resources[SMAddon.smController.SelectedResource].maxAmount.ToString("######0.####")), GUILayout.Width(265));
+                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265), GUILayout.Height(20));
                             GUILayout.EndHorizontal();
                         }
-                        else if (SMAddon.smController.SelectedResource == "Crew")
+                        else if (SMAddon.smController.SelectedResources.Contains("Science"))
                         {
-                            resourcename = SMAddon.smController.SelectedResource;
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, part.protoModuleCrew.Count.ToString(), part.CrewCapacity.ToString()), GUILayout.Width(265));
-                            GUILayout.EndHorizontal();
-                        }
-                        else if (SMAddon.smController.SelectedResource == "Science")
-                        {
-                            resourcename = SMAddon.smController.SelectedResource;
                             int ScienceCount = 0;
                             foreach (PartModule pm in part.Modules)
                             {
@@ -278,7 +357,11 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage(string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
             }
             GUILayout.EndVertical();
             GUILayout.EndScrollView();
