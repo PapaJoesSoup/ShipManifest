@@ -1,5 +1,9 @@
 ShipManifest
 ============
+Version 4.2.0.1 - Release 04 May, 2015 - Transfers Expansion Edtion bug fixes.
+- Fixed:  When realism is off and override Stock crew Xfers is on, transfers cause a flickering portrait and do not complete.
+- Fixed:  In Roster, Gender is correctly displayed, but changing a Kerbal's Gender results in the opposite gender being saved.
+
 Version 4.2.0.0 - Release 03 May, 2015 - Transfers Expansion Edtion. Multi-Resource & Multi-Part Xfers.
 - New: You can now "link" 2 resources together simply by clicking on a Second Resource.
 - New: You can now link multiple parts in the Transfer window, and move resources from 1:N, N:N and N:1 parts.
