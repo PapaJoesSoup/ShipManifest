@@ -1,5 +1,19 @@
 ShipManifest
 ============
+Version 4.2.0.0 - Release 03 May, 2015 - Transfers Expansion Edtion. Multi-Resource & Multi-Part Xfers.
+- New: You can now "link" 2 resources together simply by clicking on a Second Resource.
+- New: You can now link multiple parts in the Transfer window, and move resources from 1:N, N:N and N:1 parts.
+- New: Added Kerbal Gender Management in Roster Window.
+- New: Added Revert profession renaming feature to Roster for removing the ascii "1"s from game save.  For mod compatibility.
+- New: Changed config file from xml to json style.  No more spamming the KSP debug log.
+- New: Cleaned up science transfers.  Target details now only shows container modules. No more transfer to an experiment module.
+- Fixed:  When  near debris, SM window sometimes fails to display when icon is clicked from either toolbar.
+- Fixed:  With CLS enabled, selected target part text displayed in Target Crew Color instead of Target Part color.
+- Fixed:  Opening/closing a hatch from the hatch control tab fails to update the CLS spaces.
+- Fixed:  When transferring science, Realism mode prevents moving science to a container in the same part.
+- Fixed:  Disabling Resources in Settings does not remove Resources from the selection list in the Manifest Window.
+- Fixed:  Portraits not properly updating after a crew move.  Bug introduced in 4.1.3 after revisions to actual crew move timing.
+
 Version 4.1.4.4 - Release 10 Apr, 2015 - Bug fixes.
 - Fixed:  Crew transfers fail when Realism Mode is Off.
 - Fixed:  SM windows do not hide when the F2 key is toggled to hide UI.
