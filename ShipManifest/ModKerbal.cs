@@ -16,7 +16,7 @@ namespace ShipManifest
         public bool Badass;
         public string Name;
         public string Title;
-        public string Gender;
+        public ProtoCrewMember.Gender Gender;
 
         public ModKerbal(ProtoCrewMember kerbal, bool isNew)
         {
@@ -26,7 +26,7 @@ namespace ShipManifest
             Courage = kerbal.courage;
             Badass = kerbal.isBadass;
             Title = kerbal.experienceTrait.Title;
-            Gender = kerbal.gender.ToString();
+            Gender = kerbal.gender;
             IsNew = isNew;
         }
 
@@ -70,7 +70,7 @@ namespace ShipManifest
                     KerbalRoster.SetExperienceTrait(Kerbal);
                 }
             }
-            Kerbal.gender = Gender == ProtoCrewMember.Gender.Male.ToString() ? ProtoCrewMember.Gender.Male : ProtoCrewMember.Gender.Female;
+            Kerbal.gender = Gender;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;

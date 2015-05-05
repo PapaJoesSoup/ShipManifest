@@ -1387,9 +1387,6 @@ namespace ShipManifest
 
                         if (elapsed > 1)
                         {
-                            // Fire Board event for Texture Replacer.
-                            //if (Settings.EnableTextureReplacer)
-                                //GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
 
                             // Spawn crew in parts and in vessel.
                             if (PartSource == null)
@@ -1400,6 +1397,12 @@ namespace ShipManifest
                             elapsed = timestamp = 0;
                             crewXfer = false;
                             WindowTransfer.TransferCrewMemberComplete(smController.CrewXferMember, PartSource, PartTarget);
+                            if (stockXfer)
+                            {
+                                var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+                                ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", smController.CrewXferMember.name, PartTarget.partInfo.title), message, true);
+                            }
+                            stockXfer = false;
 
                             Utilities.LogMessage("crewXfer State:  " + crewXfer.ToString() + "...", "Info", Settings.VerboseLogging);
                         }
@@ -1472,9 +1475,6 @@ namespace ShipManifest
                                 }
                                 stockXfer = false;
 
-                                // Fire Board event for Texture Replacer.
-                                //if (Settings.EnableTextureReplacer)
-                                //    GameEvents.onCrewBoardVessel.Fire(smController.evaAction);
                                 break;
                         }
                         Utilities.LogMessage("Transfer State:  " + XferState.ToString() + "...", "Info", Settings.VerboseLogging);

@@ -853,7 +853,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format("Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format("in TransferCrewMemberComplete.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 

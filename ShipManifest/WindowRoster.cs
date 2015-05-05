@@ -308,12 +308,12 @@ namespace ShipManifest
             {
                 DisplaySelectProfession();
             }
-            bool isMale = ProtoCrewMember.Gender.Male.ToString() == SelectedKerbal.Gender ? true : false;
+            bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender ? true : false;
             GUILayout.BeginHorizontal();
             GUILayout.Label("Gender");
             isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
             isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
-            SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Male.ToString() : ProtoCrewMember.Gender.Female.ToString();
+            SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
             GUILayout.EndHorizontal();
 
             GUILayout.Label("Courage");
