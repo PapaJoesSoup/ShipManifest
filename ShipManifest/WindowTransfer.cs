@@ -444,7 +444,10 @@ namespace ShipManifest
                         if (pm == SMAddon.smController.SelectedModuleTarget)
                             isReceiveToggled = true;
                         else if (count == 1)
+                        {
+                            SMAddon.smController.SelectedModuleTarget = pm;
                             isReceiveToggled = true;
+                        }
                         //SelectedModuleTarget = pm;
                         var style = isReceiveToggled ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonStyle;
 
