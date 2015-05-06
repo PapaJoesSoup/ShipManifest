@@ -1,5 +1,10 @@
 ShipManifest
 ============
+Version 4.2.0.2 - Release 05 May, 2015 - Transfers Expansion Edtion bug fixes.
+- Fixed:  Science Transfer broken.  Bug introduced with version 4.2.0.0
+
+Added WIKI to Github
+
 Version 4.2.0.1 - Release 04 May, 2015 - Transfers Expansion Edtion bug fixes.
 - Fixed:  When realism is off and override Stock crew Xfers is on, transfers cause a flickering portrait and do not complete.
 - Fixed:  In Roster, Gender is correctly displayed, but changing a Kerbal's Gender results in the opposite gender being saved.
