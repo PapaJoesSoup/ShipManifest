@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using HighlightingSystem;
 using ConnectedLivingSpace;
 
 namespace ShipManifest
@@ -96,11 +97,13 @@ namespace ShipManifest
                 {
                     _clsPart.Part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
                     _clsPart.Part.SetHighlight(true, false);
+                    SMAddon.EdgeHighight(_clsPart.Part, true);
                 }
                 else
                 {
                     if (_clsPart.Part.highlightColor == Settings.Colors[Settings.MouseOverColor])
                     {
+                        SMAddon.EdgeHighight(_clsPart.Part, false);
                         if (Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
                         {
                             if (CLSPart.Space != null)

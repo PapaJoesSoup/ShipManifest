@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using HighlightingSystem;
 using ConnectedLivingSpace;
 
 namespace ShipManifest
@@ -52,6 +53,12 @@ namespace ShipManifest
         internal static bool XferOn = false;
         internal static XFERState XferState = XFERState.Off;
 
+        // part Selection mouseover vars
+        internal static bool isMouseOver = false;
+        internal static XFERMode MouseOverMode = XFERMode.SourceToTarget;
+        internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
+        internal static Part MouseOverpart = null;
+        
         // crew xfer vars
         internal static bool crewXfer = false;
         internal static bool stockXfer = false;
@@ -373,33 +380,38 @@ namespace ShipManifest
         // Crew Event handlers
         internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (!Settings.OverrideStockCrewXfer ||
+            if (!crewXfer && (!Settings.OverrideStockCrewXfer ||
                 action.to.Modules.Cast<PartModule>().Any(x => x is KerbalEVA) ||
-                action.from.Modules.Cast<PartModule>().Any(x => x is KerbalEVA))
+                action.from.Modules.Cast<PartModule>().Any(x => x is KerbalEVA)))
             {
-                // Non override and EVAs require no action
+                // no SM crew Xfers in progress, so Non-override stock Xfers and EVAs require no action
                 return;
             }
 
-            // store data from event.
-            smController.CrewXferSource = action.from;
-            smController.CrewXferTarget = action.to;
-            smController.CrewXferMember = action.host;
-            if (smController.CrewXferSource != null && smController.CrewXferTarget != null)
+            if (!crewXfer)
             {
+                // store data from event.
+                smController.CrewXferSource = action.from;
+                smController.CrewXferTarget = action.to;
+                smController.CrewXferMember = action.host;
+                if (smController.CrewXferSource != null && smController.CrewXferTarget != null)
+                    stockXfer = true;
+            }
+            // Remove the transfer message that stock displayed. 
+            var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+            var messages = FindObjectOfType<ScreenMessages>();
+            if (messages != null)
+            {
+                var messagesToRemove = messages.activeMessages.Where(x => x.startTime == message.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+                foreach (var m in messagesToRemove)
+                    ScreenMessages.RemoveMessage(m);
 
-                var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-
-                // Remove the transfer message that stock displayed. 
-                var messages = FindObjectOfType<ScreenMessages>();
-                if (messages != null)
+                // If a crew Transfer is in progress, we need to tell the user...
+                if (crewXfer)
                 {
-                    var messagesToRemove = messages.activeMessages.Where(x => x.startTime == message.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-                    foreach (var m in messagesToRemove)
-                        ScreenMessages.RemoveMessage(m);
+                    var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
+                    ScreenMessages.PostScreenMessage(string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>", action.host.name, action.to.partInfo.title), failmessage, true);
                 }
-                stockXfer = true;
-                //smController.RespawnCrew();
             }
         }
 
@@ -1733,7 +1745,7 @@ namespace ShipManifest
 
                         // Default is yellow
                         step = "Set non selected resource part color";
-                        Color partColor = Color.yellow;
+                        Color partColor = Settings.Colors[Settings.ResourcePartColor];
 
                         // match color used by CLS if active
                         if (smController.SelectedResources.Contains("Crew") && Settings.EnableCLS)
@@ -1749,6 +1761,19 @@ namespace ShipManifest
                                     if (!smController.SelectedPartsSource.Contains(thispart) && !smController.SelectedPartsTarget.Contains(thispart))
                                     {
                                         SetPartHighlight(thispart, partColor);
+                                        SMAddon.EdgeHighight(thispart, false);
+                                    }
+                                }
+                                if (isMouseOver && thispart == MouseOverpart)
+                                {
+                                    if (MouseOverRect.Contains(Event.current.mousePosition))
+                                        WindowTransfer.Highlight(thispart);
+                                    else
+                                    {
+                                        //Utilities.LogMessage(string.Format("MouseOverRect:  {0}\r\nMousePosition:  {1}", MouseOverRect.ToString(), Event.current.mousePosition.ToString()), "Error", true);
+                                        isMouseOver = false;
+                                        MouseOverpart = null;
+                                        EdgeHighight(thispart, false);
                                     }
                                 }
                             }
@@ -1762,6 +1787,26 @@ namespace ShipManifest
                 {
                     Utilities.LogMessage(string.Format(" in SMAddon.UpdateHighlighting (repeating error).  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     SMAddon.frameErrTripped = true;
+                }
+            }
+        }
+
+        internal static void EdgeHighight(Part part, bool enable, string color = null)
+        {
+            if (Settings.EnableEdgeHighlighting)
+            {
+                Highlighter highlighter = part.highlighter;
+                if (enable)
+                {
+                    if (color == null || color == "")
+                        color = Settings.MouseOverColor;
+                    highlighter.SeeThroughOn();
+                    highlighter.ConstantOnImmediate(Settings.Colors[color]);
+                }
+                else
+                {
+                    highlighter.SeeThroughOff();
+                    highlighter.ConstantOffImmediate();
                 }
             }
         }

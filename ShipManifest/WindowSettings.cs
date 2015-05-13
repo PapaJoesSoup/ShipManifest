@@ -533,6 +533,22 @@ namespace ShipManifest
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
                     SMAddon.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
+            GUILayout.BeginHorizontal();
+            label = "Enable Edge Highlighting (On Mouse Overs)";
+            Settings.EnableEdgeHighlighting = GUILayout.Toggle(Settings.EnableEdgeHighlighting, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
+            if (Settings.EnableEdgeHighlighting != Settings.prevEnableEdgeHighlighting && HighLogic.LoadedSceneIsFlight)
+            {
+                if (Settings.EnableEdgeHighlighting == false)
+                {
+                    if (SMAddon.smController.SelectedResources.Count > 0)
+                    {
+                        foreach (Part part in SMAddon.smController.SelectedResourcesParts)
+                            SMAddon.EdgeHighight(part, false);
+                    }
+                }
+            }
+
         }
 
         private static void DisplayToolTips()

@@ -14,6 +14,29 @@ namespace ShipManifest
         internal static bool ShowToolTips = Settings.PanelToolTips;
         internal static bool isRTAntennas = false;
 
+        //private static bool _rtChecked = false;
+        //private static bool _rtInstalled;
+        //internal static bool RTInstalled
+        //{
+        //    get
+        //    {
+        //        if (!_rtChecked)
+        //        {
+        //            string assemblyName = "RemoteTech";
+        //            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        //            var assembly = (from a in assemblies
+        //                            where a.FullName == assemblyName
+        //                            select a).SingleOrDefault();
+        //            if (assembly != null)
+        //                _rtInstalled = true;
+        //            else
+        //                _rtInstalled = false;
+        //            _rtChecked = true;
+        //        }
+        //        return _rtInstalled;
+        //    }
+        //}
+
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display()
         {
@@ -29,7 +52,7 @@ namespace ShipManifest
             string step = "start";
             try
             {
-                // Display all hatches
+                // Display all antennas
                 foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
                 {
                     if (!isRTAntennas && iAntenna.isRTModule)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using HighlightingSystem;
 using ConnectedLivingSpace;
 
 namespace ShipManifest
@@ -132,7 +133,7 @@ namespace ShipManifest
                 SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget);
+                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget, SourceTransferViewerScrollPosition);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -194,7 +195,7 @@ namespace ShipManifest
                 TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource);
+                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource, TargetTransferViewerScrollPosition);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -240,8 +241,12 @@ namespace ShipManifest
 
         #region Viewer Details (GUI Layout)
 
-        private static void TransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode)
+        private static void TransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
         {
+            float scrollX = Settings.TransferPosition.x + 20;
+            if (xferMode == SMAddon.XFERMode.TargetToSource)
+                scrollX = Settings.TransferPosition.x + 320;
+            float scrollY = Settings.TransferPosition.y + 30 - ViewerScrollPosition.y;
             string step = "begin";
             try
             {
@@ -271,6 +276,15 @@ namespace ShipManifest
                     {
                         PartButtonToggled(xferMode, part);
                     }
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+                    {
+                        SMAddon.EdgeHighight(part, true);
+                        SMAddon.isMouseOver = true;
+                        SMAddon.MouseOverMode = xferMode;
+                        SMAddon.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+                        SMAddon.MouseOverpart = part;
+                    }
 
                     // Reset Button enabling.
                     GUI.enabled = true;
@@ -278,20 +292,28 @@ namespace ShipManifest
                     step = "Render dump/fill buttons";
                     if (!Settings.RealismMode && SelectedResources[0] != "Crew" && SelectedResources[0] != "Science")
                     {
-                        GUI.enabled = part.Resources[SelectedResources[0]].amount > 0 && part.Resources[SelectedResources[1]].amount > 0 ? true : false;
+                        if (SelectedResources.Count > 1)
+                            GUI.enabled = (part.Resources[SelectedResources[0]].amount > 0 && part.Resources[SelectedResources[1]].amount > 0) ? true : false;
+                        else
+                            GUI.enabled = part.Resources[SelectedResources[0]].amount > 0 ? true : false;
                         var style1 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
                         if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
                         {
                             SMController.DumpPartResource(part, SelectedResources[0]);
-                            SMController.DumpPartResource(part, SelectedResources[1]);
+                            if (SelectedResources.Count > 1)
+                                SMController.DumpPartResource(part, SelectedResources[1]);
                         }
 
                         var style2 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
-                        GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount && part.Resources[SelectedResources[1]].amount < part.Resources[SelectedResources[1]].maxAmount ? true : false;
+                        if (SelectedResources.Count > 1)
+                            GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount && part.Resources[SelectedResources[1]].amount < part.Resources[SelectedResources[1]].maxAmount ? true : false;
+                        else
+                            GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount ? true : false;
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
                         {
                             SMController.FillPartResource(part, SelectedResources[0]);
-                            SMController.FillPartResource(part, SelectedResources[1]);
+                            if (SelectedResources.Count > 1)
+                                SMController.FillPartResource(part, SelectedResources[1]);
                         }
                         GUI.enabled = true;
                     }
@@ -1051,6 +1073,23 @@ namespace ShipManifest
                 strDescription = part.Resources[SelectedResources[0]].amount.ToString("######0.##") + " - " + part.partInfo.title;
             }
             return strDescription;
+        }
+
+        internal static void Highlight(Part _part)
+        {
+            string step = "begin";
+            try
+            {
+                step = "inside box - Part Selection?";
+                _part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
+                step = "highlight on";
+                _part.SetHighlight(true, false);
+                SMAddon.EdgeHighight(_part, true);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+            }
         }
         
         #endregion

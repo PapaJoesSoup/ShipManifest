@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +18,8 @@ namespace ShipManifest
         internal static Dictionary<string, Color> Colors;
 
         internal static ConfigNode settings = null;
-        private static readonly string SETTINGS_FILE = KSPUtil.ApplicationRootPath + "GameData/ShipManifest/Plugins/PluginData/SMSettings.dat";
-
+        private static readonly string SETTINGS_PATH = KSPUtil.ApplicationRootPath + "GameData/ShipManifest/Plugins/PluginData";
+        private static readonly string SETTINGS_FILE = SETTINGS_PATH + "/SMSettings.dat";
         internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
         // Persisted properties
@@ -60,8 +61,8 @@ namespace ShipManifest
         internal static bool EnableHighlighting = true;
         internal static bool OnlySourceTarget = false;
         internal static bool EnableCLSHighlighting = true;
-        internal static bool EnableBlizzyToolbar = false;
-        internal static bool EnableTextureReplacer = false;
+        internal static bool EnableEdgeHighlighting = true;
+        internal static string ResourcePartColor = "yellow";
         internal static string SourcePartColor = "red";
         internal static string TargetPartColor = "green";
         internal static string TargetPartCrewColor = "blue";
@@ -81,6 +82,8 @@ namespace ShipManifest
         internal static double PumpSoundVol = 3;
         internal static double CrewSoundVol = 3;
 
+        internal static bool EnableBlizzyToolbar = false;
+        internal static bool EnableTextureReplacer = false;
         internal static string ErrorLogLength = "1000";
         internal static double IVATimeDelaySec = 7;
         internal static bool ShowIVAUpdateBtn = false;
@@ -124,6 +127,7 @@ namespace ShipManifest
         internal static bool prevEnableHighlighting = true;
         internal static bool prevOnlySourceTarget = false;
         internal static bool prevEnableCLSHighlighting = true;
+        internal static bool prevEnableEdgeHighlighting = true;
         internal static bool prevEnableScience = true;
         internal static bool prevEnableCrew = true;
         internal static bool prevOverrideStockCrewXfer = true;
@@ -218,7 +222,7 @@ namespace ShipManifest
         #region Methods
 
 
-        internal static ConfigNode loadSettings()
+        internal static ConfigNode loadSettingsFile()
         {
             if (settings == null)
                 settings = ConfigNode.Load(SETTINGS_FILE) ?? new ConfigNode();
@@ -230,7 +234,7 @@ namespace ShipManifest
             LoadColors();
 
             if (settings == null)
-                loadSettings();
+                loadSettingsFile();
             ConfigNode WindowsNode = settings.HasNode("SM_Windows") ? settings.GetNode("SM_Windows") : settings.AddNode("SM_Windows");
             ConfigNode SettingsNode = settings.HasNode("SM_Settings") ? settings.GetNode("SM_Settings") : settings.AddNode("SM_Settings");
 
@@ -265,6 +269,8 @@ namespace ShipManifest
             EnableHighlighting = SettingsNode.HasValue("EnableHighlighting") ? bool.Parse(SettingsNode.GetValue("EnableHighlighting")) : EnableHighlighting;
             OnlySourceTarget = SettingsNode.HasValue("OnlySourceTarget") ? bool.Parse(SettingsNode.GetValue("OnlySourceTarget")) : OnlySourceTarget;
             EnableCLSHighlighting = SettingsNode.HasValue("EnableCLSHighlighting") ? bool.Parse(SettingsNode.GetValue("EnableCLSHighlighting")) : EnableCLSHighlighting;
+            EnableEdgeHighlighting = SettingsNode.HasValue("EnableEdgeHighlighting") ? bool.Parse(SettingsNode.GetValue("EnableEdgeHighlighting")) : EnableCLSHighlighting;
+            ResourcePartColor = SettingsNode.HasValue("ResourcePartColor") ? SettingsNode.GetValue("ResourcePartColor") : ResourcePartColor;
             SourcePartColor = SettingsNode.HasValue("SourcePartColor") ? SettingsNode.GetValue("SourcePartColor") : SourcePartColor;
             TargetPartColor = SettingsNode.HasValue("TargetPartColor") ? SettingsNode.GetValue("TargetPartColor") : TargetPartColor;
             TargetPartCrewColor = SettingsNode.HasValue("TargetPartCrewColor") ? SettingsNode.GetValue("TargetPartCrewColor") : TargetPartCrewColor;
@@ -322,7 +328,7 @@ namespace ShipManifest
         internal static void SaveSettings()
         {
             if (settings == null)
-                settings = loadSettings();
+                settings = loadSettingsFile();
 
             ConfigNode WindowsNode = settings.HasNode("SM_Windows") ? settings.GetNode("SM_Windows") : settings.AddNode("SM_Windows");
             ConfigNode SettingsNode = settings.HasNode("SM_Settings") ? settings.GetNode("SM_Settings") : settings.AddNode("SM_Settings");
@@ -356,6 +362,8 @@ namespace ShipManifest
             WriteValue(SettingsNode, "EnableHighlighting", EnableHighlighting);
             WriteValue(SettingsNode, "OnlySourceTarget", OnlySourceTarget);
             WriteValue(SettingsNode, "EnableCLSHighlighting", EnableCLSHighlighting);
+            WriteValue(SettingsNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
+            WriteValue(SettingsNode, "ResourcePartColor", ResourcePartColor);
             WriteValue(SettingsNode, "SourcePartColor", SourcePartColor);
             WriteValue(SettingsNode, "TargetPartColor", TargetPartColor);
             WriteValue(SettingsNode, "TargetPartCrewColor", TargetPartCrewColor);
@@ -402,6 +410,8 @@ namespace ShipManifest
             WriteValue(SettingsNode, "ShowIVAUpdateBtn", ShowIVAUpdateBtn);
             WriteValue(SettingsNode, "EnableTextureReplacer", EnableTextureReplacer);
 
+            if (!Directory.Exists(SETTINGS_PATH))
+                Directory.CreateDirectory(SETTINGS_PATH);
             settings.Save(SETTINGS_FILE);
         }
 

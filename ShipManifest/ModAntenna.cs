@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using HighlightingSystem;
 
 namespace ShipManifest
 {
@@ -108,7 +109,23 @@ namespace ShipManifest
         {
             // RT support:
             if (isRTModule)
-                XmitterModule.Events["EventOpen"].Invoke();
+            {
+                //if (TabAntenna.RTInstalled)
+                //{
+                //    if(RemoteTech.API.API.HasFlightComputer(SMAddon.vessel.id))
+                //    {
+                //        ConfigNode configNode = new ConfigNode();
+                //        configNode.AddValue("GUIDString", SMAddon.vessel.id);
+                //        configNode.AddValue("Executor", "ShipManifest");
+                //        configNode.AddValue("ReflectionType", "ShipManifest");
+                //        RemoteTech.API.API.QueueCommandToFlightComputer(configNode);
+                //    }
+                //    else
+                //        XmitterModule.Events["EventOpen"].Invoke();
+                //}
+                //else
+                    XmitterModule.Events["EventOpen"].Invoke();
+            }
             else if (iModule.Events["Toggle"].guiName == "Extend")
                 iModule.Toggle();
         }
@@ -133,6 +150,7 @@ namespace ShipManifest
                     _spart.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
                     step = "highlight on";
                     _spart.SetHighlight(true, false);
+                    SMAddon.EdgeHighight(_spart, true);
                 }
                 else
                 {
@@ -142,6 +160,7 @@ namespace ShipManifest
                         step = "highlight off - turning off highlighting";
                         _spart.SetHighlight(false, false);
                         _spart.SetHighlightDefault();
+                        SMAddon.EdgeHighight(_spart, false);
                         _spart.SetHighlightType(Part.HighlightType.OnMouseOver);
                     }
                 }

@@ -321,6 +321,7 @@ namespace ShipManifest
         {
             part.RemoveCrewmember(member);
             member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+            SMAddon.FireEventTriggers();
         }
 
         internal static bool CrewPartIsFull(Part part)
