@@ -1,5 +1,14 @@
 ShipManifest
 ============
+Version 4.2.1.0 - Release 13 May, 2015 - Highlighting Updates Edition.
+- New:  Added mouseover part highlighting on Transfer Window part Selection buttons.
+- New:  Revised mousover highlighting to use new edge highlighting methods introduced in KSP 0.90.  Improves visibility of highlighted parts.
+- New:  Added configuration switch to enable/disable mouseover edge highlighting, if performance is affected or behavior is not desired.
+- Fixed:  When using Mod Admin, SM generates and error, and SMSettings file is not created, as PluginData folder is deleted (compatability issue).
+- Fixed:  When in Preflight or Flight and Realism Off, Selecting a single fluid/gaseous resource causes Transfer Window display issues (Found during Wiki creation).  Bug introduced in 4.2.0.0
+- Fixed:  When performing a Crew Transfer in SM with Realism on, it is possible to perform a stock transfer during the Crew transfer process if Override is off, and potentially create a ghost kerbal.
+- Fixed:  When removing/adding crew to a vessel in pre-flight, vessel "remembers" professions available when scene loads.  A scene change causes correct professions to be initialized. Possible exploit.
+
 Version 4.2.0.2 - Release 05 May, 2015 - Transfers Expansion Edtion bug fixes.
 - Fixed:  Science Transfer broken.  Bug introduced with version 4.2.0.0
 
