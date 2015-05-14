@@ -533,6 +533,10 @@ namespace ShipManifest
                 if (Settings.EnableCLSHighlighting != Settings.prevEnableCLSHighlighting)
                     SMAddon.HighlightCLSVessel(Settings.EnableCLSHighlighting);
             }
+            if (Settings.EnableHighlighting)
+                GUI.enabled = true;
+            else
+                GUI.enabled = false;
             GUILayout.BeginHorizontal();
             label = "Enable Edge Highlighting (On Mouse Overs)";
             Settings.EnableEdgeHighlighting = GUILayout.Toggle(Settings.EnableEdgeHighlighting, label, GUILayout.Width(300));
@@ -548,7 +552,7 @@ namespace ShipManifest
                     }
                 }
             }
-
+            GUI.enabled = true;
         }
 
         private static void DisplayToolTips()

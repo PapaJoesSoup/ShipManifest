@@ -1,6 +1,9 @@
-﻿Version 4.3.0.0 - Release 04 May, 2015 - Transfer Expansion Edition.  External Crew Transfers.
+﻿Version 4.3.0.0 - Release xx May, 2015 - Transfer Expansion Edition.  External Crew Transfers.
 x New: When using External Seats, crew can be transferred from seat to seat.
 x New:  RT command queue is now respected.  Antenna switching from the Control Window will now be queued.
+
+Version 4.2.1.1 - Release 14 May, 2015 - Highlighting Updates Edition Bug Fix.
+- Fixed:  In Settings, if CLS is not installed, or CLS is desabled, changing the Enable Highlighting setting causes some buttons below it to become disabled.
 
 Version 4.2.1.0 - Release 13 May, 2015 - Highlighting Updates Edition.
 - New:  Added mouseover part highlighting on Transfer Window part Selection buttons.
