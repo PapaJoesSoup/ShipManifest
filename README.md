@@ -1,5 +1,8 @@
 ShipManifest
 ============
+Version 4.2.1.1 - Release 14 May, 2015 - Highlighting Updates Edition Bug Fix.
+- Fixed:  In Settings, if CLS is not installed, or CLS is desabled, changing the Enable Highlighting setting causes some buttons below it to become disabled.
+
 Version 4.2.1.0 - Release 13 May, 2015 - Highlighting Updates Edition.
 - New:  Added mouseover part highlighting on Transfer Window part Selection buttons.
 - New:  Revised mousover highlighting to use new edge highlighting methods introduced in KSP 0.90.  Improves visibility of highlighted parts.
