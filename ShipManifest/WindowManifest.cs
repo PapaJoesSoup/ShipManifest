@@ -12,9 +12,25 @@ namespace ShipManifest
     {
         #region Manifest Window - Gui Layout Code
 
+        internal static Rect Position = new Rect(0, 0, 0, 0);
+        private static bool _showWindow = false;
+        internal static bool ShowWindow
+        {
+            get
+            {
+                return _showWindow;
+            }
+            set
+            {
+                if(!value)
+                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedResourcesParts);
+                _showWindow = value;
+            }
+
+        }
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = Settings.ManifestToolTips;
+        internal static bool ShowToolTips = true;
 
         // Ship Manifest Window
         // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
@@ -24,22 +40,21 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.ManifestToolTips;
 
             GUIContent label = new GUIContent("", "Close Window");
-            if (SMAddon.crewXfer || SMAddon.XferOn)
+            if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
             {
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
             }
-            Rect rect = new Rect(296, 4, 16, 16);
+            Rect rect = new Rect(Position.width - 20, 4, 16, 16);
             if (GUI.Button(rect, label))
             {
                 SMAddon.OnSMButtonToggle();
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Settings.ManifestPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
             GUI.enabled = true;
             try
             {
@@ -69,16 +84,16 @@ namespace ShipManifest
 
                 GUILayout.BeginHorizontal();
 
-                var settingsStyle = Settings.ShowSettings ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+                var settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
                 {
                     try
                     {
-                        Settings.ShowSettings = !Settings.ShowSettings;
-                        if (Settings.ShowSettings)
+                        WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
+                        if (WindowSettings.ShowWindow)
                         {
                             // Store settings in case we cancel later...
-                            Settings.StoreTempSettings();
+                            SMSettings.StoreTempSettings();
                         }
                     }
                     catch (Exception ex)
@@ -87,13 +102,13 @@ namespace ShipManifest
                     }
                 }
 
-                var rosterStyle = Settings.ShowRoster ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+                var rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
                 {
                     try
                     {
-                        Settings.ShowRoster = !Settings.ShowRoster;
-                        if (!Settings.ShowRoster)
+                        WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
+                        if (!WindowRoster.ShowWindow)
                         {
                             WindowRoster.SelectedKerbal = null;
                             WindowRoster.ToolTip = "";
@@ -105,12 +120,12 @@ namespace ShipManifest
                     }
                 }
 
-                var controlStyle = Settings.ShowControl ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+                var controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                 if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
                 {
                     try
                     {
-                        Settings.ShowControl = !Settings.ShowControl;
+                        WindowControl.ShowWindow = !WindowControl.ShowWindow;
                     }
                     catch (Exception ex)
                     {
@@ -146,7 +161,7 @@ namespace ShipManifest
                 }
                 GUILayout.EndHorizontal();
 
-                if (Settings.EnablePFResources)
+                if (SMSettings.EnablePFResources)
                 {
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button(string.Format("Fill Resources"), SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
@@ -174,7 +189,7 @@ namespace ShipManifest
                 {
                     GUILayout.BeginHorizontal();
                     int width = 265;
-                    if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!SMSettings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                         width = 175;
 
                     string DisplayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
@@ -183,7 +198,7 @@ namespace ShipManifest
                     {
                         ResourceButtonToggled(resourceName);
                     }
-                    if ((!Settings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
+                    if ((!SMSettings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
                     {
                         if (GUILayout.Button(string.Format("{0}", "Dump"), SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
                         {
@@ -207,10 +222,10 @@ namespace ShipManifest
         {
             try
             {
-                if (!SMAddon.crewXfer && !SMAddon.XferOn)
+                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !SMAddon.XferOn)
                 {
                     // First, lets clear any highlighting...
-                    SMAddon.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
+                    SMHighlighter.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
 
                     // Now let's update our lists...
                     if (!SMAddon.smController.SelectedResources.Contains(resourceName))
@@ -261,9 +276,9 @@ namespace ShipManifest
 
                     // Now, based on the resourceselection, do we show the Transfer window?
                     if (SMAddon.smController.SelectedResources.Count > 0)
-                        Settings.ShowTransferWindow = true;
+                        WindowTransfer.ShowWindow = true;
                     else
-                        Settings.ShowTransferWindow = false;
+                        WindowTransfer.ShowWindow = false;
                 }
             }
             catch (Exception ex)
@@ -278,7 +293,7 @@ namespace ShipManifest
             {
                 List<Part> newSources = new List<Part>();
                 List<Part> newTargets = new List<Part>();
-                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
+                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
                 foreach (Part part in SMAddon.smController.SelectedPartsSource)
                 {
                     if (resourceNames.Count > 1)
@@ -290,7 +305,7 @@ namespace ShipManifest
                         newSources.Add(part);
                 }
 
-                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
+                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
                 foreach (Part part in SMAddon.smController.SelectedPartsTarget)
                 {
                     if (resourceNames.Count > 1)

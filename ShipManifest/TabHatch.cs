@@ -11,14 +11,13 @@ namespace ShipManifest
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = Settings.HatchToolTips;
+        internal static bool ShowToolTips = true;
 
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display()
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.ShowToolTips;
 
             GUILayout.BeginVertical();
             GUI.enabled = true;
@@ -100,30 +99,5 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
-        internal static void HighlightAllHatches(bool enable)
-        {
-            foreach (ModHatch iHatch in SMAddon.smController.Hatches)
-            {
-                IModuleDockingHatch iModule = (IModuleDockingHatch)iHatch.HatchModule;
-                if (enable)
-                {
-                    iModule.ModDockNode.part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
-                    iModule.ModDockNode.part.SetHighlight(true, false);
-                }
-                else
-                {
-                    if (Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
-                    {
-                        iHatch.CLSPart.Highlight(true, true);
-                    }
-                    else
-                    {
-                        iModule.ModDockNode.part.SetHighlight(false, false);
-                        iModule.ModDockNode.part.SetHighlightDefault();
-                        iModule.ModDockNode.part.SetHighlightType(Part.HighlightType.OnMouseOver);
-                    }
-                }
-            }
-        }
     }
 }

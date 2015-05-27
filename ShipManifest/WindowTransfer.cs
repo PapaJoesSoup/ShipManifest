@@ -12,10 +12,12 @@ namespace ShipManifest
     {
         #region Properties
 
-        internal static string ToolTip = "";
+        internal static Rect Position = new Rect(0, 0, 0, 0);
+        internal static bool ShowWindow = false;
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = Settings.TransferToolTips;
+        internal static bool ShowToolTips = true;
 
+        internal static string ToolTip = "";
         internal static string xferToolTip = "";
 
         #endregion
@@ -29,20 +31,19 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.TransferToolTips;
 
             GUIContent label = new GUIContent("", "Close Window");
-            if (SMAddon.crewXfer || SMAddon.XferOn)
+            if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
             {
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
             }
-            Rect rect = new Rect(604, 4, 16, 16);
+            Rect rect = new Rect(Position.width - 20, 4, 16, 16);
             if (GUI.Button(rect, label))
             {
-                Settings.ShowTransferWindow = false;
-                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
-                SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
+                WindowTransfer.ShowWindow = false;
+                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
+                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
                 SMAddon.smController.SelectedResources.Clear();
                 SMAddon.smController.SelectedPartsSource.Clear();
                 SMAddon.smController.SelectedPartsTarget.Clear();
@@ -50,7 +51,7 @@ namespace ShipManifest
                 return;
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 0, 0);
             GUI.enabled = true;
             try
             {
@@ -96,7 +97,7 @@ namespace ShipManifest
 
         private static void TextBetweenViewers(List<Part> SelectedParts)
         {
-            if (SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowIVAUpdateBtn)
+            if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.ShowIVAUpdateBtn)
             {
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(SelectedParts != null ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
@@ -186,10 +187,10 @@ namespace ShipManifest
             try
             {
                 // Adjust target style colors for part selectors when using/not using CLS highlighting
-                if (Settings.EnableCLSHighlighting && SMAddon.smController.SelectedResources.Contains("Crew"))
-                    SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartCrewColor];
+                if (SMSettings.EnableCLSHighlighting && SMAddon.smController.SelectedResources.Contains("Crew"))
+                    SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
                 else
-                    SMStyle.ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
+                    SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
 
                 // This is a scroll panel (we are using it to make button lists...)
                 TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
@@ -243,10 +244,10 @@ namespace ShipManifest
 
         private static void TransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
         {
-            float scrollX = Settings.TransferPosition.x + 20;
+            float scrollX = WindowTransfer.Position.x + 20;
             if (xferMode == SMAddon.XFERMode.TargetToSource)
-                scrollX = Settings.TransferPosition.x + 320;
-            float scrollY = Settings.TransferPosition.y + 30 - ViewerScrollPosition.y;
+                scrollX = WindowTransfer.Position.x + 320;
+            float scrollY = WindowTransfer.Position.y + 30 - ViewerScrollPosition.y;
             string step = "begin";
             try
             {
@@ -259,7 +260,7 @@ namespace ShipManifest
 
                     // set the conditions for a button style change.
                     int btnWidth = 265;
-                    if (!Settings.RealismMode && !SelectedResources.Contains("Crew") && !SelectedResources.Contains("Science"))
+                    if (!SMSettings.RealismMode && !SelectedResources.Contains("Crew") && !SelectedResources.Contains("Science"))
                         btnWidth = 180;
 
                     // Set style based on viewer and toggled state.
@@ -279,18 +280,17 @@ namespace ShipManifest
                     Rect rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
                     {
-                        SMAddon.EdgeHighight(part, true);
-                        SMAddon.isMouseOver = true;
-                        SMAddon.MouseOverMode = xferMode;
-                        SMAddon.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-                        SMAddon.MouseOverpart = part;
+                        SMHighlighter.isMouseOver = true;
+                        SMHighlighter.MouseOverMode = xferMode;
+                        SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+                        SMHighlighter.MouseOverpart = part;
                     }
 
                     // Reset Button enabling.
                     GUI.enabled = true;
 
                     step = "Render dump/fill buttons";
-                    if (!Settings.RealismMode && SelectedResources[0] != "Crew" && SelectedResources[0] != "Science")
+                    if (!SMSettings.RealismMode && SelectedResources[0] != "Crew" && SelectedResources[0] != "Science")
                     {
                         if (SelectedResources.Count > 1)
                             GUI.enabled = (part.Resources[SelectedResources[0]].amount > 0 && part.Resources[SelectedResources[1]].amount > 0) ? true : false;
@@ -346,18 +346,18 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     if (crewMember.seat != null)
                     {
-                        if (SMAddon.crewXfer || SMAddon.XferOn)
+                        if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
                             GUI.enabled = false;
 
                         if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                         {
                             ToolTip = "";
-                            TransferCrewMemberBegin(crewMember, SelectedPartsSource[0], SelectedPartsSource[0]);
+                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsSource[0], SelectedPartsSource[0]);
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
                         }
                         GUI.enabled = true;
                     }
@@ -366,7 +366,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                     else
                         GUI.enabled = false;
-                    if (SMAddon.smController.CrewXferMember == crewMember && (SMAddon.crewXfer || SMAddon.XferOn))
+                    if (SMAddon.smController.CrewTransfer.SourceCrewMember == crewMember && (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn))
                     {
                         GUI.enabled = true;
                         GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
@@ -375,13 +375,13 @@ namespace ShipManifest
                     {
                         if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                         {
-                            SMAddon.smController.CrewXferMember = crewMember;
-                            TransferCrewMemberBegin(crewMember, SelectedPartsSource[0], SelectedPartsTarget[0]);
+                            SMAddon.smController.CrewTransfer.SourceCrewMember = crewMember;
+                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsSource[0], SelectedPartsTarget[0]);
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
                         }
                     }
                     GUI.enabled = true;
@@ -412,7 +412,7 @@ namespace ShipManifest
                     if (SMAddon.smController.SelectedModuleTarget != null && scienceCount > 0)
                     {
                         string toolTip = "";
-                        if (Settings.RealismMode && !isCollectable)
+                        if (SMSettings.RealismMode && !isCollectable)
                         {
                             GUI.enabled = false;
                             toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is marked not transferable";
@@ -432,7 +432,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -483,7 +483,7 @@ namespace ShipManifest
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
+                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -585,13 +585,13 @@ namespace ShipManifest
                                 TransferResources(partsSource, partsTarget);
 
                             }
-                            else if (SMAddon.XferOn && Settings.RealismMode)
+                            else if (SMAddon.XferOn && SMSettings.RealismMode)
                                 SMAddon.XferState = SMAddon.XFERState.Stop;
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
                         }
                         GUILayout.EndHorizontal();
                     }
@@ -697,7 +697,7 @@ namespace ShipManifest
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, Settings.TransferPosition, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -725,12 +725,12 @@ namespace ShipManifest
             string step = "Part Button Toggled";
             try
             {
-                if (!SMAddon.crewXfer && !SMAddon.XferOn)
+                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !SMAddon.XferOn)
                 {
                     if (xferMode == SMAddon.XFERMode.SourceToTarget)
                     {
                         // first, lets clear any highlighting...
-                        SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
+                        SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
 
                         // Now lets update the list...
                         if (SMAddon.smController.SelectedPartsSource.Contains(part))
@@ -743,7 +743,7 @@ namespace ShipManifest
                                 SMAddon.smController.SelectedPartsSource.Clear();
                             SMAddon.smController.SelectedPartsSource.Add(part);
                         }
-                        if (SMAddon.smController.SelectedResources.Contains("Crew") && Settings.EnableCLS)
+                        if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
                         {
                             SMAddon.UpdateCLSSpaces();
                         }
@@ -752,7 +752,7 @@ namespace ShipManifest
                     else
                     {
                         // first, lets clear any highlighting...
-                        SMAddon.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
+                        SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
                         if (SMAddon.smController.SelectedPartsTarget.Contains(part))
                         {
                             SMAddon.smController.SelectedPartsTarget.Remove(part);
@@ -787,101 +787,6 @@ namespace ShipManifest
             }
         }
 
-        internal static void TransferCrewMemberBegin(ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
-        {
-            SMAddon.smController.CrewXferSource = sourcePart;
-            SMAddon.smController.CrewXferTarget = targetPart;
-            SMAddon.smController.CrewXferMember = crewMember;
-            SMAddon.crewXfer = true;
-        }
-
-        internal static void TransferCrewMemberComplete(ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
-        {
-            try
-            {
-                ProtoCrewMember targetMember = null;
-                if (sourcePart.internalModel != null && targetPart.internalModel != null)
-                {
-                    // Build source and target seat indexes.
-                    int curIdx = crewMember.seatIdx;
-                    int newIdx = curIdx;
-                    InternalSeat sourceSeat = crewMember.seat;
-                    InternalSeat targetSeat = null;
-                    if (sourcePart == targetPart)
-                    {
-                        // Must be a move...
-                        newIdx += newIdx + 1 >= sourcePart.CrewCapacity ? 0 : 1;
-
-                        // get target seat from part's inernal model
-                        targetSeat = sourcePart.internalModel.seats[newIdx];
-                    }
-                    else
-                    {
-                        // Xfer to another part
-                        // get target seat from part's inernal model
-                        for (int x = 0; x < targetPart.internalModel.seats.Count; x++)
-                        {
-                            InternalSeat seat = targetPart.internalModel.seats[x];
-                            if (!seat.taken)
-                            {
-                                targetSeat = seat;
-                                newIdx = x;
-                                break;
-                            }
-                        }
-                        // All seats full?
-                        if (targetSeat == null)
-                        {
-                            // try to match seat if possible (swap with counterpart)
-                            if (newIdx >= targetPart.internalModel.seats.Count)
-                                newIdx = 0;
-                            targetSeat = targetPart.internalModel.seats[newIdx];
-                        }
-                    }
-
-                    // seats have been chosen.
-                    // Do we need to swap places with another Kerbal?
-                    if (targetSeat.taken)
-                    {
-                        // Swap places.
-
-                        // get Kerbal to swap with through his seat...
-                        targetMember = targetSeat.kerbalRef.protoCrewMember;
-
-                        // Remove the crew members from the part(s)...
-                        SMController.RemoveCrewMember(crewMember, sourcePart);
-                        SMController.RemoveCrewMember(targetMember, targetPart);
-
-                        // Add the crew members back into the part(s) at their new seats.
-                        sourcePart.AddCrewmemberAt(targetMember, curIdx);
-                        targetPart.AddCrewmemberAt(crewMember, newIdx);
-                    }
-                    else
-                    {
-                        // Just move.
-                        SMController.RemoveCrewMember(crewMember, sourcePart);
-                        targetPart.AddCrewmemberAt(crewMember, newIdx);
-                    }
-
-                    // if moving within a part, set the seat2seat flag
-                    SMAddon.isSeat2Seat = sourcePart == targetPart ? true : false;
-                }
-                else
-                {
-                    // no portraits, so let's just move kerbals...
-                    SMController.RemoveCrewMember(crewMember, sourcePart);
-                    SMController.AddCrewMember(crewMember, targetPart);
-                }
-                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", Settings.VerboseLogging);
-                SMAddon.smController.RespawnCrew();
-                SMAddon.ivaDelayActive = true;
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format("in TransferCrewMemberComplete.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
-
         private static void TransferScience(PartModule source, PartModule target)
         {
             ScienceData[] moduleScience = null;
@@ -891,48 +796,48 @@ namespace ShipManifest
 
                 if (moduleScience != null && moduleScience.Length > 0)
                 {
-                    Utilities.LogMessage(string.Format("moduleScience has data..."), "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage(string.Format("moduleScience has data..."), "Info", SMSettings.VerboseLogging);
 
                     if (((IScienceDataContainer)target) != null)
                     {
                         // Lets store the data from the source.
                         if (((ModuleScienceContainer)target).StoreData( new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
                         {
-                            Utilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", Settings.VerboseLogging);
+                            Utilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", SMSettings.VerboseLogging);
                             foreach (ScienceData data in moduleScience)
                             {
                                 ((IScienceDataContainer)source).DumpData(data);
                             }
 
-                            if (Settings.RealismMode)
+                            if (SMSettings.RealismMode)
                             {
-                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", Settings.VerboseLogging);
+                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SMSettings.VerboseLogging);
                             }
                             else
                             {
-                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", Settings.VerboseLogging);
+                                Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", SMSettings.VerboseLogging);
                                 ((ModuleScienceExperiment)source).ResetExperiment();
                             }
                         }
                         else
                         {
-                            Utilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", Settings.VerboseLogging);
+                            Utilities.LogMessage(string.Format("Science Data transfer failed..."), "Info", SMSettings.VerboseLogging);
                         }
                     }
                     else
                     {
-                        Utilities.LogMessage(string.Format("((IScienceDataContainer)target) is null"), "Info", Settings.VerboseLogging);
+                        Utilities.LogMessage(string.Format("((IScienceDataContainer)target) is null"), "Info", SMSettings.VerboseLogging);
                     }
-                    Utilities.LogMessage(string.Format("Transfer Complete."), "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage(string.Format("Transfer Complete."), "Info", SMSettings.VerboseLogging);
                 }
                 else if (moduleScience == null)
                 {
-                    Utilities.LogMessage(string.Format("moduleScience is null..."), "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage(string.Format("moduleScience is null..."), "Info", SMSettings.VerboseLogging);
                 }
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(" in TransferScience:  Error:  " + ex.ToString(), "Info", Settings.VerboseLogging);
+                Utilities.LogMessage(" in TransferScience:  Error:  " + ex.ToString(), "Info", SMSettings.VerboseLogging);
             }
         }
 
@@ -943,7 +848,7 @@ namespace ShipManifest
                 // Create Xfer Objects for timed process...
                 List<ModXferResource> XferResources = SMAddon.smController.ResourcesToXfer;
 
-                if (Settings.RealismMode)
+                if (SMSettings.RealismMode)
                 {
                     // This flag enables the Update handler in SMAddon and sets the direction
                     SMAddon.XferMode = source == SMAddon.smController.SelectedPartsSource ? SMAddon.XFERMode.SourceToTarget : SMAddon.XFERMode.TargetToSource;
@@ -956,10 +861,10 @@ namespace ShipManifest
                             AmtCapacity = XferResources[1].SourceCapacity(SMAddon.XferMode);
 
                     // Calculate the actual flow rate, based on source capacity and max flow time setting...
-                    SMAddon.act_flow_rate = AmtCapacity / Settings.FlowRate > Settings.MaxFlowTimeSec ? AmtCapacity / Settings.MaxFlowTimeSec : Settings.FlowRate;
+                    SMAddon.act_flow_rate = AmtCapacity / SMSettings.FlowRate > SMSettings.MaxFlowTimeSec ? AmtCapacity / SMSettings.MaxFlowTimeSec : SMSettings.FlowRate;
 
                     // now lets make some noise and simulate the pumping process...
-                    Utilities.LogMessage("Playing pump sound...", "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage("Playing pump sound...", "Info", SMSettings.VerboseLogging);
 
                     // Start the process
                     SMAddon.XferOn = true;
@@ -991,7 +896,7 @@ namespace ShipManifest
 
         internal static bool IsShipControllable()
         {
-            return ((SMAddon.vessel.IsControllable && Settings.RealismMode) || !Settings.RealismMode);
+            return ((SMAddon.vessel.IsControllable && SMSettings.RealismMode) || !SMSettings.RealismMode);
         }
 
         private static int GetScienceCount(Part part, bool IsCapacity)
@@ -1075,16 +980,14 @@ namespace ShipManifest
             return strDescription;
         }
 
-        internal static void Highlight(Part _part)
+        internal static void MouseOverHighlight(Part _part)
         {
             string step = "begin";
             try
             {
                 step = "inside box - Part Selection?";
-                _part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
-                step = "highlight on";
-                _part.SetHighlight(true, false);
-                SMAddon.EdgeHighight(_part, true);
+                SMHighlighter.SetPartHighlight(_part, SMSettings.Colors[SMSettings.MouseOverColor]);
+                SMHighlighter.EdgeHighight(_part, true);
             }
             catch (Exception ex)
             {

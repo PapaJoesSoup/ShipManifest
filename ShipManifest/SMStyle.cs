@@ -30,9 +30,10 @@ namespace ShipManifest
         internal static void SetupGUI()
         {
             GUI.skin = HighLogic.Skin;
+            //GUI.skin = null;
             if (WindowStyle == null)
             {
-                Settings.LoadColors();
+                SMSettings.LoadColors();
                 SetStyles();
             }
         }
@@ -63,7 +64,7 @@ namespace ShipManifest
             ButtonSourceStyle.alignment = TextAnchor.UpperLeft;
 
             ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledSourceStyle.normal.textColor = Settings.Colors[Settings.SourcePartColor];
+            ButtonToggledSourceStyle.normal.textColor = SMSettings.Colors[SMSettings.SourcePartColor];
             ButtonToggledSourceStyle.fontSize = 14;
             ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
@@ -78,7 +79,7 @@ namespace ShipManifest
             ButtonTargetStyle.alignment = TextAnchor.UpperLeft;
 
             ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button);
-            ButtonToggledTargetStyle.normal.textColor = Settings.Colors[Settings.TargetPartColor];
+            ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
             ButtonToggledTargetStyle.fontSize = 14;
             ButtonToggledTargetStyle.hover.textColor = Color.blue;
             ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
@@ -116,7 +117,6 @@ namespace ShipManifest
             ToolTipStyle.wordWrap = false;
             ToolTipStyle.fontStyle = FontStyle.Normal;
             ToolTipStyle.normal.textColor = Color.yellow;
-
         }
     }
 }

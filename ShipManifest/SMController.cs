@@ -83,7 +83,7 @@ namespace ShipManifest
                         foreach (Part part in Vessel.Parts)
                         {
                             // First let's Get any Crew, if desired...
-                            if (Settings.EnableCrew && (part.CrewCapacity > 0 && part.partInfo.name != "kerbalEVA"))
+                            if (SMSettings.EnableCrew && (part.CrewCapacity > 0 && part.partInfo.name != "kerbalEVA"))
                             {
                                 bool vResourceFound = false;
                                 // is resource in the list yet?.
@@ -103,7 +103,7 @@ namespace ShipManifest
                                 }
                             }
                             // Let's Get any Science...
-                            if (Settings.EnableScience)
+                            if (SMSettings.EnableScience)
                             {
                                 bool mResourceFound = false;
                                 IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
@@ -134,12 +134,12 @@ namespace ShipManifest
                             }
 
                             // Now, let's get flight Resources.
-                            if (Settings.EnableResources)
+                            if (SMSettings.EnableResources)
                             {
                                 foreach (PartResource resource in part.Resources)
                                 {
                                     // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                                    if (!Settings.RealismMode || (Settings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                                    if (!SMSettings.RealismMode || (SMSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
                                     {
                                         bool vResourceFound = false;
                                         // is resource in the list yet?.
@@ -186,10 +186,6 @@ namespace ShipManifest
         internal List<Part> SelectedPartsSource = new List<Part>();
         internal List<Part> SelectedPartsTarget = new List<Part>();
 
-        internal Part CrewXferSource;
-        internal Part CrewXferTarget;
-        internal ProtoCrewMember CrewXferMember;
-
         internal PartModule SelectedModuleSource;
         internal PartModule SelectedModuleTarget;
 
@@ -197,6 +193,8 @@ namespace ShipManifest
         internal ICLSPart clsPartTarget;
         internal ICLSSpace clsSpaceSource;
         internal ICLSSpace clsSpaceTarget;
+
+        internal CrewTransfer CrewTransfer = new CrewTransfer();
 
         // Control Window parts
         private List<ModHatch> _hatches = new List<ModHatch>();
@@ -305,25 +303,6 @@ namespace ShipManifest
             }
         }
 
-        internal static void AddCrewMember(ProtoCrewMember kerbal, Part part)
-        {
-            part.AddCrewmember(kerbal);
-            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
-            if (part.internalModel != null)
-            {
-                if (kerbal.seat != null)
-                    kerbal.seat.SpawnCrew();
-            }
-            SMAddon.FireEventTriggers();
-        }
-
-        internal static void RemoveCrewMember(ProtoCrewMember member, Part part)
-        {
-            part.RemoveCrewmember(member);
-            member.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-            SMAddon.FireEventTriggers();
-        }
-
         internal static bool CrewPartIsFull(Part part)
         {
             return !(part.protoModuleCrew.Count < part.CrewCapacity);
@@ -365,7 +344,7 @@ namespace ShipManifest
             {
                 for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
                 {
-                    RemoveCrewMember(part.protoModuleCrew[i], part);
+                    CrewTransfer.RemoveCrewMember(part.protoModuleCrew[i], part);
                 }
                 SMAddon.FireEventTriggers();
             }

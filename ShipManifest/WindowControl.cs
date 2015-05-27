@@ -9,9 +9,11 @@ namespace ShipManifest
 {
     static class WindowControl
     {
+        internal static Rect Position = new Rect(0, 0, 0, 0);
+        internal static bool ShowWindow = false;
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = Settings.PanelToolTips;
+        internal static bool ShowToolTips = true;
 
         private static bool _showHatch;
         private static bool _showPanel;
@@ -76,16 +78,16 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.ShowToolTips;
+            ShowToolTips = SMSettings.ShowToolTips;
 
-            Rect rect = new Rect(366, 4, 16, 16);
+            Rect rect = new Rect(Position.width - 20, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
-                Settings.ShowControl = false;
+                ShowWindow = false;
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Settings.ControlPosition, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             // This is a scroll panel (we are using it to make button lists...)
             GUILayout.BeginVertical();
@@ -104,7 +106,7 @@ namespace ShipManifest
         {
             GUILayout.BeginHorizontal();
 
-            if (!Settings.EnableCLS)
+            if (!SMSettings.EnableCLS)
                 GUI.enabled = false;
             var hatchesStyle = ShowHatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))

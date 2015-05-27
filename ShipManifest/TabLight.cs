@@ -11,14 +11,13 @@ namespace ShipManifest
     {
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = Settings.PanelToolTips;
+        internal static bool ShowToolTips = true;
 
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display()
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = Settings.ShowToolTips;
 
             GUILayout.BeginVertical();
             GUI.enabled = true;

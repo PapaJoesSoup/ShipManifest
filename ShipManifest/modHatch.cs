@@ -95,31 +95,26 @@ namespace ShipManifest
             {
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    _clsPart.Part.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
-                    _clsPart.Part.SetHighlight(true, false);
-                    SMAddon.EdgeHighight(_clsPart.Part, true);
+                    SMHighlighter.SetPartHighlight(_clsPart.Part, SMSettings.Colors[SMSettings.MouseOverColor]);
+                    SMHighlighter.EdgeHighight(_clsPart.Part, true);
                 }
                 else
                 {
-                    if (_clsPart.Part.highlightColor == Settings.Colors[Settings.MouseOverColor])
+                    if (_clsPart.Part.highlightColor == SMSettings.Colors[SMSettings.MouseOverColor])
                     {
-                        SMAddon.EdgeHighight(_clsPart.Part, false);
-                        if (Settings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && Settings.ShowTransferWindow)
+                        SMHighlighter.EdgeHighight(_clsPart.Part, false);
+                        if (SMSettings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && WindowTransfer.ShowWindow)
                         {
                             if (CLSPart.Space != null)
                                 CLSPart.Highlight(true, true);
                             else
                             {
-                                _clsPart.Part.SetHighlight(false, false);
-                                _clsPart.Part.SetHighlightDefault();
-                                _clsPart.Part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                                SMHighlighter.ClearPartHighlight(_clsPart.Part);
                             }
                         }
                         else
                         {
-                            _clsPart.Part.SetHighlight(false, false);
-                            _clsPart.Part.SetHighlightDefault();
-                            _clsPart.Part.SetHighlightType(Part.HighlightType.OnMouseOver);
+                            SMHighlighter.ClearPartHighlight(_clsPart.Part);
                         }
                     }
                 }

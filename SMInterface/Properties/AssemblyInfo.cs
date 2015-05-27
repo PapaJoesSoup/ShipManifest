@@ -1,16 +1,16 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ShipManifest")]
-[assembly: AssemblyDescription("Ship Manifest Manages your vessel")]
+[assembly: AssemblyTitle("SMInterface")]
+[assembly: AssemblyDescription("Allows access to Ship Manifest's Crew Transfer Process")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PapaJoe's SOUP")]
-[assembly: AssemblyProduct("ShipManifest")]
-[assembly: AssemblyCopyright("Copyright ©  2013, 2014, 2015")]
+[assembly: AssemblyProduct("SMInterface")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("beb41dac-da12-440b-a4bc-4ac5eca7bce2")]
+[assembly: Guid("74ce8c6b-8b99-440e-93e2-122eadb8cfd9")]
 
 // Version information for an assembly consists of the following four values:
 //

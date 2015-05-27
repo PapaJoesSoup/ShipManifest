@@ -26,7 +26,7 @@ namespace ShipManifest
 
         internal static void LoadTexture(ref Texture2D tex, String FileName)
         {
-            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", Settings.VerboseLogging);
+            LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, FileName), "Info", SMSettings.VerboseLogging);
             WWW img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, FileName));
             img1.LoadImageIntoTexture(tex);
         }
@@ -104,17 +104,17 @@ namespace ShipManifest
             try
             {
                 // Add rolling error list. This limits growth.  Configure with ErrorListLength
-                if (_errors.Count() > int.Parse(Settings.ErrorLogLength) && int.Parse(Settings.ErrorLogLength) > 0)
-                    _errors.RemoveRange(0, _errors.Count() - int.Parse(Settings.ErrorLogLength));
+                if (_errors.Count() > int.Parse(SMSettings.ErrorLogLength) && int.Parse(SMSettings.ErrorLogLength) > 0)
+                    _errors.RemoveRange(0, _errors.Count() - int.Parse(SMSettings.ErrorLogLength));
                 if (verbose)
                     _errors.Add(type + ": " + error);
-                if (type == "Error" && Settings.AutoDebug)
-                    Settings.ShowDebugger = true;
+                if (type == "Error" && SMSettings.AutoDebug)
+                    WindowDebugger.ShowWindow = true;
             }
             catch (Exception ex)
             {
                 _errors.Add("Error: " + ex.ToString());
-                Settings.ShowDebugger = true;
+                WindowDebugger.ShowWindow = true;
             }
         }
 
@@ -156,7 +156,7 @@ namespace ShipManifest
 
         internal static void ShowToolTip(Vector2 toolTipPos, string ToolTip)
         {
-            if (Settings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
+            if (SMSettings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
             {
                 Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
                 Rect rect = new Rect(toolTipPos.x + 20, toolTipPos.y - 4, size.x, size.y);

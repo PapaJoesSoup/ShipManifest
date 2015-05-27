@@ -16,11 +16,11 @@ namespace ShipManifest
             set { _xmitterModule = value; }
         }
 
-        private PartModule _animaeModule;
+        private PartModule _animateModule;
         internal PartModule AnimateModule
         {
-            get { return _animaeModule; }
-            set { _animaeModule = value; }
+            get { return _animateModule; }
+            set { _animateModule = value; }
         }
 
         private Part _spart;
@@ -110,20 +110,20 @@ namespace ShipManifest
             // RT support:
             if (isRTModule)
             {
-                //if (TabAntenna.RTInstalled)
-                //{
-                //    if(RemoteTech.API.API.HasFlightComputer(SMAddon.vessel.id))
-                //    {
-                //        ConfigNode configNode = new ConfigNode();
-                //        configNode.AddValue("GUIDString", SMAddon.vessel.id);
-                //        configNode.AddValue("Executor", "ShipManifest");
-                //        configNode.AddValue("ReflectionType", "ShipManifest");
-                //        RemoteTech.API.API.QueueCommandToFlightComputer(configNode);
-                //    }
-                //    else
-                //        XmitterModule.Events["EventOpen"].Invoke();
-                //}
-                //else
+                if (TabAntenna.RTInstalled)
+                {
+                    //if (RemoteTech.API.API.HasFlightComputer(SMAddon.vessel.id))
+                    //{
+                    //    ConfigNode configNode = new ConfigNode();
+                    //    configNode.AddValue("GUIDString", SMAddon.vessel.id);
+                    //    configNode.AddValue("Executor", "ShipManifest");
+                    //    configNode.AddValue("ReflectionType", "ShipManifest");
+                    //    RemoteTech.API.API.QueueCommandToFlightComputer(configNode);
+                    //}
+                    //else
+                        XmitterModule.Events["EventOpen"].Invoke();
+                }
+                else
                     XmitterModule.Events["EventOpen"].Invoke();
             }
             else if (iModule.Events["Toggle"].guiName == "Extend")
@@ -139,30 +139,20 @@ namespace ShipManifest
                 iModule.Toggle();
         }
 
-        internal void Highlight(Rect rect)
+        internal void MouseOverHighlight(Rect rect)
         {
             string step = "begin";
             try
             {
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    step = "inside box - antenna Extended/retracted?";
-                    _spart.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
-                    step = "highlight on";
-                    _spart.SetHighlight(true, false);
-                    SMAddon.EdgeHighight(_spart, true);
+                    SMHighlighter.SetPartHighlight(_spart, SMSettings.Colors[SMSettings.MouseOverColor]);
+                    SMHighlighter.EdgeHighight(_spart, true);
                 }
                 else
                 {
-                    step = "outside box - highlight off";
-                    if (_spart.highlightColor == Settings.Colors[Settings.MouseOverColor])
-                    {
-                        step = "highlight off - turning off highlighting";
-                        _spart.SetHighlight(false, false);
-                        _spart.SetHighlightDefault();
-                        SMAddon.EdgeHighight(_spart, false);
-                        _spart.SetHighlightType(Part.HighlightType.OnMouseOver);
-                    }
+                    SMHighlighter.ClearPartHighlight(_spart);
+                    SMHighlighter.EdgeHighight(_spart, false);
                 }
             }
             catch (Exception ex)

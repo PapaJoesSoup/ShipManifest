@@ -42,7 +42,7 @@ namespace ShipManifest
         {
             get
             {
-                if (Settings.RealismMode && !this.Retractable && (this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED || this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
+                if (SMSettings.RealismMode && !this.Retractable && (this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED || this.PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
                     return false;
                 else
                     return true;
@@ -95,23 +95,13 @@ namespace ShipManifest
             {
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    step = "inside box - panel Extended/retracted?";
-                    _spart.SetHighlightColor(Settings.Colors[Settings.MouseOverColor]);
-                    step = "highlight on";
-                    _spart.SetHighlight(true, false);
-                    SMAddon.EdgeHighight(_spart, true);
+                    SMHighlighter.SetPartHighlight(_spart, SMSettings.Colors[SMSettings.MouseOverColor]);
+                    SMHighlighter.EdgeHighight(_spart, true);
                 }
                 else
                 {
-                    step = "outside box - highlight off";
-                    if (_spart.highlightColor == Settings.Colors[Settings.MouseOverColor])
-                    {
-                        step = "highlight off - turning off highlighting";
-                        _spart.SetHighlight(false, false);
-                        _spart.SetHighlightDefault();
-                        SMAddon.EdgeHighight(_spart, false);
-                        _spart.SetHighlightType(Part.HighlightType.OnMouseOver);
-                    }
+                    SMHighlighter.ClearPartHighlight(_spart);
+                    SMHighlighter.EdgeHighight(_spart, false);
                 }
             }
             catch (Exception ex)

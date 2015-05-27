@@ -58,9 +58,9 @@ namespace ShipManifest
 
         public void SyncKerbal()
         {
-            if (Settings.EnableKerbalRename)
+            if (SMSettings.EnableKerbalRename)
                 Kerbal.name = Name;
-            if (Settings.EnableKerbalRename && Settings.RenameWithProfession)
+            if (SMSettings.EnableKerbalRename && SMSettings.RenameWithProfession)
             KerbalRoster.SetExperienceTrait(Kerbal);
             if (Title != Kerbal.experienceTrait.Title)
             {

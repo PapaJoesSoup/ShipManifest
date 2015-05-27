@@ -311,7 +311,7 @@ namespace ShipManifest
         internal static void XferResource(List<Part> XferParts, ModXferResource modResource, double XferAmount, SMAddon.XFERMode XferMode, bool isSource)
         {
             // This adjusts the delta when we get to the end of the xfer.
-            Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 1. XferAmount = " + XferAmount.ToString() + ", Is Source: " + isSource.ToString(), "Info", Settings.VerboseLogging);
+            Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 1. XferAmount = " + XferAmount.ToString() + ", Is Source: " + isSource.ToString(), "Info", SMSettings.VerboseLogging);
 
             // This var keeps track of what we actually moved..
             double XferBalance = XferAmount;
@@ -320,7 +320,7 @@ namespace ShipManifest
             // count up source parts with avalilabe resources. so we can devide by them
             while (XferBalance > 0)
             {
-                Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 2. XferBalance = " + XferBalance.ToString() + ", Is Source: " + isSource.ToString(), "Info", Settings.VerboseLogging);
+                Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 2. XferBalance = " + XferBalance.ToString() + ", Is Source: " + isSource.ToString(), "Info", SMSettings.VerboseLogging);
 
                 // Lets account for any empty/full containers
                 int PartCount = 0;
@@ -347,7 +347,7 @@ namespace ShipManifest
                         AmtToMove = CapacityAvail >= PartAmt ? PartAmt : CapacityAvail;
                         part.Resources[modResource.ResourceName].amount += AmtToMove;
                     }
-                    Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 3. AmtToMove = " + AmtToMove.ToString() + ", Is Source: " + isSource.ToString(), "Info", Settings.VerboseLogging);
+                    Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 3. AmtToMove = " + AmtToMove.ToString() + ", Is Source: " + isSource.ToString(), "Info", SMSettings.VerboseLogging);
                     // Report ramaining balance after Transfer.
                     XferBalance -= AmtToMove;
                     if (XferBalance <= 0)
