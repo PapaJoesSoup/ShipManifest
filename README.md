@@ -1,5 +1,14 @@
 ShipManifest
 ============
+Version 4.3.0.0 - Pre-Release xx May, 2015 - CrewTransfer Interface & Refactoring Edition.
+- New:  Refactored Crew transfers into separate class and added events to improve visibility and state management.
+- New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
+- New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel is omitted in Space Center.
+- New:  Refactoring - moved window vars from Settings into window level code.
+- New:  Altered Settings Save to segregate Hidden settings for ease of identification by users.
+- Fixed:  Bug in multi-part transfers that lock transfer in run state, with no progress.
+- Fixed:  Bug in Crew Transfer with CLS installed.  First transfer works fine, subsequent xfers fail, and Transfer is stuck in moving...
+
 Version 4.2.1.1 - Release 14 May, 2015 - Highlighting Updates Edition Bug Fix.
 - Fixed:  In Settings, if CLS is not installed, or CLS is desabled, changing the Enable Highlighting setting causes some buttons below it to become disabled.
 
