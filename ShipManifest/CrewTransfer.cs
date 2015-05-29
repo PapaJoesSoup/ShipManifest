@@ -395,7 +395,7 @@ namespace ShipManifest
                         RemoveCrewMember(TargetCrewMember, TargetPart);
 
                         // Add the crew members back into the part(s) at their new seats.
-                        SourcePart.AddCrewmemberAt(TargetCrewMember, TargetPart.internalModel.seats.IndexOf(SourceSeat));
+                        SourcePart.AddCrewmemberAt(TargetCrewMember, SourcePart.internalModel.seats.IndexOf(SourceSeat));
                         TargetPart.AddCrewmemberAt(SourceCrewMember, TargetPart.internalModel.seats.IndexOf(TargetSeat));
                     }
                     else
@@ -433,12 +433,12 @@ namespace ShipManifest
         internal static void AddCrewMember(ProtoCrewMember pKerbal, Part part)
         {
             part.AddCrewmember(pKerbal);
-            pKerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
             if (part.internalModel != null)
             {
                 if (pKerbal.seat != null)
                     pKerbal.seat.SpawnCrew();
             }
+            pKerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
             SMAddon.FireEventTriggers();
         }
 

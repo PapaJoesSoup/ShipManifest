@@ -366,7 +366,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                     else
                         GUI.enabled = false;
-                    if (SMAddon.smController.CrewTransfer.SourceCrewMember == crewMember && (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn))
+                    if ((SMAddon.smController.CrewTransfer.SourceCrewMember == crewMember || SMAddon.smController.CrewTransfer.TargetCrewMember == crewMember) && (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn))
                     {
                         GUI.enabled = true;
                         GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
