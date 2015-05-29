@@ -2,6 +2,7 @@ ShipManifest
 ============
 Version 4.3.0.0 - Pre-Release xx May, 2015 - CrewTransfer Interface & Refactoring Edition.
 - New:  Refactored Crew transfers into separate class and added events to improve visibility and state management.
+- New:  When transferring kerbals, if the target seat is occupied, the transfer process now displays both kerbals involved as "Moving"
 - New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
 - New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel is omitted in Space Center.
 - New:  Refactoring - moved window vars from Settings into window level code.
