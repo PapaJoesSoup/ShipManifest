@@ -204,39 +204,54 @@ namespace ShipManifest
             if (SourcePart.internalModel != null && TargetPart.internalModel != null)
             {
                 // Build source and target seat indexes.
-                int curIdx = SourceCrewMember.seatIdx;
-                int newIdx = curIdx;
                 SourceSeat = SourceCrewMember.seat;
                 TargetSeat = null;
                 if (SourcePart == TargetPart)
                 {
                     // Must be a move...
-                    newIdx += newIdx + 1 >= SourcePart.CrewCapacity ? 0 : 1;
-
-                    // get target seat from part's inernal model
-                    TargetSeat = SourcePart.internalModel.seats[newIdx];
+                    //Get the first available valid seat
+                    foreach (InternalSeat seat in SourcePart.internalModel.seats)
+                    {
+                        if (seat.taken)
+                        {
+                            // This supports DeepFreeze frozen kerbals...
+                            if (seat.kerbalRef.protoCrewMember.type != ProtoCrewMember.KerbalType.Unowned)
+                            {
+                                TargetSeat = seat;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            TargetSeat = seat;
+                            break;
+                        }
+                    }
                 }
                 else
                 {
                     // Xfer to another part
                     // get target seat from part's inernal model
-                    for (int x = 0; x < TargetPart.internalModel.seats.Count; x++)
+                    foreach (InternalSeat seat in TargetPart.internalModel.seats)
                     {
-                        InternalSeat seat = TargetPart.internalModel.seats[x];
                         if (!seat.taken)
                         {
                             TargetSeat = seat;
-                            newIdx = x;
                             break;
                         }
                     }
                     // All seats full?
                     if (TargetSeat == null)
                     {
-                        // try to match seat if possible (swap with counterpart)
-                        if (newIdx >= TargetPart.internalModel.seats.Count)
-                            newIdx = 0;
-                        TargetSeat = TargetPart.internalModel.seats[newIdx];
+                        foreach (InternalSeat seat in TargetPart.internalModel.seats)
+                        {
+                            // This supports DeepFreeze frozen kerbals...
+                            if (seat.kerbalRef.protoCrewMember.type != ProtoCrewMember.KerbalType.Unowned)
+                            {
+                                TargetSeat = seat;
+                                break;
+                            }
+                        }
                     }
                 }
 
