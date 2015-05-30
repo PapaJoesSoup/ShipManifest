@@ -215,7 +215,7 @@ namespace ShipManifest
                         if (seat.taken)
                         {
                             // This supports DeepFreeze frozen kerbals...
-                            if (seat.kerbalRef.protoCrewMember.type != ProtoCrewMember.KerbalType.Unowned)
+                            if (seat.kerbalRef!= null)
                             {
                                 TargetSeat = seat;
                                 break;
@@ -246,7 +246,7 @@ namespace ShipManifest
                         foreach (InternalSeat seat in TargetPart.internalModel.seats)
                         {
                             // This supports DeepFreeze frozen kerbals...
-                            if (seat.kerbalRef.protoCrewMember.type != ProtoCrewMember.KerbalType.Unowned)
+                            if (seat.kerbalRef != null)
                             {
                                 TargetSeat = seat;
                                 break;
