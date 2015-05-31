@@ -24,6 +24,13 @@ namespace ShipManifest
                 return IsModInstalled("ShipManifest");
             }
         }
+        internal static bool IsKISInstalled
+        {
+            get
+            {
+                return IsModInstalled("KIS");
+            }
+        }
         internal static bool IsCLSInstalled
         {
             get

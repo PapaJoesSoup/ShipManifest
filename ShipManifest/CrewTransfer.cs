@@ -293,13 +293,13 @@ namespace ShipManifest
 
                             SMAddon.elapsed = SMAddon.timestamp = 0;
                             CrewXferActive = false;
-                            CrewTransferComplete();
                             if (IsStockXfer)
                             {
                                 var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
                                 ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
                             }
                             IsStockXfer = false;
+                            CrewTransferComplete();
 
                             Utilities.LogMessage("CrewTransferProcess crewXfer State:  " + CrewXferActive.ToString() + "...", "Info", SMSettings.VerboseLogging);
                         }
@@ -363,7 +363,6 @@ namespace ShipManifest
                                 SMAddon.source3.Play();
                                 SMAddon.timestamp = SMAddon.elapsed = 0;
                                 SMAddon.XferState = SMAddon.XFERState.Off;
-                                CrewTransferComplete();
                                 CrewXferActive = false;
                                 IsSeat2SeatXfer = false;
                                 if (IsStockXfer)
@@ -372,6 +371,7 @@ namespace ShipManifest
                                     ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
                                 }
                                 IsStockXfer = false;
+                                CrewTransferComplete();
 
                                 break;
                         }
@@ -418,6 +418,23 @@ namespace ShipManifest
                         // Just move.
                         RemoveCrewMember(SourceCrewMember, SourcePart);
                         TargetPart.AddCrewmemberAt(SourceCrewMember, TargetPart.internalModel.seats.IndexOf(TargetSeat));
+                    }
+
+                    // Now let's deal with third party mod support...
+                    if (InstalledMods.IsKISInstalled)
+                    {
+                        if (TargetSeat != SourceSeat)
+                        {
+                            GameEvents.HostedFromToAction<ProtoCrewMember, Part> Sourceaction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(SourceCrewMember, SourcePart, TargetPart);
+                            GameEvents.onCrewTransferred.Fire(Sourceaction);
+
+                            //If a swap, we need to handle that too...
+                            if (TargetCrewMember != null)
+                            {
+                                GameEvents.HostedFromToAction<ProtoCrewMember, Part> targetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(TargetCrewMember, TargetPart, SourcePart);
+                                GameEvents.onCrewTransferred.Fire(targetAction);
+                            }
+                        }
                     }
                 }
                 else
