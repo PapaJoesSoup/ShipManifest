@@ -21,6 +21,7 @@ namespace ShipManifest
         internal static GUIStyle LabelStyle;
         internal static GUIStyle LabelStyleBold;
         internal static GUIStyle LabelStyleRed;
+        internal static GUIStyle LabelStyleCyan;
         internal static GUIStyle LabelStyleYellow;
         internal static GUIStyle LabelStyleGreen;
         internal static GUIStyle LabelStyleNoWrap;
@@ -105,6 +106,9 @@ namespace ShipManifest
 
             LabelStyleRed = new GUIStyle(LabelStyle);
             LabelStyleRed.normal.textColor = Color.red;
+
+            LabelStyleCyan = new GUIStyle(LabelStyle);
+            LabelStyleCyan.normal.textColor = Color.cyan;
 
             LabelStyleYellow = new GUIStyle(LabelStyle);
             LabelStyleYellow.normal.textColor = Color.yellow;

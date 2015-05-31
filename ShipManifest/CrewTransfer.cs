@@ -215,7 +215,7 @@ namespace ShipManifest
                         if (seat.taken)
                         {
                             // This supports DeepFreeze frozen kerbals...
-                            if (seat.kerbalRef!= null)
+                            if (seat.kerbalRef!= null && seat.crew != SourceCrewMember)
                             {
                                 TargetSeat = seat;
                                 break;
@@ -231,7 +231,7 @@ namespace ShipManifest
                 else
                 {
                     // Xfer to another part
-                    // get target seat from part's inernal model
+                    // get target seat from target part's inernal model
                     foreach (InternalSeat seat in TargetPart.internalModel.seats)
                     {
                         if (!seat.taken)

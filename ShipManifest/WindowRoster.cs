@@ -93,7 +93,7 @@ namespace ShipManifest
                 GUILayout.BeginVertical();
                 DisplayRosterFilter();
 
-                RosterListViewer();
+                DisplayRosterListViewer();
 
                 if (OnCreate)
                     CreateKerbalViewer();
@@ -131,14 +131,20 @@ namespace ShipManifest
             }
         }
 
-        private static void RosterListViewer()
+        private static void DisplayRosterListViewer()
         {
             try
             {
                 ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(200), GUILayout.Width(400));
                 GUILayout.BeginVertical();
 
-                foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+                // Support for DeepFreeze
+                List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+                if (InstalledMods.IsDFInstalled)
+                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+                Utilities.LogMessage(string.Format("IsDFInstalled:  {0}", InstalledMods.IsDFInstalled.ToString()), "Info", true);
+
+                foreach (ProtoCrewMember kerbal in AllCrew)
                 {
                     if (CanDisplayKerbal(kerbal))
                     {
@@ -151,7 +157,7 @@ namespace ShipManifest
                             labelStyle = SMStyle.LabelStyle;
 
                         // What vessel is this Kerbal Assigned to?
-                        string vesselName = "";
+                        string rosterDetails = "";
                         if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                         {
                             foreach (Vessel thisVessel in FlightGlobals.Vessels)
@@ -161,23 +167,30 @@ namespace ShipManifest
                                 {
                                     if (crewMember == kerbal)
                                     {
-                                        vesselName = "\r\n  -  " + thisVessel.name.Replace("(unloaded)", "");
+                                        rosterDetails = "\r\n  -  " + thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
                                     }
                                 }
                             }
                         }
+                        else if (InstalledMods.IsDFInstalled && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+                        {
+                            Utilities.LogMessage("Kerbal may be frozen.  Kerbal:  " + kerbal.name, "Info", true);
+                            // This kerbal could be frozen.  Lets find out...
+                            rosterDetails = GetFrozenDetials(kerbal);
+                            labelStyle = SMStyle.LabelStyleCyan;
+                        }
                         else
                         {
                             // Since the kerbal has no vessel assignment, lets show what their status is instead...
-                            vesselName = "\r\n  -  " + kerbal.rosterStatus;
+                            rosterDetails = "\r\n  -  " + kerbal.rosterStatus;
                         }
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0}{1}", kerbal.name + ", (" + kerbal.experienceTrait.Title + "/" + kerbal.experience.ToString() + ")", vesselName), labelStyle, GUILayout.Width(230), GUILayout.Height(10));  // + "  (" + kerbal.seat.vessel.name + ")"
+                        GUILayout.Label(string.Format("{0}{1}", kerbal.name + ", (" + kerbal.experienceTrait.Title + "/" + kerbal.experience.ToString() + ")", rosterDetails), labelStyle, GUILayout.Width(230), GUILayout.Height(10));  // + "  (" + kerbal.seat.vessel.name + ")"
                         string buttonText = string.Empty;
                         string buttonToolTip = string.Empty;
 
-                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                             GUI.enabled = true;
                         else
                             GUI.enabled = false;
@@ -271,6 +284,39 @@ namespace ShipManifest
             {
                 Utilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
+        }
+
+        private static string GetFrozenDetials(ProtoCrewMember kerbal)
+        {
+            string rosterDetails = "";
+            bool _found = false;
+            foreach (Vessel thisVessel in FlightGlobals.Vessels)
+            {
+                List<Part> cryoParts = (from p in thisVessel.parts where p.name.Contains("cryofreezer") select p).ToList();
+                foreach (Part pPart in cryoParts)
+                {
+                    List<PartModule> cryoModules = (from PartModule m in pPart.Modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
+                    foreach (PartModule pMmodule in cryoModules)
+                    {
+                        foreach (BaseEvent thisEvent in pMmodule.Events)
+                        {
+                            if (thisEvent.guiName.Contains(kerbal.name))
+                            {
+                                _found = true;
+                                rosterDetails = "\r\n - Frozen - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                break;
+                            }
+                        }
+                        if (_found) break;
+                    }
+                    if (_found) break;
+                }
+            }
+            if (!_found)
+            {
+                rosterDetails = "\r\n - Frozen";
+            }
+            return rosterDetails;
         }
 
         private static void CreateKerbalViewer()
@@ -458,9 +504,9 @@ namespace ShipManifest
         {
             if (isAll)
                 return true;
-            else if (isVessel && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+            else if (isVessel && (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (InstalledMods.IsDFInstalled && GetFrozenDetials(kerbal).Contains("Frozen -"))))
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                 return true;
             else
                 return false;

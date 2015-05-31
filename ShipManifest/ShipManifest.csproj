@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CrewTransfer.cs" />
+    <Compile Include="InstalledMods.cs" />
     <Compile Include="ModAntenna.cs" />
     <Compile Include="CLSClient.cs" />
     <Compile Include="ModLight.cs" />
