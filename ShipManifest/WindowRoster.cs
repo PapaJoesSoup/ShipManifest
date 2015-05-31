@@ -177,7 +177,7 @@ namespace ShipManifest
                         {
                             Utilities.LogMessage("Kerbal may be frozen.  Kerbal:  " + kerbal.name, "Info", true);
                             // This kerbal could be frozen.  Lets find out...
-                            rosterDetails = GetFrozenDetials(kerbal);
+                            rosterDetails = GetProtoFrozenDetials(kerbal);
                             labelStyle = SMStyle.LabelStyleCyan;
                         }
                         else
@@ -303,7 +303,7 @@ namespace ShipManifest
                             if (thisEvent.guiName.Contains(kerbal.name))
                             {
                                 _found = true;
-                                rosterDetails = "\r\n - Frozen - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                rosterDetails = "\r\n- Frozen: " + thisVessel.GetName().Replace("(unloaded)", "");
                                 break;
                             }
                         }
@@ -315,6 +315,42 @@ namespace ShipManifest
             if (!_found)
             {
                 rosterDetails = "\r\n - Frozen";
+            }
+            return rosterDetails;
+        }
+
+        private static string GetProtoFrozenDetials(ProtoCrewMember kerbal)
+        {
+            string rosterDetails = "";
+            bool _found = false;
+            foreach (Vessel thisVessel in FlightGlobals.Vessels)
+            {
+                List<ProtoPartSnapshot> cryoParts = (from p in thisVessel.protoVessel.protoPartSnapshots where p.partName.Contains("cryofreezer") select p).ToList();
+                foreach (ProtoPartSnapshot pPart in cryoParts)
+                {
+                    List<ProtoPartModuleSnapshot> cryoModules = (from ProtoPartModuleSnapshot m in pPart.modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
+                    foreach (ProtoPartModuleSnapshot pMmodule in cryoModules)
+                    {
+                        ConfigNode cryoNode = pMmodule.moduleValues;
+                        {
+                            if (cryoNode.HasValue("FrozenCrew"))
+                            {
+                                string FrozenCrew = cryoNode.GetValue("FrozenCrew");
+                                if (FrozenCrew.Contains(kerbal.name))
+                                {
+                                    _found = true;
+                                    rosterDetails = "\r\n- Frozen: " + thisVessel.GetName().Replace("(unloaded)", "");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (_found) break;
+                }
+            }
+            if (!_found)
+            {
+                rosterDetails = "Frozen";
             }
             return rosterDetails;
         }
