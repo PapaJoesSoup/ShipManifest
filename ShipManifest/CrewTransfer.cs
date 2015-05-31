@@ -12,6 +12,10 @@ namespace ShipManifest
     public class CrewTransfer : ICrewTransfer
     {
         // crew xfer inerface properties
+
+        internal static bool IgnoreSourceXferEvent = false;
+        internal static bool IgnoreTargetXferEvent = false;
+
         private bool _crewXferActive = false;
         public bool CrewXferActive
         {

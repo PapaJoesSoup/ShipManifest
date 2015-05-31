@@ -363,7 +363,18 @@ namespace ShipManifest
         // Crew Event handlers
         internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (!smController.CrewTransfer.CrewXferActive && (!SMSettings.OverrideStockCrewXfer ||
+            // Are we performing a mod notification?  If so, ignore the action...
+            if (CrewTransfer.IgnoreSourceXferEvent || CrewTransfer.IgnoreTargetXferEvent)
+            {
+                if (action.host == smController.CrewTransfer.SourceCrewMember)
+                    CrewTransfer.IgnoreSourceXferEvent = false;
+                if (action.host == smController.CrewTransfer.TargetCrewMember)
+                    CrewTransfer.IgnoreTargetXferEvent = false;
+
+                // Mod notification.  This requires no additional action
+                return;
+            }
+            else if (!smController.CrewTransfer.CrewXferActive && (!SMSettings.OverrideStockCrewXfer ||
                 action.to.Modules.Cast<PartModule>().Any(x => x is KerbalEVA) ||
                 action.from.Modules.Cast<PartModule>().Any(x => x is KerbalEVA)))
             {
