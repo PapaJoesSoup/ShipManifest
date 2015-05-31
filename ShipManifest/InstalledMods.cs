@@ -10,21 +10,28 @@ namespace ShipManifest
     {
         private static Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        public static bool IsSMInstalled
+        internal static bool IsRTInstalled
+        {
+            get
+            {
+                return IsModInstalled("RemoteTech");
+            }
+        }
+        internal static bool IsSMInstalled
         {
             get
             {
                 return IsModInstalled("ShipManifest");
             }
         }
-        public static bool IsCLSInstalled
+        internal static bool IsCLSInstalled
         {
             get
             {
                 return IsModInstalled("ConnectedLivingSpace");
             }
         }
-        public static bool IsDFInstalled
+        internal static bool IsDFInstalled
         {
             get
             {

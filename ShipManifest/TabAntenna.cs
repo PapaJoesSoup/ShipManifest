@@ -14,31 +14,6 @@ namespace ShipManifest
         internal static bool ShowToolTips = true;
         internal static bool isRTAntennas = false;
 
-        private static bool _rtChecked = false;
-        private static bool _rtInstalled = false;
-        internal static bool RTInstalled
-        {
-            get
-            {
-                if (!_rtChecked)
-                {
-                    string assemblyName = "RemoteTech";
-                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                    //foreach (var thisassembly in assemblies)
-                        //Utilities.LogMessage("Installed assembly:  " + thisassembly.FullName, "Error", true);
-                    var assembly = (from a in assemblies
-                                    where a.FullName.Contains(assemblyName)
-                                    select a).SingleOrDefault();
-                    if (assembly != null)
-                        _rtInstalled = true;
-                    else
-                        _rtInstalled = false;
-                    _rtChecked = true;
-                }
-                return _rtInstalled;
-            }
-        }
-
         private static Vector2 DisplayViewerPosition = Vector2.zero;
         internal static void Display()
         {
@@ -49,7 +24,7 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             GUI.enabled = true;
             GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            if (RTInstalled)
+            if (InstalledMods.IsRTInstalled)
                 GUILayout.Label("Antenna Control Center  (RemoteTech detected)", GUILayout.Height(10));
             else
                 GUILayout.Label("Antenna Control Center ", GUILayout.Height(10));

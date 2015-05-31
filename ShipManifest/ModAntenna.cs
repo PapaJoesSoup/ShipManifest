@@ -110,7 +110,7 @@ namespace ShipManifest
             // RT support:
             if (isRTModule)
             {
-                if (TabAntenna.RTInstalled)
+                if (InstalledMods.IsRTInstalled)
                 {
                     //if (RemoteTech.API.API.HasFlightComputer(SMAddon.vessel.id))
                     //{
