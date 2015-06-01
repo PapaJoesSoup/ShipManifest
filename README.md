@@ -1,12 +1,12 @@
 ShipManifest
 ============
 Version 4.3.0.0 - Release xx June, 2015 - Crew, Interfaces, & Refactoring Edition.
-- New:  Refactored Crew transfers into separate class to improve visibility and state management. Added OnCrewTransferred Event triggers for mod notification.
+- New:  Refactored Crew transfers into separate class to improve visibility and state management.
 - New:  Crew transfers (part to part & seat to seat) now show both kerbals involved as moving, when a kerbal swap occurs.
 - New:  Added DeepFreeze mod support for handling/viewing frozen kerbals. No more xferring frozen kerbals, and Roster Window now shows frozen kerbals.
 - New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
+- New:  Add onCrewTransferred Event trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
 - New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel filter is omitted when in Space Center.
-- New:  Add OnCrewtransferred Trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
 - New:  Refactoring - moved window vars from Settings into window level code.
 - New:  Refactoring - Added InstalledMods static class to centralize mod assembly detection and soft dependencies.
 - New:  Refactoring - Altered Settings Save to segregate Hidden settings for ease of identification by users.
