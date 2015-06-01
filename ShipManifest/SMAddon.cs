@@ -363,13 +363,31 @@ namespace ShipManifest
         // Crew Event handlers
         internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            // Are we performing a mod notification?  If so, ignore the action...
+            // Are we performing a mod notification?  If so, ignore the event...
             if (CrewTransfer.IgnoreSourceXferEvent || CrewTransfer.IgnoreTargetXferEvent)
             {
+                // For some reason we see 2 instances of this event, not sure why yet.  So I'm adding a counter to allow for it...   
+                // Dirty, but works until I understand it better.
                 if (action.host == smController.CrewTransfer.SourceCrewMember)
-                    CrewTransfer.IgnoreSourceXferEvent = false;
+                {
+                    if (CrewTransfer.ignoreSrcEventCount < 1)
+                        CrewTransfer.ignoreSrcEventCount += 1;
+                    else
+                    {
+                        CrewTransfer.IgnoreSourceXferEvent = false;
+                        CrewTransfer.ignoreSrcEventCount = 0;
+                    }
+                }
                 if (action.host == smController.CrewTransfer.TargetCrewMember)
-                    CrewTransfer.IgnoreTargetXferEvent = false;
+                {
+                    if (CrewTransfer.ignoreTgtEventCount < 1)
+                        CrewTransfer.ignoreTgtEventCount += 1;
+                    else
+                    {
+                        CrewTransfer.IgnoreTargetXferEvent = false;
+                        CrewTransfer.ignoreTgtEventCount = 0;
+                    }
+                }
 
                 // Mod notification.  This requires no additional action
                 return;

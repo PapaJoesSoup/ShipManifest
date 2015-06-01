@@ -14,7 +14,9 @@ namespace ShipManifest
         // crew xfer inerface properties
 
         internal static bool IgnoreSourceXferEvent = false;
+        internal static int ignoreSrcEventCount = 0;
         internal static bool IgnoreTargetXferEvent = false;
+        internal static int ignoreTgtEventCount = 0;
 
         private bool _crewXferActive = false;
         public bool CrewXferActive
@@ -204,6 +206,7 @@ namespace ShipManifest
             SourcePart = sourcePart;
             TargetPart = targetPart;
             SourceCrewMember = crewMember;
+            TargetCrewMember = null;
 
             if (SourcePart.internalModel != null && TargetPart.internalModel != null)
             {
@@ -335,7 +338,7 @@ namespace ShipManifest
                                 // Play run sound when start sound is nearly done. (repeats)
                                 if (SMAddon.elapsed >= SMAddon.source1.clip.length - 0.25)
                                 {
-                                    Utilities.LogMessage("source2.play():  started.", "info", true);
+                                    Utilities.LogMessage("source2.play():  started.", "info", SMSettings.VerboseLogging);
                                     SMAddon.source2.Play();
                                     SMAddon.elapsed = 0;
                                     SMAddon.XferState = SMAddon.XFERState.Run;
@@ -423,29 +426,34 @@ namespace ShipManifest
                         RemoveCrewMember(SourceCrewMember, SourcePart);
                         TargetPart.AddCrewmemberAt(SourceCrewMember, TargetPart.internalModel.seats.IndexOf(TargetSeat));
                     }
-
-                    // Now let's deal with third party mod support...
-                    if (InstalledMods.IsKISInstalled)
-                    {
-                        if (TargetSeat != SourceSeat)
-                        {
-                            GameEvents.HostedFromToAction<ProtoCrewMember, Part> Sourceaction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(SourceCrewMember, SourcePart, TargetPart);
-                            GameEvents.onCrewTransferred.Fire(Sourceaction);
-
-                            //If a swap, we need to handle that too...
-                            if (TargetCrewMember != null)
-                            {
-                                GameEvents.HostedFromToAction<ProtoCrewMember, Part> targetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(TargetCrewMember, TargetPart, SourcePart);
-                                GameEvents.onCrewTransferred.Fire(targetAction);
-                            }
-                        }
-                    }
                 }
                 else
                 {
                     // no portraits, so let's just move kerbals...
-                    RemoveCrewMember(SourceCrewMember, SourcePart);
-                    AddCrewMember(SourceCrewMember, TargetPart);
+                    if (TargetCrewMember != null)
+                    {
+                        RemoveCrewMember(SourceCrewMember, SourcePart);
+                        RemoveCrewMember(TargetCrewMember, TargetPart);
+                        AddCrewMember(SourceCrewMember, TargetPart);
+                        AddCrewMember(TargetCrewMember, SourcePart);
+                    }
+                    else
+                    {
+                        RemoveCrewMember(SourceCrewMember, SourcePart);
+                        AddCrewMember(SourceCrewMember, TargetPart);
+                    }
+                }
+                // Now let's deal with third party mod support...
+                IgnoreSourceXferEvent = true;
+                GameEvents.HostedFromToAction<ProtoCrewMember, Part> Sourceaction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(SourceCrewMember, SourcePart, TargetPart);
+                GameEvents.onCrewTransferred.Fire(Sourceaction);
+
+                //If a swap, we need to handle that too...
+                if (TargetCrewMember != null)
+                {
+                    IgnoreTargetXferEvent = true;
+                    GameEvents.HostedFromToAction<ProtoCrewMember, Part> targetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(TargetCrewMember, TargetPart, SourcePart);
+                    GameEvents.onCrewTransferred.Fire(targetAction);
                 }
                 Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", SMSettings.VerboseLogging);
                 SourcePart.SpawnCrew();
