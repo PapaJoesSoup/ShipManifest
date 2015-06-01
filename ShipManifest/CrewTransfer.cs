@@ -11,13 +11,12 @@ namespace ShipManifest
 {
     public class CrewTransfer : ICrewTransfer
     {
-        // crew xfer inerface properties
 
+        // OnCrewTransferred Event Handling Flags
         internal static bool IgnoreSourceXferEvent = false;
-        internal static int ignoreSrcEventCount = 0;
         internal static bool IgnoreTargetXferEvent = false;
-        internal static int ignoreTgtEventCount = 0;
 
+        // crew xfer inerface properties
         private bool _crewXferActive = false;
         public bool CrewXferActive
         {
@@ -42,7 +41,7 @@ namespace ShipManifest
                 _isStockXfer = value;
             }
         }
-        private double _crewXferDelaysec = SMSettings.IVATimeDelaySec;
+        private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
         public double CrewXferDelaySec
         {
             get
@@ -78,6 +77,8 @@ namespace ShipManifest
                 _seat2SeatXferDelaySec = value;
             }
         }
+
+        internal static CrewXFERState CrewXferState = CrewXFERState.Off;
 
         public InternalSeat _sourceSeat = null;
         public InternalSeat SourceSeat
@@ -315,9 +316,9 @@ namespace ShipManifest
                     }
                     else
                     {
-                        switch (SMAddon.XferState)
+                        switch (CrewXferState)
                         {
-                            case SMAddon.XFERState.Off:
+                            case CrewXFERState.Off:
                                 // We're just starting loop, so set some evnironment stuff.
                                 SMAddon.timestamp = 0;
 
@@ -325,13 +326,13 @@ namespace ShipManifest
                                 // http://www.freesound.org/people/adcbicycle/sounds/14214/
                                 string path1 = SMSettings.CrewSoundStart != null ? SMSettings.CrewSoundStart : "ShipManifest/Sounds/14214-1";
                                 string path2 = SMSettings.CrewSoundRun != null ? SMSettings.CrewSoundRun : "ShipManifest/Sounds/14214-2";
-                                string path3 = SMSettings.CrewSoundStop != null ? SMSettings.CrewSoundStop  : "ShipManifest/Sounds/14214-3";
+                                string path3 = SMSettings.CrewSoundStop != null ? SMSettings.CrewSoundStop : "ShipManifest/Sounds/14214-3";
 
                                 SMAddon.LoadSounds("Crew", path1, path2, path3, SMSettings.CrewSoundVol);
-                                SMAddon.XferState = SMAddon.XFERState.Start;
+                                CrewXferState = CrewXFERState.Start;
                                 break;
 
-                            case SMAddon.XFERState.Start:
+                            case CrewXFERState.Start:
 
                                 SMAddon.elapsed += Planetarium.GetUniversalTime() - SMAddon.timestamp;
 
@@ -341,11 +342,11 @@ namespace ShipManifest
                                     Utilities.LogMessage("source2.play():  started.", "info", SMSettings.VerboseLogging);
                                     SMAddon.source2.Play();
                                     SMAddon.elapsed = 0;
-                                    SMAddon.XferState = SMAddon.XFERState.Run;
+                                    CrewXferState = CrewXFERState.Run;
                                 }
                                 break;
 
-                            case SMAddon.XFERState.Run:
+                            case CrewXFERState.Run:
 
                                 SMAddon.elapsed += Planetarium.GetUniversalTime() - SMAddon.timestamp;
 
@@ -353,11 +354,11 @@ namespace ShipManifest
                                 if (SMAddon.elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.elapsed > Seat2SeatXferDelaySec))
                                 {
                                     // Reset State vars
-                                    SMAddon.XferState = SMAddon.XFERState.Stop;
+                                    CrewXferState = CrewXFERState.Stop;
                                 }
                                 break;
 
-                            case SMAddon.XFERState.Stop:
+                            case CrewXFERState.Stop:
 
                                 // Spawn crew in parts and in vessel.
                                 if (PartSource == null)
@@ -369,21 +370,38 @@ namespace ShipManifest
                                 SMAddon.source2.Stop();
                                 SMAddon.source3.Play();
                                 SMAddon.timestamp = SMAddon.elapsed = 0;
-                                SMAddon.XferState = SMAddon.XFERState.Off;
-                                CrewXferActive = false;
-                                IsSeat2SeatXfer = false;
-                                if (IsStockXfer)
-                                {
-                                    var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-                                    ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
-                                }
-                                IsStockXfer = false;
                                 CrewTransferComplete();
+                                CrewXferState = CrewXFERState.Portraits;
+                                break;
 
+                            case CrewXFERState.Portraits:
+
+                                // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
+                                if (SMAddon.smController.CrewTransfer.IvaDelayActive && SMAddon.smController.CrewTransfer.IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
+                                {
+                                    SMAddon.smController.CrewTransfer.IvaPortraitDelay += 1;
+                                }
+                                else if (SMAddon.smController.CrewTransfer.IvaDelayActive && SMAddon.smController.CrewTransfer.IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay)
+                                {
+                                    SMAddon.smController.CrewTransfer.IvaDelayActive = false;
+                                    IgnoreSourceXferEvent = IgnoreTargetXferEvent = false;
+                                    SMAddon.smController.CrewTransfer.IvaPortraitDelay = 0;
+                                    SMAddon.smController.CrewTransfer.SourceCrewMember = SMAddon.smController.CrewTransfer.TargetCrewMember = null;
+                                    SMAddon.smController.RespawnCrew();
+
+                                    CrewXferState = CrewXFERState.Off;
+                                    CrewXferActive = IsSeat2SeatXfer = false;
+                                    if (IsStockXfer)
+                                    {
+                                        var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+                                        ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
+                                    }
+                                    IsStockXfer = false;
+                                }
                                 break;
                         }
-                        Utilities.LogMessage("Transfer State:  " + SMAddon.XferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
-                        if (SMAddon.XferState != SMAddon.XFERState.Off)
+                        Utilities.LogMessage("Transfer State:  " + CrewTransfer.CrewXferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
+                        if (CrewXferState != CrewXFERState.Off)
                             SMAddon.timestamp = Planetarium.GetUniversalTime();
                         else
                             Utilities.LogMessage("CrewTransferProcess:  Complete.", "info", SMSettings.VerboseLogging);
@@ -394,9 +412,9 @@ namespace ShipManifest
             {
                 if (!SMAddon.frameErrTripped)
                 {
-                    Utilities.LogMessage("Transfer State:  " + SMAddon.XferState.ToString() + "...", "Error", true);
+                    Utilities.LogMessage("Transfer State:  " + CrewXferState.ToString() + "...", "Error", true);
                     Utilities.LogMessage(string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    SMAddon.XferState = SMAddon.XFERState.Stop;
+                    CrewXferState = CrewXFERState.Stop;
                     SMAddon.frameErrTripped = true;
                 }
             }
@@ -493,6 +511,14 @@ namespace ShipManifest
             SMAddon.FireEventTriggers();
         }
 
+        internal enum CrewXFERState
+        {
+            Off,
+            Start,
+            Run,
+            Stop,
+            Portraits
+        }
 
     }
 }

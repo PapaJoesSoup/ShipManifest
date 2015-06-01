@@ -103,7 +103,8 @@ namespace ShipManifest
         internal static string TargetPartCrewColor = "blue";
         internal static string CLS_SpaceColor = "green";
         internal static string MouseOverColor = "green";
-        internal static double IVATimeDelaySec = 7;
+        internal static double CrewXferDelaySec = 7;
+        internal static int IvaUpdateFrameDelay = 20;
         internal static bool ShowIVAUpdateBtn = false;
         internal static double PumpSoundVol = 3;
         internal static double CrewSoundVol = 3;
@@ -182,7 +183,7 @@ namespace ShipManifest
             return settings;
         }
 
-        internal static void ApplySettings()
+        internal static void LoadSettings()
         {
             LoadColors();
 
@@ -269,7 +270,8 @@ namespace ShipManifest
             PumpSoundVol = HiddenNode.HasValue("PumpSoundVol") ? double.Parse(HiddenNode.GetValue("PumpSoundVol")) : PumpSoundVol;
             CrewSoundVol = HiddenNode.HasValue("CrewSoundVol") ? double.Parse(HiddenNode.GetValue("CrewSoundVol")) : CrewSoundVol;
             // Hidden config
-            IVATimeDelaySec = HiddenNode.HasValue("IVATimeDelaySec") ? double.Parse(HiddenNode.GetValue("IVATimeDelaySec")) : IVATimeDelaySec;
+            CrewXferDelaySec = HiddenNode.HasValue("CrewXferDelaySec") ? double.Parse(HiddenNode.GetValue("CrewXferDelaySec")) : CrewXferDelaySec;
+            IvaUpdateFrameDelay = HiddenNode.HasValue("IvaUpdateFrameDelay") ? int.Parse(HiddenNode.GetValue("IvaUpdateFrameDelay")) : IvaUpdateFrameDelay;
             ShowIVAUpdateBtn = HiddenNode.HasValue("ShowIVAUpdateBtn") ? bool.Parse(HiddenNode.GetValue("ShowIVAUpdateBtn")) : ShowIVAUpdateBtn;
 
             // Okay, set the Settings loaded flag
@@ -361,7 +363,8 @@ namespace ShipManifest
             WriteValue(HiddenNode, "MouseOverColor", MouseOverColor);
             WriteValue(HiddenNode, "PumpSoundVol", PumpSoundVol);
             WriteValue(HiddenNode, "CrewSoundVol", CrewSoundVol);
-            WriteValue(HiddenNode, "IVATimeDelaySec", IVATimeDelaySec);
+            WriteValue(HiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
+            WriteValue(HiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
             WriteValue(HiddenNode, "ShowIVAUpdateBtn", ShowIVAUpdateBtn);
 
             if (!Directory.Exists(SETTINGS_PATH))
