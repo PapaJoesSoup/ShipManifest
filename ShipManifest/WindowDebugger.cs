@@ -95,7 +95,7 @@ namespace ShipManifest
                 }
                 catch (Exception ex)
                 {
-                    Utilities.LogMessage("Error Writing File:  " + ex.ToString(), "Info", true);
+                    Utilities.LogMessage("Error Writing File:  " + ex.ToString(), "Error", true);
                 }
             }
             catch (Exception ex)

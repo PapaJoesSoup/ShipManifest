@@ -142,7 +142,6 @@ namespace ShipManifest
                 List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
                 if (InstalledMods.IsDFInstalled)
                     AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-                Utilities.LogMessage(string.Format("IsDFInstalled:  {0}", InstalledMods.IsDFInstalled.ToString()), "Info", true);
 
                 foreach (ProtoCrewMember kerbal in AllCrew)
                 {
@@ -175,7 +174,6 @@ namespace ShipManifest
                         }
                         else if (InstalledMods.IsDFInstalled && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead) && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                         {
-                            Utilities.LogMessage("Kerbal may be frozen.  Kerbal:  " + kerbal.name, "Info", true);
                             // This kerbal could be frozen.  Lets find out...
                             rosterDetails = GetProtoFrozenDetials(kerbal);
                             labelStyle = SMStyle.LabelStyleCyan;

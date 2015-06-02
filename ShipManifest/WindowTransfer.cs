@@ -608,8 +608,6 @@ namespace ShipManifest
                 // Calculate Ratio and transfer amounts.  Ratio is based off the largest amount to move, so will always be less than 1.
                 double ratio = ModXferResource.CalcRatio(XferResources, XferMode);
 
-                Utilities.LogMessage("ratio:  " + ratio.ToString(), "Info", true);
-
                 if (XferResources[0].TargetCapacity(XferMode) > XferResources[1].TargetCapacity(XferMode))
                 {
                     XferResources[0].XferRatio = 1;
@@ -618,7 +616,6 @@ namespace ShipManifest
                     {
                         XferResources[0].sXferAmount = thisXferAmount;
                         XferResources[1].sXferAmount = thisXferAmount * ratio <= XferResources[1].SourceCapacity(XferMode) ? thisXferAmount * ratio : XferResources[1].SourceCapacity(XferMode);
-
                     }
                     else
                     {

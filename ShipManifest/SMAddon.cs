@@ -397,7 +397,6 @@ namespace ShipManifest
         //Vessel state handlers
         internal void OnVesselWasModified(Vessel modVessel)
         {
-            Utilities.LogMessage("SMAddon.OnVesselWasModified.", "Info", true);
             Utilities.LogMessage("SMAddon.OnVesselWasModified.", "Info", SMSettings.VerboseLogging);
             try
             {
@@ -499,7 +498,6 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnPartUndock");
             try
             {
-                Utilities.LogMessage("OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", true);
                 Utilities.LogMessage("OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", SMSettings.VerboseLogging);
             }
             catch (Exception ex)
