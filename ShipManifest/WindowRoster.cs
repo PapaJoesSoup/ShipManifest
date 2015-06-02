@@ -173,7 +173,7 @@ namespace ShipManifest
                                 }
                             }
                         }
-                        else if (InstalledMods.IsDFInstalled && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+                        else if (InstalledMods.IsDFInstalled && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead) && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                         {
                             Utilities.LogMessage("Kerbal may be frozen.  Kerbal:  " + kerbal.name, "Info", true);
                             // This kerbal could be frozen.  Lets find out...

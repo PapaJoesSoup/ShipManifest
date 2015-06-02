@@ -3,12 +3,12 @@ x New: When using External Seats, crew can be transferred from seat to seat.
 x New:  RT command queue is now respected.  Antenna switching from the Control Window will now be queued.
 
 Version 4.3.0.0 - Release xx June, 2015 - Crew, Interfaces, & Refactoring Edition.
-- New:  Refactored Crew transfers into separate class to improve visibility and state management. Added OnCrewTransferred Event triggers for mod notification.
+- New:  Refactored Crew transfers into separate class to improve visibility and state management.
 - New:  Crew transfers (part to part & seat to seat) now show both kerbals involved as moving, when a kerbal swap occurs.
 - New:  Added DeepFreeze mod support for handling/viewing frozen kerbals. No more xferring frozen kerbals, and Roster Window now shows frozen kerbals.
 - New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
+- New:  Add onCrewTransferred Event trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
 - New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel filter is omitted when in Space Center.
-y New:  Add support for KIS inventory movement with kerbal transfers.
 - New:  Refactoring - moved window vars from Settings into window level code.
 - New:  Refactoring - Added InstalledMods static class to centralize mod assembly detection and soft dependencies.
 - New:  Refactoring - Altered Settings Save to segregate Hidden settings for ease of identification by users.
@@ -221,10 +221,6 @@ Version 0.23.5.3.2.2 - 2 May, 2014 - Realism Settings Love Edition..
  - Fixed:  Highlighting behaves abnormally on part changes when moving away from source and target part being the same...
          - Internally found, Post release of 0.23.5.3.2.1a
 
- - Dist numbers at release:
-   - Forum views:  43490
-   - DLs:  10319
-
 Version 0.23.5.3.2.1b - 26 Apr, 2014 - TACLS test Edition. Github release (Not on Spaceport)
  - Fixed:  SM not detecting Changes in Creability with Inflatable Parts...
          - http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Crew-Science-Resources%29-v0-23-5-3-2-1-22-Apr-14?p=1118517&viewfull=1#post1118517
@@ -257,10 +253,6 @@ Version 0.23.5.3.2.1 - 22 Apr, 2014 - Bug fixes Edition.
  - Fixed: Crew event triggers causing duplicate life support resources in TAC Life Support.
         - http://forum.kerbalspaceprogram.com/...=1#post1108035
 
- - Dist numbers at release:
-   - Forum views:  36962
-   - DLs:  9012
-
 Version 0.23.5.3.2 - 16 Apr, 2014 - Add ConnectedLivingSpace Integration.
  - Realism Mode:  Crew Xfers & Moves are now "space" aware.  if the target part is not connected via an internal passageway, then the xfer or move cannot occur.
  - CLS awareness can be turned off in the config file, for those that want to be able to xfer across living spaces.
@@ -277,10 +269,6 @@ Version 0.23.5.3.2 - 16 Apr, 2014 - Add ConnectedLivingSpace Integration.
                         http://forum.kerbalspaceprogram.com/threads/62270-0-23-5-Ship-Manifest-%28Manage-Crew-Science-Resources%29-v0-23-5-3-2-16-Apr-14?p=1052405&viewfull=1#post1052405
  - Dependencies on CLS and Toolbar. Be sure that is understood. I will look at optional dependencies in the future, but for now, it is what it is. Besides, they are great plugins.
 
- - Dist numbers at release:
-   - Forum views: 32580 
-   - DLs:  7857
-
 Version 0.23.3.1.5 - 26 Feb, 2014 - Add Realism to Crew Transfer.
  - Realism Mode:  Crew Xfers & Moves now occur in "real" time.  We now have Sounds of crewman moving.  Portrait updates now occur when Kerbals get in thier new seat.
 	- Added Crew sound locations to settings Window.
@@ -289,10 +277,6 @@ Version 0.23.3.1.5 - 26 Feb, 2014 - Add Realism to Crew Transfer.
  - Resource Xfers enhancements.  Added textbox for entering Exact Xfer Amounts.  Integers can be entered, and fractions can be pasted into box for now...
  - Rearranged resource xfer details to make it more intuitive after adding text box.
  - Include Toolbar 1.6.0 redistribution 
-
- - Dist numbers at release:
-   - Forum views:  19489
-   - DLs:  4712
 
 Version 0.23.3.1.4 - 15 Feb, 2014 - General cleanup, configuration & UI enhancements.
  - Realism Mode:  Science Xfers now render experiments inoperable after xfer.
@@ -303,10 +287,6 @@ Version 0.23.3.1.4 - 15 Feb, 2014 - General cleanup, configuration & UI enhancem
 	- Config File switch to enable/disable Crew Transfer Feature.  Enabled by default.
 	- Config File switch to enable/disable Science Transfer Feature.  Enabled by default.
 - Include Toolbar 1.5.3 redistribution
-
- - Dist numbers at release:
-   - Forum views:  ??
-   - DLs:  3817
 
 Version 0.23.3.1.3 - 12 Feb, 2014 - Add Preflight features and fix preflight fill resources bug.
  - Add Crew Fill and Crew Empty Buttons to PreFlight.   Now you can fill or empty your vessel on the pad.
