@@ -1,6 +1,8 @@
 ShipManifest
 ============
-Version 4.3.0.0 - Release xx June, 2015 - Crew, Interfaces, & Refactoring Edition.
+Version 4.3.0.0RC - Release 01 June, 2015 - Crew, Interfaces, & Refactoring Edition.
+NOTE:  This is a release candidate and not an official release.  The contents of this release are subject to change.
+
 - New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
 - New:  Add onCrewTransferred Event trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
 - New:  Added DeepFreeze mod support for handling/viewing frozen kerbals. No more xferring frozen kerbals, and Roster Window now shows frozen kerbals.
