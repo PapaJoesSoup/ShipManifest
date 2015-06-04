@@ -20,8 +20,10 @@ namespace ShipManifest
 
         // Object Properties
         internal string ResourceName = "";
-        internal double AmtXferred = 0;
         internal double XferRatio = 1;
+        internal double AmtXferred = 0;
+        internal double AmtXferredOld = 0;
+        internal int XferTimeout = 0;
 
         //Source Viewer
         internal double srcXferAmount = 0;
@@ -290,8 +292,8 @@ namespace ShipManifest
                 if (SMAddon.smController.ResourcesToXfer[0].ToCapacityRemaining(SMAddon.XferMode) == 0d && 
                     SMAddon.smController.ResourcesToXfer[1].ToCapacityRemaining(SMAddon.XferMode) == 0d)
                     return true;
-                if ((SMAddon.smController.ResourcesToXfer[0].AmtXferred >= SMAddon.smController.ResourcesToXfer[0].XferAmount(SMAddon.XferMode)) &&
-                    (SMAddon.smController.ResourcesToXfer[1].AmtXferred >= SMAddon.smController.ResourcesToXfer[1].XferAmount(SMAddon.XferMode)))
+                if ((SMAddon.smController.ResourcesToXfer[0].AmtXferred >= SMAddon.smController.ResourcesToXfer[0].XferAmount(SMAddon.XferMode)-0.0000001) &&
+                    (SMAddon.smController.ResourcesToXfer[1].AmtXferred >= SMAddon.smController.ResourcesToXfer[1].XferAmount(SMAddon.XferMode) - 0.0000001))
                     return true;
                 return false;
             }
@@ -362,6 +364,11 @@ namespace ShipManifest
                         case ResourceXFERState.Off:
                             // reset counters
                             SMAddon.timestamp = SMAddon.elapsed = 0;
+                            foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
+                            {
+                                modResource.AmtXferredOld = 0;
+                                modResource.XferTimeout = 0;
+                            }
 
                             // Default sound license: CC-By-SA
                             // http://www.freesound.org/people/vibe_crc/sounds/59328/
@@ -451,6 +458,7 @@ namespace ShipManifest
                                         modResource.AmtXferred += deltaAmt;
                                     }
                                 }
+
                                 Utilities.LogMessage("ResourceTransferProcess - 3b. Resource:  " + modResource.ResourceName + ", AmtXferred = " + modResource.AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
                                 Utilities.LogMessage("ResourceTransferProcess - 3c. Resource:  " + modResource.ResourceName + ", SrcAmtRemaining = " + modResource.FromAmtRemaining(SMAddon.XferMode).ToString() + ", TgtCapRemaining = " + modResource.ToCapacityRemaining(SMAddon.XferMode), "Info", SMSettings.VerboseLogging);
                             }
@@ -458,6 +466,28 @@ namespace ShipManifest
                             // 10. determine if completed.
                             if (isXferComplete())
                                 XferState = ResourceXFERState.Stop;
+                            else
+                            {
+                                foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
+                                {
+                                    // activate timeout if we are stuck in a loop.
+                                    if (modResource.AmtXferred != modResource.AmtXferredOld)
+                                    {
+                                        modResource.AmtXferredOld = modResource.AmtXferred;
+                                        modResource.XferTimeout = 0;
+                                    }
+                                    else
+                                    {
+                                        modResource.XferTimeout += 1;
+                                        if (modResource.XferTimeout >= 30)
+                                        {
+                                            XferState = ResourceXFERState.Stop;
+                                            Utilities.LogMessage("ResourceTransferProcess - 4.  Timeout occurred!  Resource:  " + modResource.ResourceName + ", AmtXferred = " + modResource.AmtXferred.ToString(), "Error", true);
+                                        }
+                                    }
+                                }
+                            }
+
                             break;
 
                         case ResourceXFERState.Stop:
@@ -505,10 +535,12 @@ namespace ShipManifest
 
             // This var keeps track of what we actually moved..
             double XferBalance = XferAmount;
+            double XferBalanceOld = XferBalance;
+            int XferTimeout = 0;
 
             // Not all parts will have enough resource to meet the SrcPartAmt to move.   We need to account for that.
             // count up source parts with avalilabe resources. so we can devide by them
-            while (XferBalance > 0d)
+            while (XferBalance > 0.0000001d)
             {
                 Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 2. XferBalance = " + XferBalance.ToString() + ", Is Source: " + drain.ToString(), "Info", SMSettings.VerboseLogging);
 
@@ -537,11 +569,26 @@ namespace ShipManifest
                         AmtToMove = CapacityAvail >= PartAmt ? PartAmt : CapacityAvail;
                         part.Resources[modResource.ResourceName].amount += AmtToMove;
                     }
-                    Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 3. AmtToMove = " + AmtToMove.ToString() + ", Is Source: " + drain.ToString(), "Info", SMSettings.VerboseLogging);
+                    Utilities.LogMessage("XferResource:  " + modResource.ResourceName + " - 3. AmtToMove = " + AmtToMove.ToString() + ", Drain: " + drain.ToString(), "Info", SMSettings.VerboseLogging);
                     // Report ramaining balance after Transfer.
                     XferBalance -= AmtToMove;
-                    if (XferBalance == 0d)
+                }
+                // account for rounding and double resolution issues 
+                if (XferBalance <= 0.0000001d)
+                    break;
+                else if (XferBalance != XferBalanceOld)
+                {
+                    XferBalanceOld = XferBalance;
+                    XferTimeout = 0;
+                }
+                else if (XferBalance == XferBalanceOld)
+                {
+                    XferTimeout += 1;
+                    if (XferTimeout >= 30)
+                    {
+                        Utilities.LogMessage("XferResource  Timeout!  Resource:  " + modResource.ResourceName + " - 3. XferBalance = " + XferBalance.ToString() + ", Drain: " + drain.ToString(), "Error", true);
                         break;
+                    }
                 }
             }
         }

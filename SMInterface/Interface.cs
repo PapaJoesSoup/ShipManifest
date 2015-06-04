@@ -62,5 +62,4 @@ namespace ShipManifest
             return _ISMobj;
         }
     }
-
 }

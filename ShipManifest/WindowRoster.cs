@@ -221,7 +221,7 @@ namespace ShipManifest
                             buttonText = "Add";
                             buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
                         }
-                        else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+                        else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                         {
                             GUI.enabled = true;
                             buttonText = "Respawn";
