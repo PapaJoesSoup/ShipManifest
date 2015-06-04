@@ -255,7 +255,7 @@ namespace ShipManifest
                         if (GUILayout.Button(new GUIContent(buttonText,buttonToolTip), GUILayout.Width(60)))
                         {
                             if (buttonText == "Add")
-                                CrewTransfer.AddCrewMember(kerbal, SMAddon.smController.SelectedPartsSource[0]);
+                                TransferCrew.AddCrewMember(kerbal, SMAddon.smController.SelectedPartsSource[0]);
                             else if (buttonText == "Respawn")
                                 SMController.RespawnKerbal(kerbal);
                             else if (buttonText == "Remove")
@@ -263,7 +263,7 @@ namespace ShipManifest
                                 // get part...
                                 Part part = SMAddon.smController.FindKerbalPart(kerbal);
                                 if (part != null)
-                                    CrewTransfer.RemoveCrewMember(kerbal, part);
+                                    TransferCrew.RemoveCrewMember(kerbal, part);
                             }
                         }
                         Rect rect2 = GUILayoutUtility.GetLastRect();

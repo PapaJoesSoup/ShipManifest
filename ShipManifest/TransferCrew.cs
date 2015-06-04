@@ -9,12 +9,12 @@ using ConnectedLivingSpace;
 
 namespace ShipManifest
 {
-    public class CrewTransfer : ICrewTransfer
+    public class TransferCrew : ICrewTransfer
     {
 
         // OnCrewTransferred Event Handling Flags
-        internal static bool IgnoreSourceXferEvent = false;
-        internal static bool IgnoreTargetXferEvent = false;
+        internal static bool IgnoreFromToXferEvent = false;
+        internal static bool IgnoreToFromXferEvent = false;
 
         // crew xfer inerface properties
         private bool _crewXferActive = false;
@@ -80,28 +80,28 @@ namespace ShipManifest
 
         internal static CrewXFERState CrewXferState = CrewXFERState.Off;
 
-        public InternalSeat _sourceSeat = null;
-        public InternalSeat SourceSeat
+        public InternalSeat _fromSeat = null;
+        public InternalSeat FromSeat
         {
             get
             {
-                return _sourceSeat;
+                return _fromSeat;
             }
             set
             {
-                _sourceSeat = value;
+                _fromSeat = value;
             }
         }
-        public InternalSeat _targetSeat = null;
-        public InternalSeat TargetSeat
+        public InternalSeat _toSeat = null;
+        public InternalSeat ToSeat
         {
             get
             {
-                return _targetSeat;
+                return _toSeat;
             }
             set
             {
-                _targetSeat = value;
+                _toSeat = value;
             }
         }
 
@@ -140,56 +140,56 @@ namespace ShipManifest
             }
         }
 
-        private Part _sourcePart;
-        public Part SourcePart
+        private Part _fromPart;
+        public Part FromPart
         {
             get
             {
-                return _sourcePart;
+                return _fromPart;
             }
             set
             {
-                _sourcePart = value;
+                _fromPart = value;
             }
         }
-        private Part _targetPart;
-        public Part TargetPart
+        private Part _toPart;
+        public Part ToPart
         {
             get
             {
-                return _targetPart;
+                return _toPart;
             }
             set
             {
-                _targetPart = value;
+                _toPart = value;
             }
         }
-        private ProtoCrewMember _sourceCrewMember;
-        public ProtoCrewMember SourceCrewMember
+        private ProtoCrewMember _fromCrewMember;
+        public ProtoCrewMember FromCrewMember
         {
             get
             {
-                return _sourceCrewMember;
+                return _fromCrewMember;
             }
             set
             {
-                _sourceCrewMember = value;
+                _fromCrewMember = value;
             }
         }
-        private ProtoCrewMember _targetCrewMember;
-        public ProtoCrewMember TargetCrewMember
+        private ProtoCrewMember _toCrewMember;
+        public ProtoCrewMember ToCrewMember
         {
             get
             {
-                return _targetCrewMember;
+                return _toCrewMember;
             }
             set
             {
-                _targetCrewMember = value;
+                _toCrewMember = value;
             }
         }
         
-        public static CrewTransfer Instance
+        public static TransferCrew Instance
         {
             get
             {
@@ -197,41 +197,41 @@ namespace ShipManifest
             }
         }
 
-        public CrewTransfer() 
+        public TransferCrew() 
         {
 
         }
 
-        public void CrewTransferBegin(ProtoCrewMember crewMember, Part sourcePart, Part targetPart)
+        public void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
         {
-            SourcePart = sourcePart;
-            TargetPart = targetPart;
-            SourceCrewMember = crewMember;
-            TargetCrewMember = null;
+            FromPart = fromPart;
+            ToPart = toPart;
+            FromCrewMember = crewMember;
+            ToCrewMember = null;
 
-            if (SourcePart.internalModel != null && TargetPart.internalModel != null)
+            if (FromPart.internalModel != null && ToPart.internalModel != null)
             {
                 // Build source and target seat indexes.
-                SourceSeat = SourceCrewMember.seat;
-                TargetSeat = null;
-                if (SourcePart == TargetPart)
+                FromSeat = FromCrewMember.seat;
+                ToSeat = null;
+                if (FromPart == ToPart)
                 {
                     // Must be a move...
                     //Get the first available valid seat
-                    foreach (InternalSeat seat in SourcePart.internalModel.seats)
+                    foreach (InternalSeat seat in FromPart.internalModel.seats)
                     {
                         if (seat.taken)
                         {
                             // This supports DeepFreeze frozen kerbals...
-                            if (seat.kerbalRef!= null && seat.crew != SourceCrewMember)
+                            if (seat.kerbalRef!= null && seat.crew != FromCrewMember)
                             {
-                                TargetSeat = seat;
+                                ToSeat = seat;
                                 break;
                             }
                         }
                         else
                         {
-                            TargetSeat = seat;
+                            ToSeat = seat;
                             break;
                         }
                     }
@@ -240,23 +240,23 @@ namespace ShipManifest
                 {
                     // Xfer to another part
                     // get target seat from target part's inernal model
-                    foreach (InternalSeat seat in TargetPart.internalModel.seats)
+                    foreach (InternalSeat seat in ToPart.internalModel.seats)
                     {
                         if (!seat.taken)
                         {
-                            TargetSeat = seat;
+                            ToSeat = seat;
                             break;
                         }
                     }
                     // All seats full?
-                    if (TargetSeat == null)
+                    if (ToSeat == null)
                     {
-                        foreach (InternalSeat seat in TargetPart.internalModel.seats)
+                        foreach (InternalSeat seat in ToPart.internalModel.seats)
                         {
                             // This supports DeepFreeze frozen kerbals...
                             if (seat.kerbalRef != null)
                             {
-                                TargetSeat = seat;
+                                ToSeat = seat;
                                 break;
                             }
                         }
@@ -265,13 +265,13 @@ namespace ShipManifest
 
                 // seats have been chosen.
                 // Do we need to swap places with another Kerbal?
-                if (TargetSeat.taken)
+                if (ToSeat.taken)
                 {
                     // get Kerbal to swap with through his seat...
-                    TargetCrewMember = TargetSeat.kerbalRef.protoCrewMember;
+                    ToCrewMember = ToSeat.kerbalRef.protoCrewMember;
                 }
                 // if moving within a part, set the seat2seat flag
-                IsSeat2SeatXfer = SourcePart == TargetPart ? true : false;
+                IsSeat2SeatXfer = FromPart == ToPart ? true : false;
             }
             CrewXferActive = true;
         }
@@ -282,9 +282,9 @@ namespace ShipManifest
             {
                 if (SMAddon.smController.CrewTransfer.CrewXferActive)
                 {
-                    Part PartSource = SMAddon.smController.CrewTransfer.SourcePart;
-                    Part PartTarget = SMAddon.smController.CrewTransfer.TargetPart;
-                    ProtoCrewMember pKerbal = SMAddon.smController.CrewTransfer.SourceCrewMember;
+                    Part PartSource = SMAddon.smController.CrewTransfer.FromPart;
+                    Part PartTarget = SMAddon.smController.CrewTransfer.ToPart;
+                    ProtoCrewMember pKerbal = SMAddon.smController.CrewTransfer.FromCrewMember;
                     if (!SMSettings.RealismMode)
                     {
                         if (SMAddon.timestamp != 0)
@@ -304,7 +304,7 @@ namespace ShipManifest
                             if (IsStockXfer)
                             {
                                 var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-                                ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
+                                ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, PartTarget.partInfo.title), message, true);
                             }
                             IsStockXfer = false;
                             CrewTransferComplete();
@@ -384,9 +384,9 @@ namespace ShipManifest
                                 else if (SMAddon.smController.CrewTransfer.IvaDelayActive && SMAddon.smController.CrewTransfer.IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay)
                                 {
                                     SMAddon.smController.CrewTransfer.IvaDelayActive = false;
-                                    IgnoreSourceXferEvent = IgnoreTargetXferEvent = false;
+                                    IgnoreFromToXferEvent = IgnoreToFromXferEvent = false;
                                     SMAddon.smController.CrewTransfer.IvaPortraitDelay = 0;
-                                    SMAddon.smController.CrewTransfer.SourceCrewMember = SMAddon.smController.CrewTransfer.TargetCrewMember = null;
+                                    SMAddon.smController.CrewTransfer.FromCrewMember = SMAddon.smController.CrewTransfer.ToCrewMember = null;
                                     SMAddon.smController.RespawnCrew();
 
                                     CrewXferState = CrewXFERState.Off;
@@ -394,13 +394,13 @@ namespace ShipManifest
                                     if (IsStockXfer)
                                     {
                                         var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-                                        ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", SourceCrewMember.name, PartTarget.partInfo.title), message, true);
+                                        ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, PartTarget.partInfo.title), message, true);
                                     }
                                     IsStockXfer = false;
                                 }
                                 break;
                         }
-                        Utilities.LogMessage("Transfer State:  " + CrewTransfer.CrewXferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
+                        Utilities.LogMessage("Transfer State:  " + TransferCrew.CrewXferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
                         if (CrewXferState != CrewXFERState.Off)
                             SMAddon.timestamp = Planetarium.GetUniversalTime();
                         else
@@ -424,63 +424,63 @@ namespace ShipManifest
         {
             try
             {
-                if (SourcePart.internalModel != null && TargetPart.internalModel != null)
+                if (FromPart.internalModel != null && ToPart.internalModel != null)
                 {
-                    if (TargetSeat.taken)
+                    if (ToSeat.taken)
                     {
                         // Swap places.
 
                         // Remove the crew members from the part(s)...
-                        RemoveCrewMember(SourceCrewMember, SourcePart);
-                        RemoveCrewMember(TargetCrewMember, TargetPart);
+                        RemoveCrewMember(FromCrewMember, FromPart);
+                        RemoveCrewMember(ToCrewMember, ToPart);
 
                         // Add the crew members back into the part(s) at their new seats.
-                        SourcePart.AddCrewmemberAt(TargetCrewMember, SourcePart.internalModel.seats.IndexOf(SourceSeat));
-                        TargetPart.AddCrewmemberAt(SourceCrewMember, TargetPart.internalModel.seats.IndexOf(TargetSeat));
+                        FromPart.AddCrewmemberAt(ToCrewMember, FromPart.internalModel.seats.IndexOf(FromSeat));
+                        ToPart.AddCrewmemberAt(FromCrewMember, ToPart.internalModel.seats.IndexOf(ToSeat));
                     }
                     else
                     {
                         // Just move.
-                        RemoveCrewMember(SourceCrewMember, SourcePart);
-                        TargetPart.AddCrewmemberAt(SourceCrewMember, TargetPart.internalModel.seats.IndexOf(TargetSeat));
+                        RemoveCrewMember(FromCrewMember, FromPart);
+                        ToPart.AddCrewmemberAt(FromCrewMember, ToPart.internalModel.seats.IndexOf(ToSeat));
                     }
                 }
                 else
                 {
                     // no portraits, so let's just move kerbals...
-                    if (TargetCrewMember != null)
+                    if (ToCrewMember != null)
                     {
-                        RemoveCrewMember(SourceCrewMember, SourcePart);
-                        RemoveCrewMember(TargetCrewMember, TargetPart);
-                        AddCrewMember(SourceCrewMember, TargetPart);
-                        AddCrewMember(TargetCrewMember, SourcePart);
+                        RemoveCrewMember(FromCrewMember, FromPart);
+                        RemoveCrewMember(ToCrewMember, ToPart);
+                        AddCrewMember(FromCrewMember, ToPart);
+                        AddCrewMember(ToCrewMember, FromPart);
                     }
                     else
                     {
-                        RemoveCrewMember(SourceCrewMember, SourcePart);
-                        AddCrewMember(SourceCrewMember, TargetPart);
+                        RemoveCrewMember(FromCrewMember, FromPart);
+                        AddCrewMember(FromCrewMember, ToPart);
                     }
                 }
                 // Now let's deal with third party mod support...
-                IgnoreSourceXferEvent = true;
-                GameEvents.HostedFromToAction<ProtoCrewMember, Part> Sourceaction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(SourceCrewMember, SourcePart, TargetPart);
+                IgnoreFromToXferEvent = true;
+                GameEvents.HostedFromToAction<ProtoCrewMember, Part> Sourceaction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
                 GameEvents.onCrewTransferred.Fire(Sourceaction);
 
                 //If a swap, we need to handle that too...
-                if (TargetCrewMember != null)
+                if (ToCrewMember != null)
                 {
-                    IgnoreTargetXferEvent = true;
-                    GameEvents.HostedFromToAction<ProtoCrewMember, Part> targetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(TargetCrewMember, TargetPart, SourcePart);
+                    IgnoreToFromXferEvent = true;
+                    GameEvents.HostedFromToAction<ProtoCrewMember, Part> targetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
                     GameEvents.onCrewTransferred.Fire(targetAction);
                 }
                 Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", SMSettings.VerboseLogging);
-                SourcePart.SpawnCrew();
-                TargetPart.SpawnCrew();
+                FromPart.SpawnCrew();
+                ToPart.SpawnCrew();
 
                 // not sure if these help.   We have been experiencing issues with "ghost" kerbals & EVAs/docking/undocking after Crew Moves.   
                 // trying this to see if it "cleans up" any internal tracking inside of KSP...
-                SourcePart.RegisterCrew();
-                TargetPart.RegisterCrew();
+                FromPart.RegisterCrew();
+                ToPart.RegisterCrew();
 
                 SMAddon.smController.RespawnCrew();
                 SMAddon.smController.CrewTransfer.IvaDelayActive = true;

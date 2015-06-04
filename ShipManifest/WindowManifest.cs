@@ -42,7 +42,7 @@ namespace ShipManifest
             ToolTipActive = false;
 
             GUIContent label = new GUIContent("", "Close Window");
-            if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
+            if (SMAddon.smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
             {
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
@@ -222,7 +222,7 @@ namespace ShipManifest
         {
             try
             {
-                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !SMAddon.XferOn)
+                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !TransferResource.ResourceXferActive)
                 {
                     // First, lets clear any highlighting...
                     SMHighlighter.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
@@ -268,9 +268,9 @@ namespace ShipManifest
                     foreach (string resource in SMAddon.smController.SelectedResources)
                     {
                         // Lets create a Xfer Object for managing xfer options and data.
-                        ModXferResource modResource = new ModXferResource(resource);
-                        modResource.sXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
-                        modResource.tXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
+                        TransferResource modResource = new TransferResource(resource);
+                        modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
+                        modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
                         SMAddon.smController.ResourcesToXfer.Add(modResource);
                     }
 

@@ -16,14 +16,14 @@ namespace ShipManifest
 
         Guid XferVesselID { get; }
 
-        Part SourcePart { get; }
-        Part TargetPart { get; }
+        Part FromPart { get; }
+        Part ToPart { get; }
 
-        ProtoCrewMember SourceCrewMember { get; }
-        ProtoCrewMember TargetCrewMember { get; }
+        ProtoCrewMember FromCrewMember { get; }
+        ProtoCrewMember ToCrewMember { get; }
 
-        InternalSeat SourceSeat { get; }
-        InternalSeat TargetSeat { get; }
+        InternalSeat FromSeat { get; }
+        InternalSeat ToSeat { get; }
     }
 
     public static class SMInterface
@@ -53,7 +53,7 @@ namespace ShipManifest
         public static ICrewTransfer GetCrewTransfer()
         {
             ICrewTransfer _ISMobj = null;
-            Type SMAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest.CrewTransfer");
+            Type SMAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest.TransferCrew");
             if (SMAddonType != null)
             {
                 object crewTransferObj = SMAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);

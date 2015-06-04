@@ -41,7 +41,7 @@ namespace ShipManifest
 
         // variables used for tracking xfer sliders for resources.
         internal double AmtXferred = 0;
-        internal List<ModXferResource> ResourcesToXfer = new List<ModXferResource>();
+        internal List<TransferResource> ResourcesToXfer = new List<TransferResource>();
 
         internal Vessel Vessel
         {
@@ -194,7 +194,7 @@ namespace ShipManifest
         internal ICLSSpace clsSpaceSource;
         internal ICLSSpace clsSpaceTarget;
 
-        internal CrewTransfer CrewTransfer = new CrewTransfer();
+        internal TransferCrew CrewTransfer = new TransferCrew();
 
         // Control Window parts
         private List<ModHatch> _hatches = new List<ModHatch>();
@@ -344,7 +344,7 @@ namespace ShipManifest
             {
                 for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
                 {
-                    CrewTransfer.RemoveCrewMember(part.protoModuleCrew[i], part);
+                    TransferCrew.RemoveCrewMember(part.protoModuleCrew[i], part);
                 }
                 SMAddon.FireEventTriggers();
             }

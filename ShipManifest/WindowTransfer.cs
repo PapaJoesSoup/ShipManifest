@@ -33,7 +33,7 @@ namespace ShipManifest
             ToolTipActive = false;
 
             GUIContent label = new GUIContent("", "Close Window");
-            if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
+            if (SMAddon.smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
             {
                 label = new GUIContent("", "Action in progress.  Cannot close window");
                 GUI.enabled = false;
@@ -346,7 +346,7 @@ namespace ShipManifest
                     GUILayout.BeginHorizontal();
                     if (crewMember.seat != null)
                     {
-                        if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
+                        if (SMAddon.smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
                             GUI.enabled = false;
 
                         if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
@@ -366,7 +366,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                     else
                         GUI.enabled = false;
-                    if ((SMAddon.smController.CrewTransfer.SourceCrewMember == crewMember || SMAddon.smController.CrewTransfer.TargetCrewMember == crewMember) && (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn))
+                    if ((SMAddon.smController.CrewTransfer.FromCrewMember == crewMember || SMAddon.smController.CrewTransfer.ToCrewMember == crewMember) && (SMAddon.smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive))
                     {
                         GUI.enabled = true;
                         GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
@@ -375,7 +375,7 @@ namespace ShipManifest
                     {
                         if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                         {
-                            SMAddon.smController.CrewTransfer.SourceCrewMember = crewMember;
+                            SMAddon.smController.CrewTransfer.FromCrewMember = crewMember;
                             SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsSource[0], SelectedPartsTarget[0]);
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -497,14 +497,14 @@ namespace ShipManifest
             // This routine assumes that a resource has been selected on the Resource manifest window.
             // Pass in static vars to improve readability.
             List<string> selectedResources = SMAddon.smController.SelectedResources;
-            List<ModXferResource> XferResources = SMAddon.smController.ResourcesToXfer;
+            List<TransferResource> XferResources = SMAddon.smController.ResourcesToXfer;
 
             if (partsSource.Count > 0)
             {
-                ModXferResource modResource = ModXferResource.GetXferResource(XferResources, XferMode, false);
-                ModXferResource ratioResource = ModXferResource.GetXferResource(XferResources, XferMode, true);
+                TransferResource modResource = TransferResource.GetXferResource(XferResources, XferMode, false);
+                TransferResource ratioResource = TransferResource.GetXferResource(XferResources, XferMode, true);
                 modResource.XferRatio = 1;
-                ratioResource.XferRatio = ModXferResource.CalcRatio(XferResources, XferMode);
+                ratioResource.XferRatio = TransferResource.CalcRatio(XferResources, XferMode);
 
                 double thisXferAmount = modResource.XferAmount(XferMode);
                 double ratioXferAmt = ratioResource.XferAmount(XferMode);
@@ -523,11 +523,11 @@ namespace ShipManifest
 
                 // Xfer Controls Display
                 // let's determine how much of a resource we can move to the target.
-                double maxXferAmount = ModXferResource.CalcMaxXferAmt(partsSource, partsTarget, selectedResources);
+                double maxXferAmount = TransferResource.CalcMaxXferAmt(partsSource, partsTarget, selectedResources);
                 if (maxXferAmount > 0)
                 {
                     GUILayout.BeginHorizontal();
-                    if (SMAddon.XferOn)
+                    if (TransferResource.ResourceXferActive)
                     {
                         // We want to show this during transfer if the direction is correct...
                         if (SMAddon.XferMode == XferMode)
@@ -557,7 +557,7 @@ namespace ShipManifest
                         modResource.SetStringZero(strXferAmount, XferMode);
                         // Update static Xfer Amount var
                         thisXferAmount = modResource.UpdateXferAmount(strXferAmount, XferMode);
-                        ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.SourceCapacity(XferMode) ? ratioResource.SourceCapacity(XferMode) : thisXferAmount * ratioResource.XferRatio;
+                        ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.FromCapacity(XferMode) ? ratioResource.FromCapacity(XferMode) : thisXferAmount * ratioResource.XferRatio;
                         GUILayout.Label(" / " + ratioXferAmt.ToString("#######0.##"), GUILayout.Width(80));
                     }
                     GUILayout.EndHorizontal();
@@ -571,22 +571,22 @@ namespace ShipManifest
 
                         // set button style
                         GUIContent xferContent = null;
-                        if (!SMAddon.XferOn)
+                        if (!TransferResource.ResourceXferActive)
                             xferContent = new GUIContent("Xfer", "Transfers the selected resource\r\nto the selected " + strTarget + " Part");
                         else
                             xferContent = new GUIContent("Stop", "Halts the Transfer of the selected resource\r\nto the selected " + strTarget + " Part");
 
                         if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
                         {
-                            if (!SMAddon.XferOn)
+                            if (!TransferResource.ResourceXferActive)
                             {
                                 //Calc amounts and update xfer modules
                                 AssignXferAmounts(XferResources, XferMode, thisXferAmount);
                                 TransferResources(partsSource, partsTarget);
 
                             }
-                            else if (SMAddon.XferOn && SMSettings.RealismMode)
-                                SMAddon.XferState = SMAddon.XFERState.Stop;
+                            else if (TransferResource.ResourceXferActive && SMSettings.RealismMode)
+                                TransferResource.XferState = TransferResource.ResourceXFERState.Stop;
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
@@ -595,32 +595,32 @@ namespace ShipManifest
                         }
                         GUILayout.EndHorizontal();
                     }
-                    if (!SMAddon.XferOn)
+                    if (!TransferResource.ResourceXferActive)
                         modResource.UpdateXferAmount(thisXferAmount.ToString(), XferMode);
                 }
             }
         }
 
-        private static void AssignXferAmounts(List<ModXferResource> XferResources, SMAddon.XFERMode XferMode, double thisXferAmount)
+        private static void AssignXferAmounts(List<TransferResource> XferResources, SMAddon.XFERMode XferMode, double thisXferAmount)
         {
             if (XferResources.Count > 1)
             {
                 // Calculate Ratio and transfer amounts.  Ratio is based off the largest amount to move, so will always be less than 1.
-                double ratio = ModXferResource.CalcRatio(XferResources, XferMode);
+                double ratio = TransferResource.CalcRatio(XferResources, XferMode);
 
-                if (XferResources[0].TargetCapacity(XferMode) > XferResources[1].TargetCapacity(XferMode))
+                if (XferResources[0].ToCapacity(XferMode) > XferResources[1].ToCapacity(XferMode))
                 {
                     XferResources[0].XferRatio = 1;
                     XferResources[1].XferRatio = ratio;
                     if (XferMode == SMAddon.XFERMode.SourceToTarget)
                     {
-                        XferResources[0].sXferAmount = thisXferAmount;
-                        XferResources[1].sXferAmount = thisXferAmount * ratio <= XferResources[1].SourceCapacity(XferMode) ? thisXferAmount * ratio : XferResources[1].SourceCapacity(XferMode);
+                        XferResources[0].srcXferAmount = thisXferAmount;
+                        XferResources[1].srcXferAmount = thisXferAmount * ratio <= XferResources[1].FromCapacity(XferMode) ? thisXferAmount * ratio : XferResources[1].FromCapacity(XferMode);
                     }
                     else
                     {
-                        XferResources[0].tXferAmount = thisXferAmount;
-                        XferResources[1].tXferAmount = thisXferAmount * ratio <= XferResources[1].SourceCapacity(XferMode) ? thisXferAmount * ratio : XferResources[1].SourceCapacity(XferMode);
+                        XferResources[0].tgtXferAmount = thisXferAmount;
+                        XferResources[1].tgtXferAmount = thisXferAmount * ratio <= XferResources[1].FromCapacity(XferMode) ? thisXferAmount * ratio : XferResources[1].FromCapacity(XferMode);
                     }
                 }
                 else
@@ -629,13 +629,13 @@ namespace ShipManifest
                     XferResources[0].XferRatio = ratio;
                     if (XferMode == SMAddon.XFERMode.SourceToTarget)
                     {
-                        XferResources[1].sXferAmount = thisXferAmount;
-                        XferResources[0].sXferAmount = thisXferAmount * ratio <= XferResources[0].SourceCapacity(XferMode) ? thisXferAmount * ratio : XferResources[0].SourceCapacity(XferMode);
+                        XferResources[1].srcXferAmount = thisXferAmount;
+                        XferResources[0].srcXferAmount = thisXferAmount * ratio <= XferResources[0].FromCapacity(XferMode) ? thisXferAmount * ratio : XferResources[0].FromCapacity(XferMode);
                     }
                     else
                     {
-                        XferResources[1].tXferAmount = thisXferAmount;
-                        XferResources[0].tXferAmount = thisXferAmount * ratio <= XferResources[0].SourceCapacity(XferMode) ? thisXferAmount * ratio : XferResources[0].SourceCapacity(XferMode);
+                        XferResources[1].tgtXferAmount = thisXferAmount;
+                        XferResources[0].tgtXferAmount = thisXferAmount * ratio <= XferResources[0].FromCapacity(XferMode) ? thisXferAmount * ratio : XferResources[0].FromCapacity(XferMode);
                     }
                 }
             }
@@ -643,9 +643,9 @@ namespace ShipManifest
             {
                 XferResources[0].XferRatio = 1;
                 if (XferMode == SMAddon.XFERMode.SourceToTarget)
-                    XferResources[0].sXferAmount = thisXferAmount;
+                    XferResources[0].srcXferAmount = thisXferAmount;
                 else
-                    XferResources[0].tXferAmount = thisXferAmount;                         
+                    XferResources[0].tgtXferAmount = thisXferAmount;                         
             }
         }
 
@@ -654,7 +654,7 @@ namespace ShipManifest
             string step = "";
             try
             {
-                foreach (ModXferResource modResource in SMAddon.smController.ResourcesToXfer)
+                foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
                 {
                     string resource = modResource.ResourceName;
 
@@ -678,7 +678,7 @@ namespace ShipManifest
                         GUILayout.BeginHorizontal();
 
                         GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
-                        GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, modResource.SourceAmtRemaining(XferMode).ToString("#######0.##"), modResource.SourceCapacity(XferMode).ToString("######0.##")), noWrap, GUILayout.Width(210), GUILayout.Height(18));
+                        GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, modResource.FromAmtRemaining(XferMode).ToString("#######0.##"), modResource.FromCapacity(XferMode).ToString("######0.##")), noWrap, GUILayout.Width(210), GUILayout.Height(18));
                         GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(20), GUILayout.Height(18));
                         if (SMAddon.vessel.IsControllable)
                         {
@@ -722,7 +722,7 @@ namespace ShipManifest
             string step = "Part Button Toggled";
             try
             {
-                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !SMAddon.XferOn)
+                if (!SMAddon.smController.CrewTransfer.CrewXferActive && !TransferResource.ResourceXferActive)
                 {
                     if (xferMode == SMAddon.XFERMode.SourceToTarget)
                     {
@@ -766,10 +766,10 @@ namespace ShipManifest
                     if (!SMAddon.smController.SelectedResources.Contains("Crew") && !SMAddon.smController.SelectedResources.Contains("Science"))
                     {
                         step = "Set Xfer amounts = yes";
-                        foreach (ModXferResource modResource in SMAddon.smController.ResourcesToXfer)
+                        foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
                         {
-                            modResource.sXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, modResource.ResourceName);
-                            modResource.tXferAmount = ModXferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, modResource.ResourceName);
+                            modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, modResource.ResourceName);
+                            modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, modResource.ResourceName);
                         }
                     }
                 }
@@ -843,7 +843,7 @@ namespace ShipManifest
             try
             {
                 // Create Xfer Objects for timed process...
-                List<ModXferResource> XferResources = SMAddon.smController.ResourcesToXfer;
+                List<TransferResource> XferResources = SMAddon.smController.ResourcesToXfer;
 
                 if (SMSettings.RealismMode)
                 {
@@ -852,27 +852,27 @@ namespace ShipManifest
 
                     // let's get the capacity of the source for flow calculations.
                     // Flow is based on the largest resource capacity
-                    double AmtCapacity = XferResources[0].SourceCapacity(SMAddon.XferMode);
+                    double AmtCapacity = XferResources[0].FromCapacity(SMAddon.XferMode);
                     if (XferResources.Count == 2)
-                        if (XferResources[1].SourceCapacity(SMAddon.XferMode) > AmtCapacity)
-                            AmtCapacity = XferResources[1].SourceCapacity(SMAddon.XferMode);
+                        if (XferResources[1].FromCapacity(SMAddon.XferMode) > AmtCapacity)
+                            AmtCapacity = XferResources[1].FromCapacity(SMAddon.XferMode);
 
                     // Calculate the actual flow rate, based on source capacity and max flow time setting...
-                    SMAddon.act_flow_rate = AmtCapacity / SMSettings.FlowRate > SMSettings.MaxFlowTimeSec ? AmtCapacity / SMSettings.MaxFlowTimeSec : SMSettings.FlowRate;
+                    TransferResource.act_flow_rate = AmtCapacity / SMSettings.FlowRate > SMSettings.MaxFlowTimeSec ? AmtCapacity / SMSettings.MaxFlowTimeSec : SMSettings.FlowRate;
 
                     // now lets make some noise and simulate the pumping process...
                     Utilities.LogMessage("Playing pump sound...", "Info", SMSettings.VerboseLogging);
 
                     // Start the process
-                    SMAddon.XferOn = true;
+                    TransferResource.ResourceXferActive = true;
                 }
                 else
                 {
                     //Not in Realism mode, so just move the resource...
-                    foreach (ModXferResource modResource in XferResources)
+                    foreach (TransferResource modResource in XferResources)
                     {
-                        ModXferResource.XferResource(source, modResource, modResource.XferAmount(SMAddon.XferMode), SMAddon.XferMode, true);
-                        ModXferResource.XferResource(target, modResource, modResource.XferAmount(SMAddon.XferMode), SMAddon.XferMode, false);
+                        TransferResource.XferResource(source, modResource, modResource.XferAmount(SMAddon.XferMode), SMAddon.XferMode, true);
+                        TransferResource.XferResource(target, modResource, modResource.XferAmount(SMAddon.XferMode), SMAddon.XferMode, false);
                     }
                 }
             }
@@ -888,7 +888,7 @@ namespace ShipManifest
 
         private static bool CanResourceBeXferred(SMAddon.XFERMode thisXferMode, double maxXferAmount)
         {
-            return ((!SMAddon.XferOn && maxXferAmount > 0) || (SMAddon.XferOn && SMAddon.XferMode == thisXferMode));
+            return ((!TransferResource.ResourceXferActive && maxXferAmount > 0) || (TransferResource.ResourceXferActive && SMAddon.XferMode == thisXferMode));
         }
 
         internal static bool IsShipControllable()

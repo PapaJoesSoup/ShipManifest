@@ -40,18 +40,8 @@ namespace ShipManifest
         [KSPField(isPersistant = true)]
         internal static double elapsed = 0.0;
 
-        [KSPField(isPersistant = true)]
-        internal static double flow_rate = (double)SMSettings.FlowRate;
-
-        [KSPField(isPersistant = true)]
-        internal static int flow_time = SMSettings.MaxFlowTimeSec;
-
-        internal static double act_flow_rate = 0;
-
         // Resource xfer vars
         internal static XFERMode XferMode = XFERMode.SourceToTarget;
-        internal static bool XferOn = false;
-        internal static XFERState XferState = XFERState.Off;
 
         // Toolbar Integration.
         private static IButton SMButton_Blizzy = null;
@@ -293,28 +283,26 @@ namespace ShipManifest
                         //Instantiate the controller for the active vessel.
                         smController = SMController.GetInstance(vessel);
                         SMHighlighter.UpdateHighlighting();
-
-                        // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
-                        if (smController.CrewTransfer.IsStockXfer && !smController.CrewTransfer.CrewXferActive)
-                        {
-                            smController.CrewTransfer.TargetPart.RemoveCrewmember(smController.CrewTransfer.SourceCrewMember);
-                            smController.CrewTransfer.SourcePart.AddCrewmember(smController.CrewTransfer.SourceCrewMember);
-                            if (smController.CrewTransfer.SourceCrewMember.seat != null)
-                                smController.CrewTransfer.SourceCrewMember.seat.SpawnCrew();
-
-                            smController.RespawnCrew();
-                            smController.CrewTransfer.CrewTransferBegin(smController.CrewTransfer.SourceCrewMember, smController.CrewTransfer.SourcePart, smController.CrewTransfer.TargetPart);
-                        }
                
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
-                        if (XferOn)
-                            RealModePumpXfer();
+                        if (TransferResource.ResourceXferActive)
+                            TransferResource.ResourceTransferProcess();
 
                         // Realism Mode Crew transfer operation (real time)
                         if (smController.CrewTransfer.CrewXferActive)
                             smController.CrewTransfer.CrewTransferProcess();
+                        else if (smController.CrewTransfer.IsStockXfer)
+                        {
+                            // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
+                            smController.CrewTransfer.ToPart.RemoveCrewmember(smController.CrewTransfer.FromCrewMember);
+                            smController.CrewTransfer.FromPart.AddCrewmember(smController.CrewTransfer.FromCrewMember);
+                            if (smController.CrewTransfer.FromCrewMember.seat != null)
+                                smController.CrewTransfer.FromCrewMember.seat.SpawnCrew();
 
+                            smController.RespawnCrew();
+                            smController.CrewTransfer.CrewTransferBegin(smController.CrewTransfer.FromCrewMember, smController.CrewTransfer.FromPart, smController.CrewTransfer.ToPart);
+                        }
                     }
                 }
             }
@@ -354,7 +342,7 @@ namespace ShipManifest
         // Crew Event handlers
         internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (CrewTransfer.IgnoreSourceXferEvent || CrewTransfer.IgnoreTargetXferEvent)
+            if (TransferCrew.IgnoreFromToXferEvent || TransferCrew.IgnoreToFromXferEvent)
             {
                 // We are performing a mod notification. Ignore the event.
                 return;
@@ -370,10 +358,10 @@ namespace ShipManifest
             if (!smController.CrewTransfer.CrewXferActive)
             {
                 // store data from event.
-                smController.CrewTransfer.SourcePart = action.from;
-                smController.CrewTransfer.TargetPart = action.to;
-                smController.CrewTransfer.SourceCrewMember = action.host;
-                if (smController.CrewTransfer.SourcePart != null && smController.CrewTransfer.TargetPart != null)
+                smController.CrewTransfer.FromPart = action.from;
+                smController.CrewTransfer.ToPart = action.to;
+                smController.CrewTransfer.FromCrewMember = action.host;
+                if (smController.CrewTransfer.FromPart != null && smController.CrewTransfer.ToPart != null)
                     smController.CrewTransfer.IsStockXfer = true;
             }
             // Remove the transfer message that stock displayed. 
@@ -705,7 +693,7 @@ namespace ShipManifest
                 if (WindowManifest.ShowWindow)
                 {
                     // SM is showing.  Turn off.
-                    if (smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
+                    if (smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
                         return;
 
                     SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedResourcesParts);
@@ -783,7 +771,7 @@ namespace ShipManifest
             bool results = false;
             try
             {
-                if (SMAddon.smController.CrewTransfer.CrewXferActive || SMAddon.XferOn)
+                if (SMAddon.smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
                 {
                     WindowTransfer.xferToolTip = "Transfer in progress.  Xfers disabled.";
                     return results;
@@ -816,15 +804,6 @@ namespace ShipManifest
                 WindowTransfer.xferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
             return results;
         }
-
-        //internal static bool shouldToggle()
-        //{
-        //    //Debug.Log("[ShipManifest]:  ShipManifestAddon.shouldToggle");
-        //    return (HighLogic.LoadedScene == GameScenes.FLIGHT && !MapView.MapIsEnabled && !PauseMenu.isOpen && !FlightResultsDialog.isDisplaying &&
-        //                    FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null &&
-        //                    smController.CanDrawButton
-        //                    );
-        //}
 
         private static bool IsCLSInSameSpace(Part SelectedPartSource, Part SelectedPartTarget)
         {
@@ -1201,192 +1180,6 @@ namespace ShipManifest
             }
         }
 
-        private void RealModePumpXfer()
-        {
-            try
-            {
-                if (XferOn)
-                {
-                    double deltaT = 0;
-                    flow_rate = SMSettings.FlowRate;
-
-                    switch (XferState)
-                    {
-                        case XFERState.Off:
-                            // reset counters
-                            timestamp = elapsed = 0;
-
-                            // Default sound license: CC-By-SA
-                            // http://www.freesound.org/people/vibe_crc/sounds/59328/
-                            string path1 = SMSettings.PumpSoundStart != null ? SMSettings.PumpSoundStart : "ShipManifest/Sounds/59328-1";
-                            string path2 = SMSettings.PumpSoundRun != null ? SMSettings.PumpSoundRun : "ShipManifest/Sounds/59328-2";
-                            string path3 = SMSettings.PumpSoundStop != null ? SMSettings.PumpSoundStop : "ShipManifest/Sounds/59328-3";
-
-                            // Load Sounds, and Play Sound 1
-                            LoadSounds("Pump", path1, path2, path3, SMSettings.PumpSoundVol);
-                            XferState = XFERState.Start;
-                            break;
-
-                        case XFERState.Start:
-
-                            // calculate elapsed.
-                            elapsed += Planetarium.GetUniversalTime();
-
-                            // Play run sound when start sound is nearly done. (repeats)
-                            if (elapsed >= source1.clip.length - 0.25)
-                            {
-                                source2.Play();
-                                elapsed = 0;
-                                XferState = XFERState.Run;
-                            }
-                            break;
-
-                        case XFERState.Run:
-
-                            deltaT = Planetarium.GetUniversalTime() - timestamp;
-                            deltaT = deltaT > 0 ? deltaT : 0.001;
-                            double deltaAmt = deltaT * act_flow_rate;
-                            Utilities.LogMessage("RealModePumpXfer - 1. DeltaT = " + deltaT.ToString() + "\r\n    FlowRate = " + act_flow_rate.ToString() + "\r\n    DeltaAmt = " + deltaAmt.ToString(), "Info", SMSettings.VerboseLogging);
-
-                            // Consume electricity
-                            double deltaCharge = deltaT * act_flow_rate * SMSettings.FlowCost;
-                            if (!ConsumeCharge(deltaCharge))
-                            {
-                                XferState = XFERState.Stop;
-                            }
-                            else
-                            {
-                                // We had enough electricity, so lets move the resource....
-                                List<Part> PartsSource = smController.SelectedPartsSource;
-                                List<Part> PartsTarget = smController.SelectedPartsTarget;
-                                if (XferMode == XFERMode.TargetToSource)
-                                {
-                                    // Source is target on Interface...
-                                    PartsSource = smController.SelectedPartsTarget;
-                                    PartsTarget = smController.SelectedPartsSource;
-                                }
-                                foreach (ModXferResource modResource in smController.ResourcesToXfer)
-                                {
-                                    deltaAmt = deltaT * act_flow_rate * modResource.XferRatio;
-                                    Utilities.LogMessage("RealModePumpXfer - 2a. Resource:  " + modResource.ResourceName + ", DeltaAmt = " + deltaAmt.ToString(), "Info", SMSettings.VerboseLogging);
-                                    double SrcAmtRemaining = modResource.SourceAmtRemaining(XferMode);
-                                    double TgtAmtRemianCapacity = modResource.TargetCapacityRemaining(XferMode);
-                                    if (deltaAmt > SrcAmtRemaining)
-                                        deltaAmt = SrcAmtRemaining;
-                                    if (deltaAmt > TgtAmtRemianCapacity)
-                                        deltaAmt = TgtAmtRemianCapacity;
-
-                                    Utilities.LogMessage("RealModePumpXfer - 2b. Resource:  " + modResource.ResourceName + ", Adj deltaAmt = " + deltaAmt.ToString(), "Info", SMSettings.VerboseLogging);
-                                    if (deltaAmt > 0)
-                                    {
-                                        Utilities.LogMessage("RealModePumpXfer - 3a. Resource:  " + modResource.ResourceName + ", Xferring DeltaAmt = " + deltaAmt.ToString(), "Info", SMSettings.VerboseLogging);
-                                        ModXferResource.XferResource(PartsSource, modResource, deltaAmt, XferMode, true);
-                                        ModXferResource.XferResource(PartsTarget, modResource, deltaAmt, XferMode, false);
-                                        modResource.AmtXferred += deltaAmt;
-                                    }
-                                    Utilities.LogMessage("RealModePumpXfer - 3b. Resource:  " + modResource.ResourceName + ", AmtXferred = " + modResource.AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
-                                    Utilities.LogMessage("RealModePumpXfer - 3c. Resource:  " + modResource.ResourceName + ", SrcAmtRemaining = " + modResource.SourceAmtRemaining(XferMode).ToString() + ", TgtCapRemaining = " + modResource.TargetCapacityRemaining(XferMode), "Info", SMSettings.VerboseLogging);
-                                }
-
-                                // Are we done?
-                                if (isXferComplete())
-                                    XferState = XFERState.Stop;
-                            }
-                            break;
-
-                        case XFERState.Stop:
-
-                            // play pump shutdown.
-                            source2.Stop();
-                            source3.Play();
-                            timestamp = elapsed = 0;
-                            XferState = XFERState.Off;
-                            foreach (ModXferResource modResource in smController.ResourcesToXfer)
-                            {
-                                modResource.AmtXferred = 0;
-                                modResource.sXferAmount = ModXferResource.CalcMaxXferAmt(smController.SelectedPartsSource, smController.SelectedPartsTarget, SMAddon.smController.SelectedResources);
-                                if (modResource.sXferAmount < 0.0001)
-                                    modResource.sXferAmount = 0;
-                                modResource.strTXferAmount = modResource.sXferAmount.ToString();
-                                modResource.tXferAmount = ModXferResource.CalcMaxXferAmt(smController.SelectedPartsTarget, smController.SelectedPartsSource, SMAddon.smController.SelectedResources);
-                                if (modResource.tXferAmount < 0.0001)
-                                    modResource.tXferAmount = 0;
-                                modResource.strTXferAmount = modResource.tXferAmount.ToString();
-                            }
-                            XferOn = false;
-                            break;
-                    }
-                    Utilities.LogMessage("RealModePumpXfer - 5.  Transfer State:  " + XferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
-                    if (XferState != XFERState.Off)
-                        timestamp = Planetarium.GetUniversalTime();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!frameErrTripped)
-                {
-                    Utilities.LogMessage(string.Format(" in RealModePumpXfer (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-                    frameErrTripped = true;
-                    throw ex;
-                }
-            }
-        }
-
-        private static bool isXferComplete()
-        {
-            if (smController.ResourcesToXfer.Count > 1)
-            {
-                Utilities.LogMessage("isXferComplete - A1. Resource:  " + smController.ResourcesToXfer[0].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[0].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[0].AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
-                Utilities.LogMessage("isXferComplete - A2 Resource:  " + smController.ResourcesToXfer[1].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[1].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[1].AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
-                if (smController.ResourcesToXfer[0].SourceAmtRemaining(XferMode) == 0 && smController.ResourcesToXfer[1].SourceAmtRemaining(XferMode) == 0)
-                    return true;
-                if (smController.ResourcesToXfer[0].TargetCapacityRemaining(XferMode) == 0 && smController.ResourcesToXfer[1].TargetCapacityRemaining(XferMode) == 0)
-                    return true;
-                if ((smController.ResourcesToXfer[0].AmtXferred >= smController.ResourcesToXfer[0].XferAmount(XferMode)) &&
-                    (smController.ResourcesToXfer[1].AmtXferred >= smController.ResourcesToXfer[1].XferAmount(XferMode)))
-                    return true;
-                return false;
-            }
-            else
-            {
-                Utilities.LogMessage("isXferComplete - B. Resource:  " + smController.ResourcesToXfer[0].ResourceName + ", TotalXferAmt = " + smController.ResourcesToXfer[0].XferAmount(XferMode).ToString() + ", AmtXferred = " + smController.ResourcesToXfer[0].AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
-                if (smController.ResourcesToXfer[0].SourceAmtRemaining(XferMode) == 0)
-                    return true;
-                if (smController.ResourcesToXfer[0].TargetCapacityRemaining(XferMode) == 0)
-                    return true;
-                if (smController.ResourcesToXfer[0].AmtXferred >= smController.ResourcesToXfer[0].XferAmount(XferMode))
-                    return true;
-                return false;
-            }
-        }
-
-        private bool ConsumeCharge(double deltaCharge)
-        {
-            if (!smController.SelectedResources.Contains("ElectricCharge") && SMSettings.EnableXferCost)
-            {
-                foreach (Part iPart in smController._partsByResource["ElectricCharge"])
-                {
-                    if (iPart.Resources["ElectricCharge"].amount >= deltaCharge)
-                    {
-                        iPart.Resources["ElectricCharge"].amount -= deltaCharge;
-                        deltaCharge = 0;
-                        break;
-                    }
-                    else
-                    {
-                        deltaCharge -= iPart.Resources["ElectricCharge"].amount;
-                        iPart.Resources["ElectricCharge"].amount = 0;
-                    }
-                }
-                if (deltaCharge > 0)
-                    return false;
-                else
-                    return true;
-            }
-            else
-                return true;
-        }
-
         internal static void LoadSounds(string SoundType, string path1, string path2, string path3, double dblVol)
         {
             try
@@ -1477,14 +1270,6 @@ namespace ShipManifest
         }
 
         #endregion
-
-        internal enum XFERState
-        {
-            Off,
-            Start,
-            Run,
-            Stop
-        }
 
         internal enum XFERMode
         {
