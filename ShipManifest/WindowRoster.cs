@@ -15,6 +15,7 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
+
         //Profession vars
         internal static bool isPilot = false;
         internal static bool isEngineer = false;
