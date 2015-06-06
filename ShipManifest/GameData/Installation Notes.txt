@@ -1,0 +1,74 @@
+Thanks for downloading Ship Manifest!
+
+Ship Manifest is a tool to manage your ship's "things".  I started with [url=http://forum.kerbalspaceprogram.com/threads/60936]Crew Manifest[/url] as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.  
+
+I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
+
+----------------
+Current Version 4.3.0.1 - Release 06 Jun, 2015 - Crew, Interfaces, & Refactoring Edition.
+----------------
+
+---------
+Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
+          CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
+          Github - https://github.com/PapaJoesSoup/ShipManifest/releases
+---------
+
+NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest can use:
+	- Toolbar.
+	- Connected Living Spaces
+	- Module Manager  
+
+IMPORTANT NOTE for CLS users:  
+
+If you use CLS and you upgrade SM, SM version 0.90.0_4.0.0+ now requires CLS version 1.1.1.0 or higher.  Changes to the CLS interface have exposed hatches for third party use, and SM takes advantage of this.  Be sure to install the latest version of CLS when you upgrade SM to 4.0.0.0 or higher
+
+Toolbar, CLS and Module manager are not included with the release.  if you would like to use these fine mods, Get the latest here:
+ - Toolbar:   http://forum.kerbalspaceprogram.com/threads/60863.
+ - CLS: http://forum.kerbalspaceprogram.com/threads/70161.
+ - Module Manager: http://forum.kerbalspaceprogram.com/threads/55219
+
+--------------------
+Installation steps: 
+--------------------
+
+1.  Remove any previous installation of ShipManifest from your GameData folder.
+2.  Overwrite your GameData folder with the contents of the archive.  
+
+------------
+What's New:
+------------
+Version 4.3.0.0 - Release 04 June, 2015 - Crew, Interfaces, & Refactoring Edition.
+- New:  Refactored Crew transfers into separate class to improve visibility and state management.
+- New:  Crew transfers (part to part & seat to seat) now show both kerbals involved as moving, when a kerbal swap occurs.
+- New:  Added DeepFreeze mod support for handling/viewing frozen kerbals. No more xferring frozen kerbals, and Roster Window now shows frozen kerbals.
+- New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
+- New:  Add onCrewTransferred Event trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
+- New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel filter is omitted when in Space Center.
+- New:  Refactoring - moved window vars from Settings into window level code.
+- New:  Refactoring - Added InstalledMods static class to centralize mod assembly detection and soft dependencies.
+- New:  Refactoring - Altered Settings Save to segregate Hidden settings for ease of identification by users.
+- Fixed:  Bug in multi-part transfers that lock transfer in run state, with no progress.  Gave loops timeouts, and relaxed the resolution of the calculation to allow for rounding errors.
+- Fixed:  Bug in Crew Transfer.  When transferring a crew member to a full part with realism off, the crew member does not swap and disappears...
+- Fixed:  Bug in Crew Transfer with CLS installed.  First transfer works fine, subsequent xfers fail, and Transfer is stuck in moving...
+----------
+License:  CC BY-NC-SA 4.0
+----------
+
+http://creativecommons.org/licenses/by-nc-sa/4.0/.  Original license on Crew Manifest was do as you want.  I felt the original and contributing authors deserve due attribution, since this is a derivative work.
+
+---------------
+Source code:  http://github.com/PapaJoesSoup/ShipManifest
+---------------
+
+---------------
+WIKI:  http://github.com/PapaJoesSoup/ShipManifest/wiki
+---------------
+
+------------	
+Videos:
+------------	
+
+ - Kottabos did a fine review here:  [url]www.youtube.com/watch?v=I_TNxjnW234[/url] (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
+
+This work is based in large part on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.

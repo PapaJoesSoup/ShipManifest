@@ -271,6 +271,35 @@ namespace ShipManifest
 
         #region Action Methods
 
+        internal void RefreshLists()
+        {
+            GetSelectedResourcesParts();
+            // now lets reconcile the selected parts based on the new list of resources...
+            WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
+
+            // Now lets update the Xfer Objects...
+            SMAddon.smController.ResourcesToXfer.Clear();
+            foreach (string resource in SMAddon.smController.SelectedResources)
+            {
+                // Lets create a Xfer Object for managing xfer options and data.
+                TransferResource modResource = new TransferResource(resource);
+                modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
+                modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
+                SMAddon.smController.ResourcesToXfer.Add(modResource);
+            }
+            if (SMSettings.EnableCLS && SMAddon.CanShowShipManifest(false))
+            {
+                if (SMAddon.GetCLSAddon())
+                {
+                    SMAddon.UpdateCLSSpaces();
+                    GetHatches();
+                }
+            }
+            GetAntennas();
+            GetLights();
+            GetSolarPanels();
+        }
+
         internal void GetSelectedResourcesParts()
         {
             if (SelectedResources.Count == 1)

@@ -287,7 +287,9 @@ namespace ShipManifest
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
                         if (TransferResource.ResourceXferActive)
+                        {
                             TransferResource.ResourceTransferProcess();
+                        }
 
                         // Realism Mode Crew transfer operation (real time)
                         if (smController.CrewTransfer.CrewXferActive)
@@ -926,6 +928,14 @@ namespace ShipManifest
         {
             try
             {
+                if (vessel != newVessel)
+                {
+                    if(smController.CrewTransfer.CrewXferActive && !smController.CrewTransfer.IvaDelayActive)
+                        smController.CrewTransfer.CrewTransferAbort();
+                    if (TransferResource.ResourceXferActive && SMSettings.RealismMode)
+                        TransferResource.ResourceTransferAbort();
+                }
+
                 if (vessel != null && SMAddon.CanShowShipManifest(false))
                 {
                     if (newVessel.isEVA && !vessel.isEVA)
@@ -942,12 +952,7 @@ namespace ShipManifest
                 // Now let's update the current vessel view...
                 vessel = newVessel;
                 smController = SMController.GetInstance(vessel);
-                smController.GetSelectedResourcesParts();
-                if (SMSettings.EnableCLS && SMAddon.CanShowShipManifest(false))
-                {
-                    if (GetCLSAddon())
-                        UpdateCLSSpaces();
-                }
+                smController.RefreshLists();
             }
             catch (Exception ex)
             {

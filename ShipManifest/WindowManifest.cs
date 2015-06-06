@@ -287,7 +287,7 @@ namespace ShipManifest
             }
         }
 
-        private static void ReconcileSelectedXferParts(List<string> resourceNames)
+        internal static void ReconcileSelectedXferParts(List<string> resourceNames)
         {
             if (resourceNames.Count > 0)
             {

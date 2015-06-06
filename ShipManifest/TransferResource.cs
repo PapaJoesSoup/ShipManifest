@@ -17,6 +17,7 @@ namespace ShipManifest
         internal static double flow_rate = (double)SMSettings.FlowRate;
         internal static int flow_time = SMSettings.MaxFlowTimeSec;
         internal static double act_flow_rate = 0;
+        internal static DateTime timestamp;
 
         // Object Properties
         internal string ResourceName = "";
@@ -363,7 +364,7 @@ namespace ShipManifest
                     {
                         case ResourceXFERState.Off:
                             // reset counters
-                            SMAddon.timestamp = SMAddon.elapsed = 0;
+                            SMAddon.elapsed = 0;
                             foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
                             {
                                 modResource.AmtXferredOld = 0;
@@ -379,12 +380,13 @@ namespace ShipManifest
                             // Load Sounds, and Play Sound 1
                             SMAddon.LoadSounds("Pump", path1, path2, path3, SMSettings.PumpSoundVol);
                             XferState = ResourceXFERState.Start;
+                            timestamp = DateTime.Now;
                             break;
 
                         case ResourceXFERState.Start:
 
                             // calculate elapsed.
-                            SMAddon.elapsed += Planetarium.GetUniversalTime();
+                            SMAddon.elapsed += (DateTime.Now - TransferResource.timestamp).TotalSeconds; 
 
                             // Play run sound when start sound is nearly done. (repeats)
                             if (SMAddon.elapsed >= SMAddon.source1.clip.length - 0.25)
@@ -400,12 +402,14 @@ namespace ShipManifest
                             //Run process:
 
                             // 1.  Get elapsed from last run
-                            deltaT = Planetarium.GetUniversalTime() - SMAddon.timestamp;
-                            deltaT = deltaT > 0 ? deltaT : 0.001;
+                            deltaT = (DateTime.Now - TransferResource.timestamp).TotalSeconds; 
+                            Utilities.LogMessage("ResourceTransferProcess - 1. DeltaT = " + deltaT.ToString(), "Info", SMSettings.VerboseLogging);
+                            if (deltaT == 0)
+                                return;
+                            TransferResource.timestamp = DateTime.Now;
 
                             // 2.  Calculate amount to move based on flow rate and time delta
                             double deltaAmt = deltaT * act_flow_rate;
-                            Utilities.LogMessage("ResourceTransferProcess - 1. DeltaT = " + deltaT.ToString() + "\r\n    FlowRate = " + act_flow_rate.ToString() + "\r\n    DeltaAmt = " + deltaAmt.ToString(), "Info", SMSettings.VerboseLogging);
                             
                             List<Part> PartsFrom = SMAddon.smController.SelectedPartsSource;
                             List<Part> PartsTo = SMAddon.smController.SelectedPartsTarget;
@@ -487,7 +491,6 @@ namespace ShipManifest
                                     }
                                 }
                             }
-
                             break;
 
                         case ResourceXFERState.Stop:
@@ -495,7 +498,7 @@ namespace ShipManifest
                             // play pump shutdown.
                             SMAddon.source2.Stop();
                             SMAddon.source3.Play();
-                            SMAddon.timestamp = SMAddon.elapsed = 0;
+                            SMAddon.elapsed = 0;
                             XferState = ResourceXFERState.Off;
                             foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
                             {
@@ -513,8 +516,6 @@ namespace ShipManifest
                             break;
                     }
                     Utilities.LogMessage("ResourceTransferProcess - 5.  Transfer State:  " + XferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
-                    if (XferState != ResourceXFERState.Off)
-                        SMAddon.timestamp = Planetarium.GetUniversalTime();
                 }
             }
             catch (Exception ex)
@@ -618,6 +619,11 @@ namespace ShipManifest
             }
             else
                 return true;
+        }
+
+        internal static void ResourceTransferAbort()
+        {
+            XferState = ResourceXFERState.Stop;
         }
 
         internal enum ResourceXFERState
