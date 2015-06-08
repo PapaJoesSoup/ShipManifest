@@ -1,5 +1,11 @@
 ShipManifest
 ============
+Version 4.3.0.2 - Release 08 June, 2015 - Crew, Interfaces, & Refactoring Edition.
+- New:  Cleaned up highlighting when undocking events occur to turn off highlighting on vessel parts/vessels that become detatched...
+- Fixed:  Bug in settings.  When disabling Crew in setting, if crew was selected, Highligting does not turn off.
+- Fixed:  Bug in Settings.  When in Highlighting Tab, "Highlight only Source/Target parts" and "Enable CLS Highlighting" should act like radio buttons but do not. 
+- Fixed:  Under certain circumstances, Highlighting woud not be completely cleared when turned off If crew was selected and CLS was enabled.
+
 Version 4.3.0.1 - Release 06 June, 2015 - Crew, Interfaces, & Refactoring Edition.
 - New:  Refactored Resource transfers to improve overall transfer speed, flow & "feel".  Lag was causing issues on larger vessels.
 - New:  Refactored Vessel update methods to properly udate various part lists if vessel changes occur while SM windows are open (undocking, etc.).  Now various windows properly refresh.
