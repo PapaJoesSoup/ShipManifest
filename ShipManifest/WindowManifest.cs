@@ -23,7 +23,7 @@ namespace ShipManifest
             set
             {
                 if(!value)
-                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedResourcesParts);
+                    SMHighlighter.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
                 _showWindow = value;
             }
 

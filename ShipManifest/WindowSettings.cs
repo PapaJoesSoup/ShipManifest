@@ -226,6 +226,7 @@ namespace ShipManifest
                 if (SMAddon.smController.SelectedResources.Contains("Crew"))
                 {
                     // Clear Resource selection.
+                    SMHighlighter.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
                     SMAddon.smController.SelectedResources.Clear();
                     WindowTransfer.ShowWindow = false;
                 }
@@ -486,8 +487,8 @@ namespace ShipManifest
                 {
                     if (SMAddon.smController.SelectedResources.Contains("Crew"))
                     {
-                        SMHighlighter.HighlightCLSVessel(SMSettings.EnableHighlighting, true);
                         // Update spaces and reassign the resource to observe new settings.
+                        SMHighlighter.HighlightCLSVessel(SMSettings.EnableHighlighting, true);
                         SMAddon.UpdateCLSSpaces();
                         SMAddon.smController.SelectedResources.Clear();
                         SMAddon.smController.SelectedResources.Add("Crew");
@@ -506,18 +507,19 @@ namespace ShipManifest
             label = "Highlight Only Source / Target Parts";
             SMSettings.OnlySourceTarget = GUILayout.Toggle(SMSettings.OnlySourceTarget, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            if (SMSettings.OnlySourceTarget && !SMSettings.prevOnlySourceTarget)
+            if (SMSettings.OnlySourceTarget && (!SMSettings.prevOnlySourceTarget || SMSettings.EnableCLSHighlighting))
             {
                 SMSettings.EnableCLSHighlighting = false;
                 if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew"))
                 {
-                    SMHighlighter.HighlightCLSVessel(false, true);
                     // Update spaces and reassign the resource to observe new settings.
+                    SMHighlighter.HighlightCLSVessel(false, true);
                     SMAddon.UpdateCLSSpaces();
                     SMAddon.smController.SelectedResources.Clear();
                     SMAddon.smController.SelectedResources.Add("Crew");
                 }
             }
+            // Enable CLS Highlighting Mode
             if (!SMSettings.EnableHighlighting || !SMSettings.EnableCLS)
                 GUI.enabled = false;
             else
@@ -527,13 +529,15 @@ namespace ShipManifest
             label = "Enable CLS Highlighting";
             SMSettings.EnableCLSHighlighting = GUILayout.Toggle(SMSettings.EnableCLSHighlighting, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
-            if (SMSettings.EnableCLSHighlighting && !SMSettings.prevEnableCLSHighlighting)
+            if (SMSettings.EnableCLSHighlighting && (!SMSettings.prevEnableCLSHighlighting || SMSettings.OnlySourceTarget))
                 SMSettings.OnlySourceTarget = false;
             if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && WindowTransfer.ShowWindow)
             {
                 if (SMSettings.EnableCLSHighlighting != SMSettings.prevEnableCLSHighlighting)
                     SMHighlighter.HighlightCLSVessel(SMSettings.EnableCLSHighlighting);
             }
+
+            // Enable Edge Highlighting Mode
             if (SMSettings.EnableHighlighting)
                 GUI.enabled = true;
             else

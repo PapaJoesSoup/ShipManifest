@@ -390,10 +390,7 @@ namespace ShipManifest
             Utilities.LogMessage("SMAddon.OnVesselWasModified.", "Info", SMSettings.VerboseLogging);
             try
             {
-                if (smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
-                    SMAddon.clsAddon.Vessel.Highlight(false);
-                else if (smController.SelectedResourcesParts.Count > 0)
-                    SMHighlighter.ClearPartsHighlight(smController.SelectedResourcesParts);
+                SMHighlighter.ClearResourceHighlighting(smController.SelectedResourcesParts);
                 UpdateSMcontroller(modVessel);
             }
             catch (Exception ex)
@@ -407,10 +404,7 @@ namespace ShipManifest
             Utilities.LogMessage("SMAddon.OnVesselChange active...", "Info", SMSettings.VerboseLogging);
             try
             {
-                if (smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
-                    SMAddon.clsAddon.Vessel.Highlight(false);
-                else if (smController.SelectedResourcesParts.Count > 0)
-                    SMHighlighter.ClearPartsHighlight(smController.SelectedResourcesParts);
+                SMHighlighter.ClearResourceHighlighting(smController.SelectedResourcesParts);
                 UpdateSMcontroller(newVessel);
             }
             catch (Exception ex)
@@ -437,8 +431,7 @@ namespace ShipManifest
             {
                 if (data.Equals(FlightGlobals.ActiveVessel))
                 {
-                    if (smController.SelectedResourcesParts.Count > 0)
-                        SMHighlighter.ClearPartsHighlight(smController.SelectedResourcesParts);
+                    SMHighlighter.ClearResourceHighlighting(smController.SelectedResourcesParts);
                     UpdateSMcontroller(data);
                 }
             }
@@ -698,7 +691,7 @@ namespace ShipManifest
                     if (smController.CrewTransfer.CrewXferActive || TransferResource.ResourceXferActive)
                         return;
 
-                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedResourcesParts);
+                    SMHighlighter.ClearResourceHighlighting(SMAddon.smController.SelectedResourcesParts);
                     SMAddon.smController.SelectedResources.Clear();
                     SMAddon.smController.SelectedPartsSource.Clear();
                     SMAddon.smController.SelectedPartsTarget.Clear();
@@ -928,6 +921,7 @@ namespace ShipManifest
         {
             try
             {
+                SMHighlighter.ClearResourceHighlighting(smController.SelectedResourcesParts);
                 if (vessel != newVessel)
                 {
                     if(smController.CrewTransfer.CrewXferActive && !smController.CrewTransfer.IvaDelayActive)

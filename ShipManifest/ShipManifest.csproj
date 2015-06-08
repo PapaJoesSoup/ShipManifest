@@ -99,37 +99,37 @@
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="GameData\ChangeLog.txt" />
-    <Content Include="GameData\Installation Notes.txt" />
-    <Content Include="GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
-    <Content Include="GameData\ShipManifest\Plugins\ShipManifest.dll" />
-    <Content Include="GameData\ShipManifest\Plugins\SMInterface.dll" />
-    <Content Include="GameData\ShipManifest\Sounds\Sounds.txt" />
-    <Content Include="GameData\ShipManifest\Textures\IconOff_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconOff_38.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconOn_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconOn_38.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconR_Off_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconR_Off_38.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconR_On_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconR_On_38.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconS_Off_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconS_Off_38.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconS_On_24.png" />
-    <Content Include="GameData\ShipManifest\Textures\IconS_On_38.png" />
+    <Content Include="Distribution\ChangeLog.txt" />
+    <Content Include="Distribution\Installation Notes.txt" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\SMInterface.dll" />
+    <Content Include="Distribution\GameData\ShipManifest\Sounds\Sounds.txt" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconOff_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconOff_38.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconOn_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconOn_38.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconR_Off_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconR_Off_38.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconR_On_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconR_On_38.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_Off_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_Off_38.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_24.png" />
+    <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_38.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GameData\ShipManifest\Plugins\PluginData\SMSettings.dat" />
-    <None Include="GameData\ShipManifest\ShipManifest.version" />
-    <None Include="GameData\ShipManifest\Sounds\14214-1.ogg" />
-    <None Include="GameData\ShipManifest\Sounds\14214-2.ogg" />
-    <None Include="GameData\ShipManifest\Sounds\14214-3.ogg" />
-    <None Include="GameData\ShipManifest\Sounds\59328-1.ogg" />
-    <None Include="GameData\ShipManifest\Sounds\59328-2.ogg" />
-    <None Include="GameData\ShipManifest\Sounds\59328-3.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Plugins\PluginData\SMSettings.dat" />
+    <None Include="Distribution\GameData\ShipManifest\ShipManifest.version" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\14214-1.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\14214-2.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\14214-3.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\59328-1.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\59328-2.ogg" />
+    <None Include="Distribution\GameData\ShipManifest\Sounds\59328-3.ogg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SMInterface\SMInterface.csproj">
@@ -140,7 +140,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\GameData\ShipManifest\Plugins\"</PostBuildEvent>
+copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

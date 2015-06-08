@@ -273,7 +273,7 @@ namespace ShipManifest
 
         internal void RefreshLists()
         {
-            GetSelectedResourcesParts();
+            GetSelectedResourcesParts(true);
             // now lets reconcile the selected parts based on the new list of resources...
             WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
 
@@ -300,11 +300,14 @@ namespace ShipManifest
             GetSolarPanels();
         }
 
-        internal void GetSelectedResourcesParts()
+        internal void GetSelectedResourcesParts(bool refresh = false)
         {
             if (SelectedResources.Count == 1)
             {
-                SelectedResourcesParts = _partsByResource[SelectedResources[0]];
+                if (refresh)
+                    SelectedResourcesParts = PartsByResource[SelectedResources[0]];
+                else
+                    SelectedResourcesParts = _partsByResource[SelectedResources[0]];
             }
             else if (SelectedResources.Count == 2)
             {

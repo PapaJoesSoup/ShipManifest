@@ -57,6 +57,7 @@ Version 4.3.0.0 - Release 04 June, 2015 - Crew, Interfaces, & Refactoring Editio
 - Fixed:  Bug in multi-part transfers that lock transfer in run state, with no progress.  Gave loops timeouts, and relaxed the resolution of the calculation to allow for rounding errors.
 - Fixed:  Bug in Crew Transfer.  When transferring a crew member to a full part with realism off, the crew member does not swap and disappears...
 - Fixed:  Bug in Crew Transfer with CLS installed.  First transfer works fine, subsequent xfers fail, and Transfer is stuck in moving...
+
 ----------
 License:  CC BY-NC-SA 4.0
 ----------

@@ -48,10 +48,17 @@ namespace ShipManifest
 
         internal static bool IsModInstalled(string assemblyName)
         {
-            Assembly assembly = (from a in assemblies
-                                 where a.FullName.Contains(assemblyName)
-                                 select a).SingleOrDefault();
-            return assembly != null;
+            try
+            {
+                Assembly assembly = (from a in assemblies
+                                     where a.FullName.Contains(assemblyName)
+                                     select a).First();
+                return assembly != null;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
