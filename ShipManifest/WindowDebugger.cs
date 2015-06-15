@@ -31,7 +31,7 @@ namespace ShipManifest
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowDebugger.Position, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             GUILayout.BeginVertical();
-            Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
+            Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(300), GUILayout.Width(500));
             GUILayout.BeginVertical();
 
             foreach (string error in Utilities.Errors)

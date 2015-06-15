@@ -5,7 +5,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with [url=htt
 I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
 
 ----------------
-Current Version 4.3.0.1 - Release 06 Jun, 2015 - Crew, Interfaces, & Refactoring Edition.
+Current Version 4.3.1.0 - Release 15 Jun, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
 ----------------
 
 ---------
@@ -38,25 +38,17 @@ Installation steps:
 ------------
 What's New:
 ------------
-Version 4.3.0.1 - Release 06 June, 2015 - Crew, Interfaces, & Refactoring Edition.
-- New:  Refactored Resource transfers to improve overall transfer speed, flow & "feel".  Lag was causing issues on larger vessels.
-- New:  Refactored Vessel update methods to properly udate various part lists if vessel changes occur while SM windows are open (undocking, etc.).  Now various windows properly refresh.
-- Fixed:  Bug in multi-part transfers that allowed continued transfers when a transfer is initiated and then you undock a vessel from a station.
-- Fixed:  Bug in Crew Transfers that allowed continued transfers when a crew transfer is initiated and then you undock a vessel from a station.
+Version 4.3.1.0 - Release 15 June, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
+- New:  Tightened Integration with DeepFreeze by adding DF Interface component and simplifying Frozen Kerbal display and detection...
+- New:  Added ability to Freeze/Thaw Kerbals in  DeepFreeze Container via Roster window.  Works only when a freezer is part of the active vessel and contains kerbals.
+- New:  Added New GUI Skin: Unity Default.  Selectable in Settings Config Tab and takes effect immediately.
+- New:  Updated Roster display to improve general layout and readability.
+- New:  Added Mods Tab to Settings Window.  Displayes Installed Mods/Assemblies.
+- Fixed:  Bug in settings.  When cancelling or saving changes in Space Center, Settings Icon does not revert on toolbar.
+- Fixed:  Bug with KIS compatability.  When transferring Kerbals with inventory, a race condition occurs with OnCrewTransferred Event handler and causes errors.
+          Added switch in SMSetting.dat to allow disabling onCrewTransferred Event call if KIS still is causing issues.
+- Fixed:  Bug in Multi Part transfers.  Transfers sometimes still hang.  Added check for maxAmount to Transfer, and a flag for transfer in progress to allow Stop button to remain visible until completion...
 
-Version 4.3.0.0 - Release 04 June, 2015 - Crew, Interfaces, & Refactoring Edition.
-- New:  Refactored Crew transfers into separate class to improve visibility and state management.
-- New:  Crew transfers (part to part & seat to seat) now show both kerbals involved as moving, when a kerbal swap occurs.
-- New:  Added DeepFreeze mod support for handling/viewing frozen kerbals. No more xferring frozen kerbals, and Roster Window now shows frozen kerbals.
-- New:  Added SMInterface.dll for other mods to detect Crew xfers in progress and act accordingly.
-- New:  Add onCrewTransferred Event trigger to be consistent with Stock Crew Transfers and to support KIS inventory movement when crew transfers occur.
-- New:  Added Kerbal Filter for Roster Window:  All, vessel, Available, Dead/Missing.  Vessel filter is omitted when in Space Center.
-- New:  Refactoring - moved window vars from Settings into window level code.
-- New:  Refactoring - Added InstalledMods static class to centralize mod assembly detection and soft dependencies.
-- New:  Refactoring - Altered Settings Save to segregate Hidden settings for ease of identification by users.
-- Fixed:  Bug in multi-part transfers that lock transfer in run state, with no progress.  Gave loops timeouts, and relaxed the resolution of the calculation to allow for rounding errors.
-- Fixed:  Bug in Crew Transfer.  When transferring a crew member to a full part with realism off, the crew member does not swap and disappears...
-- Fixed:  Bug in Crew Transfer with CLS installed.  First transfer works fine, subsequent xfers fail, and Transfer is stuck in moving...
 
 ----------
 License:  CC BY-NC-SA 4.0

@@ -23,6 +23,7 @@ namespace ShipManifest
         internal static bool _showConfigTab = false;
         internal static bool _showSoundsTab = false;
         internal static bool _showToolTipTab = false;
+        internal static bool _showModsTab = false;
 
         internal static bool ShowRealismTab
         {
@@ -89,6 +90,20 @@ namespace ShipManifest
                 _showToolTipTab = value;
             }
         }
+        internal static bool ShowModsTab
+        {
+            get
+            {
+                return _showModsTab;
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _showModsTab = value;
+            }
+        }
+        internal static bool ShowAllAssemblies = false;
 
         internal static string strFlowCost = "0";
 
@@ -116,7 +131,7 @@ namespace ShipManifest
 
             DisplayTabButtons();
 
-            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
+            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(300), GUILayout.Width(380));
             GUILayout.BeginVertical();
 
             DisplaySelectedTab();
@@ -125,17 +140,23 @@ namespace ShipManifest
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save"))
+            if (GUILayout.Button("Save", GUILayout.Height(20)))
             {
                 SMSettings.SaveIntervalSec = int.Parse(txtSaveInterval);
                 SMSettings.SaveSettings();
-                ShowWindow = false;
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    SMAddon.OnSMSettingsToggle();
+                else
+                    ShowWindow = false;
             }
-            if (GUILayout.Button("Cancel"))
+            if (GUILayout.Button("Cancel", GUILayout.Height(20)))
             {
                 // We've canclled, so restore original settings.
                 SMSettings.RestoreTempSettings();
-                ShowWindow = false;
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    SMAddon.OnSMSettingsToggle();
+                else
+                    ShowWindow = false;
             }
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
@@ -147,24 +168,24 @@ namespace ShipManifest
         {
             GUILayout.BeginHorizontal();
 
-            var realismStyle = ShowRealismTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+            GUIStyle realismStyle = ShowRealismTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
             if (GUILayout.Button("Realism", realismStyle, GUILayout.Height(20)))
             {
                 ShowRealismTab = true;
             }
             GUI.enabled = true;
             var highlightStyle = ShowHighlightTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-            if (GUILayout.Button("Highlighting", highlightStyle, GUILayout.Height(20)))
+            if (GUILayout.Button("Highlight", highlightStyle, GUILayout.Height(20)))
             {
                 ShowHighlightTab = true;
             }
             var tooltipStyle = ShowToolTipTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-            if (GUILayout.Button("ToolTips", tooltipStyle, GUILayout.Height(20)))
+            if (GUILayout.Button("ToolTip", tooltipStyle, GUILayout.Height(20)))
             {
                 ShowToolTipTab = true;
             }
             var soundStyle = ShowSoundsTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-            if (GUILayout.Button("Sounds", soundStyle, GUILayout.Height(20)))
+            if (GUILayout.Button("Sound", soundStyle, GUILayout.Height(20)))
             {
                 ShowSoundsTab = true;
             }
@@ -172,6 +193,11 @@ namespace ShipManifest
             if (GUILayout.Button("Config", configStyle, GUILayout.Height(20)))
             {
                 ShowConfigTab = true;
+            }
+            var modStyle = ShowModsTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+            if (GUILayout.Button("Mods", modStyle, GUILayout.Height(20)))
+            {
+                ShowModsTab = true;
             }
             GUILayout.EndHorizontal();
         }
@@ -188,18 +214,19 @@ namespace ShipManifest
                 DisplayToolTips();
             else if (ShowConfigTab)
                 DisplayConfig();
+            else if (ShowModsTab)
+                DisplayMods();
         }
 
         private static void DisplayRealism()
         {
             Rect rect = new Rect();
             GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
             if (!SMSettings.LockSettings)
-                GUILayout.Label("Realism Settings / Options", GUILayout.Height(10));
+                GUILayout.Label("Realism Settings / Options", SMStyle.LabelTabHeader);
             else
-                GUILayout.Label("Realism Settings / Options  (Locked.  Unlock in Config file)", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+                GUILayout.Label("Realism Settings / Options  (Locked.  Unlock in Config file)", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
             bool isEnabled = (!SMSettings.LockSettings);
             // Realism Mode
@@ -472,9 +499,8 @@ namespace ShipManifest
         {
             string label = "";
             GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Highlighting", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Highlighting", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
             // EnableHighlighting Mode
             GUILayout.BeginHorizontal();
@@ -565,9 +591,8 @@ namespace ShipManifest
             // Enable Tool Tips
             string label = "";
             GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("ToolTips", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("ToolTips", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
             label = "Enable Tool Tips";
             SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, label, GUILayout.Width(300));
@@ -623,9 +648,8 @@ namespace ShipManifest
 
         private static void DisplaySounds()
         {
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Sounds", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Sounds", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
             GUILayout.Label("Transfer Pump:", GUILayout.Height(20));
 
@@ -673,10 +697,8 @@ namespace ShipManifest
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Configuraton", GUILayout.Height(10));
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Configuraton", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
             if (!ToolbarManager.ToolbarAvailable)
             {
@@ -691,9 +713,11 @@ namespace ShipManifest
             SMSettings.EnableBlizzyToolbar = GUILayout.Toggle(SMSettings.EnableBlizzyToolbar, label, GUILayout.Width(300));
 
             GUI.enabled = true;
-            // TextureReplacer Mode
-            //label = "Enable Texture Replacer Events";
-            //Settings.EnableTextureReplacer = GUILayout.Toggle(Settings.EnableTextureReplacer, label, GUILayout.Width(300));
+            // UnityStyle Mode
+            label = "Enable Unity Style GUI Interface";
+            SMSettings.UseUnityStyle = GUILayout.Toggle(SMSettings.UseUnityStyle, label, GUILayout.Width(300));
+            if (SMSettings.UseUnityStyle && !SMSettings.prevUseUnityStyle)
+                SMStyle.WindowStyle = null;
 
             label = "Enable Debug Window";
             WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, label, GUILayout.Width(300));
@@ -742,12 +766,24 @@ namespace ShipManifest
             txtSaveInterval = GUILayout.TextField(txtSaveInterval, GUILayout.Width(40));
             GUILayout.Label("(sec)", GUILayout.Width(40));
             GUILayout.EndHorizontal();
+        }
 
+        private static void DisplayMods()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Installed Mods  ", SMStyle.LabelTabHeader, GUILayout.Width(180));
+            ShowAllAssemblies = GUILayout.Toggle(ShowAllAssemblies, "Show All Assemblies", SMStyle.ToggleStyleHeader);
+            GUILayout.EndHorizontal();
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+            if (ShowAllAssemblies)
+                InstalledMods.DisplayAssemblyList();
+            else
+                InstalledMods.DisplayModList();
         }
 
         private static void ResetTabs()
         {
-            _showRealismTab = _showHighlightTab = _showToolTipTab = _showSoundsTab = _showConfigTab = false;
+            _showRealismTab = _showHighlightTab = _showToolTipTab = _showSoundsTab = _showConfigTab = _showModsTab = false;
         }
 
         #endregion

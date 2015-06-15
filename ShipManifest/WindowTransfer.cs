@@ -131,7 +131,7 @@ namespace ShipManifest
             try
             {
                 // This is a scroll panel (we are using it to make button lists...)
-                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
+                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget, SourceTransferViewerScrollPosition);
@@ -152,7 +152,7 @@ namespace ShipManifest
             {
                 // Source Part resource Details
                 // this Scroll viewer is for the details of the part selected above.
-                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, GUILayout.Height(100), GUILayout.Width(300));
+                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedResources.Contains("Crew"))
@@ -193,7 +193,7 @@ namespace ShipManifest
                     SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
 
                 // This is a scroll panel (we are using it to make button lists...)
-                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, GUILayout.Height(125), GUILayout.Width(300));
+                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(125), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource, TargetTransferViewerScrollPosition);
@@ -213,7 +213,7 @@ namespace ShipManifest
             try
             {
                 // Target Part resource details
-                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, GUILayout.Height(100), GUILayout.Width(300));
+                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
@@ -330,19 +330,19 @@ namespace ShipManifest
             }
         }
 
-        private static void CrewDetails(List<Part> SelectedPartsSource, List<Part> SelectedPartsTarget, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
+        private static void CrewDetails(List<Part> SelectedPartsFrom, List<Part> SelectedPartsTo, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
         {
             // Since only one Crew Part can be selected, all lists will use an index of [0].
             int scrollX = 20;
             if (xferMode == SMAddon.XFERMode.TargetToSource)
                 scrollX = 320;
 
-            if (SelectedPartsSource.Count > 0)
+            if (SelectedPartsFrom.Count > 0)
             {
-                List<ProtoCrewMember> crewMembers = SelectedPartsSource[0].protoModuleCrew;
-                for (int x = 0; x < SelectedPartsSource[0].protoModuleCrew.Count(); x++)
+                List<ProtoCrewMember> crewMembers = SelectedPartsFrom[0].protoModuleCrew;
+                for (int x = 0; x < SelectedPartsFrom[0].protoModuleCrew.Count(); x++)
                 {
-                    ProtoCrewMember crewMember = SelectedPartsSource[0].protoModuleCrew[x];
+                    ProtoCrewMember crewMember = SelectedPartsFrom[0].protoModuleCrew[x];
                     GUILayout.BeginHorizontal();
                     if (crewMember.seat != null)
                     {
@@ -352,7 +352,7 @@ namespace ShipManifest
                         if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
                         {
                             ToolTip = "";
-                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsSource[0], SelectedPartsSource[0]);
+                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsFrom[0], SelectedPartsFrom[0]);
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
@@ -362,7 +362,7 @@ namespace ShipManifest
                         GUI.enabled = true;
                     }
                     GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
-                    if (SMAddon.CanKerbalsBeXferred(SelectedPartsSource, SelectedPartsTarget))
+                    if (SMAddon.CanKerbalsBeXferred(SelectedPartsFrom, SelectedPartsTo))
                         GUI.enabled = true;
                     else
                         GUI.enabled = false;
@@ -376,7 +376,7 @@ namespace ShipManifest
                         if (GUILayout.Button(new GUIContent("Xfer", xferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                         {
                             SMAddon.smController.CrewTransfer.FromCrewMember = crewMember;
-                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsSource[0], SelectedPartsTarget[0]);
+                            SMAddon.smController.CrewTransfer.CrewTransferBegin(crewMember, SelectedPartsFrom[0], SelectedPartsTo[0]);
                         }
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
@@ -524,7 +524,7 @@ namespace ShipManifest
                 // Xfer Controls Display
                 // let's determine how much of a resource we can move to the target.
                 double maxXferAmount = TransferResource.CalcMaxXferAmt(partsSource, partsTarget, selectedResources);
-                if (maxXferAmount > 0)
+                if (maxXferAmount > 0 || TransferResource.ResourceXferActive)
                 {
                     GUILayout.BeginHorizontal();
                     if (TransferResource.ResourceXferActive)

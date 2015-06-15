@@ -21,9 +21,8 @@ namespace ShipManifest
 
             GUILayout.BeginVertical();
             GUI.enabled = true;
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Hatch Control Center ", GUILayout.Height(10));
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
             string step = "start";
             try
             {
@@ -42,7 +41,7 @@ namespace ShipManifest
 
                     step = "gui enable";
                     GUI.enabled = isEnabled;
-                    bool newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(330));
+                    bool newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(325));
                     step = "button toggle check";
                     if (!open && newOpen)
                     {

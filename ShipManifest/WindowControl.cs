@@ -93,7 +93,7 @@ namespace ShipManifest
             GUILayout.BeginVertical();
             DisplayWindowTabs();
             // This is a scroll panel (we are using it to make button lists...)
-            DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, GUILayout.Height(200), GUILayout.Width(370));
+            DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(200), GUILayout.Width(370));
             DisplaySelectedTab();
             GUILayout.EndScrollView();
 

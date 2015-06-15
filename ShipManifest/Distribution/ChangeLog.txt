@@ -1,12 +1,24 @@
-﻿Version 4.3.1.0 - Release xx June, 2015 - External Crew Transfer Edition.
+﻿Version 4.3.2.0 - Release xx June, 2015 - External Crew Transfer Edition.
 x New: When using External Seats, crew can be transferred from seat to seat.
 x New:  RT command queue is now respected.  Antenna switching from the Control Window will now be queued.
+
+Version 4.3.1.0 - Release 15 June, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
+- New:  Tightened Integration with DeepFreeze by adding DF Interface component and simplifying Frozen Kerbal display and detection...
+- New:  Added ability to Freeze/Thaw Kerbals in  DeepFreeze Container via Roster window.  Works only when a freezer is part of the active vessel and contains kerbals.
+- New:  Added New GUI Skin: Unity Default.  Selectable in Settings Config Tab and takes effect immediately.
+- New:  Updated Roster display to improve general layout and readability.
+- New:  Added Mods Tab to Settings Window.  Displayes Installed Mods/Assemblies.
+- Fixed:  Bug in settings.  When cancelling or saving changes in Space Center, Settings Icon does not revert on toolbar.
+- Fixed:  Bug with KIS compatability.  When transferring Kerbals with inventory, a race condition occurs with OnCrewTransferred Event handler and causes errors.
+          Added switch in SMSetting.dat to allow disabling onCrewTransferred Event call if KIS still is causing issues.
+- Fixed:  Bug in Multi Part transfers.  Transfers sometimes still hang.  Added check for maxAmount to Transfer, and a flag for transfer in progress to allow Stop button to remain visible until completion...
 
 Version 4.3.0.2 - Release 08 June, 2015 - Crew, Interfaces, & Refactoring Edition.
 - New:  Cleaned up highlighting when undocking events occur to turn off highlighting on vessel parts/vessels that become detatched...
 - Fixed:  Bug in settings.  When disabling Crew in setting, if crew was selected, Highligting does not turn off.
 - Fixed:  Bug in Settings.  When in Highlighting Tab, "Highlight only Source/Target parts" and "Enable CLS Highlighting" should act like radio buttons but do not. 
 - Fixed:  Under certain circumstances, Highlighting woud not be completely cleared when turned off If crew was selected and CLS was enabled.
+- Fixed:  RemoteTech detection was failing when multiple copies of the RemoteTech.dll existed.
 
 Version 4.3.0.1 - Release 06 June, 2015 - Crew, Interfaces, & Refactoring Edition.
 - New:  Refactored Resource transfers to improve overall transfer speed, flow & "feel".  Lag was causing issues on larger vessels.

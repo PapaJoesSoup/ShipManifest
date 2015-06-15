@@ -62,6 +62,12 @@
     <Reference Include="CLSInterfaces">
       <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
+    <Reference Include="DeepFreeze">
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\GameData\REPOSoftTech\DeepFreeze\Plugins\DeepFreeze.dll</HintPath>
+    </Reference>
+    <Reference Include="DFInterface">
+      <HintPath>Distribution\GameData\ShipManifest\Plugins\DFInterface.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\KSP_Data\Managed\UnityEngine.dll</HintPath>
@@ -100,6 +106,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\DFInterface.dll" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />

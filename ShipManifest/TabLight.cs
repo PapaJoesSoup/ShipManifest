@@ -21,9 +21,8 @@ namespace ShipManifest
 
             GUILayout.BeginVertical();
             GUI.enabled = true;
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("External Light Control Center ", GUILayout.Height(10));
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
             string step = "start";
             try
             {
@@ -32,7 +31,7 @@ namespace ShipManifest
                 {
                     string label = iLight.Status + " - " + iLight.Title;
                     bool OnState = iLight.isOn;
-                    bool newOnState = GUILayout.Toggle(OnState, label, GUILayout.Width(330), GUILayout.Height(40));
+                    bool newOnState = GUILayout.Toggle(OnState, label, GUILayout.Width(325), GUILayout.Height(40));
                     step = "button toggle check";
                     if (!OnState && newOnState)
                         iLight.TurnOnLight();

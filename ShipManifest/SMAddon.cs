@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using HighlightingSystem;
 using ConnectedLivingSpace;
+using DF;
 
 namespace ShipManifest
 {
@@ -20,6 +21,9 @@ namespace ShipManifest
         internal static string TextureFolder = "ShipManifest/Textures/";
         internal static string saveMessage = string.Empty;
 
+        // DeepFreeze Frozen Crew interface
+        internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
+        
         // Vessel vars
         internal static ICLSAddon clsAddon = null;
 
@@ -33,9 +37,6 @@ namespace ShipManifest
         internal static AudioClip sound1;
         internal static AudioClip sound2;
         internal static AudioClip sound3;
-
-        [KSPField(isPersistant = true)]
-        internal static double timestamp = 0.0;
 
         [KSPField(isPersistant = true)]
         internal static double elapsed = 0.0;
@@ -115,7 +116,10 @@ namespace ShipManifest
                     frameErrTripped = false;
 
                 if (WindowRoster.resetRosterSize)
-                    WindowRoster.Position.height = 300; //reset hight
+                    if (SMSettings.UseUnityStyle)
+                        WindowRoster.Position.height = 330; //reset hight
+                    else
+                        WindowRoster.Position.height = 350; //reset hight
 
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
@@ -260,6 +264,12 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
             try
             {
+                if (SMSettings.UseUnityStyle)
+                    GUI.skin = null;
+                else
+                    GUI.skin = HighLogic.Skin;
+
+                SMStyle.SetupGUI();
                 Display();
 
                 Utilities.ShowToolTips();
@@ -305,6 +315,20 @@ namespace ShipManifest
                             smController.RespawnCrew();
                             smController.CrewTransfer.CrewTransferBegin(smController.CrewTransfer.FromCrewMember, smController.CrewTransfer.FromPart, smController.CrewTransfer.ToPart);
                         }
+
+                        if (SMSettings.EnableOnCrewTransferEvent && TransferCrew.FireSourceXferEvent)
+                        {
+                            // Now let's deal with third party mod support...
+                            TransferCrew.FireSourceXferEvent = false;
+                            GameEvents.onCrewTransferred.Fire(TransferCrew.SourceAction);
+
+                            //If a swap, we need to handle that too...
+                            if (TransferCrew.FireTargetXferEvent)
+                            {
+                                TransferCrew.FireTargetXferEvent = false;
+                                GameEvents.onCrewTransferred.Fire(TransferCrew.TargetAction);
+                            }
+                        }
                     }
                 }
             }
@@ -344,7 +368,8 @@ namespace ShipManifest
         // Crew Event handlers
         internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
         {
-            if (TransferCrew.IgnoreFromToXferEvent || TransferCrew.IgnoreToFromXferEvent)
+            if ((action.host == TransferCrew.SourceAction.host && action.from == TransferCrew.SourceAction.from && action.to == TransferCrew.SourceAction.to)
+                || action.host == TransferCrew.TargetAction.host && action.from == TransferCrew.TargetAction.from && action.to == TransferCrew.TargetAction.to)
             {
                 // We are performing a mod notification. Ignore the event.
                 return;
@@ -729,12 +754,14 @@ namespace ShipManifest
                         SMRoster_Blizzy.TexturePath = WindowRoster.ShowWindow ? TextureFolder + "IconR_On_24" : TextureFolder + "IconR_Off_24";
                     else
                         SMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
+
+                    SMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                 }
 
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMRosterToggleOn.  " + ex.ToString(), "Error", true);
+                Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMRosterToggle.  " + ex.ToString(), "Error", true);
             }
         }
         internal static void OnSMSettingsToggle()
@@ -1105,8 +1132,6 @@ namespace ShipManifest
             try
             {
                 step = "0 - Start";
-                SMStyle.SetupGUI();
-
                 if (WindowDebugger.ShowWindow)
                     WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display, " Ship Manifest -  Debug Console - Ver. " + SMSettings.CurVersion, GUILayout.MinHeight(20));
 
@@ -1121,10 +1146,10 @@ namespace ShipManifest
                     if (WindowRoster.ShowWindow && SMAddon.ShowUI)
                     {
                         if (WindowRoster.resetRosterSize)
-                        {
-                            step = "5 - Reset Roster Size";
-                            WindowRoster.Position.height = 300; //reset hight
-                        }
+                            if (SMSettings.UseUnityStyle)
+                                WindowRoster.Position.height = 330; //reset hight
+                            else
+                                WindowRoster.Position.height = 350; //reset hight
 
                         step = "6 - Show Roster";
                         WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display, "Ship Manifest Roster", GUILayout.MinHeight(20));

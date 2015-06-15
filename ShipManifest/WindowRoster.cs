@@ -5,12 +5,15 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 using ConnectedLivingSpace;
+using DF;
 
 namespace ShipManifest
 {
     internal static class WindowRoster
     {
-        internal static Rect Position = new Rect(0, 0, 400, 300);
+        internal static float windowWidth = 700;
+        internal static float windowHeight = 330;
+        internal static Rect Position = new Rect(0, 0, 0, 0);
         internal static bool ShowWindow = false;
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
@@ -34,6 +37,10 @@ namespace ShipManifest
                     return "";
             }
         }
+        
+        // Gender var
+        internal static ProtoCrewMember.Gender gender = ProtoCrewMember.Gender.Male;
+
         //Filter vars
         internal static bool isAll = true;
         internal static bool isVessel = false;
@@ -89,7 +96,7 @@ namespace ShipManifest
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
             try
             {
-                GUIStyle style = GUI.skin.button;
+                GUIStyle style = new GUIStyle(GUI.skin.button);
                 var defaultColor = style.normal.textColor;
                 GUILayout.BeginVertical();
                 DisplayRosterFilter();
@@ -105,14 +112,14 @@ namespace ShipManifest
                 else
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120)))
+                    if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120), GUILayout.Height(20)))
                     {
                         OnCreate = true;
                     }
                     if (SMSettings.RenameWithProfession)
                     {
                         string toolTip = "This action resets all renamed Kerbals to their KSP default professions.\r\nIt removes any non printing chars used to maintain a specific profession.\r\nUse this when you wish to revert a game save to be compatabile with KerbalStats\r\n or some other mod that creates custom professions.";
-                        if (GUILayout.Button(new GUIContent("Reset Professions", toolTip), GUILayout.MaxWidth(120)))
+                        if (GUILayout.Button(new GUIContent("Reset Professions", toolTip), GUILayout.MaxWidth(120), GUILayout.Height(20)))
                         {
                             ResetKerbalProfessions();
                         }
@@ -136,12 +143,19 @@ namespace ShipManifest
         {
             try
             {
-                ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(200), GUILayout.Width(400));
                 GUILayout.BeginVertical();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Name", GUILayout.Width(140));
+                GUILayout.Label("Gender", GUILayout.Width(50));
+                GUILayout.Label("Profession", GUILayout.Width(70));
+                GUILayout.Label("Skill", GUILayout.Width(30));
+                GUILayout.Label("Status", GUILayout.Width(220));
+                GUILayout.EndHorizontal();
 
-                // Support for DeepFreeze
+                ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
                 List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-                if (InstalledMods.IsDFInstalled)
+                // Support for DeepFreeze
+                if (DFInterface.IsDFInstalled)
                     AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
 
                 foreach (ProtoCrewMember kerbal in AllCrew)
@@ -167,27 +181,31 @@ namespace ShipManifest
                                 {
                                     if (crewMember == kerbal)
                                     {
-                                        rosterDetails = "\r\n  -  " + thisVessel.GetName().Replace("(unloaded)", "");
+                                        rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
                                     }
                                 }
                             }
                         }
-                        else if (InstalledMods.IsDFInstalled && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead) && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+                        else if (DFInterface.IsDFInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                         {
                             // This kerbal could be frozen.  Lets find out...
-                            rosterDetails = GetProtoFrozenDetials(kerbal);
+                            rosterDetails = GetFrozenDetials(kerbal);
                             labelStyle = SMStyle.LabelStyleCyan;
                         }
                         else
                         {
-                            // Since the kerbal has no vessel assignment, lets show what their status is instead...
-                            rosterDetails = "\r\n  -  " + kerbal.rosterStatus;
+                            // Since the kerbal has no vessel assignment, lets show what their status...
+                            rosterDetails = kerbal.rosterStatus.ToString();
                         }
-                        GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0}{1}", kerbal.name + ", (" + kerbal.experienceTrait.Title + "/" + kerbal.experience.ToString() + ")", rosterDetails), labelStyle, GUILayout.Width(230), GUILayout.Height(10));  // + "  (" + kerbal.seat.vessel.name + ")"
                         string buttonText = string.Empty;
                         string buttonToolTip = string.Empty;
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
+                        GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
+                        GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
+                        GUILayout.Label(kerbal.experienceLevel.ToString().ToString(), labelStyle, GUILayout.Width(30));
+                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(220));
 
                         if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                             GUI.enabled = true;
@@ -200,7 +218,7 @@ namespace ShipManifest
                         else
                             buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
 
-                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60)))
+                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20), GUILayout.Height(20)))
                         {
                             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                             {
@@ -216,49 +234,75 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
 
-                        if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count > 0 && !SMController.CrewPartIsFull(SMAddon.smController.SelectedPartsSource[0]))
+                        if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
                         {
-                            GUI.enabled = true;
-                            buttonText = "Add";
-                            buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
+                            if (((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count > 0 && !SMController.CrewPartIsFull(SMAddon.smController.SelectedPartsSource[0]))
+                            {
+                                GUI.enabled = true;
+                                buttonText = "Add";
+                                buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
+                            }
+                            else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned) && SMAddon.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id)
+                            {
+                                GUI.enabled = false;
+                                buttonText = "Thaw";
+                                buttonToolTip = "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
+                            }
+                            else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned) && SMAddon.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id)
+                            {
+                                GUI.enabled = true;
+                                buttonText = "Thaw";
+                                buttonToolTip = "UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
+                            }
+                            else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) && IsKerbalReadyToFreeze(kerbal))
+                            {
+                                GUI.enabled = true;
+                                buttonText = "Freeze";
+                                buttonToolTip = "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
+                            }
+                            else if (((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                            {
+                                GUI.enabled = true;
+                                buttonText = "Remove";
+                                buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+                            }
+                            else if (((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count == 0)
+                            {
+                                GUI.enabled = false;
+                                buttonText = "Add";
+                                buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
+                            }
+                            else if ((SMSettings.RealismMode && !SMAddon.smController.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                            {
+                                GUI.enabled = false;
+                                buttonText = "Add";
+                                buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
+                            }
+                            else
+                            {
+                                GUI.enabled = false;
+                                buttonText = "--";
+                                buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
+                            }
                         }
-                        else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+
+                        if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                         {
                             GUI.enabled = true;
                             buttonText = "Respawn";
                             buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
                         }
-                        else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
-                        {
-                            GUI.enabled = true;
-                            buttonText = "Remove";
-                            buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
-                        }
-                        else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((SMSettings.RealismMode && SMAddon.smController.IsPreLaunch) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.smController.SelectedPartsSource.Count == 0)
-                        {
-                            GUI.enabled = false;
-                            buttonText = "Add";
-                            buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
-                        }
-                        else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && (SMSettings.RealismMode && !SMAddon.smController.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
-                        {
-                            GUI.enabled = false;
-                            buttonText = "Add";
-                            buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
-                        }
-                        else
-                        {
-                            GUI.enabled = false;
-                            buttonText = "--";
-                                buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
-                        }
 
-                        if (GUILayout.Button(new GUIContent(buttonText,buttonToolTip), GUILayout.Width(60)))
+                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60), GUILayout.Height(20)))
                         {
                             if (buttonText == "Add")
                                 TransferCrew.AddCrewMember(kerbal, SMAddon.smController.SelectedPartsSource[0]);
                             else if (buttonText == "Respawn")
                                 SMController.RespawnKerbal(kerbal);
+                            else if (buttonText == "Thaw")
+                                ThawKerbal(kerbal);
+                            else if (buttonText == "Freeze")
+                                FreezeKerbal(kerbal);
                             else if (buttonText == "Remove")
                             {
                                 // get part...
@@ -285,80 +329,107 @@ namespace ShipManifest
             }
         }
 
+        internal static Dictionary<string, KerbalInfo> GetFrozenKerbals()
+        {
+            if (DFInterface.IsDFInstalled)
+            {
+                IDFInterface IDF = DFInterface.GetFrozenKerbals();
+                return IDF.FrozenKerbals;
+            }
+            else
+                return new Dictionary<string, KerbalInfo>();
+        }
+
         private static string GetFrozenDetials(ProtoCrewMember kerbal)
         {
             string rosterDetails = "";
-            bool _found = false;
-            foreach (Vessel thisVessel in FlightGlobals.Vessels)
-            {
-                List<Part> cryoParts = (from p in thisVessel.parts where p.name.Contains("cryofreezer") select p).ToList();
-                foreach (Part pPart in cryoParts)
-                {
-                    List<PartModule> cryoModules = (from PartModule m in pPart.Modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
-                    foreach (PartModule pMmodule in cryoModules)
-                    {
-                        foreach (BaseEvent thisEvent in pMmodule.Events)
-                        {
-                            if (thisEvent.guiName.Contains(kerbal.name))
-                            {
-                                _found = true;
-                                rosterDetails = "\r\n- Frozen: " + thisVessel.GetName().Replace("(unloaded)", "");
-                                break;
-                            }
-                        }
-                        if (_found) break;
-                    }
-                    if (_found) break;
-                }
-            }
-            if (!_found)
-            {
-                rosterDetails = "\r\n - Frozen";
-            }
+            if (SMAddon.FrozenKerbals.ContainsKey(kerbal.name))
+                rosterDetails = "Frozen - " + (SMAddon.FrozenKerbals[kerbal.name]).vesselName.Replace("(unloaded)", "");
+            else
+                rosterDetails = "Frozen";
+
             return rosterDetails;
         }
 
-        private static string GetProtoFrozenDetials(ProtoCrewMember kerbal)
+        internal static bool IsKerbalReadyToFreeze(ProtoCrewMember kerbal)
         {
-            string rosterDetails = "";
-            bool _found = false;
-            foreach (Vessel thisVessel in FlightGlobals.Vessels)
+            if (DFInterface.IsDFInstalled)
             {
-                List<ProtoPartSnapshot> cryoParts = (from p in thisVessel.protoVessel.protoPartSnapshots where p.partName.Contains("cryofreezer") select p).ToList();
-                foreach (ProtoPartSnapshot pPart in cryoParts)
+                List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.partInfo.name == "cryofreezer" select p).ToList();
+                foreach (Part CryoFreezer in cryofreezers)
                 {
-                    List<ProtoPartModuleSnapshot> cryoModules = (from ProtoPartModuleSnapshot m in pPart.modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
-                    foreach (ProtoPartModuleSnapshot pMmodule in cryoModules)
+                    if (CryoFreezer.protoModuleCrew.Contains(kerbal))
                     {
-                        ConfigNode cryoNode = pMmodule.moduleValues;
+                        return true;
+                    }
+                }
+                return false;
+            }
+            else
+                return false;
+        }
+
+        internal static void ThawKerbal(ProtoCrewMember kerbal)
+        {
+            try
+            {
+                if (DFInterface.IsDFInstalled)
+                {
+                    DF.DeepFreeze objFreeze = DF.DeepFreeze.Instance;
+                    KerbalInfo iKerbal = SMAddon.FrozenKerbals[kerbal.name];
+
+                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.partInfo.name == "cryofreezer" select p).ToList();
+                    foreach (Part CryoFreezer in cryofreezers)
+                    {
+                        if (CryoFreezer.flightID == iKerbal.partID)
                         {
-                            if (cryoNode.HasValue("FrozenCrew"))
-                            {
-                                string FrozenCrew = cryoNode.GetValue("FrozenCrew");
-                                if (FrozenCrew.Contains(kerbal.name))
-                                {
-                                    _found = true;
-                                    rosterDetails = "\r\n- Frozen: " + thisVessel.GetName().Replace("(unloaded)", "");
-                                    break;
-                                }
-                            }
+                            PartModule deepFreezer = (from PartModule pm in CryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+                            ((DF.DeepFreezer)deepFreezer).beginThawKerbal(kerbal.name);
+                            break;
                         }
                     }
-                    if (_found) break;
                 }
             }
-            if (!_found)
+            catch (Exception ex)
             {
-                rosterDetails = "Frozen";
+                Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
-            return rosterDetails;
+        }
+
+        internal static void FreezeKerbal(ProtoCrewMember kerbal)
+        {
+            try
+            {
+                if (DFInterface.IsDFInstalled)
+                {
+                    DF.DeepFreeze objFreeze = DF.DeepFreeze.Instance;
+
+                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.partInfo.name == "cryofreezer" select p).ToList();
+                    foreach (Part CryoFreezer in cryofreezers)
+                    {
+                        if (CryoFreezer.protoModuleCrew.Contains(kerbal))
+                        {
+                            PartModule deepFreezer = (from PartModule pm in CryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+                            ((DF.DeepFreezer)deepFreezer).beginFreezeKerbal(kerbal);
+                            break;
+                        }
+                    }
+
+                    // this only works in SpaceCenter, and makes them available (removed from vessel)
+                    // objFreeze.ThawFrozenCrew(kerbal.name, FlightGlobals.ActiveVessel.id, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
         }
 
         private static void CreateKerbalViewer()
         {
             DisplaySelectProfession();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create", GUILayout.MaxWidth(80)))
+            if (GUILayout.Button("Create", GUILayout.MaxWidth(80), GUILayout.Height(20)))
             {
                 bool kerbalFound = false;
                 while (!kerbalFound)
@@ -369,7 +440,7 @@ namespace ShipManifest
                 }
                 OnCreate = false;
             }
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80)))
+            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80), GUILayout.Height(20)))
             {
                 OnCreate = false;
                 SelectedKerbal = null;
@@ -524,7 +595,7 @@ namespace ShipManifest
                 if (!isAll && !isVessel && !isDead)
                     isAvail = true;
             }
-            isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(80));
+            isDead = GUILayout.Toggle(isDead, "Dead/Missing");
             if (isDead)
                 isAll = isVessel = isAvail = false;
             else
@@ -539,7 +610,7 @@ namespace ShipManifest
         {
             if (isAll)
                 return true;
-            else if (isVessel && (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (InstalledMods.IsDFInstalled && GetFrozenDetials(kerbal).Contains("Frozen -"))))
+            else if (isVessel && (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (DFInterface.IsDFInstalled && GetFrozenDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", "")))))
                 return true;
             else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                 return true;

@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 using ConnectedLivingSpace;
+using DF;
 
 namespace ShipManifest
 {
@@ -59,7 +60,7 @@ namespace ShipManifest
             try
             {
                 GUILayout.BeginVertical();
-                SMScrollViewerPosition = GUILayout.BeginScrollView(SMScrollViewerPosition, GUILayout.Height(100), GUILayout.Width(300));
+                SMScrollViewerPosition = GUILayout.BeginScrollView(SMScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.IsPreLaunch)
@@ -112,6 +113,10 @@ namespace ShipManifest
                         {
                             WindowRoster.SelectedKerbal = null;
                             WindowRoster.ToolTip = "";
+                        }
+                        else
+                        {
+                            SMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                         }
                     }
                     catch (Exception ex)
@@ -265,13 +270,16 @@ namespace ShipManifest
 
                     // Now lets update the Xfer Objects...
                     SMAddon.smController.ResourcesToXfer.Clear();
-                    foreach (string resource in SMAddon.smController.SelectedResources)
+                    if (!SMAddon.smController.SelectedResources.Contains("Crew") && !SMAddon.smController.SelectedResources.Contains("Science"))
                     {
-                        // Lets create a Xfer Object for managing xfer options and data.
-                        TransferResource modResource = new TransferResource(resource);
-                        modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
-                        modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
-                        SMAddon.smController.ResourcesToXfer.Add(modResource);
+                        foreach (string resource in SMAddon.smController.SelectedResources)
+                        {
+                            // Lets create a Xfer Object for managing xfer options and data.
+                            TransferResource modResource = new TransferResource(resource);
+                            modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, resource);
+                            modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, resource);
+                            SMAddon.smController.ResourcesToXfer.Add(modResource);
+                        }
                     }
 
                     // Now, based on the resourceselection, do we show the Transfer window?
@@ -289,42 +297,63 @@ namespace ShipManifest
 
         internal static void ReconcileSelectedXferParts(List<string> resourceNames)
         {
-            if (resourceNames.Count > 0)
+            try
             {
-                List<Part> newSources = new List<Part>();
-                List<Part> newTargets = new List<Part>();
-                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
-                foreach (Part part in SMAddon.smController.SelectedPartsSource)
+                if (resourceNames.Count > 0)
                 {
-                    if (resourceNames.Count > 1)
+                    List<Part> newSources = new List<Part>();
+                    List<Part> newTargets = new List<Part>();
+                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
+                    foreach (Part part in SMAddon.smController.SelectedPartsSource)
                     {
-                        if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                            newSources.Add(part);
+                        if (resourceNames.Count > 1)
+                        {
+                            if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                                newSources.Add(part);
+                        }
+                        else
+                        {
+                            if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
+                                newSources.Add(part);
+                            else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                                newSources.Add(part);
+                            else if (part.Resources.Contains(resourceNames[0]))
+                                newSources.Add(part);
+                        }
                     }
-                    else if (part.Resources.Contains(resourceNames[0]))
-                        newSources.Add(part);
-                }
 
-                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
-                foreach (Part part in SMAddon.smController.SelectedPartsTarget)
-                {
-                    if (resourceNames.Count > 1)
+                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
+                    foreach (Part part in SMAddon.smController.SelectedPartsTarget)
                     {
-                        if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                            newTargets.Add(part);
+                        if (resourceNames.Count > 1)
+                        {
+                            if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                                newTargets.Add(part);
+                        }
+                        else
+                        {
+                            if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
+                                newTargets.Add(part);
+                            else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                                newTargets.Add(part);
+                            else if (part.Resources.Contains(resourceNames[0]))
+                                newTargets.Add(part);
+                        }
                     }
-                    else if (part.Resources.Contains(resourceNames[0]))
-                        newTargets.Add(part);
+                    SMAddon.smController.SelectedPartsSource.Clear();
+                    SMAddon.smController.SelectedPartsSource = newSources;
+                    SMAddon.smController.SelectedPartsTarget.Clear();
+                    SMAddon.smController.SelectedPartsTarget = newTargets;
                 }
-                SMAddon.smController.SelectedPartsSource.Clear();
-                SMAddon.smController.SelectedPartsSource = newSources;
-                SMAddon.smController.SelectedPartsTarget.Clear();
-                SMAddon.smController.SelectedPartsTarget = newTargets;
+                else
+                {
+                    SMAddon.smController.SelectedPartsSource.Clear();
+                    SMAddon.smController.SelectedPartsTarget.Clear();
+                }
             }
-            else
+            catch (Exception ex)
             {
-                SMAddon.smController.SelectedPartsSource.Clear();
-                SMAddon.smController.SelectedPartsTarget.Clear();
+                Utilities.LogMessage(string.Format(" in WindowManifest.ReconcileSelectedXferParts.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -332,7 +361,7 @@ namespace ShipManifest
         {
             try
             {
-                ResourceScrollViewerPosition = GUILayout.BeginScrollView(ResourceScrollViewerPosition, GUILayout.Height(100), GUILayout.Width(300));
+                ResourceScrollViewerPosition = GUILayout.BeginScrollView(ResourceScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedResources.Count > 0)

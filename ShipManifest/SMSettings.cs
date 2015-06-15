@@ -91,6 +91,7 @@ namespace ShipManifest
         internal static bool RenameWithProfession = false;
         internal static bool AutoSave = false;
         internal static int SaveIntervalSec = 60;
+        internal static bool UseUnityStyle = false;
 
 
 
@@ -108,6 +109,7 @@ namespace ShipManifest
         internal static bool ShowIVAUpdateBtn = false;
         internal static double PumpSoundVol = 3;
         internal static double CrewSoundVol = 3;
+        internal static bool EnableOnCrewTransferEvent = true;
 
 
         
@@ -119,6 +121,7 @@ namespace ShipManifest
         internal static string prevErrorLogLength = "1000";
         internal static bool prevSaveLogOnExit = true;
         internal static bool prevAutoSave;
+        internal static bool prevUseUnityStyle = false;
         internal static int prevSaveIntervalSec = 60;
 
         internal static bool prevRealismMode = false;
@@ -258,7 +261,7 @@ namespace ShipManifest
             SaveLogOnExit = SettingsNode.HasValue("SaveLogOnExit") ? bool.Parse(SettingsNode.GetValue("SaveLogOnExit")) : SaveLogOnExit;
             EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;
             RenameWithProfession = SettingsNode.HasValue("RenameWithProfession") ? bool.Parse(SettingsNode.GetValue("RenameWithProfession")) : RenameWithProfession;
-
+            UseUnityStyle = SettingsNode.HasValue("UseUnityStyle") ? bool.Parse(SettingsNode.GetValue("UseUnityStyle")) : UseUnityStyle;
 
             // Hidden Settings
             // Hidden Highlighting
@@ -273,13 +276,13 @@ namespace ShipManifest
             CrewXferDelaySec = HiddenNode.HasValue("CrewXferDelaySec") ? double.Parse(HiddenNode.GetValue("CrewXferDelaySec")) : CrewXferDelaySec;
             IvaUpdateFrameDelay = HiddenNode.HasValue("IvaUpdateFrameDelay") ? int.Parse(HiddenNode.GetValue("IvaUpdateFrameDelay")) : IvaUpdateFrameDelay;
             ShowIVAUpdateBtn = HiddenNode.HasValue("ShowIVAUpdateBtn") ? bool.Parse(HiddenNode.GetValue("ShowIVAUpdateBtn")) : ShowIVAUpdateBtn;
+            EnableOnCrewTransferEvent = HiddenNode.HasValue("EnableOnCrewTransferEvent") ? bool.Parse(HiddenNode.GetValue("EnableOnCrewTransferEvent")) : EnableOnCrewTransferEvent;
 
             // Okay, set the Settings loaded flag
             Loaded = true;
 
             // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
             RepositionWindows();
-
         }
 
         internal static void SaveSettings()
@@ -354,6 +357,7 @@ namespace ShipManifest
             WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
             WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
             WriteValue(SettingsNode, "RenameWithProfession", RenameWithProfession);
+            WriteValue(SettingsNode, "UseUnityStyle", UseUnityStyle);
 
             // Hidden Settings
             WriteValue(HiddenNode, "ResourcePartColor", ResourcePartColor);
@@ -366,6 +370,7 @@ namespace ShipManifest
             WriteValue(HiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
             WriteValue(HiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
             WriteValue(HiddenNode, "ShowIVAUpdateBtn", ShowIVAUpdateBtn);
+            WriteValue(HiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
 
             if (!Directory.Exists(SETTINGS_PATH))
                 Directory.CreateDirectory(SETTINGS_PATH);
@@ -478,6 +483,7 @@ namespace ShipManifest
             prevOverrideStockCrewTransfer = OverrideStockCrewXfer;
             prevEnableKerbalRename = EnableKerbalRename;
             prevRenameWithProfession = RenameWithProfession;
+            prevUseUnityStyle = UseUnityStyle;
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
@@ -527,6 +533,7 @@ namespace ShipManifest
             OverrideStockCrewXfer = prevOverrideStockCrewTransfer;
             EnableKerbalRename = prevEnableKerbalRename;
             RenameWithProfession = prevRenameWithProfession;
+            UseUnityStyle = prevUseUnityStyle;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
             SaveLogOnExit = prevSaveLogOnExit;

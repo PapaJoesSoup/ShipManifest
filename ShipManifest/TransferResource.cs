@@ -234,10 +234,10 @@ namespace ShipManifest
             return amount;
         }
 
-        internal static double CalcMaxXferAmt(List<Part> Sources, List<Part> Targets, List<string> SelectedResources)
+        internal static double CalcMaxXferAmt(List<Part> PartsFrom, List<Part> PartsTo, List<string> SelectedResources)
         {
             double maxXferAmount = 0;
-            if (Sources.Count == 0 || Targets.Count == 0 || (SelectedResources.Count == 0 || SelectedResources.Count == 0))
+            if (PartsFrom.Count == 0 || PartsTo.Count == 0 || (SelectedResources.Count == 0 || SelectedResources.Count == 0))
                 maxXferAmount = 0;
             else
             {
@@ -245,17 +245,17 @@ namespace ShipManifest
                 int resIdx = 0;
                 if (SelectedResources.Count > 1)
                 {
-                    if (TransferResource.CalcResourceCapacity(Targets, SelectedResources[0]) < TransferResource.CalcResourceCapacity(Targets, SelectedResources[1]))
+                    if (TransferResource.CalcResourceCapacity(PartsTo, SelectedResources[0]) < TransferResource.CalcResourceCapacity(PartsTo, SelectedResources[1]))
                         resIdx = 1;
                 }
                 // now lets get the amount to move.  we will use this higher portion to calc lower volume ratio during move.
-                double maxSourceAmount = 0;
-                foreach (Part Source in Sources)
-                    maxSourceAmount += Source.Resources[SelectedResources[resIdx]].amount;
-                foreach (Part Target in Targets)
-                    maxXferAmount += (Target.Resources[SelectedResources[resIdx]].maxAmount - Target.Resources[SelectedResources[resIdx]].amount);
+                double maxFromAmount = 0;
+                foreach (Part partFrom in PartsFrom)
+                    maxFromAmount += partFrom.Resources[SelectedResources[resIdx]].amount;
+                foreach (Part partTo in PartsTo)
+                    maxXferAmount += (partTo.Resources[SelectedResources[resIdx]].maxAmount - partTo.Resources[SelectedResources[resIdx]].amount);
 
-                maxXferAmount = maxXferAmount > maxSourceAmount ? maxSourceAmount : maxXferAmount;
+                maxXferAmount = maxXferAmount > maxFromAmount ? maxFromAmount : maxXferAmount;
                 maxXferAmount = maxXferAmount < 0.0001 ? 0 : maxXferAmount;
             }
             return maxXferAmount;
@@ -283,6 +283,16 @@ namespace ShipManifest
 
         private static bool isXferComplete()
         {
+            List<Part> PartsFrom = SMAddon.smController.SelectedPartsSource;
+            List<Part> PartsTo = SMAddon.smController.SelectedPartsTarget;
+            if (SMAddon.XferMode == SMAddon.XFERMode.TargetToSource)
+            {
+                PartsFrom = SMAddon.smController.SelectedPartsTarget;
+                PartsTo = SMAddon.smController.SelectedPartsSource;
+            }
+
+            if (TransferResource.CalcMaxXferAmt(PartsFrom, PartsTo, SMAddon.smController.SelectedResources) == 0)
+                return true;
             if (SMAddon.smController.ResourcesToXfer.Count > 1)
             {
                 Utilities.LogMessage("isXferComplete - A1. Resource:  " + SMAddon.smController.ResourcesToXfer[0].ResourceName + ", TotalXferAmt = " + SMAddon.smController.ResourcesToXfer[0].XferAmount(SMAddon.XferMode).ToString() + ", AmtXferred = " + SMAddon.smController.ResourcesToXfer[0].AmtXferred.ToString(), "Info", SMSettings.VerboseLogging);
@@ -293,7 +303,7 @@ namespace ShipManifest
                 if (SMAddon.smController.ResourcesToXfer[0].ToCapacityRemaining(SMAddon.XferMode) == 0d && 
                     SMAddon.smController.ResourcesToXfer[1].ToCapacityRemaining(SMAddon.XferMode) == 0d)
                     return true;
-                if ((SMAddon.smController.ResourcesToXfer[0].AmtXferred >= SMAddon.smController.ResourcesToXfer[0].XferAmount(SMAddon.XferMode)-0.0000001) &&
+                if ((SMAddon.smController.ResourcesToXfer[0].AmtXferred >= SMAddon.smController.ResourcesToXfer[0].XferAmount(SMAddon.XferMode)- 0.0000001) &&
                     (SMAddon.smController.ResourcesToXfer[1].AmtXferred >= SMAddon.smController.ResourcesToXfer[1].XferAmount(SMAddon.XferMode) - 0.0000001))
                     return true;
                 return false;
@@ -523,6 +533,22 @@ namespace ShipManifest
                 if (!SMAddon.frameErrTripped)
                 {
                     Utilities.LogMessage(string.Format(" in ResourceTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    SMAddon.source2.Stop();
+                    SMAddon.source3.Stop();
+                    XferState = ResourceXFERState.Off;
+                    foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
+                    {
+                        modResource.AmtXferred = 0;
+                        modResource.srcXferAmount = TransferResource.CalcMaxXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedResources);
+                        if (modResource.srcXferAmount < 0.0001)
+                            modResource.srcXferAmount = 0;
+                        modResource.strTgtXferAmount = modResource.srcXferAmount.ToString();
+                        modResource.tgtXferAmount = TransferResource.CalcMaxXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedResources);
+                        if (modResource.tgtXferAmount < 0.0001)
+                            modResource.tgtXferAmount = 0;
+                        modResource.strTgtXferAmount = modResource.tgtXferAmount.ToString();
+                    }
+                    ResourceXferActive = false;
                     SMAddon.frameErrTripped = true;
                     throw ex;
                 }

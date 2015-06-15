@@ -21,9 +21,8 @@ namespace ShipManifest
 
             GUILayout.BeginVertical();
             GUI.enabled = true;
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Deployable Solar Panel Control Center ", GUILayout.Height(10));
-            GUILayout.Label("--------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
+            GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
             string step = "start";
             try
             {
@@ -48,7 +47,7 @@ namespace ShipManifest
                         label = iPanel.PanelStatus + " - (Locked) - " + iPanel.Title;;
                         isEnabled = false;
                     }
-                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(330), GUILayout.Height(40));
+                    bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
                     step = "button toggle check";
                     if (!open && newOpen)
                         iPanel.ExtendPanel();
