@@ -20,6 +20,10 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static string xferToolTip = "";
 
+        // Switches for List Viewers
+        internal static bool ShowSourceVessels = false;
+        internal static bool ShowTargetVessels = false;
+
         #endregion
 
         #region TransferWindow (GUI Layout)
@@ -42,11 +46,12 @@ namespace ShipManifest
             if (GUI.Button(rect, label))
             {
                 WindowTransfer.ShowWindow = false;
-                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
-                SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
                 SMAddon.smController.SelectedResources.Clear();
                 SMAddon.smController.SelectedPartsSource.Clear();
                 SMAddon.smController.SelectedPartsTarget.Clear();
+
+                SMAddon.smController.SelectedVesselsSource.Clear();
+                SMAddon.smController.SelectedVesselsTarget.Clear();
                 ToolTip = "";
                 return;
             }
@@ -60,12 +65,11 @@ namespace ShipManifest
                 //Left Column Begins
                 GUILayout.BeginVertical();
 
-
                 // Build source Transfer Viewer
                 SourceTransferViewer();
 
                 // Text above Source Details. (Between viewers)
-                TextBetweenViewers(SMAddon.smController.SelectedPartsSource);
+                TextBetweenViewers(SMAddon.smController.SelectedPartsSource, SMAddon.XFERMode.SourceToTarget);
 
                 // Build Details ScrollViewer
                 SourceDetailsViewer();
@@ -80,7 +84,7 @@ namespace ShipManifest
                 TargetTransferViewer();
 
                 // Text between viewers
-                TextBetweenViewers(SMAddon.smController.SelectedPartsTarget);
+                TextBetweenViewers(SMAddon.smController.SelectedPartsTarget, SMAddon.XFERMode.TargetToSource);
 
                 // Build Target details Viewer
                 TargetDetailsViewer();
@@ -95,32 +99,48 @@ namespace ShipManifest
             }
         }
 
-        private static void TextBetweenViewers(List<Part> SelectedParts)
+        private static void TextBetweenViewers(List<Part> SelectedParts, SMAddon.XFERMode xferMode)
         {
+            string labelText = "";
+            GUILayout.BeginHorizontal();
             if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.ShowIVAUpdateBtn)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label(SelectedParts != null ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected", GUILayout.Width(190), GUILayout.Height(20));
-                if (GUILayout.Button("Update Portraits", SMStyle.ButtonStyle, GUILayout.Width(110), GUILayout.Height(20)))
-                {
-                    SMAddon.smController.RespawnCrew();
-                }
-                GUILayout.EndHorizontal();
-            }
+                labelText = SelectedParts != null ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected";
             else
             {
                 if (SelectedParts != null)
                 {
                     if (SelectedParts.Count > 1)
-                    {
-                        GUILayout.Label(string.Format("{0}", "Multiple Parts Selected"), GUILayout.Width(300), GUILayout.Height(20));
-                    }
+                        labelText = string.Format("{0}", "Multiple Parts Selected");
                     else if (SelectedParts.Count == 1)
-                        GUILayout.Label(string.Format("{0}", SelectedParts[0].partInfo.title), GUILayout.Width(300), GUILayout.Height(20));
+                        labelText = string.Format("{0}", SelectedParts[0].partInfo.title);
                     else
-                        GUILayout.Label(string.Format("{0}", "No Part Selected"), GUILayout.Width(300), GUILayout.Height(20));
+                        labelText = string.Format("{0}", "No Part Selected");
                 }
             }
+            GUILayout.Label(labelText, GUILayout.Width(200));
+            if (CanShowVessels())
+            {
+                if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                {
+                    bool prevValue = WindowTransfer.ShowSourceVessels;
+                    WindowTransfer.ShowSourceVessels = GUILayout.Toggle(WindowTransfer.ShowSourceVessels, "Vessels", GUILayout.Width(90));
+                    if (!prevValue && WindowTransfer.ShowSourceVessels)
+                        WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
+                }
+                else
+                {
+                    bool prevValue = WindowTransfer.ShowSourceVessels;
+                    WindowTransfer.ShowTargetVessels = GUILayout.Toggle(WindowTransfer.ShowTargetVessels, "Vessels", GUILayout.Width(90));
+                    if (!prevValue && WindowTransfer.ShowSourceVessels)
+                        WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        private static bool CanShowVessels()
+        {
+            return SMAddon.smController.DockedVessels.Count > 0 && !SMAddon.smController.SelectedResources.Contains("Crew") && !SMAddon.smController.SelectedResources.Contains("Science");
         }
 
         #region Source Viewers (GUI Layout)
@@ -131,10 +151,13 @@ namespace ShipManifest
             try
             {
                 // This is a scroll panel (we are using it to make button lists...)
-                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(125), GUILayout.Width(300));
+                SourceTransferViewerScrollPosition = GUILayout.BeginScrollView(SourceTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget, SourceTransferViewerScrollPosition);
+                if (ShowSourceVessels && CanShowVessels())
+                    VesselTransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget, SourceTransferViewerScrollPosition);
+                else
+                    PartsTransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.SourceToTarget, SourceTransferViewerScrollPosition);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -152,7 +175,7 @@ namespace ShipManifest
             {
                 // Source Part resource Details
                 // this Scroll viewer is for the details of the part selected above.
-                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(102), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedResources.Contains("Crew"))
@@ -193,10 +216,13 @@ namespace ShipManifest
                     SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
 
                 // This is a scroll panel (we are using it to make button lists...)
-                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(125), GUILayout.Width(300));
+                TargetTransferViewerScrollPosition = GUILayout.BeginScrollView(TargetTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
-                TransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource, TargetTransferViewerScrollPosition);
+                if (ShowTargetVessels && CanShowVessels())
+                    VesselTransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource, TargetTransferViewerScrollPosition);
+                else
+                    PartsTransferViewer(SMAddon.smController.SelectedResources, SMAddon.XFERMode.TargetToSource, TargetTransferViewerScrollPosition);
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
@@ -213,7 +239,7 @@ namespace ShipManifest
             try
             {
                 // Target Part resource details
-                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(102), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
@@ -242,7 +268,7 @@ namespace ShipManifest
 
         #region Viewer Details (GUI Layout)
 
-        private static void TransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
+        private static void PartsTransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
         {
             float scrollX = WindowTransfer.Position.x + 20;
             if (xferMode == SMAddon.XFERMode.TargetToSource)
@@ -280,7 +306,7 @@ namespace ShipManifest
                     Rect rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
                     {
-                        SMHighlighter.isMouseOver = true;
+                        SMHighlighter.IsMouseOver = true;
                         SMHighlighter.MouseOverMode = xferMode;
                         SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
                         SMHighlighter.MouseOverpart = part;
@@ -293,7 +319,7 @@ namespace ShipManifest
                     if (!SMSettings.RealismMode && SelectedResources[0] != "Crew" && SelectedResources[0] != "Science")
                     {
                         if (SelectedResources.Count > 1)
-                            GUI.enabled = (part.Resources[SelectedResources[0]].amount > 0 && part.Resources[SelectedResources[1]].amount > 0) ? true : false;
+                            GUI.enabled = (part.Resources[SelectedResources[0]].amount > 0 || part.Resources[SelectedResources[1]].amount > 0) ? true : false;
                         else
                             GUI.enabled = part.Resources[SelectedResources[0]].amount > 0 ? true : false;
                         var style1 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
@@ -306,7 +332,7 @@ namespace ShipManifest
 
                         var style2 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
                         if (SelectedResources.Count > 1)
-                            GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount && part.Resources[SelectedResources[1]].amount < part.Resources[SelectedResources[1]].maxAmount ? true : false;
+                            GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount || part.Resources[SelectedResources[1]].amount < part.Resources[SelectedResources[1]].maxAmount ? true : false;
                         else
                             GUI.enabled = part.Resources[SelectedResources[0]].amount < part.Resources[SelectedResources[0]].maxAmount ? true : false;
                         if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
@@ -324,7 +350,100 @@ namespace ShipManifest
             {
                 if (!SMAddon.frameErrTripped)
                 {
-                    Utilities.LogMessage("Error in Windowtransfer.TransferViewer (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
+                    Utilities.LogMessage("Error in Windowtransfer.PartsTransferViewer (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
+        }
+
+        private static void VesselTransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
+        {
+            float scrollX = WindowTransfer.Position.x + 20;
+            if (xferMode == SMAddon.XFERMode.TargetToSource)
+                scrollX = WindowTransfer.Position.x + 320;
+            float scrollY = WindowTransfer.Position.y + 30 - ViewerScrollPosition.y;
+            string step = "begin";
+            try
+            {
+                step = "begin button loop";
+                foreach (ModDockedVessel modDockedVessel in SMAddon.smController.DockedVessels)
+                {
+                    // Build the part button title...
+                    step = "vessel button title";
+                    string strDescription = GetResourceDescription(SelectedResources, modDockedVessel);
+
+                    // set the conditions for a button style change.
+                    int btnWidth = 265;
+                    if (!SMSettings.RealismMode)
+                        btnWidth = 180;
+
+                    // Set style based on viewer and toggled state.
+                    step = "Set style";
+                    GUIStyle style = GetVesselButtonStyle(xferMode, modDockedVessel);
+
+                    GUILayout.BeginHorizontal();
+
+                    // Now let's account for any target buttons already pressed. (sources and targets for resources cannot be the same)
+                    GUI.enabled = IsVesselSelectable(SelectedResources[0], xferMode, modDockedVessel);
+
+                    step = "Render part Buttons";
+                    if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
+                    {
+                        VesselButtonToggled(xferMode, modDockedVessel);
+                    }
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+                    {
+                        SMHighlighter.IsMouseOver = true;
+                        SMHighlighter.MouseOverMode = xferMode;
+                        SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+                        SMHighlighter.MouseOverpart = null;
+                        SMHighlighter.MouseOverparts = modDockedVessel.VesselParts;
+                    }
+                    //if (Event.current.type == EventType.Repaint)
+                    //{
+                    //    modDockedVessel.Highlight(GUILayoutUtility.GetLastRect());
+                    //}
+
+                    // Reset Button enabling.
+                    GUI.enabled = true;
+
+                    //step = "Render dump/fill buttons";
+                    if (!SMSettings.RealismMode)
+                    {
+                        if (SelectedResources.Count > 1)
+                            GUI.enabled = (TransferResource.CalcResourceRemaining(modDockedVessel.VesselParts, SelectedResources[0]) > 0 || TransferResource.CalcResourceRemaining(modDockedVessel.VesselParts, SelectedResources[1]) > 0) ? true : false;
+                        else
+                            GUI.enabled = TransferResource.CalcResourceRemaining(modDockedVessel.VesselParts, SelectedResources[0]) > 0 ? true : false;
+                        var style1 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+                        if (GUILayout.Button(string.Format("{0}", "Dump"), style1, GUILayout.Width(45), GUILayout.Height(20)))
+                        {
+                            SMController.DumpPartsResource(modDockedVessel.VesselParts, SelectedResources[0]);
+                            if (SelectedResources.Count > 1)
+                                SMController.DumpPartsResource(modDockedVessel.VesselParts, SelectedResources[1]);
+                        }
+
+                        var style2 = xferMode == SMAddon.XFERMode.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+                        if (SelectedResources.Count > 1)
+                            GUI.enabled = TransferResource.CalcRemainingCapacity(modDockedVessel.VesselParts, SelectedResources[0]) > 0 || TransferResource.CalcRemainingCapacity(modDockedVessel.VesselParts, SelectedResources[0]) > 0 ? true : false;
+                        else
+                            GUI.enabled = TransferResource.CalcRemainingCapacity(modDockedVessel.VesselParts, SelectedResources[0]) > 0 ? true : false;
+                        if (GUILayout.Button(string.Format("{0}", "Fill"), style2, GUILayout.Width(30), GUILayout.Height(20)))
+                        {
+                            SMController.FillPartsResource(modDockedVessel.VesselParts, SelectedResources[0]);
+                            if (SelectedResources.Count > 1)
+                                SMController.FillPartsResource(modDockedVessel.VesselParts, SelectedResources[1]);
+                        }
+                        GUI.enabled = true;
+                    }
+                    GUILayout.EndHorizontal();
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage("Error in Windowtransfer.VesselTransferViewer (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
                     SMAddon.frameErrTripped = true;
                 }
             }
@@ -726,9 +845,6 @@ namespace ShipManifest
                 {
                     if (xferMode == SMAddon.XFERMode.SourceToTarget)
                     {
-                        // first, lets clear any highlighting...
-                        SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
-
                         // Now lets update the list...
                         if (SMAddon.smController.SelectedPartsSource.Contains(part))
                         {
@@ -748,8 +864,6 @@ namespace ShipManifest
                     }
                     else
                     {
-                        // first, lets clear any highlighting...
-                        SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
                         if (SMAddon.smController.SelectedPartsTarget.Contains(part))
                         {
                             SMAddon.smController.SelectedPartsTarget.Remove(part);
@@ -784,6 +898,46 @@ namespace ShipManifest
             }
         }
 
+        private static void VesselButtonToggled(SMAddon.XFERMode xferMode, ModDockedVessel modVessel)
+        {
+            string step = "Vessel Button Toggled";
+            try
+            {
+                if (xferMode == SMAddon.XFERMode.SourceToTarget)
+                {
+                    // Now lets update the list...
+                    if (SMAddon.smController.SelectedVesselsSource.Contains(modVessel))
+                        SMAddon.smController.SelectedVesselsSource.Remove(modVessel);
+                    else
+                        SMAddon.smController.SelectedVesselsSource.Add(modVessel);
+                    SMAddon.smController.SelectedPartsSource = SMAddon.smController.GetSelectedVesselsParts(SMAddon.smController.SelectedVesselsSource, SMAddon.smController.SelectedResources);
+                }
+                else
+                {
+                    if (SMAddon.smController.SelectedVesselsTarget.Contains(modVessel))
+                        SMAddon.smController.SelectedVesselsTarget.Remove(modVessel);
+                    else
+                        SMAddon.smController.SelectedVesselsTarget.Add(modVessel);
+                    SMAddon.smController.SelectedPartsTarget = SMAddon.smController.GetSelectedVesselsParts(SMAddon.smController.SelectedVesselsTarget, SMAddon.smController.SelectedResources);
+                }
+                WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
+                step = "Set Xfer amounts?";
+                foreach (TransferResource modResource in SMAddon.smController.ResourcesToXfer)
+                {
+                    modResource.srcXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsSource, SMAddon.smController.SelectedPartsTarget, modResource.ResourceName);
+                    modResource.tgtXferAmount = TransferResource.CalcMaxResourceXferAmt(SMAddon.smController.SelectedPartsTarget, SMAddon.smController.SelectedPartsSource, modResource.ResourceName);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!SMAddon.frameErrTripped)
+                {
+                    Utilities.LogMessage("Error in WindowTransfer.VesselButtonToggled (" + xferMode.ToString() + ") at step:  " + step + ".  Error:  " + ex.ToString(), "Error", true);
+                    SMAddon.frameErrTripped = true;
+                }
+            }
+        }
+
         private static void TransferScience(PartModule source, PartModule target)
         {
             ScienceData[] moduleScience = null;
@@ -802,14 +956,10 @@ namespace ShipManifest
                         {
                             Utilities.LogMessage(string.Format("((ModuleScienceContainer)source) data stored"), "Info", SMSettings.VerboseLogging);
                             foreach (ScienceData data in moduleScience)
-                            {
                                 ((IScienceDataContainer)source).DumpData(data);
-                            }
 
                             if (SMSettings.RealismMode)
-                            {
                                 Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data"), "Info", SMSettings.VerboseLogging);
-                            }
                             else
                             {
                                 Utilities.LogMessage(string.Format("((Module ScienceExperiment xferred.  Dump Source data, reset Experiment"), "Info", SMSettings.VerboseLogging);
@@ -937,6 +1087,22 @@ namespace ShipManifest
             return isSelectable;
         }
 
+        private static bool IsVesselSelectable(string SelectedResource, SMAddon.XFERMode xferMode, ModDockedVessel modDockedVessel)
+        {
+            bool isSelectable = true;
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (SMAddon.smController.SelectedVesselsTarget.Contains(modDockedVessel))
+                    isSelectable = false;
+            }
+            else
+            {
+                if (SMAddon.smController.SelectedVesselsSource.Contains(modDockedVessel))
+                    isSelectable = false;
+            }
+            return isSelectable;
+        }
+
         private static GUIStyle GetPartButtonStyle(SMAddon.XFERMode xferMode, Part part)
         {
             GUIStyle style = SMStyle.ButtonSourceStyle;
@@ -950,6 +1116,26 @@ namespace ShipManifest
             else
             {
                 if (SMAddon.smController.SelectedPartsTarget.Contains(part))
+                    style = SMStyle.ButtonToggledTargetStyle;
+                else
+                    style = SMStyle.ButtonTargetStyle;
+            }
+            return style;
+        }
+
+        private static GUIStyle GetVesselButtonStyle(SMAddon.XFERMode xferMode, ModDockedVessel modDockedVessel)
+        {
+            GUIStyle style = SMStyle.ButtonSourceStyle;
+            if (xferMode == SMAddon.XFERMode.SourceToTarget)
+            {
+                if (SMAddon.smController.SelectedVesselsSource.Contains(modDockedVessel))
+                    style = SMStyle.ButtonToggledSourceStyle;
+                else
+                    style = SMStyle.ButtonSourceStyle;
+            }
+            else
+            {
+                if (SMAddon.smController.SelectedVesselsTarget.Contains(modDockedVessel))
                     style = SMStyle.ButtonToggledTargetStyle;
                 else
                     style = SMStyle.ButtonTargetStyle;
@@ -977,6 +1163,38 @@ namespace ShipManifest
             return strDescription;
         }
 
+        private static string GetResourceDescription(List<string> SelectedResources, ModDockedVessel modDockedVvessel)
+        {
+            string strDescription = "";
+
+            strDescription = DisplayVesselResourceTotals(modDockedVvessel, SelectedResources) + " - " + modDockedVvessel.VesselName;
+            return strDescription;
+        }
+
+        internal static string DisplayVesselResourceTotals(ModDockedVessel modDockedVessel, List<string> selectedResources)
+        {
+            string displayAmount = "";
+            double currAmount = 0;
+            double totAmount = 0;
+            try
+            {
+                List<ModDockedVessel> modDockedVessels = new List<ModDockedVessel>();
+                modDockedVessels.Add(modDockedVessel);
+                foreach (Part part in SMAddon.smController.GetSelectedVesselsParts(modDockedVessels, selectedResources))
+                {
+                    currAmount += part.Resources[selectedResources[0]].amount;
+                    totAmount += part.Resources[selectedResources[0]].maxAmount;
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(String.Format(" in DisplayVesselResourceTotals().  Error:  {0}", ex.ToString()), "Error", true);
+            }
+            displayAmount = string.Format("({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"));
+
+            return displayAmount;
+        }
+
         internal static void MouseOverHighlight(Part _part)
         {
             string step = "begin";
@@ -991,7 +1209,21 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
             }
         }
-        
+
+        internal static void MouseOverHighlight(List<Part> _parts)
+        {
+            string step = "begin";
+            try
+            {
+                step = "inside box - Part Selection?";
+                SMHighlighter.SetPartsHighlight(_parts, SMSettings.Colors[SMSettings.MouseOverColor]);
+                SMHighlighter.EdgeHighight(_parts, true);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+            }
+        }
         #endregion
 
     }

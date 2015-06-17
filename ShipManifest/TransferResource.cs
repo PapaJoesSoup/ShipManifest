@@ -123,7 +123,8 @@ namespace ShipManifest
             double amount = 0;
             if (parts != null)
                 foreach (Part part in parts)
-                    amount += part.Resources[SelectedResource].amount;
+                    if (part.Resources.Contains(SelectedResource))
+                        amount += part.Resources[SelectedResource].amount;
             return amount;
         }
 
@@ -221,7 +222,8 @@ namespace ShipManifest
             double amount = 0;
             if (parts != null)
                 foreach (Part part in parts)
-                    amount += part.Resources[SelectedResource].maxAmount;
+                    if (part.Resources.Contains(SelectedResource))
+                        amount += part.Resources[SelectedResource].maxAmount;
             return amount;
         }
 
@@ -230,7 +232,8 @@ namespace ShipManifest
             double amount = 0;
             if (parts != null)
                 foreach (Part part in parts)
-                    amount += (part.Resources[SelectedResource].maxAmount - part.Resources[SelectedResource].amount);
+                    if (part.Resources.Contains(SelectedResource))
+                        amount += (part.Resources[SelectedResource].maxAmount - part.Resources[SelectedResource].amount);
             return amount;
         }
 

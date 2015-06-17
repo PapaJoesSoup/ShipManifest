@@ -15,10 +15,11 @@ namespace ShipManifest
         #region Properties
 
         // WindowTransfer part mouseover vars
-        internal static bool isMouseOver = false;
+        internal static bool IsMouseOver = false;
         internal static SMAddon.XFERMode MouseOverMode = SMAddon.XFERMode.SourceToTarget;
         internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
         internal static Part MouseOverpart = null;
+        internal static List<Part> MouseOverparts = null;
 
         #endregion
 
@@ -117,7 +118,7 @@ namespace ShipManifest
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+                Utilities.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
             }
         }
 
@@ -137,6 +138,29 @@ namespace ShipManifest
                 {
                     highlighter.SeeThroughOff();
                     highlighter.ConstantOffImmediate();
+                }
+            }
+        }
+
+        internal static void EdgeHighight(List<Part> parts, bool enable, string color = null)
+        {
+            if (SMSettings.EnableEdgeHighlighting)
+            {
+                foreach (Part part in parts)
+                {
+                    Highlighter highlighter = part.highlighter;
+                    if (enable)
+                    {
+                        if (color == null || color == "")
+                            color = SMSettings.MouseOverColor;
+                        highlighter.SeeThroughOn();
+                        highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
+                    }
+                    else
+                    {
+                        highlighter.SeeThroughOff();
+                        highlighter.ConstantOffImmediate();
+                    }
                 }
             }
         }
@@ -169,7 +193,7 @@ namespace ShipManifest
             }
         }
 
-        internal static void UpdateHighlighting()
+        internal static void Update_Highlighter()
         {
             string step = "";
             try
@@ -180,12 +204,37 @@ namespace ShipManifest
                     step = "Showhipmanifest = true";
                     if (SMAddon.CanShowShipManifest(false))
                     {
-                        if (SMSettings.EnableCLS && SMSettings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null)
+                        step = "Clear old highlighting";
+                        // Clear Highlighting on everything, start fresh
+                        SMHighlighter.EdgeHighight(SMAddon.smController.Vessel.parts, false);
+                        ClearPartsHighlight(SMAddon.smController.Vessel.parts);
+
+                        step = "Mouseover highlighting, if any";
+                        // Supports Transfer Window vessel/part Highlighting....
+                        if (SMHighlighter.IsMouseOver)
                         {
-                            if (SMAddon.smController.SelectedResources.Contains("Crew"))
+                            if (SMHighlighter.MouseOverRect.Contains(Event.current.mousePosition))
+                            {
+                                if (SMHighlighter.MouseOverpart == null && SMHighlighter.MouseOverparts != null)
+                                    WindowTransfer.MouseOverHighlight(SMHighlighter.MouseOverparts);
+                                else if (SMHighlighter.MouseOverpart != null)
+                                    WindowTransfer.MouseOverHighlight(SMHighlighter.MouseOverpart);
+                            }
+                            else
+                            {
+                                SMHighlighter.IsMouseOver = false;
+                                SMHighlighter.MouseOverpart = null;
+                                SMHighlighter.MouseOverparts = null;
+                            }
+                        }
+
+                        if (SMAddon.smController.SelectedResources != null && SMAddon.smController.SelectedResources.Count > 0)
+                        {
+                            // If Crew and cls, perform cls Highlighting
+                            if (SMSettings.EnableCLS && SMSettings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null && SMAddon.smController.SelectedResources.Contains("Crew"))
                             {
                                 step = "Highlight CLS vessel";
-                                HighlightCLSVessel(true);
+                                HighlightCLSVessel(true, true);
 
                                 // Turn off the source and target cls highlighting.  We are going to replace it.
                                 if (SMAddon.smController.clsPartSource != null)
@@ -193,50 +242,27 @@ namespace ShipManifest
                                 if (SMAddon.smController.clsPartTarget != null)
                                     SMAddon.smController.clsPartTarget.Highlight(false, true);
                             }
-                        }
 
-                        step = "Set Selected Part Colors";
-                        SetPartsHighlight(SMAddon.smController.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
-                        if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
-                            SetPartsHighlight(SMAddon.smController.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartCrewColor]);
-                        else
-                            SetPartsHighlight(SMAddon.smController.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);
+                            // Default is yellow
+                            step = "Set non selected resource part color";
+                            Color partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
 
-                        // Default is yellow
-                        step = "Set non selected resource part color";
-                        Color partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
+                            // match color used by CLS if active
+                            if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
+                                partColor = Color.green;
 
-                        // match color used by CLS if active
-                        if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
-                            partColor = Color.green;
-
-                        step = "Set Resource Part Colors";
-                        if (SMAddon.smController.SelectedResources != null && SMAddon.smController.SelectedResources.Count > 0)
-                        {
-                            foreach (Part thispart in SMAddon.smController.SelectedResourcesParts)
+                            step = "Set Resource Part Colors";
+                            if (!SMSettings.OnlySourceTarget)
                             {
-                                SMHighlighter.EdgeHighight(thispart, false);
-                                if (!SMSettings.OnlySourceTarget)
-                                {
-                                    if (!SMAddon.smController.SelectedPartsSource.Contains(thispart) && !SMAddon.smController.SelectedPartsTarget.Contains(thispart))
-                                    {
-                                        SetPartHighlight(thispart, partColor);
-                                    }
-                                }
-                                if (SMHighlighter.isMouseOver && thispart == SMHighlighter.MouseOverpart)
-                                {
-                                    if (SMHighlighter.MouseOverRect.Contains(Event.current.mousePosition))
-                                        WindowTransfer.MouseOverHighlight(thispart);
-                                    else
-                                    {
-                                        //Utilities.LogMessage(string.Format("MouseOverRect:  {0}\r\nMousePosition:  {1}", MouseOverRect.ToString(), Event.current.mousePosition.ToString()), "Error", true);
-                                        SMHighlighter.isMouseOver = false;
-                                        SMHighlighter.MouseOverpart = null;
-                                        SetPartHighlight(thispart, partColor);
-                                        EdgeHighight(thispart, false);
-                                    }
-                                }
+                                SetPartsHighlight(SMAddon.smController.SelectedResourcesParts, partColor);
                             }
+
+                            step = "Set Selected Part Colors";
+                            SetPartsHighlight(SMAddon.smController.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
+                            if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.EnableCLS)
+                                SetPartsHighlight(SMAddon.smController.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartCrewColor]);
+                            else
+                                SetPartsHighlight(SMAddon.smController.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);
                         }
                     }
                 }

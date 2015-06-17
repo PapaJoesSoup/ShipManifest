@@ -74,6 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModDockedVessel.cs" />
     <Compile Include="TransferCrew.cs" />
     <Compile Include="InstalledMods.cs" />
     <Compile Include="ModAntenna.cs" />

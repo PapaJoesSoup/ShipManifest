@@ -94,7 +94,7 @@ namespace ShipManifest
             DisplayWindowTabs();
             // This is a scroll panel (we are using it to make button lists...)
             DisplayViewerPosition = GUILayout.BeginScrollView(DisplayViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(200), GUILayout.Width(370));
-            DisplaySelectedTab();
+            DisplaySelectedTab(DisplayViewerPosition);
             GUILayout.EndScrollView();
 
             DisplaySelectedActions();
@@ -165,16 +165,16 @@ namespace ShipManifest
             GUILayout.EndHorizontal();
         }
 
-        internal static void DisplaySelectedTab()
+        internal static void DisplaySelectedTab(Vector2 DisplayViewerPosition)
         {
             if (ShowHatch)
-                TabHatch.Display();
+                TabHatch.Display(DisplayViewerPosition);
             else if (ShowPanel)
-                TabSolarPanel.Display();
+                TabSolarPanel.Display(DisplayViewerPosition);
             else if (ShowAntenna)
-                TabAntenna.Display();
+                TabAntenna.Display(DisplayViewerPosition);
             else if (ShowLight)
-                TabLight.Display();
+                TabLight.Display(DisplayViewerPosition);
         }
 
         internal static void DisplaySelectedActions()

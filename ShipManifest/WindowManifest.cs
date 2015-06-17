@@ -303,52 +303,87 @@ namespace ShipManifest
                 {
                     List<Part> newSources = new List<Part>();
                     List<Part> newTargets = new List<Part>();
-                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsSource);
-                    foreach (Part part in SMAddon.smController.SelectedPartsSource)
+                    if (WindowTransfer.ShowSourceVessels && !resourceNames.Contains("Crew") && !resourceNames.Contains("Science"))
                     {
-                        if (resourceNames.Count > 1)
+                        SMAddon.smController.SelectedPartsSource = SMAddon.smController.GetSelectedVesselsParts(SMAddon.smController.SelectedVesselsSource, resourceNames);
+                        if (!WindowTransfer.ShowTargetVessels)
                         {
-                            if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                                newSources.Add(part);
+                            foreach (Part part in SMAddon.smController.SelectedPartsSource)
+                            {
+                                if (SMAddon.smController.SelectedPartsTarget.Contains(part))
+                                    SMAddon.smController.SelectedPartsTarget.Remove(part);
+                            }
                         }
-                        else
+                    }
+                    else
+                    {
+                        foreach (Part part in SMAddon.smController.SelectedPartsSource)
                         {
-                            if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
-                                newSources.Add(part);
-                            else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                                newSources.Add(part);
-                            else if (part.Resources.Contains(resourceNames[0]))
-                                newSources.Add(part);
+                            if (resourceNames.Count > 1)
+                            {
+                                if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                                    newSources.Add(part);
+                            }
+                            else
+                            {
+                                if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
+                                    newSources.Add(part);
+                                else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                                    newSources.Add(part);
+                                else if (part.Resources.Contains(resourceNames[0]))
+                                    newSources.Add(part);
+                            }
                         }
+                        SMAddon.smController.SelectedPartsSource.Clear();
+                        SMAddon.smController.SelectedPartsSource = newSources;
                     }
 
-                    SMHighlighter.ClearPartsHighlight(SMAddon.smController.SelectedPartsTarget);
-                    foreach (Part part in SMAddon.smController.SelectedPartsTarget)
+                    if (WindowTransfer.ShowTargetVessels && !resourceNames.Contains("Crew") && !resourceNames.Contains("Science"))
                     {
-                        if (resourceNames.Count > 1)
+                        SMAddon.smController.SelectedPartsTarget = SMAddon.smController.GetSelectedVesselsParts(SMAddon.smController.SelectedVesselsTarget, resourceNames);
+                        if(!WindowTransfer.ShowSourceVessels)
                         {
-                            if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                                newTargets.Add(part);
-                        }
-                        else
-                        {
-                            if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
-                                newTargets.Add(part);
-                            else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                                newTargets.Add(part);
-                            else if (part.Resources.Contains(resourceNames[0]))
-                                newTargets.Add(part);
+                            foreach (Part part in SMAddon.smController.SelectedPartsTarget)
+                            {
+                                if (SMAddon.smController.SelectedPartsSource.Contains(part))
+                                    SMAddon.smController.SelectedPartsSource.Remove(part);
+                            }
                         }
                     }
-                    SMAddon.smController.SelectedPartsSource.Clear();
-                    SMAddon.smController.SelectedPartsSource = newSources;
-                    SMAddon.smController.SelectedPartsTarget.Clear();
-                    SMAddon.smController.SelectedPartsTarget = newTargets;
+                    else
+                    {
+                        foreach (Part part in SMAddon.smController.SelectedPartsTarget)
+                        {
+                            if (resourceNames.Count > 1)
+                            {
+                                if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
+                                    newTargets.Add(part);
+                            }
+                            else
+                            {
+                                if (resourceNames[0] == "Crew" && part.CrewCapacity > 0)
+                                    newTargets.Add(part);
+                                else if (resourceNames[0] == "Science" && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                                    newTargets.Add(part);
+                                else if (part.Resources.Contains(resourceNames[0]))
+                                    newTargets.Add(part);
+                            }
+                        }
+                        SMAddon.smController.SelectedPartsTarget.Clear();
+                        SMAddon.smController.SelectedPartsTarget = newTargets;
+                    }
+                    if (resourceNames.Contains("Crew") || resourceNames.Contains("Science"))
+                    {
+                        SMAddon.smController.SelectedVesselsSource.Clear();
+                        SMAddon.smController.SelectedVesselsTarget.Clear();
+                    }
                 }
                 else
                 {
                     SMAddon.smController.SelectedPartsSource.Clear();
                     SMAddon.smController.SelectedPartsTarget.Clear();
+                    SMAddon.smController.SelectedVesselsSource.Clear();
+                    SMAddon.smController.SelectedVesselsTarget.Clear();
                 }
             }
             catch (Exception ex)

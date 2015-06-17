@@ -9,13 +9,16 @@ namespace ShipManifest
 {
     static class TabHatch
     {
+
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
 
-        private static Vector2 DisplayViewerPosition = Vector2.zero;
-        internal static void Display()
+        internal static void Display(Vector2 DisplayViewerPosition)
         {
+            float scrollX = WindowControl.Position.x + 20;
+            float scrollY = WindowControl.Position.y + 50 - DisplayViewerPosition.y;
+
             // Reset Tooltip active flag...
             ToolTipActive = false;
 
@@ -51,8 +54,14 @@ namespace ShipManifest
                     {
                         iHatch.CloseHatch(true);
                     }
-                    if (Event.current.type == EventType.Repaint)
-                        iHatch.Highlight(GUILayoutUtility.GetLastRect());
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+                    {
+                        SMHighlighter.IsMouseOver = true;
+                        SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+                        SMHighlighter.MouseOverpart = iHatch.CLSPart.Part;
+                        SMHighlighter.MouseOverparts = null;
+                    }
                 }
             }
             catch (Exception ex)

@@ -13,9 +13,11 @@ namespace ShipManifest
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
 
-        private static Vector2 DisplayViewerPosition = Vector2.zero;
-        internal static void Display()
+        internal static void Display(Vector2 DisplayViewerPosition)
         {
+            float scrollX = WindowControl.Position.x + 10;
+            float scrollY = WindowControl.Position.y + 50 - DisplayViewerPosition.y;
+
             // Reset Tooltip active flag...
             ToolTipActive = false;
 
@@ -54,8 +56,14 @@ namespace ShipManifest
                     else if (open && !newOpen)
                         iPanel.RetractPanel();
 
-                    if (Event.current.type == EventType.Repaint)
-                        iPanel.Highlight(GUILayoutUtility.GetLastRect());
+                    Rect rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+                    {
+                        SMHighlighter.IsMouseOver = true;
+                        SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+                        SMHighlighter.MouseOverpart = iPanel.SPart;
+                        SMHighlighter.MouseOverparts = null;
+                    }
                 }
             }
             catch (Exception ex)

@@ -183,6 +183,41 @@ namespace ShipManifest
         internal List<string> SelectedResources = new List<string>();
 
         // Multi-Part Xfer Storage
+        private List<ModDockedVessel> _dockedVessels = null;
+        internal List<ModDockedVessel> DockedVessels
+        {
+            get
+            {
+                if (_dockedVessels == null)
+                {
+                    _dockedVessels = new List<ModDockedVessel>();
+                    List<Part> DockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList();
+                    foreach (Part dPart in DockingParts)
+                    {
+                        List<PartModule> dNodes = (from PartModule m in dPart.Modules where m.moduleName == "ModuleDockingNode" select m).ToList();
+                        foreach (PartModule pModule in dNodes)
+                        {
+                            DockedVesselInfo dockedInfo = ((ModuleDockingNode)pModule).vesselInfo;
+                            if (dockedInfo != null)
+                            {
+                                ModDockedVessel modDockedVessel = new ModDockedVessel(dockedInfo);
+                                List<uint> LaunchIds = (from m in _dockedVessels where m.LaunchID > 0 select m.LaunchID).ToList();
+                                if (!LaunchIds.Contains(modDockedVessel.LaunchID))
+                                    _dockedVessels.Add(modDockedVessel);
+                           }
+                        }
+                    }
+                }
+                return _dockedVessels;
+            }
+            set
+            {
+                _dockedVessels = value;
+            }
+        }
+        internal List<ModDockedVessel> SelectedVesselsSource = new List<ModDockedVessel>();
+        internal List<ModDockedVessel> SelectedVesselsTarget = new List<ModDockedVessel>();
+
         internal List<Part> SelectedResourcesParts = new List<Part>();
         internal List<Part> SelectedPartsSource = new List<Part>();
         internal List<Part> SelectedPartsTarget = new List<Part>();
@@ -275,6 +310,7 @@ namespace ShipManifest
         internal void RefreshLists()
         {
             GetSelectedResourcesParts(true);
+            _dockedVessels = null;
             // now lets reconcile the selected parts based on the new list of resources...
             WindowManifest.ReconcileSelectedXferParts(SMAddon.smController.SelectedResources);
 
@@ -306,6 +342,7 @@ namespace ShipManifest
             GetAntennas();
             GetLights();
             GetSolarPanels();
+            DockedVessels = null;
         }
 
         internal void GetSelectedResourcesParts(bool refresh = false)
@@ -458,23 +495,31 @@ namespace ShipManifest
 
         internal static void DumpPartResource(Part part, string resourceName)
         {
-            foreach (PartResource resource in part.Resources)
+            if (part.Resources.Contains(resourceName))
+                part.Resources[resourceName].amount = 0;
+        }
+
+        internal static void DumpPartsResource(List<Part> PartList, string resourceName)
+        {
+            foreach (Part part in PartList)
             {
-                if (resource.info.name == resourceName)
-                {
-                    resource.amount = 0;
-                }
+                if (part.Resources.Contains(resourceName))
+                    part.Resources[resourceName].amount = 0;
             }
         }
 
         internal static void FillPartResource(Part part, string resourceName)
         {
-            foreach (PartResource resource in part.Resources)
+            if (part.Resources.Contains(resourceName))
+                part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
+        }
+
+        internal static void FillPartsResource(List<Part> PartList, string resourceName)
+        {
+            foreach (Part part in PartList)
             {
-                if (resource.info.name == resourceName)
-                {
-                    resource.amount = resource.maxAmount;
-                }
+                if (part.Resources.Contains(resourceName))
+                    part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
             }
         }
 
@@ -589,6 +634,52 @@ namespace ShipManifest
             {
                 Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex.ToString()), "Error", true);
             }
+        }
+
+        internal List<Part> GetSelectedVesselsParts(List<ModDockedVessel> modDockedVessels, List<string> SelectedResources)
+        {
+            List<Part> ResourcePartList = new List<Part>();
+            try
+            {
+                if (modDockedVessels != null && modDockedVessels.Count > 0)
+                {
+                    foreach (ModDockedVessel modDockedvessel in modDockedVessels)
+                    {
+                        if (SelectedResources.Count > 1)
+                            ResourcePartList.AddRange((from p in modDockedvessel.VesselParts where (p.Resources.Contains(SelectedResources[0]) && p.Resources.Contains(SelectedResources[1])) select p).ToList());
+                        else
+                            ResourcePartList.AddRange((from p in modDockedvessel.VesselParts where p.Resources.Contains(SelectedResources[0]) select p).ToList());
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex.ToString()), "Error", true);
+                ResourcePartList = new List<Part>();
+            }
+            return ResourcePartList;
+        }
+
+        internal List<Part> GetDockedVesselParts(DockedVesselInfo vesselInfo)
+        {
+            List<Part> VesselpartList = new List<Part>();
+            try
+            {
+                if (vesselInfo != null)
+                {
+                    Part VesselRoot = (from p in Vessel.parts where p.flightID == vesselInfo.rootPartUId select p).SingleOrDefault();
+                    if (VesselRoot != null)
+                    {
+                        VesselpartList = (from p in Vessel.parts where p.launchID == VesselRoot.launchID select p).ToList();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex.ToString()), "Error", true);
+                VesselpartList = new List<Part>();
+            }
+            return VesselpartList;
         }
 
         #endregion

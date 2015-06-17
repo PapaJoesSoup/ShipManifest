@@ -292,7 +292,7 @@ namespace ShipManifest
                     {
                         //Instantiate the controller for the active vessel.
                         smController = SMController.GetInstance(vessel);
-                        SMHighlighter.UpdateHighlighting();
+                        SMHighlighter.Update_Highlighter();
                
                         // Realism Mode Resource transfer operation (real time)
                         // XferOn is flagged in the Resource Controller
@@ -628,7 +628,7 @@ namespace ShipManifest
                         DummyHandler,
                         DummyHandler,
                         DummyHandler,
-                        ApplicationLauncher.AppScenes.FLIGHT,
+                        ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
                         (Texture)GameDatabase.Instance.GetTexture(TextureFolder + Iconfile, false));
 
                     if (WindowManifest.ShowWindow)
@@ -879,7 +879,7 @@ namespace ShipManifest
                 bool canShow = false;
                 if (SMAddon.ShowUI
                     && HighLogic.LoadedScene == GameScenes.FLIGHT
-                    && !MapView.MapIsEnabled
+                    //&& !MapView.MapIsEnabled
                     && !isPauseMenuOpen()
                     && !isFlightDialogDisplaying()
                     && FlightGlobals.fetch != null
@@ -902,7 +902,7 @@ namespace ShipManifest
                 {
                     string values = "SMAddon.ShowUI = " + SMAddon.ShowUI.ToString() + "\r\n";
                     values += "HighLogic.LoadedScene = " + HighLogic.LoadedScene.ToString() + "\r\n";
-                    values += "!MapView.MapIsEnabled = " +MapView.MapIsEnabled.ToString() + "\r\n";
+                    //values += "!MapView.MapIsEnabled = " +MapView.MapIsEnabled.ToString() + "\r\n";
                     values += "PauseMenu.isOpen = " + isPauseMenuOpen().ToString() + "\r\n";
                     values += "FlightResultsDialog.isDisplaying = " + isFlightDialogDisplaying().ToString() + "\r\n";
                     values += "FlightGlobals.fetch != null = " + (FlightGlobals.fetch != null).ToString() + "\r\n";

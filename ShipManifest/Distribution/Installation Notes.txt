@@ -5,7 +5,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with [url=htt
 I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
 
 ----------------
-Current Version 4.3.1.0 - Release 15 Jun, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
+Current Version 4.4.0.0 - Release 17 Jun, 2015 - Docked Vessel Transfers Edition.
 ----------------
 
 ---------
@@ -14,10 +14,14 @@ Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
 ---------
 
-NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest can use:
-	- Toolbar.
-	- Connected Living Spaces
+NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
+	- Blizzy's Toolbar.
+	- Connected Living Space
 	- Module Manager  
+	- DeepFreeze
+	- RemoteTech Antennas
+	- KSP-AVC
+	- CKAN
 
 IMPORTANT NOTE for CLS users:  
 
@@ -38,17 +42,10 @@ Installation steps:
 ------------
 What's New:
 ------------
-Version 4.3.1.0 - Release 15 June, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
-- New:  Tightened Integration with DeepFreeze by adding DF Interface component and simplifying Frozen Kerbal display and detection...
-- New:  Added ability to Freeze/Thaw Kerbals in  DeepFreeze Container via Roster window.  Works only when a freezer is part of the active vessel and contains kerbals.
-- New:  Added New GUI Skin: Unity Default.  Selectable in Settings Config Tab and takes effect immediately.
-- New:  Updated Roster display to improve general layout and readability.
-- New:  Added Mods Tab to Settings Window.  Displayes Installed Mods/Assemblies.
-- Fixed:  Bug in settings.  When cancelling or saving changes in Space Center, Settings Icon does not revert on toolbar.
-- Fixed:  Bug with KIS compatability.  When transferring Kerbals with inventory, a race condition occurs with OnCrewTransferred Event handler and causes errors.
-          Added switch in SMSetting.dat to allow disabling onCrewTransferred Event call if KIS still is causing issues.
-- Fixed:  Bug in Multi Part transfers.  Transfers sometimes still hang.  Added check for maxAmount to Transfer, and a flag for transfer in progress to allow Stop button to remain visible until completion...
-
+Version 4.4.0.0 - Release 17 June, 2015 - Docked Vessel Transfers Edition.
+- New:  Added ability to transfer, dump/fill resources by Docked vessel.  Multi resource, Docked Vessel(s) <-> Docked vessel(s), Docked Vessel(s) <-> Part(s), and Part(s) <-> Part(s) transfers are now possible.  Huge flexibility.  
+- New:  Highlighting Refactoring.  Docked Vessel highlighting, on mouseover cleanup, and standardized mouseover highlighting model.
+- New:  Opened up SM to allow operation in MapView while in flight.  All features work, and Toolbar button is displayed while in MapView during flight.
 
 ----------
 License:  CC BY-NC-SA 4.0
@@ -70,4 +67,4 @@ Videos:
 
  - Kottabos did a fine review here:  [url]www.youtube.com/watch?v=I_TNxjnW234[/url] (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
 
-This work is based in large part on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.
+This work was based in large part on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.

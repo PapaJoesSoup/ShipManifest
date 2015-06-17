@@ -89,47 +89,6 @@ namespace ShipManifest
                 SMAddon.FireEventTriggers();
         }
 
-        internal void Highlight(Rect rect)
-        {
-            try
-            {
-                if (rect.Contains(Event.current.mousePosition))
-                {
-                    SMHighlighter.SetPartHighlight(_clsPart.Part, SMSettings.Colors[SMSettings.MouseOverColor]);
-                    SMHighlighter.EdgeHighight(_clsPart.Part, true);
-                }
-                else
-                {
-                    if (_clsPart.Part.highlightColor == SMSettings.Colors[SMSettings.MouseOverColor])
-                    {
-                        SMHighlighter.EdgeHighight(_clsPart.Part, false);
-                        if (SMSettings.EnableCLS && SMAddon.smController.SelectedResources.Contains("Crew") && WindowTransfer.ShowWindow)
-                        {
-                            if (CLSPart.Space != null)
-                                CLSPart.Highlight(true, true);
-                            else
-                            {
-                                SMHighlighter.ClearPartHighlight(_clsPart.Part);
-                            }
-                        }
-                        else
-                        {
-                            SMHighlighter.ClearPartHighlight(_clsPart.Part);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (!SMAddon.frameErrTripped)
-                {
-                    Utilities.LogMessage(string.Format(" in Hatch.Highlight.  Error:  {0}", ex.ToString()), "Error", true);
-                    SMAddon.frameErrTripped = true;
-                }
-
-
-            }
-        }
     }
 
 }
