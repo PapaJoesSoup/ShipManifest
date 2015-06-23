@@ -117,7 +117,7 @@ namespace ShipManifest
                         labelText = string.Format("{0}", "No Part Selected");
                 }
             }
-            GUILayout.Label(labelText, GUILayout.Width(200));
+            GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(200));
             if (CanShowVessels())
             {
                 if (xferMode == SMAddon.XFERMode.SourceToTarget)
@@ -175,7 +175,7 @@ namespace ShipManifest
             {
                 // Source Part resource Details
                 // this Scroll viewer is for the details of the part selected above.
-                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(102), GUILayout.Width(300));
+                SourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(SourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 if (SMAddon.smController.SelectedResources.Contains("Crew"))
@@ -239,7 +239,7 @@ namespace ShipManifest
             try
             {
                 // Target Part resource details
-                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(102), GUILayout.Width(300));
+                TargetDetailsViewerScrollPosition = GUILayout.BeginScrollView(TargetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
                 GUILayout.BeginVertical();
 
                 // --------------------------------------------------------------------------
@@ -653,7 +653,8 @@ namespace ShipManifest
                         {
                             GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
                             GUILayout.Label((modResource.XferAmount(SMAddon.XferMode) - modResource.AmtXferred).ToString("#######0.##"));
-                            GUILayout.Label(" / " + (ratioResource.XferAmount(SMAddon.XferMode) - ratioResource.AmtXferred).ToString("#######0.##"));
+                            if (SMAddon.smController.SelectedResources.Count > 1)
+                                GUILayout.Label(" | " + (ratioResource.XferAmount(SMAddon.XferMode) - ratioResource.AmtXferred).ToString("#######0.##"));
                         }
                     }
                     else
@@ -677,7 +678,8 @@ namespace ShipManifest
                         // Update static Xfer Amount var
                         thisXferAmount = modResource.UpdateXferAmount(strXferAmount, XferMode);
                         ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.FromCapacity(XferMode) ? ratioResource.FromCapacity(XferMode) : thisXferAmount * ratioResource.XferRatio;
-                        GUILayout.Label(" / " + ratioXferAmt.ToString("#######0.##"), GUILayout.Width(80));
+                        if (SMAddon.smController.SelectedResources.Count > 1)
+                            GUILayout.Label(" | " + ratioXferAmt.ToString("#######0.##"), GUILayout.Width(80));
                     }
                     GUILayout.EndHorizontal();
 
@@ -686,7 +688,7 @@ namespace ShipManifest
                         GUILayout.BeginHorizontal();
                         GUIStyle noPad = SMStyle.LabelStyleNoPad;
                         GUILayout.Label("Xfer:", noPad, GUILayout.Width(50), GUILayout.Height(20));
-                        thisXferAmount = (double)GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(180));
+                        thisXferAmount = (double)GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(190));
 
                         // set button style
                         GUIContent xferContent = null;
@@ -797,12 +799,12 @@ namespace ShipManifest
                         GUILayout.BeginHorizontal();
 
                         GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
-                        GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, modResource.FromAmtRemaining(XferMode).ToString("#######0.##"), modResource.FromCapacity(XferMode).ToString("######0.##")), noWrap, GUILayout.Width(210), GUILayout.Height(18));
+                        GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, modResource.FromAmtRemaining(XferMode).ToString("#######0.##"), modResource.FromCapacity(XferMode).ToString("######0.##")), SMStyle.LabelStyleNoWrap, GUILayout.Width(220), GUILayout.Height(18));
                         GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(20), GUILayout.Height(18));
                         if (SMAddon.vessel.IsControllable)
                         {
                             step = "render flow button(s)";
-                            if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s)."), GUILayout.Width(40), GUILayout.Height(18)))
+                            if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s)."), GUILayout.Width(40), GUILayout.Height(20)))
                             {
                                 foreach (Part part in partsSource)
                                 {

@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 using ConnectedLivingSpace;
-using DF;
 
 namespace ShipManifest
 {
@@ -53,7 +52,6 @@ namespace ShipManifest
         {
             get { return Vessel.landedAt == "LaunchPad" || Vessel.landedAt == "Runway"; }
         }
-
 
         #endregion
 
@@ -333,7 +331,8 @@ namespace ShipManifest
                 if (SMAddon.GetCLSAddon())
                 {
                     SMAddon.UpdateCLSSpaces();
-                    GetHatches();
+                    if (SMAddon.GetCLSVessel())
+                        GetHatches();
                 }
             }
 

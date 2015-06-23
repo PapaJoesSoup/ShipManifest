@@ -1,7 +1,11 @@
-﻿Version 4.4.0.1 - Release xx June, 2015 - External Crew Transfer Edition.
+﻿Version 4.4.1.0 - Release xx June, 2015 - External Crew Transfer Edition.
 x New:  When using External Seats, crew can be transferred from seat to seat.
 x New:  RT command queue is now respected.  Antenna switching from the Control Window will now be queued.
 x New:  Added Fuel Pump Module to allow Module Manager management of Transfer parameters by resource.
+
+Version 4.4.0.1 - Release 22 June, 2015 - Docked Vessel Transfers Edition.
+- Fixed:  When switching vessels while in MapView with Crew Selected and CLS installed and enabled, errors are generated in log during transition.
+- Fixed:  With the releae of DeepFreeze 0.16, my freez and thaw command no longer work, and cause errors.
 
 Version 4.4.0.0 - Release 17 June, 2015 - Docked Vessel Transfers Edition.
 - New:  Added ability to transfer, dump/fill resources by Docked vessel.  Multi resource, Docked Vessel(s) <-> Docked vessel(s), Docked Vessel(s) <-> Part(s), and Part(s) <-> Part(s) transfers are now possible.  Huge flexibility.  

@@ -5,7 +5,6 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 using ConnectedLivingSpace;
-using DF;
 
 namespace ShipManifest
 {

@@ -69,8 +69,11 @@ namespace ShipManifest
                 {
                     ClearPartHighlight(part);
                 }
-                if (SMSettings.EnableCLS && SMSettings.EnableCLSHighlighting && SMAddon.clsAddon.Vessel != null)
-                    SMAddon.clsAddon.Vessel.Highlight(false);
+                if (SMSettings.EnableCLS && SMSettings.EnableCLSHighlighting && SMAddon.GetCLSVessel())
+                {
+                    if (_ResourceParts.Count > 0 && _ResourceParts[0] != null)
+                        SMAddon.clsAddon.Vessel.Highlight(false);
+                }
             }
         }
 

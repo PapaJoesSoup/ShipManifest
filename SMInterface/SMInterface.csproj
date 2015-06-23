@@ -32,18 +32,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\KSPAssemblies\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSPAssemblies\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\KSPAssemblies\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -52,7 +52,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\"
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-3\KSP_win\GameData\ShipManifest\Plugins\"
 copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\\Distribution\GameData\ShipManifest\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

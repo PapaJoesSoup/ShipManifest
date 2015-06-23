@@ -8,6 +8,7 @@ using HighlightingSystem;
 using ConnectedLivingSpace;
 using DF;
 
+
 namespace ShipManifest
 {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
@@ -454,7 +455,7 @@ namespace ShipManifest
             Utilities.LogMessage("SMAddon.OnVesselLoaded active...", "Info", SMSettings.VerboseLogging);
             try
             {
-                if (data.Equals(FlightGlobals.ActiveVessel))
+                if (data.Equals(FlightGlobals.ActiveVessel) && data != smController.Vessel)
                 {
                     SMHighlighter.ClearResourceHighlighting(smController.SelectedResourcesParts);
                     UpdateSMcontroller(data);
@@ -1013,7 +1014,6 @@ namespace ShipManifest
                         if (smController.clsSpaceSource != null && smController.clsSpaceTarget != null)
                             break;
                     }
-                    smController.GetHatches();
                 }
                 catch (Exception ex)
                 {

@@ -333,8 +333,8 @@ namespace ShipManifest
         {
             if (DFInterface.IsDFInstalled)
             {
-                IDFInterface IDF = DFInterface.GetFrozenKerbals();
-                return IDF.FrozenKerbals;
+                Utilities.LogMessage("GetFrozenKerbals.  Loading", "Info", true);
+                return DFInterface.GetFrozenKerbals().FrozenKerbals;
             }
             else
                 return new Dictionary<string, KerbalInfo>();
@@ -375,19 +375,22 @@ namespace ShipManifest
             {
                 if (DFInterface.IsDFInstalled)
                 {
-                    DF.DeepFreeze objFreeze = DF.DeepFreeze.Instance;
                     KerbalInfo iKerbal = SMAddon.FrozenKerbals[kerbal.name];
 
-                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.partInfo.name == "cryofreezer" select p).ToList();
+                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
                     foreach (Part CryoFreezer in cryofreezers)
                     {
                         if (CryoFreezer.flightID == iKerbal.partID)
                         {
                             PartModule deepFreezer = (from PartModule pm in CryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
-                            ((DF.DeepFreezer)deepFreezer).beginThawKerbal(kerbal.name);
+                            ((IDeepFreezer)deepFreezer).beginThawKerbal(kerbal.name);
                             break;
                         }
                     }
+                }
+                else
+                {
+                    Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", DFInterface.IsDFInstalled.ToString()), "Info", true);
                 }
             }
             catch (Exception ex)
@@ -402,15 +405,13 @@ namespace ShipManifest
             {
                 if (DFInterface.IsDFInstalled)
                 {
-                    DF.DeepFreeze objFreeze = DF.DeepFreeze.Instance;
-
-                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.partInfo.name == "cryofreezer" select p).ToList();
+                    List<Part> cryofreezers = (from p in SMAddon.smController.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
                     foreach (Part CryoFreezer in cryofreezers)
                     {
                         if (CryoFreezer.protoModuleCrew.Contains(kerbal))
                         {
                             PartModule deepFreezer = (from PartModule pm in CryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
-                            ((DF.DeepFreezer)deepFreezer).beginFreezeKerbal(kerbal);
+                            ((IDeepFreezer)deepFreezer).beginFreezeKerbal(kerbal);
                             break;
                         }
                     }
