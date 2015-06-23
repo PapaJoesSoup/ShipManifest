@@ -1,5 +1,10 @@
 ShipManifest
 ============
+Version 4.4.0.0 - Release 17 June, 2015 - Docked Vessel Transfers Edition.
+- New:  Added ability to transfer, dump/fill resources by Docked vessel.  Multi resource, Docked Vessel(s) <-> Docked vessel(s), Docked Vessel(s) <-> Part(s), and Part(s) <-> Part(s) transfers are now possible.  Huge flexibility.  
+- New:  Highlighting Refactoring.  Docked Vessel highlighting, on mouseover cleanup, and standardized mouseover highlighting model.
+- New:  Opened up SM to allow operation in MapView while in flight.  All features work, and Toolbar button is displayed while in MapView during flight.
+
 Version 4.3.0.2 - Release 08 June, 2015 - Crew, Interfaces, & Refactoring Edition.
 - New:  Cleaned up highlighting when undocking events occur to turn off highlighting on vessel parts/vessels that become detatched...
 - Fixed:  Bug in settings.  When disabling Crew in setting, if crew was selected, Highligting does not turn off.
