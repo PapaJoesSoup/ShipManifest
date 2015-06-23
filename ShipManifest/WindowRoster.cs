@@ -333,7 +333,6 @@ namespace ShipManifest
         {
             if (DFInterface.IsDFInstalled)
             {
-                Utilities.LogMessage("GetFrozenKerbals.  Loading", "Info", true);
                 return DFInterface.GetFrozenKerbals().FrozenKerbals;
             }
             else
