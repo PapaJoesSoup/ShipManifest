@@ -1,5 +1,9 @@
 ShipManifest
 ============
+Version 4.4.0.1 - Release 23 June, 2015 - Docked Vessel Transfers Edition.
+- Fixed:  When switching vessels while in MapView with Crew Selected and CLS installed and enabled, errors are generated in log during transition.
+- Fixed:  With the releae of DeepFreeze 0.16, freeze and thaw commands from Roster Window no longer work and cause errors.
+
 Version 4.4.0.0 - Release 17 June, 2015 - Docked Vessel Transfers Edition.
 - New:  Added ability to transfer, dump/fill resources by Docked vessel.  Multi resource, Docked Vessel(s) <-> Docked vessel(s), Docked Vessel(s) <-> Part(s), and Part(s) <-> Part(s) transfers are now possible.  Huge flexibility.  
 - New:  Highlighting Refactoring.  Docked Vessel highlighting, on mouseover cleanup, and standardized mouseover highlighting model.
