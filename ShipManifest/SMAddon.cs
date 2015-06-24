@@ -379,18 +379,13 @@ namespace ShipManifest
 
             if (!smController.CrewTransfer.CrewXferActive)
             {
-                //Check for DeepFreezer full 
+                // If we are here, then we want to handle the Stock Xfer...
+
+                //Check for DeepFreezer full if full abort handling Xfer.
                 if (DFInterface.IsDFInstalled && action.to.Modules.Contains("DeepFreezer"))
-                {
                     if (((IDeepFreezer)action.to.Modules["DeepFreezer"]).DFIPartFull)
-                    {
-                        TransferCrew.RevertCrewTransfer(action.host, action.from, action.to);
-                        // Remove the transfer message that stock displayed. 
-                        string strMessage = string.Format("<color=orange>{0} is unable to xfer to {1}.  Target part is Full.</color>", action.host.name, action.to.partInfo.title);
-                        DisplayScreenMsg(strMessage);
                         return;
-                    }
-                }
+
                 // store data from event.
                 smController.CrewTransfer.FromPart = action.from;
                 smController.CrewTransfer.ToPart = action.to;
