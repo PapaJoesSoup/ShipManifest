@@ -46,6 +46,14 @@ namespace ShipManifest
                 _isStockXfer = value;
             }
         }
+
+        public bool OverrideStockCrewXfer
+        {
+            get
+            {
+                return SMSettings.OverrideStockCrewXfer;
+            }
+        }
         private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
         public double CrewXferDelaySec
         {
@@ -472,6 +480,17 @@ namespace ShipManifest
                     IsStockXfer = false;
                 }
             }
+        }
+
+        internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
+        {
+            // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
+            toPart.RemoveCrewmember(fromCrew);
+            fromPart.AddCrewmember(fromCrew);
+            if (fromCrew.seat != null)
+                fromCrew.seat.SpawnCrew();
+
+            SMAddon.smController.RespawnCrew();
         }
 
         public void CrewTransferComplete()

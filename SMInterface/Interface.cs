@@ -8,6 +8,7 @@ namespace ShipManifest
     {
         bool CrewXferActive { get; set; }
         bool IsStockXfer { get; }
+        bool OverrideStockCrewXfer { get; }
         double CrewXferDelaySec { get; }
         bool IsSeat2SeatXfer { get; }
         double Seat2SeatXferDelaySec { get; }

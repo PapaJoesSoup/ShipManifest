@@ -307,13 +307,7 @@ namespace ShipManifest
                             smController.CrewTransfer.CrewTransferProcess();
                         else if (smController.CrewTransfer.IsStockXfer)
                         {
-                            // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
-                            smController.CrewTransfer.ToPart.RemoveCrewmember(smController.CrewTransfer.FromCrewMember);
-                            smController.CrewTransfer.FromPart.AddCrewmember(smController.CrewTransfer.FromCrewMember);
-                            if (smController.CrewTransfer.FromCrewMember.seat != null)
-                                smController.CrewTransfer.FromCrewMember.seat.SpawnCrew();
-
-                            smController.RespawnCrew();
+                            TransferCrew.RevertCrewTransfer(smController.CrewTransfer.FromCrewMember, smController.CrewTransfer.FromPart, smController.CrewTransfer.ToPart);
                             smController.CrewTransfer.CrewTransferBegin(smController.CrewTransfer.FromCrewMember, smController.CrewTransfer.FromPart, smController.CrewTransfer.ToPart);
                         }
 
@@ -385,6 +379,18 @@ namespace ShipManifest
 
             if (!smController.CrewTransfer.CrewXferActive)
             {
+                //Check for DeepFreezer full 
+                if (DFInterface.IsDFInstalled && action.to.Modules.Contains("DeepFreezer"))
+                {
+                    if (((IDeepFreezer)action.to.Modules["DeepFreezer"]).DFIPartFull)
+                    {
+                        TransferCrew.RevertCrewTransfer(action.host, action.from, action.to);
+                        // Remove the transfer message that stock displayed. 
+                        string strMessage = string.Format("<color=orange>{0} is unable to xfer to {1}.  Target part is Full.</color>", action.host.name, action.to.partInfo.title);
+                        DisplayScreenMsg(strMessage);
+                        return;
+                    }
+                }
                 // store data from event.
                 smController.CrewTransfer.FromPart = action.from;
                 smController.CrewTransfer.ToPart = action.to;
@@ -393,20 +399,21 @@ namespace ShipManifest
                     smController.CrewTransfer.IsStockXfer = true;
             }
             // Remove the transfer message that stock displayed. 
-            var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-            var messages = FindObjectOfType<ScreenMessages>();
-            if (messages != null)
-            {
-                var messagesToRemove = messages.activeMessages.Where(x => x.startTime == message.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-                foreach (var m in messagesToRemove)
-                    ScreenMessages.RemoveMessage(m);
+            string failMessage = string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>", action.host.name, action.to.partInfo.title);
+            DisplayScreenMsg(failMessage);
+        }
 
-                // If a crew Transfer is in progress, we need to tell the user...
-                if (smController.CrewTransfer.CrewXferActive)
-                {
-                    var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
-                    ScreenMessages.PostScreenMessage(string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>", action.host.name, action.to.partInfo.title), failmessage, true);
-                }
+        private static void DisplayScreenMsg(string strMessage)
+        {
+            var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+            var smessages = FindObjectOfType<ScreenMessages>();
+            if (smessages != null)
+            {
+                var smessagesToRemove = smessages.activeMessages.Where(x => x.startTime == smessage.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+                foreach (var m in smessagesToRemove)
+                    ScreenMessages.RemoveMessage(m);
+                var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
+                ScreenMessages.PostScreenMessage(strMessage, failmessage, true);
             }
         }
 
