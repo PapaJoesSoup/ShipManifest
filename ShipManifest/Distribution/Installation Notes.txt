@@ -5,7 +5,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with [url=htt
 I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
 
 ----------------
-Current Version 4.4.0.1 - Release 23 Jun, 2015 - Docked Vessel Transfers Edition.
+Current Version 4.4.0.2 - Release 24 Jun, 2015 - Docked Vessel Transfers Edition.
 ----------------
 
 ---------
@@ -15,22 +15,13 @@ Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
 ---------
 
 NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
-	- Blizzy's Toolbar.
-	- Connected Living Space (Verson 1.1.1.0 or higher)
-	- Module Manager  
-	- DeepFreeze  (Version 0.16.0.2 or higher)
-	- RemoteTech Antennas
-	- KSP-AVC
-	- CKAN
-
-IMPORTANT NOTE for CLS users:  
-
-If you use CLS and you upgrade SM, SM version 0.90.0_4.0.0+ now requires CLS version 1.1.1.0 or higher.  Changes to the CLS interface have exposed hatches for third party use, and SM takes advantage of this.  Be sure to install the latest version of CLS when you upgrade SM to 4.0.0.0 or higher
-
-Toolbar, CLS and Module manager are not included with the release.  if you would like to use these fine mods, Get the latest here:
- - Toolbar:   http://forum.kerbalspaceprogram.com/threads/60863.
- - CLS: http://forum.kerbalspaceprogram.com/threads/70161.
- - Module Manager: http://forum.kerbalspaceprogram.com/threads/55219
+	- Blizzy's Toolbar. http://forum.kerbalspaceprogram.com/threads/60863.
+	- Connected Living Space (Verson 1.1.1.0 or higher)  http://forum.kerbalspaceprogram.com/threads/70161.
+	- Module Manager  http://forum.kerbalspaceprogram.com/threads/55219
+	- DeepFreeze  (Version 0.16.0.2 or higher)  http://forum.kerbalspaceprogram.com/threads/124720
+	- RemoteTech Antennas  http://forum.kerbalspaceprogram.com/threads/83305
+	- KSP-AVC  http://forum.kerbalspaceprogram.com/threads/79745
+	- CKAN  http://forum.kerbalspaceprogram.com/threads/100067
 
 --------------------
 Installation steps: 
@@ -42,6 +33,10 @@ Installation steps:
 ------------
 What's New:
 ------------
+Version 4.4.0.2 - Release 24 June, 2015 - Docked Vessel Transfers Edition.
+- New:  Added StockCrewXferOverride flag to SMInterface
+- New:  Added check for full DeepFreezer when Stock Transfer Initiated and Override is On.  Ignore event if Freezer is full, and allow DeepFreeze to handle it.
+
 Version 4.4.0.1 - Release 23 June, 2015 - Docked Vessel Transfers Edition.
 - Fixed:  When switching vessels while in MapView with Crew Selected and CLS installed and enabled, errors are generated in log during transition.
 - Fixed:  With the releae of DeepFreeze 0.16, freeze and thaw commands from Roster Window no longer work and cause errors.
