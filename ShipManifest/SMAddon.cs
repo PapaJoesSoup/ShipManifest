@@ -381,7 +381,7 @@ namespace ShipManifest
             {
                 // If we are here, then we want to handle the Stock Xfer...
 
-                //Check for DeepFreezer full if full abort handling Xfer.
+                //Check for DeepFreezer full. if full, abort handling Xfer.
                 if (DFInterface.IsDFInstalled && action.to.Modules.Contains("DeepFreezer"))
                     if (((IDeepFreezer)action.to.Modules["DeepFreezer"]).DFIPartFull)
                         return;
