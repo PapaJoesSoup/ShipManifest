@@ -285,10 +285,8 @@ namespace ShipManifest
                 }
                 // if moving within a part, set the seat2seat flag
                 IsSeat2SeatXfer = FromPart == ToPart ? true : false;
-                //FromCrewMember.KerbalRef.IVADisable();
-                //if (ToCrewMember != null)
-                //    ToCrewMember.KerbalRef.IVADisable();
             }
+            FlightEVA.fetch.DisableInterface();
             CrewXferActive = true;
         }
 
@@ -298,83 +296,25 @@ namespace ShipManifest
             {
                 if (CrewXferActive)
                 {
+                    if (CameraManager.Instance.currentCameraMode == CameraManager.CameraMode.IVA)
+                    {
+                        ScreenMessages.PostScreenMessage(string.Format("<color=orange>Cannot go IVA.  An SM Crew Xfer is in progress</color>"), 4f);
+                        CameraManager.Instance.SetCameraMode(CameraManager.CameraMode.Flight);
+                    }
+
                     Part PartFrom = FromPart;
                     Part PartTo = ToPart;
                     ProtoCrewMember pKerbal = FromCrewMember;
-                    if (!SMSettings.RealismMode)
+
+                    switch (CrewXferState)
                     {
-                        switch (CrewXferState)
-                        {
-                            case CrewXFERState.Off:
-                                // We're just starting loop, so set some evnironment stuff.
-                                timestamp = DateTime.Now;
-                                CrewXferState = CrewXFERState.Start;
-                                break;
-
-                            case CrewXFERState.Start:
-                                SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds; 
-                                CrewXferState = CrewXFERState.Transfer;
-                                break;
-
-                            case CrewXFERState.Transfer:
-
-                                SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds; 
-                                if (SMAddon.elapsed > 1)
-                                    CrewXferState = CrewXFERState.Stop;
-                                break;
-
-                            case CrewXFERState.Stop:
-
-                                // Spawn crew in parts and in vessel.
-                                if (PartFrom == null)
-                                    PartFrom = PartTo;
-                                if (PartTo == null)
-                                    PartTo = PartFrom;
-                                SMAddon.elapsed = 0;
-                                CrewTransferComplete();
-                                CrewXferState = CrewXFERState.Portraits;
-
-                                break;
-
-                            case CrewXFERState.Portraits:
-
-                                // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
-                                if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
-                                {
-                                    IvaPortraitDelay += 1;
-                                }
-                                else if (IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay)
-                                {
-                                    IvaDelayActive = false;
-                                    IvaPortraitDelay = 0;
-                                    FromCrewMember = ToCrewMember = null;
-                                    SMAddon.smController.RespawnCrew();
-
-                                    CrewXferState = CrewXFERState.Off;
-                                    CrewXferActive = IsSeat2SeatXfer = false;
-                                    if (IsStockXfer)
-                                    {
-                                        var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-                                        ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, PartTo.partInfo.title), message, true);
-                                    }
-                                    IsStockXfer = false;
-                                }
-                                break;
-                        }
-                        Utilities.LogMessage("CrewTransferProcess crewXfer State:  " + CrewXferActive.ToString() + "...", "Info", SMSettings.VerboseLogging);
-                        if (CrewXferState != CrewXFERState.Off)
+                        case CrewXFERState.Off:
+                            // We're just starting loop, so set some evnironment stuff.
                             timestamp = DateTime.Now;
-                        else
-                            Utilities.LogMessage("CrewTransferProcess:  Complete.", "info", SMSettings.VerboseLogging);
-                    }
-                    else
-                    {
-                        switch (CrewXferState)
-                        {
-                            case CrewXFERState.Off:
-                                // We're just starting loop, so set some evnironment stuff.
-                                timestamp = DateTime.Now;
+                            CrewXferState = CrewXFERState.Start;
 
+                            if (SMSettings.RealismMode)
+                            { 
                                 // Default sound license: CC-By-SA
                                 // http://www.freesound.org/people/adcbicycle/sounds/14214/
                                 string path1 = SMSettings.CrewSoundStart != null ? SMSettings.CrewSoundStart : "ShipManifest/Sounds/14214-1";
@@ -382,13 +322,15 @@ namespace ShipManifest
                                 string path3 = SMSettings.CrewSoundStop != null ? SMSettings.CrewSoundStop : "ShipManifest/Sounds/14214-3";
 
                                 SMAddon.LoadSounds("Crew", path1, path2, path3, SMSettings.CrewSoundVol);
-                                CrewXferState = CrewXFERState.Start;
-                                break;
+                            }
+                            break;
 
-                            case CrewXFERState.Start:
+                        case CrewXFERState.Start:
 
-                                SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds; 
+                            SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds;
 
+                            if (SMSettings.RealismMode)
+                            {
                                 // Play run sound when start sound is nearly done. (repeats)
                                 if (SMAddon.elapsed >= SMAddon.source1.clip.length - 0.25)
                                 {
@@ -397,74 +339,72 @@ namespace ShipManifest
                                     SMAddon.elapsed = 0;
                                     CrewXferState = CrewXFERState.Transfer;
                                 }
-                                break;
+                            }
+                            else
+                            {
+                                CrewXferState = CrewXFERState.Transfer;
+                            }
+                            break;
 
-                            case CrewXFERState.Transfer:
+                        case CrewXFERState.Transfer:
 
-                                SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds; 
+                            SMAddon.elapsed += (DateTime.Now - timestamp).TotalSeconds; 
 
+                            if (SMSettings.RealismMode)
+                            {
                                 // wait for movement to end...
                                 if (SMAddon.elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.elapsed > Seat2SeatXferDelaySec))
-                                {
-                                    // Reset State vars
                                     CrewXferState = CrewXFERState.Stop;
-                                }
-                                break;
+                            }
+                            else
+                            {
+                                if (SMAddon.elapsed > 1)
+                                    CrewXferState = CrewXFERState.Stop;
+                            }
+                            break;
 
-                            case CrewXFERState.Stop:
+                        case CrewXFERState.Stop:
 
-                                // Spawn crew in parts and in vessel.
-                                if (PartFrom == null)
-                                    PartFrom = PartTo;
-                                if (PartTo == null)
-                                    PartTo = PartFrom;
+                            // Spawn crew in parts and in vessel.
+                            if (PartFrom == null)
+                                PartFrom = PartTo;
+                            if (PartTo == null)
+                                PartTo = PartFrom;
 
+                            if (SMSettings.RealismMode)
+                            {
                                 // play crew sit.
                                 SMAddon.source2.Stop();
                                 SMAddon.source3.Play();
-                                SMAddon.elapsed = 0;
-                                CrewTransferComplete();
-                                CrewXferState = CrewXFERState.Portraits;
-                                break;
+                            }
+                            SMAddon.elapsed = 0;
+                            CrewTransferAction();
+                            CrewXferState = CrewXFERState.Portraits;
+                            IvaDelayActive = true;
+                            Utilities.LogMessage("CrewTransferProcess:  Updating Portraits...", "info", SMSettings.VerboseLogging);
+                            break;
 
-                            case CrewXFERState.Portraits:
+                        case CrewXFERState.Portraits:
 
-                                // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
-                                if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
-                                {
-                                    IvaPortraitDelay += 1;
-                                }
-                                else if (IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay)
-                                {
-                                    IvaDelayActive = false;
-                                    IvaPortraitDelay = 0;
-                                    //if (FromSeat != null)
-                                    //{
-                                    //    FromCrewMember.KerbalRef.IVAEnable();
-                                    //    if (ToCrewMember != null)
-                                    //        ToCrewMember.KerbalRef.IVAEnable();
-                                    //}
-                                    FromCrewMember = ToCrewMember = null;
-                                    SMAddon.smController.RespawnCrew();
+                            // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
+                            if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
+                            {
+                                IvaPortraitDelay += 1;
+                            }
+                            else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
+                            {
+                                if (IsStockXfer)
+                                    ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, PartTo.partInfo.title), 5f);
 
-                                    CrewXferState = CrewXFERState.Off;
-                                    CrewXferActive = IsSeat2SeatXfer = false;
-                                    if (IsStockXfer)
-                                    {
-                                        var message = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-                                        ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, PartTo.partInfo.title), message, true);
-                                    }
-                                    IsStockXfer = false;
-
-                                }
-                                break;
-                        }
-                        Utilities.LogMessage("Transfer State:  " + TransferCrew.CrewXferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
-                        if (CrewXferState != CrewXFERState.Off)
-                            timestamp = DateTime.Now;
-                        else
-                            Utilities.LogMessage("CrewTransferProcess:  Complete.", "info", SMSettings.VerboseLogging);
+                                ResetXferProcess();
+                            }
+                            break;
                     }
+                    Utilities.LogMessage("Transfer State:  " + TransferCrew.CrewXferState.ToString() + "...", "Info", SMSettings.VerboseLogging);
+                    if (CrewXferState != CrewXFERState.Off)
+                        timestamp = DateTime.Now;
+                    else
+                        Utilities.LogMessage("CrewTransferProcess:  Complete.", "info", SMSettings.VerboseLogging);
                 }
             }
             catch (Exception ex)
@@ -474,12 +414,21 @@ namespace ShipManifest
                     Utilities.LogMessage("Transfer State:  " + CrewXferState.ToString() + "...", "Error", true);
                     Utilities.LogMessage(string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     SMAddon.frameErrTripped = true;
-                    FromCrewMember = ToCrewMember = null;
-                    CrewXferState = CrewXFERState.Off;
-                    CrewXferActive = IsSeat2SeatXfer = false;
-                    IsStockXfer = false;
+                    ResetXferProcess();
                 }
             }
+        }
+
+       private void ResetXferProcess()
+        {
+            IvaDelayActive = false;
+            IvaPortraitDelay = 0;
+            FromCrewMember = ToCrewMember = null;
+            SMAddon.smController.RespawnCrew();
+            FlightEVA.fetch.EnableInterface();
+            CameraManager.ICameras_ResetAll();
+            CrewXferState = CrewXFERState.Off;
+            CrewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
         }
 
         internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
@@ -493,12 +442,14 @@ namespace ShipManifest
             SMAddon.smController.RespawnCrew();
         }
 
-        public void CrewTransferComplete()
+        public void CrewTransferAction()
         {
             try
             {
+                Utilities.LogMessage("CrewTransferAction:  Begin.", "info", SMSettings.VerboseLogging);
                 if (FromPart.internalModel != null && ToPart.internalModel != null)
                 {
+                    Utilities.LogMessage("CrewTransferAction:  InternalModel exists.", "info", SMSettings.VerboseLogging);
                     if (ToSeat.taken)
                     {
                         // Swap places.
@@ -521,6 +472,7 @@ namespace ShipManifest
                 else
                 {
                     // no portraits, so let's just move kerbals...
+                    Utilities.LogMessage("CrewTransferAction:  No InternalModel.", "info", SMSettings.VerboseLogging);
                     if (ToCrewMember != null)
                     {
                         RemoveCrewMember(FromCrewMember, FromPart);
@@ -548,7 +500,6 @@ namespace ShipManifest
                     }
                 }
 
-                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", SMSettings.VerboseLogging);
                 FromPart.SpawnCrew();
                 ToPart.SpawnCrew();
 
@@ -559,11 +510,10 @@ namespace ShipManifest
 
                 SMAddon.smController.RespawnCrew();
                 SMAddon.smController.CrewTransfer.IvaDelayActive = true;
-                Utilities.LogMessage("RealModeCrewXfer:  Updating Portraits...", "info", SMSettings.VerboseLogging);
             }
             catch (Exception ex)
             {
-                Utilities.LogMessage(string.Format("in CrewTransferComplete.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                Utilities.LogMessage(string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
 
@@ -580,6 +530,8 @@ namespace ShipManifest
             SMAddon.smController.CrewTransfer.FromCrewMember = SMAddon.smController.CrewTransfer.ToCrewMember = null;
             CrewXferState = CrewXFERState.Off;
             _crewXferActive = IsSeat2SeatXfer = false;
+            FlightEVA.fetch.EnableInterface();
+            CameraManager.ICameras_ResetAll();
             IsStockXfer = false;
         }
 

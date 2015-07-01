@@ -115,14 +115,16 @@ namespace ShipManifest
             ToolTipActive = false;
 
             rect = new Rect(Position.width - 20, 4, 16, 16);
-            if (GUI.Button(rect, new GUIContent("", "Close Window")))
+            if (GUI.Button(rect, new GUIContent("", "Close Window.\r\nSettings will not be saved, but they will also not be reverted.")))
             {
                 ToolTip = "";
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                     SMAddon.OnSMSettingsToggle();
                 else
+                {
+                    SMSettings.StoreTempSettings();
                     ShowWindow = false;
-
+                }
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
@@ -153,10 +155,14 @@ namespace ShipManifest
             {
                 // We've canclled, so restore original settings.
                 SMSettings.RestoreTempSettings();
+
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                     SMAddon.OnSMSettingsToggle();
                 else
+                {
+                    SMSettings.StoreTempSettings();
                     ShowWindow = false;
+                }
             }
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
@@ -716,7 +722,7 @@ namespace ShipManifest
             // UnityStyle Mode
             label = "Enable Unity Style GUI Interface";
             SMSettings.UseUnityStyle = GUILayout.Toggle(SMSettings.UseUnityStyle, label, GUILayout.Width(300));
-            if (SMSettings.UseUnityStyle && !SMSettings.prevUseUnityStyle)
+            if (SMSettings.UseUnityStyle != SMSettings.prevUseUnityStyle)
                 SMStyle.WindowStyle = null;
 
             label = "Enable Debug Window";

@@ -91,11 +91,8 @@ namespace ShipManifest
         internal static bool RenameWithProfession = false;
         internal static bool AutoSave = false;
         internal static int SaveIntervalSec = 60;
-        internal static bool UseUnityStyle = false;
+        internal static bool UseUnityStyle = true;
 
-
-
-        // Roster Options
 
         // Unmanaged options.
         internal static string ResourcePartColor = "yellow";
@@ -106,11 +103,9 @@ namespace ShipManifest
         internal static string MouseOverColor = "green";
         internal static double CrewXferDelaySec = 7;
         internal static int IvaUpdateFrameDelay = 20;
-        internal static bool ShowIVAUpdateBtn = false;
         internal static double PumpSoundVol = 3;
         internal static double CrewSoundVol = 3;
         internal static bool EnableOnCrewTransferEvent = true;
-
 
         
         // End Persisted Properties
@@ -121,7 +116,7 @@ namespace ShipManifest
         internal static string prevErrorLogLength = "1000";
         internal static bool prevSaveLogOnExit = true;
         internal static bool prevAutoSave;
-        internal static bool prevUseUnityStyle = false;
+        internal static bool prevUseUnityStyle = true;
         internal static int prevSaveIntervalSec = 60;
 
         internal static bool prevRealismMode = false;
@@ -172,7 +167,6 @@ namespace ShipManifest
 
         internal static string DebugLogPath = @"Plugins\PluginData\";
         internal static bool CLSInstalled = false;
-
 
         #endregion
 
@@ -254,7 +248,7 @@ namespace ShipManifest
             WindowDebugger.ShowWindow = SettingsNode.HasValue("ShowDebugger") ? bool.Parse(SettingsNode.GetValue("ShowDebugger")) : WindowDebugger.ShowWindow;
             VerboseLogging = SettingsNode.HasValue("VerboseLogging") ? bool.Parse(SettingsNode.GetValue("VerboseLogging")) : VerboseLogging;
             AutoSave = SettingsNode.HasValue("AutoSave") ? bool.Parse(SettingsNode.GetValue("AutoSave")) : AutoSave;
-            SaveIntervalSec = SettingsNode.HasValue("ShowDebugger") ? int.Parse(SettingsNode.GetValue("SaveIntervalSec")) : SaveIntervalSec;
+            SaveIntervalSec = SettingsNode.HasValue("SaveIntervalSec") ? int.Parse(SettingsNode.GetValue("SaveIntervalSec")) : SaveIntervalSec;
             AutoDebug = SettingsNode.HasValue("AutoDebug") ? bool.Parse(SettingsNode.GetValue("AutoDebug")) : AutoDebug;
             DebugLogPath = SettingsNode.HasValue("DebugLogPath") ? SettingsNode.GetValue("DebugLogPath") : DebugLogPath;
             ErrorLogLength = SettingsNode.HasValue("ErrorLogLength") ? SettingsNode.GetValue("ErrorLogLength") : ErrorLogLength;
@@ -275,11 +269,14 @@ namespace ShipManifest
             // Hidden config
             CrewXferDelaySec = HiddenNode.HasValue("CrewXferDelaySec") ? double.Parse(HiddenNode.GetValue("CrewXferDelaySec")) : CrewXferDelaySec;
             IvaUpdateFrameDelay = HiddenNode.HasValue("IvaUpdateFrameDelay") ? int.Parse(HiddenNode.GetValue("IvaUpdateFrameDelay")) : IvaUpdateFrameDelay;
-            ShowIVAUpdateBtn = HiddenNode.HasValue("ShowIVAUpdateBtn") ? bool.Parse(HiddenNode.GetValue("ShowIVAUpdateBtn")) : ShowIVAUpdateBtn;
             EnableOnCrewTransferEvent = HiddenNode.HasValue("EnableOnCrewTransferEvent") ? bool.Parse(HiddenNode.GetValue("EnableOnCrewTransferEvent")) : EnableOnCrewTransferEvent;
 
             // Okay, set the Settings loaded flag
             Loaded = true;
+            StoreTempSettings();
+
+            // Force Styles to refresh/load.
+            SMStyle.WindowStyle = null;
 
             // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
             RepositionWindows();
@@ -287,6 +284,7 @@ namespace ShipManifest
 
         internal static void SaveSettings()
         {
+            StoreTempSettings();
             if (settings == null)
                 settings = loadSettingsFile();
 
@@ -369,7 +367,6 @@ namespace ShipManifest
             WriteValue(HiddenNode, "CrewSoundVol", CrewSoundVol);
             WriteValue(HiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
             WriteValue(HiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
-            WriteValue(HiddenNode, "ShowIVAUpdateBtn", ShowIVAUpdateBtn);
             WriteValue(HiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
 
             if (!Directory.Exists(SETTINGS_PATH))

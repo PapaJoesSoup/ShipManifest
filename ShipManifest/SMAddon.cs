@@ -270,7 +270,7 @@ namespace ShipManifest
                 else
                     GUI.skin = HighLogic.Skin;
 
-                SMStyle.SetupGUI();
+                SMStyle.SetupGUIStyles();
                 Display();
 
                 Utilities.ShowToolTips();
@@ -377,14 +377,23 @@ namespace ShipManifest
                 return;
             }
 
-            if (!smController.CrewTransfer.CrewXferActive)
+            if (smController.CrewTransfer.CrewXferActive)
             {
-                // If we are here, then we want to handle the Stock Xfer...
-
+                // Remove the transfer message that stock displayed. 
+                string failMessage = string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>", action.host.name, action.to.partInfo.title);
+                DisplayScreenMsg(failMessage);
+                TransferCrew.RevertCrewTransfer(action.host, action.from, action.to);
+                return;
+            }
+            else
+            {
                 //Check for DeepFreezer full. if full, abort handling Xfer.
                 if (DFInterface.IsDFInstalled && action.to.Modules.Contains("DeepFreezer"))
                     if (((IDeepFreezer)action.to.Modules["DeepFreezer"]).DFIPartFull)
                         return;
+
+                // If we are here, then we want to override the Stock Xfer...
+                RemoveScreenMsg();
 
                 // store data from event.
                 smController.CrewTransfer.FromPart = action.from;
@@ -393,12 +402,9 @@ namespace ShipManifest
                 if (smController.CrewTransfer.FromPart != null && smController.CrewTransfer.ToPart != null)
                     smController.CrewTransfer.IsStockXfer = true;
             }
-            // Remove the transfer message that stock displayed. 
-            string failMessage = string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>", action.host.name, action.to.partInfo.title);
-            DisplayScreenMsg(failMessage);
         }
 
-        private static void DisplayScreenMsg(string strMessage)
+        internal static void DisplayScreenMsg(string strMessage)
         {
             var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
             var smessages = FindObjectOfType<ScreenMessages>();
@@ -409,6 +415,18 @@ namespace ShipManifest
                     ScreenMessages.RemoveMessage(m);
                 var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
                 ScreenMessages.PostScreenMessage(strMessage, failmessage, true);
+            }
+        }
+
+        internal static void RemoveScreenMsg()
+        {
+            var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+            var smessages = FindObjectOfType<ScreenMessages>();
+            if (smessages != null)
+            {
+                var smessagesToRemove = smessages.activeMessages.Where(x => x.startTime == smessage.startTime && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+                foreach (var m in smessagesToRemove)
+                    ScreenMessages.RemoveMessage(m);
             }
         }
 
@@ -775,6 +793,7 @@ namespace ShipManifest
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
+                    SMSettings.StoreTempSettings();
                     if (SMSettings.EnableBlizzyToolbar)
                         SMSettings_Blizzy.TexturePath = WindowSettings.ShowWindow ? TextureFolder + "IconS_On_24" : TextureFolder + "IconS_Off_24";
                     else

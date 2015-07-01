@@ -24,6 +24,36 @@ namespace ShipManifest
         internal static bool ShowSourceVessels = false;
         internal static bool ShowTargetVessels = false;
 
+        internal static Dictionary<PartModule, bool> _ScienceModulesSource;
+        internal static Dictionary<PartModule, bool> ScienceModulesSource
+        {
+            get
+            {
+                if (_ScienceModulesSource == null)
+                {
+                    if (SMAddon.smController.SelectedPartsSource.Count > 0)
+                    {
+                        _ScienceModulesSource = new Dictionary<PartModule, bool>();
+                        IScienceDataContainer[] modules = SMAddon.smController.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
+                        if (modules.Length > 0)
+                        {
+                            foreach (PartModule pm in modules)
+                            {
+                                _ScienceModulesSource.Add(pm, false);
+                            }
+                        }
+                        return _ScienceModulesSource;
+                    } 
+                    else
+                    {
+                        return new Dictionary<PartModule, bool>();
+                    }
+                }
+                else
+                    return _ScienceModulesSource;
+            }
+        }
+
         #endregion
 
         #region TransferWindow (GUI Layout)
@@ -103,8 +133,8 @@ namespace ShipManifest
         {
             string labelText = "";
             GUILayout.BeginHorizontal();
-            if (SMAddon.smController.SelectedResources.Contains("Crew") && SMSettings.ShowIVAUpdateBtn)
-                labelText = SelectedParts != null ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected";
+            if (SMAddon.smController.SelectedResources.Contains("Crew"))
+                labelText = SelectedParts.Count > 0 ? string.Format("{0}", SelectedParts[0].partInfo.title) : "No Part Selected";
             else
             {
                 if (SelectedParts != null)
@@ -285,9 +315,9 @@ namespace ShipManifest
                     string strDescription = GetResourceDescription(SelectedResources, part);
 
                     // set the conditions for a button style change.
-                    int btnWidth = 265;
+                    int btnWidth = 270;
                     if (!SMSettings.RealismMode && !SelectedResources.Contains("Crew") && !SelectedResources.Contains("Science"))
-                        btnWidth = 180;
+                        btnWidth = 190;
 
                     // Set style based on viewer and toggled state.
                     step = "Set style";
@@ -513,7 +543,7 @@ namespace ShipManifest
         {
             if (SMAddon.smController.SelectedPartsSource.Count > 0)
             {
-                IScienceDataContainer[] modules = SMAddon.smController.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
+                PartModule[] modules = ScienceModulesSource.Keys.ToArray();
                 foreach (PartModule pm in modules)
                 {
                     // Containers.
@@ -525,12 +555,34 @@ namespace ShipManifest
                         isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
 
                     GUILayout.BeginHorizontal();
+                    if (((IScienceDataContainer)pm).GetScienceCount() > 0)
+                        GUI.enabled = true;
+                    else
+                        GUI.enabled = false;
+
+                    string label = "+";
+                    string toolTip = "Expand/Collapse Science detail.";
+                    if (!GUI.enabled)
+                        toolTip += " (Disabled, nothing to xfer)";
+                    // TODO:  add logic for mananging expand/collapse container list.
+                    GUIStyle expandStyle = ScienceModulesSource[pm] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+                    if (ScienceModulesSource[pm])
+                        label = "-";
+                    if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(15), GUILayout.Height(20)))
+                    {
+                        ScienceModulesSource[pm] = !ScienceModulesSource[pm];
+                    }
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    {
+                        Rect rect = GUILayoutUtility.GetLastRect();
+                        ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                    }
+                    GUI.enabled = true;
                     GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
 
                     // If we have target selected, it is not the same as the source, there is science to xfer.
                     if (SMAddon.smController.SelectedModuleTarget != null && scienceCount > 0)
                     {
-                        string toolTip = "";
                         if (SMSettings.RealismMode && !isCollectable)
                         {
                             GUI.enabled = false;
@@ -538,10 +590,9 @@ namespace ShipManifest
                         }
                         else
                         {
-                            toolTip = "Realism is off, or Experiment/data is transferable";
                             GUI.enabled = true;
+                            toolTip = "Realism is off, or Experiment/data is transferable";
                         }
-
                         if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
                         {
                             SMAddon.smController.SelectedModuleSource = pm;
@@ -555,6 +606,46 @@ namespace ShipManifest
                         }
                     }
                     GUILayout.EndHorizontal();
+                    if (ScienceModulesSource[pm] && pm.ClassName == "ModuleScienceContainer")
+                    {
+                        ScienceData[] data = ((ModuleScienceContainer)pm).GetData();
+                        foreach (ScienceData item in data)
+                        {
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("", GUILayout.Width(15), GUILayout.Height(20));
+                            toolTip = item.title;
+                            GUILayout.Label(new GUIContent(item.title, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
+                            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                            {
+                                Rect rect = GUILayoutUtility.GetLastRect();
+                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                            }
+                            if (SMSettings.RealismMode && !isCollectable)
+                            {
+                                GUI.enabled = false;
+                                toolTip = "Realism Mode is preventing transfer.\r\nData is marked not transferable";
+                            }
+                            else
+                            {
+                                toolTip = "Realism is off, or Data is transferable";
+                                GUI.enabled = true;
+                            }
+                            if (SMAddon.smController.SelectedModuleTarget != null && scienceCount > 0)
+                            {
+                                if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                                {
+                                    if (((ModuleScienceContainer)SMAddon.smController.SelectedModuleTarget).AddData(item))
+                                        ((ModuleScienceContainer)pm).RemoveData(item);
+                                }
+                                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                                {
+                                    Rect rect = GUILayoutUtility.GetLastRect();
+                                    ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                                }
+                            }
+                            GUILayout.EndHorizontal();
+                        }
+                    }
                     GUI.enabled = true;
                 }
             }
@@ -863,6 +954,7 @@ namespace ShipManifest
                             SMAddon.UpdateCLSSpaces();
                         }
                         SMAddon.smController.SelectedModuleSource = null;
+                        WindowTransfer._ScienceModulesSource = null;
                     }
                     else
                     {
@@ -1056,11 +1148,8 @@ namespace ShipManifest
                 foreach (PartModule pm in part.Modules)
                 {
                     if (pm is IScienceDataContainer)
-                    {
                         scienceCount += ((IScienceDataContainer)pm).GetScienceCount();
-                    }
                 }
-
                 return scienceCount;
             }
             catch (Exception ex)

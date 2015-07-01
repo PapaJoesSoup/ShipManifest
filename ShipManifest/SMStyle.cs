@@ -34,7 +34,7 @@ namespace ShipManifest
         internal static GUIStyle ToolTipStyle;
         internal static GUIStyle ScrollStyle;
 
-        internal static void SetupGUI()
+        internal static void SetupGUIStyles()
         {
             if (WindowStyle == null)
             {
@@ -52,61 +52,85 @@ namespace ShipManifest
             ButtonStyle.normal.textColor = Color.white;
             ButtonStyle.hover.textColor = Color.blue;
             ButtonStyle.fontSize = 12;
+            ButtonStyle.padding.top = 0;
+            ButtonStyle.padding.bottom = 0;
             ButtonStyle.fontStyle = FontStyle.Normal;
             ButtonStyle.alignment = TextAnchor.MiddleCenter;
+            ButtonStyle.clipping = TextClipping.Clip;
 
             ButtonToggledStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledStyle.normal.textColor = Color.green;
             ButtonToggledStyle.fontSize = 12;
+            ButtonToggledStyle.padding.top = 0;
+            ButtonToggledStyle.padding.bottom = 0;
             ButtonToggledStyle.hover.textColor = Color.blue;
             ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
             ButtonToggledStyle.fontStyle = FontStyle.Normal;
             ButtonToggledStyle.alignment = TextAnchor.MiddleCenter;
+            ButtonToggledStyle.clipping = TextClipping.Clip;
 
             ButtonStyleLeft = new GUIStyle(GUI.skin.button);
             ButtonStyleLeft.normal.textColor = Color.white;
             ButtonStyleLeft.hover.textColor = Color.green;
             ButtonStyleLeft.fontSize = 12;
+            ButtonStyleLeft.padding.top = 0;
+            ButtonStyleLeft.padding.bottom = 0;
             ButtonStyleLeft.fontStyle = FontStyle.Normal;
             ButtonStyleLeft.alignment = TextAnchor.MiddleLeft;
+            ButtonStyleLeft.clipping = TextClipping.Clip;
 
             ButtonToggledStyleLeft = new GUIStyle(GUI.skin.button);
             ButtonToggledStyleLeft.normal.textColor = Color.green;
             ButtonToggledStyleLeft.fontSize = 12;
+            ButtonToggledStyleLeft.padding.top = 0;
+            ButtonToggledStyleLeft.padding.bottom = 0;
             ButtonToggledStyleLeft.hover.textColor = Color.white;
             ButtonToggledStyleLeft.normal.background = ButtonToggledStyleLeft.onActive.background;
             ButtonToggledStyleLeft.fontStyle = FontStyle.Normal;
             ButtonToggledStyleLeft.alignment = TextAnchor.MiddleLeft;
+            ButtonToggledStyleLeft.clipping = TextClipping.Clip;
 
             ButtonSourceStyle = new GUIStyle(GUI.skin.button);
             ButtonSourceStyle.normal.textColor = Color.white;
             ButtonSourceStyle.fontSize = 12;
+            ButtonSourceStyle.padding.top = 0;
+            ButtonSourceStyle.padding.bottom = 0;
             ButtonSourceStyle.hover.textColor = Color.blue;
             ButtonSourceStyle.fontStyle = FontStyle.Normal;
-            ButtonSourceStyle.alignment = TextAnchor.UpperLeft;
+            ButtonSourceStyle.alignment = TextAnchor.MiddleLeft;
+            ButtonSourceStyle.clipping = TextClipping.Clip;
 
             ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledSourceStyle.normal.textColor = SMSettings.Colors[SMSettings.SourcePartColor];
             ButtonToggledSourceStyle.fontSize = 12;
+            ButtonToggledSourceStyle.padding.top = 0;
+            ButtonToggledSourceStyle.padding.bottom = 0;
             ButtonToggledSourceStyle.hover.textColor = Color.blue;
             ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
             ButtonToggledSourceStyle.fontStyle = FontStyle.Normal;
-            ButtonToggledSourceStyle.alignment = TextAnchor.UpperLeft;
+            ButtonToggledSourceStyle.alignment = TextAnchor.MiddleLeft;
+            ButtonToggledSourceStyle.clipping = TextClipping.Clip;
 
             ButtonTargetStyle = new GUIStyle(GUI.skin.button);
             ButtonTargetStyle.normal.textColor = Color.white;
             ButtonTargetStyle.fontSize = 12;
+            ButtonTargetStyle.padding.top = 0;
+            ButtonTargetStyle.padding.bottom = 0;
             ButtonTargetStyle.hover.textColor = Color.blue;
             ButtonTargetStyle.fontStyle = FontStyle.Normal;
-            ButtonTargetStyle.alignment = TextAnchor.UpperLeft;
+            ButtonTargetStyle.alignment = TextAnchor.MiddleLeft;
+            ButtonTargetStyle.clipping = TextClipping.Clip;
 
             ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
             ButtonToggledTargetStyle.fontSize = 12;
+            ButtonToggledTargetStyle.padding.top = 0;
+            ButtonToggledTargetStyle.padding.bottom = 0;
             ButtonToggledTargetStyle.hover.textColor = Color.blue;
             ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
             ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
-            ButtonToggledTargetStyle.alignment = TextAnchor.UpperLeft;
+            ButtonToggledSourceStyle.clipping = TextClipping.Clip;
+            ButtonToggledSourceStyle.alignment = TextAnchor.MiddleLeft;
 
             ToggleStyleHeader = new GUIStyle(GUI.skin.toggle);
             ToggleStyleHeader.padding.top = 10;
@@ -138,6 +162,7 @@ namespace ShipManifest
 
             LabelStyleNoWrap = new GUIStyle(GUI.skin.label);
             LabelStyleNoWrap.wordWrap = false;
+            LabelStyleNoWrap.clipping = TextClipping.Clip;
 
             LabelStyleNoPad = new GUIStyle(GUI.skin.label);
             LabelStyleNoPad.padding.top = 0;

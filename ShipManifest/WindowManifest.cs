@@ -192,9 +192,9 @@ namespace ShipManifest
                 foreach (string resourceName in SMAddon.smController.PartsByResource.Keys)
                 {
                     GUILayout.BeginHorizontal();
-                    int width = 265;
+                    int width = 273;
                     if ((!SMSettings.RealismMode || SMAddon.smController.IsPreLaunch) && resourceName != "Crew" && resourceName != "Science")
-                        width = 175;
+                        width = 185;
 
                     string DisplayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
                     var style = SMAddon.smController.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;

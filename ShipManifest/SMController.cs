@@ -41,7 +41,6 @@ namespace ShipManifest
 
         // variables used for tracking xfer sliders for resources.
         internal double AmtXferred = 0;
-        internal List<TransferResource> ResourcesToXfer = new List<TransferResource>();
 
         internal Vessel Vessel
         {
@@ -55,9 +54,11 @@ namespace ShipManifest
 
         #endregion
 
-        #region Datasource properties
+        #region DataSource properties
 
-        // dataSource for Resource manifest and ResourceTransfer windows
+        // dataSources for Resource manifest and ResourceTransfer windows
+
+
         // Provides a list of resources and the parts that contain that resource.
         internal List<string> ResourceList = new List<string>();
         internal Dictionary<string, List<Part>> _partsByResource = null;
@@ -179,6 +180,7 @@ namespace ShipManifest
         // dataSource for Resource manifest and ResourceTransfer windows
         // Holds the Resource.info.name selected in the Resource Manifest Window.
         internal List<string> SelectedResources = new List<string>();
+        internal List<TransferResource> ResourcesToXfer = new List<TransferResource>();
 
         // Multi-Part Xfer Storage
         private List<ModDockedVessel> _dockedVessels = null;
@@ -303,7 +305,7 @@ namespace ShipManifest
         {
         }
 
-        #region Action Methods
+        #region DataSource Methods
 
         internal void RefreshLists()
         {
@@ -361,164 +363,6 @@ namespace ShipManifest
                     if (part.Resources.Contains(SelectedResources[0]) && part.Resources.Contains(SelectedResources[1]))
                         SelectedResourcesParts.Add(part);
                 }
-            }
-        }
-
-        private void FillPartCrew(int count, Part part)
-        {
-            if (IsPreLaunch && !CrewPartIsFull(part))
-            {
-                for (int i = 0; i < part.CrewCapacity && i < count; i++)
-                {
-                    ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
-                    part.AddCrewmember(kerbal);
-
-                    if (kerbal.seat != null)
-                        kerbal.seat.SpawnCrew();
-                }
-            }
-        }
-
-        internal static bool CrewPartIsFull(Part part)
-        {
-            return !(part.protoModuleCrew.Count < part.CrewCapacity);
-        }
-
-        internal Part FindKerbalPart(ProtoCrewMember pKerbal)
-        {
-            Part kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
-            return kPart;
-        }
-
-        internal static void RespawnKerbal(ProtoCrewMember kerbal)
-        {
-            kerbal.SetTimeForRespawn(0);
-            // This call causes issues in KSC scene, and is not needed.
-            //kerbal.Spawn();
-            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-            HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
-        }
-
-        internal void RespawnCrew()
-        {
-            this.Vessel.SpawnCrew();
-            SMAddon.FireEventTriggers();
-        }
-
-        internal void FillVesselCrew()
-        {
-            foreach (var part in _partsByResource["Crew"])
-            {
-                FillPartCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
-            }
-            SMAddon.FireEventTriggers();
-        }
-
-        internal void EmptyVesselCrew()
-        {
-            foreach (var part in _partsByResource["Crew"])
-            {
-                for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
-                {
-                    TransferCrew.RemoveCrewMember(part.protoModuleCrew[i], part);
-                }
-                SMAddon.FireEventTriggers();
-            }
-        }
-
-        internal void FillVesselResources()
-        {
-            List<string> resources = _partsByResource.Keys.ToList<string>();
-            foreach (string resourceName in resources)
-            {
-                if (resourceName != "Crew" && resourceName != "Science")
-                {
-                    foreach (Part part in _partsByResource[resourceName])
-                    {
-                        foreach (PartResource resource in part.Resources)
-                        {
-                            if (resource.info.name == resourceName)
-                                resource.amount = resource.maxAmount;
-                        }
-                    }
-                }
-            }
-        }
-
-        internal void EmptyVesselResources()
-        {
-            List<string> resources = _partsByResource.Keys.ToList<string>();
-            foreach (string resourceName in resources)
-            {
-                if (resourceName != "Crew" && resourceName != "Science")
-                {
-                    foreach (Part part in _partsByResource[resourceName])
-                    {
-                        foreach (PartResource resource in part.Resources)
-                        {
-                            if (resource.info.name == resourceName)
-                                resource.amount = 0;
-                        }
-                    }
-                }
-            }
-        }
-
-        internal void DumpResource(string resourceName)
-        {
-            foreach (Part part in _partsByResource[resourceName])
-            {
-                foreach (PartResource resource in part.Resources)
-                {
-                    if (resource.info.name == resourceName)
-                    {
-                        resource.amount = 0;
-                    }
-                }
-            }
-        }
-
-        internal void FillResource(string resourceName)
-        {
-            foreach (Part part in _partsByResource[resourceName])
-            {
-                foreach (PartResource resource in part.Resources)
-                {
-                    if (resource.info.name == resourceName)
-                    {
-                        resource.amount = resource.maxAmount;
-                    }
-                }
-            }
-        }
-
-        internal static void DumpPartResource(Part part, string resourceName)
-        {
-            if (part.Resources.Contains(resourceName))
-                part.Resources[resourceName].amount = 0;
-        }
-
-        internal static void DumpPartsResource(List<Part> PartList, string resourceName)
-        {
-            foreach (Part part in PartList)
-            {
-                if (part.Resources.Contains(resourceName))
-                    part.Resources[resourceName].amount = 0;
-            }
-        }
-
-        internal static void FillPartResource(Part part, string resourceName)
-        {
-            if (part.Resources.Contains(resourceName))
-                part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
-        }
-
-        internal static void FillPartsResource(List<Part> PartList, string resourceName)
-        {
-            foreach (Part part in PartList)
-            {
-                if (part.Resources.Contains(resourceName))
-                    part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
             }
         }
 
@@ -679,6 +523,168 @@ namespace ShipManifest
                 VesselpartList = new List<Part>();
             }
             return VesselpartList;
+        }
+
+        #endregion
+
+        #region Action Methods
+
+        private void FillPartCrew(int count, Part part)
+        {
+            if (IsPreLaunch && !CrewPartIsFull(part))
+            {
+                for (int i = 0; i < part.CrewCapacity && i < count; i++)
+                {
+                    ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
+                    part.AddCrewmember(kerbal);
+
+                    if (kerbal.seat != null)
+                        kerbal.seat.SpawnCrew();
+                }
+            }
+        }
+
+        internal static bool CrewPartIsFull(Part part)
+        {
+            return !(part.protoModuleCrew.Count < part.CrewCapacity);
+        }
+
+        internal Part FindKerbalPart(ProtoCrewMember pKerbal)
+        {
+            Part kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
+            return kPart;
+        }
+
+        internal static void RespawnKerbal(ProtoCrewMember kerbal)
+        {
+            kerbal.SetTimeForRespawn(0);
+            // This call causes issues in KSC scene, and is not needed.
+            //kerbal.Spawn();
+            kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+            HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
+        }
+
+        internal void RespawnCrew()
+        {
+            this.Vessel.SpawnCrew();
+            SMAddon.FireEventTriggers();
+        }
+
+        internal void FillVesselCrew()
+        {
+            foreach (var part in _partsByResource["Crew"])
+            {
+                FillPartCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
+            }
+            SMAddon.FireEventTriggers();
+        }
+
+        internal void EmptyVesselCrew()
+        {
+            foreach (var part in _partsByResource["Crew"])
+            {
+                for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
+                {
+                    TransferCrew.RemoveCrewMember(part.protoModuleCrew[i], part);
+                }
+                SMAddon.FireEventTriggers();
+            }
+        }
+
+        internal void FillVesselResources()
+        {
+            List<string> resources = _partsByResource.Keys.ToList<string>();
+            foreach (string resourceName in resources)
+            {
+                if (resourceName != "Crew" && resourceName != "Science")
+                {
+                    foreach (Part part in _partsByResource[resourceName])
+                    {
+                        foreach (PartResource resource in part.Resources)
+                        {
+                            if (resource.info.name == resourceName)
+                                resource.amount = resource.maxAmount;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal void EmptyVesselResources()
+        {
+            List<string> resources = _partsByResource.Keys.ToList<string>();
+            foreach (string resourceName in resources)
+            {
+                if (resourceName != "Crew" && resourceName != "Science")
+                {
+                    foreach (Part part in _partsByResource[resourceName])
+                    {
+                        foreach (PartResource resource in part.Resources)
+                        {
+                            if (resource.info.name == resourceName)
+                                resource.amount = 0;
+                        }
+                    }
+                }
+            }
+        }
+
+        internal void DumpResource(string resourceName)
+        {
+            foreach (Part part in _partsByResource[resourceName])
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.info.name == resourceName)
+                    {
+                        resource.amount = 0;
+                    }
+                }
+            }
+        }
+
+        internal void FillResource(string resourceName)
+        {
+            foreach (Part part in _partsByResource[resourceName])
+            {
+                foreach (PartResource resource in part.Resources)
+                {
+                    if (resource.info.name == resourceName)
+                    {
+                        resource.amount = resource.maxAmount;
+                    }
+                }
+            }
+        }
+
+        internal static void DumpPartResource(Part part, string resourceName)
+        {
+            if (part.Resources.Contains(resourceName))
+                part.Resources[resourceName].amount = 0;
+        }
+
+        internal static void DumpPartsResource(List<Part> PartList, string resourceName)
+        {
+            foreach (Part part in PartList)
+            {
+                if (part.Resources.Contains(resourceName))
+                    part.Resources[resourceName].amount = 0;
+            }
+        }
+
+        internal static void FillPartResource(Part part, string resourceName)
+        {
+            if (part.Resources.Contains(resourceName))
+                part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
+        }
+
+        internal static void FillPartsResource(List<Part> PartList, string resourceName)
+        {
+            foreach (Part part in PartList)
+            {
+                if (part.Resources.Contains(resourceName))
+                    part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
+            }
         }
 
         #endregion
