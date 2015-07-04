@@ -141,6 +141,8 @@ namespace ShipManifest
                 ToolTip = WindowSettings.ToolTip;
 
             // Control WIndow Tab switches
+            if (WindowControl.ToolTip != null && WindowControl.ToolTip.Trim().Length > 0)
+                ToolTip = WindowControl.ToolTip;
             if (TabHatch.ToolTip != null && TabHatch.ToolTip.Trim().Length > 0)
                 ToolTip = TabHatch.ToolTip;
             if (TabSolarPanel.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
@@ -151,7 +153,8 @@ namespace ShipManifest
                 ToolTip = TabLight.ToolTip;
 
             // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
-            // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity uses onGUI callbacks so we need to allow for the callback)
+            // Tooltip will not display if changes are made during the curreint OnGUI.  
+            // (Unity uses onGUI callbacks so we need to allow for the callback)
             SMAddon.toolTip = ToolTip;
         }
 
@@ -173,11 +176,13 @@ namespace ShipManifest
             if (!toolTipActive && rect.Contains(Event.current.mousePosition))
             {
                 toolTipActive = true;
-                // Since we are using GUILayout, the curent mouse position returns a position with reference to the source Details viewer. 
-                // Add the height of GUI elements already drawn to y offset to get the correct screen position
+                // Since we are using GUILayout, the curent mouse position returns a position with reference to the parent. 
+                // Add the height of parent GUI elements already drawn to y offset to get the correct screen position
                 if (rect.Contains(Event.current.mousePosition))
                 {
-                    SMAddon.ToolTipPos = Event.current.mousePosition;
+                    // Let's use the rectangle as a solid anchor and a stable tooltip, forgiving of mouse movement within bounding box...
+                    SMAddon.ToolTipPos = new Vector2(rect.xMax, rect.y);
+
                     SMAddon.ToolTipPos.x = SMAddon.ToolTipPos.x + WindowPosition.x + xOffset;
                     SMAddon.ToolTipPos.y = SMAddon.ToolTipPos.y + WindowPosition.y + yOffset;
                     //Utilities.LogMessage(string.Format("Setup Tooltip - Mouse inside Rect: \r\nRectangle data:  {0} \r\nWindowPosition:  {1}\r\nToolTip:  {2}\r\nToolTip Pos:  {3}", rect.ToString(), WindowPosition.ToString(), ToolTip, ShipManifestAddon.ToolTipPos.ToString()), "Info", true);

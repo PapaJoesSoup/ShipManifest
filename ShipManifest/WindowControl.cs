@@ -78,7 +78,6 @@ namespace ShipManifest
         {
             // Reset Tooltip active flag...
             ToolTipActive = false;
-            ShowToolTips = SMSettings.ShowToolTips;
 
             Rect rect = new Rect(Position.width - 20, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
@@ -86,7 +85,7 @@ namespace ShipManifest
                 ShowWindow = false;
                 ToolTip = "";
             }
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+            if (Event.current.type == EventType.Repaint && ShowToolTips)
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             // This is a scroll panel (we are using it to make button lists...)

@@ -129,8 +129,8 @@ namespace ShipManifest
             ButtonToggledTargetStyle.hover.textColor = Color.blue;
             ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
             ButtonToggledTargetStyle.fontStyle = FontStyle.Normal;
-            ButtonToggledSourceStyle.clipping = TextClipping.Clip;
-            ButtonToggledSourceStyle.alignment = TextAnchor.MiddleLeft;
+            ButtonToggledTargetStyle.clipping = TextClipping.Clip;
+            ButtonToggledTargetStyle.alignment = TextAnchor.MiddleLeft;
 
             ToggleStyleHeader = new GUIStyle(GUI.skin.toggle);
             ToggleStyleHeader.padding.top = 10;
@@ -184,14 +184,21 @@ namespace ShipManifest
 
             LabelStyleGreen = new GUIStyle(LabelStyle);
             LabelStyleGreen.normal.textColor = Color.green;
+            ScrollStyle = new GUIStyle(GUI.skin.box);
 
-            ToolTipStyle = new GUIStyle(GUI.skin.label);
+            if (GUI.skin != null)
+                GUI.skin = null;
+
+            ToolTipStyle = new GUIStyle(GUI.skin.button);
             ToolTipStyle.alignment = TextAnchor.MiddleLeft;
+            ToolTipStyle.fontStyle = FontStyle.Italic;
+            ToolTipStyle.padding = new RectOffset(5, 5, 5, 5);
             ToolTipStyle.wordWrap = false;
-            ToolTipStyle.fontStyle = FontStyle.Normal;
-            ToolTipStyle.normal.textColor = Color.yellow;
+            ToolTipStyle.normal.textColor = Color.green;
 
-            ScrollStyle = new GUIStyle(GUI.skin.box);        
+            if (!SMSettings.UseUnityStyle)
+                GUI.skin = HighLogic.Skin;
+
         }
     }
 }

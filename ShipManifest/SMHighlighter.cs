@@ -125,6 +125,21 @@ namespace ShipManifest
             }
         }
 
+        internal static void MouseOverHighlight(List<Part> _parts)
+        {
+            string step = "begin";
+            try
+            {
+                step = "inside box - Part Selection?";
+                SetPartsHighlight(_parts, SMSettings.Colors[SMSettings.MouseOverColor]);
+                EdgeHighight(_parts, true);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
+            }
+        }
+
         internal static void EdgeHighight(Part part, bool enable, string color = null)
         {
             if (SMSettings.EnableEdgeHighlighting)
@@ -209,25 +224,25 @@ namespace ShipManifest
                     {
                         step = "Clear old highlighting";
                         // Clear Highlighting on everything, start fresh
-                        SMHighlighter.EdgeHighight(SMAddon.smController.Vessel.parts, false);
+                        EdgeHighight(SMAddon.smController.Vessel.parts, false);
                         ClearPartsHighlight(SMAddon.smController.Vessel.parts);
 
                         step = "Mouseover highlighting, if any";
                         // Supports Transfer Window vessel/part Highlighting....
-                        if (SMHighlighter.IsMouseOver)
+                        if (IsMouseOver)
                         {
-                            if (SMHighlighter.MouseOverRect.Contains(Event.current.mousePosition))
+                            if (MouseOverRect.Contains(Event.current.mousePosition))
                             {
-                                if (SMHighlighter.MouseOverpart == null && SMHighlighter.MouseOverparts != null)
-                                    WindowTransfer.MouseOverHighlight(SMHighlighter.MouseOverparts);
-                                else if (SMHighlighter.MouseOverpart != null)
-                                    WindowTransfer.MouseOverHighlight(SMHighlighter.MouseOverpart);
+                                if (MouseOverpart == null && MouseOverparts != null)
+                                    MouseOverHighlight(MouseOverparts);
+                                else if (MouseOverpart != null)
+                                    MouseOverHighlight(MouseOverpart);
                             }
                             else
                             {
-                                SMHighlighter.IsMouseOver = false;
-                                SMHighlighter.MouseOverpart = null;
-                                SMHighlighter.MouseOverparts = null;
+                                IsMouseOver = false;
+                                MouseOverpart = null;
+                                MouseOverparts = null;
                             }
                         }
 
@@ -274,7 +289,7 @@ namespace ShipManifest
             {
                 if (!SMAddon.frameErrTripped)
                 {
-                    Utilities.LogMessage(string.Format(" in SMAddon.UpdateHighlighting (repeating error).  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                    Utilities.LogMessage(string.Format(" in SMHighlighter.UpdateHighlighting (repeating error).  Error in step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                     SMAddon.frameErrTripped = true;
                 }
             }

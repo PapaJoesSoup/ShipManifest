@@ -80,31 +80,5 @@ namespace ShipManifest
         {
             iModule.LightsOff();
         }
-
-        internal void Highlight(Rect rect)
-        {
-            string step = "begin";
-            try
-            {
-                if (rect.Contains(Event.current.mousePosition))
-                {
-                    SMHighlighter.SetPartHighlight(_spart, SMSettings.Colors[SMSettings.MouseOverColor]);
-                    SMHighlighter.EdgeHighight(_spart, true);
-                }
-                else
-                {
-                    step = "outside box - highlight off";
-                    if (_spart.highlightColor == SMSettings.Colors[SMSettings.MouseOverColor])
-                    {
-                        SMHighlighter.ClearPartHighlight(_spart);
-                        SMHighlighter.EdgeHighight(_spart, false);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
-            }
-        }
     }
 }

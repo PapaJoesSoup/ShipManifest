@@ -56,6 +56,7 @@ namespace ShipManifest
         // prevTransferToolTips = WindowTransfer.ShowToolTips;
         // prevSettingsToolTips = WindowSettings.ShowToolTips;
         // prevRosterToolTips = WindowRoster.ShowToolTips;
+        // prevControlToolTips = WindowControl.ShowToolTips;
         // prevHatchToolTips = TabHatch.ShowToolTips;
         // prevPanelToolTips = TabSolarPanel.ShowToolTips;
         // prevAntennaToolTips = TabAntenna.ShowToolTips;
@@ -154,6 +155,7 @@ namespace ShipManifest
         internal static bool prevTransferToolTips = true;
         internal static bool prevSettingsToolTips = true;
         internal static bool prevRosterToolTips = true;
+        internal static bool prevControlToolTips = true;
         internal static bool prevHatchToolTips = true;
         internal static bool prevPanelToolTips = true;
         internal static bool prevAntennaToolTips = true;
@@ -229,6 +231,7 @@ namespace ShipManifest
             WindowTransfer.ShowToolTips = SettingsNode.HasValue("TransferToolTips") ? bool.Parse(SettingsNode.GetValue("TransferToolTips")) : WindowTransfer.ShowToolTips;
             WindowSettings.ShowToolTips = SettingsNode.HasValue("SettingsToolTips") ? bool.Parse(SettingsNode.GetValue("SettingsToolTips")) : WindowSettings.ShowToolTips;
             WindowRoster.ShowToolTips = SettingsNode.HasValue("RosterToolTips") ? bool.Parse(SettingsNode.GetValue("RosterToolTips")) : WindowRoster.ShowToolTips;
+            WindowControl.ShowToolTips = SettingsNode.HasValue("ControlToolTips") ? bool.Parse(SettingsNode.GetValue("ControlToolTips")) : WindowControl.ShowToolTips;
             TabHatch.ShowToolTips = SettingsNode.HasValue("HatchToolTips") ? bool.Parse(SettingsNode.GetValue("HatchToolTips")) : TabHatch.ShowToolTips;
             TabSolarPanel.ShowToolTips = SettingsNode.HasValue("PanelToolTips") ? bool.Parse(SettingsNode.GetValue("PanelToolTips")) : TabSolarPanel.ShowToolTips;
             TabAntenna.ShowToolTips = SettingsNode.HasValue("AntennaToolTips") ? bool.Parse(SettingsNode.GetValue("AntennaToolTips")) : TabAntenna.ShowToolTips;
@@ -284,94 +287,98 @@ namespace ShipManifest
 
         internal static void SaveSettings()
         {
-            StoreTempSettings();
-            if (settings == null)
-                settings = loadSettingsFile();
+            if (Loaded && (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER))
+            {
+                StoreTempSettings();
+                if (settings == null)
+                    settings = loadSettingsFile();
 
-            ConfigNode WindowsNode = settings.HasNode("SM_Windows") ? settings.GetNode("SM_Windows") : settings.AddNode("SM_Windows");
-            ConfigNode SettingsNode = settings.HasNode("SM_Settings") ? settings.GetNode("SM_Settings") : settings.AddNode("SM_Settings");
-            ConfigNode HiddenNode = settings.HasNode("SM_Hidden") ? settings.GetNode("SM_Hidden") : settings.AddNode("SM_Hidden");
+                ConfigNode WindowsNode = settings.HasNode("SM_Windows") ? settings.GetNode("SM_Windows") : settings.AddNode("SM_Windows");
+                ConfigNode SettingsNode = settings.HasNode("SM_Settings") ? settings.GetNode("SM_Settings") : settings.AddNode("SM_Settings");
+                ConfigNode HiddenNode = settings.HasNode("SM_Hidden") ? settings.GetNode("SM_Hidden") : settings.AddNode("SM_Hidden");
 
-            // Write window positions
-            WriteRectangle(WindowsNode, "ManifestPosition", WindowManifest.Position);
-            WriteRectangle(WindowsNode, "TransferPosition", WindowTransfer.Position);
-            WriteRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
-            WriteRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
-            WriteRectangle(WindowsNode, "ControlPosition", WindowControl.Position);
-            WriteRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
+                // Write window positions
+                WriteRectangle(WindowsNode, "ManifestPosition", WindowManifest.Position);
+                WriteRectangle(WindowsNode, "TransferPosition", WindowTransfer.Position);
+                WriteRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
+                WriteRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
+                WriteRectangle(WindowsNode, "ControlPosition", WindowControl.Position);
+                WriteRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
 
-            //Write settings...
-            // Realism Settings
-            WriteValue(SettingsNode, "RealismMode", RealismMode);
-            WriteValue(SettingsNode, "EnableCrew", EnableCrew);
-            WriteValue(SettingsNode, "EnableScience", EnableScience);
-            WriteValue(SettingsNode, "EnableResources", EnableResources);
-            WriteValue(SettingsNode, "EnablePFResources", EnablePFResources);
-            WriteValue(SettingsNode, "EnableCLS", EnableCLS);
-            WriteValue(SettingsNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
-            WriteValue(SettingsNode, "FlowRate", FlowRate);
-            WriteValue(SettingsNode, "FlowCost", FlowCost);
-            WriteValue(SettingsNode, "MinFlowRate", MinFlowRate);
-            WriteValue(SettingsNode, "MaxFlowRate", MaxFlowRate);
-            WriteValue(SettingsNode, "MaxFlowTimeSec", MaxFlowTimeSec);
-            WriteValue(SettingsNode, "EnableXferCost", EnableXferCost);
-            WriteValue(SettingsNode, "LockSettings", LockSettings);
+                //Write settings...
+                // Realism Settings
+                WriteValue(SettingsNode, "RealismMode", RealismMode);
+                WriteValue(SettingsNode, "EnableCrew", EnableCrew);
+                WriteValue(SettingsNode, "EnableScience", EnableScience);
+                WriteValue(SettingsNode, "EnableResources", EnableResources);
+                WriteValue(SettingsNode, "EnablePFResources", EnablePFResources);
+                WriteValue(SettingsNode, "EnableCLS", EnableCLS);
+                WriteValue(SettingsNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
+                WriteValue(SettingsNode, "FlowRate", FlowRate);
+                WriteValue(SettingsNode, "FlowCost", FlowCost);
+                WriteValue(SettingsNode, "MinFlowRate", MinFlowRate);
+                WriteValue(SettingsNode, "MaxFlowRate", MaxFlowRate);
+                WriteValue(SettingsNode, "MaxFlowTimeSec", MaxFlowTimeSec);
+                WriteValue(SettingsNode, "EnableXferCost", EnableXferCost);
+                WriteValue(SettingsNode, "LockSettings", LockSettings);
 
-            // Highlighting Settings
-            WriteValue(SettingsNode, "EnableHighlighting", EnableHighlighting);
-            WriteValue(SettingsNode, "OnlySourceTarget", OnlySourceTarget);
-            WriteValue(SettingsNode, "EnableCLSHighlighting", EnableCLSHighlighting);
-            WriteValue(SettingsNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
+                // Highlighting Settings
+                WriteValue(SettingsNode, "EnableHighlighting", EnableHighlighting);
+                WriteValue(SettingsNode, "OnlySourceTarget", OnlySourceTarget);
+                WriteValue(SettingsNode, "EnableCLSHighlighting", EnableCLSHighlighting);
+                WriteValue(SettingsNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
 
-            // ToolTip Settings
-            WriteValue(SettingsNode, "ShowToolTips", ShowToolTips);
-            WriteValue(SettingsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
-            WriteValue(SettingsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
-            WriteValue(SettingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
-            WriteValue(SettingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
-            WriteValue(SettingsNode, "HatchToolTips", TabHatch.ShowToolTips);
-            WriteValue(SettingsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
-            WriteValue(SettingsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
-            WriteValue(SettingsNode, "LightToolTips", TabLight.ShowToolTips);
-            WriteValue(SettingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
+                // ToolTip Settings
+                WriteValue(SettingsNode, "ShowToolTips", ShowToolTips);
+                WriteValue(SettingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
+                WriteValue(SettingsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
+                WriteValue(SettingsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
+                WriteValue(SettingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
+                WriteValue(SettingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
+                WriteValue(SettingsNode, "ControlToolTips", WindowControl.ShowToolTips);
+                WriteValue(SettingsNode, "HatchToolTips", TabHatch.ShowToolTips);
+                WriteValue(SettingsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
+                WriteValue(SettingsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
+                WriteValue(SettingsNode, "LightToolTips", TabLight.ShowToolTips);
 
-            // Sound Settings
-            WriteValue(SettingsNode, "PumpSoundStart", PumpSoundStart);
-            WriteValue(SettingsNode, "PumpSoundRun", PumpSoundRun);
-            WriteValue(SettingsNode, "PumpSoundStop", PumpSoundStop);
-            WriteValue(SettingsNode, "CrewSoundStart", CrewSoundStart);
-            WriteValue(SettingsNode, "CrewSoundRun", CrewSoundRun);
-            WriteValue(SettingsNode, "CrewSoundStop", CrewSoundStop);
+                // Sound Settings
+                WriteValue(SettingsNode, "PumpSoundStart", PumpSoundStart);
+                WriteValue(SettingsNode, "PumpSoundRun", PumpSoundRun);
+                WriteValue(SettingsNode, "PumpSoundStop", PumpSoundStop);
+                WriteValue(SettingsNode, "CrewSoundStart", CrewSoundStart);
+                WriteValue(SettingsNode, "CrewSoundRun", CrewSoundRun);
+                WriteValue(SettingsNode, "CrewSoundStop", CrewSoundStop);
 
-            // Config Settings
-            WriteValue(SettingsNode, "ShowDebugger", WindowDebugger.ShowWindow);
-            WriteValue(SettingsNode, "EnableBlizzyToolbar", EnableBlizzyToolbar);
-            WriteValue(SettingsNode, "VerboseLogging", VerboseLogging);
-            WriteValue(SettingsNode, "AutoSave", AutoSave);
-            WriteValue(SettingsNode, "SaveIntervalSec", SaveIntervalSec);
-            WriteValue(SettingsNode, "AutoDebug", AutoDebug);
-            WriteValue(SettingsNode, "DebugLogPath", DebugLogPath);
-            WriteValue(SettingsNode, "ErrorLogLength", ErrorLogLength);
-            WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
-            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
-            WriteValue(SettingsNode, "RenameWithProfession", RenameWithProfession);
-            WriteValue(SettingsNode, "UseUnityStyle", UseUnityStyle);
+                // Config Settings
+                WriteValue(SettingsNode, "ShowDebugger", WindowDebugger.ShowWindow);
+                WriteValue(SettingsNode, "EnableBlizzyToolbar", EnableBlizzyToolbar);
+                WriteValue(SettingsNode, "VerboseLogging", VerboseLogging);
+                WriteValue(SettingsNode, "AutoSave", AutoSave);
+                WriteValue(SettingsNode, "SaveIntervalSec", SaveIntervalSec);
+                WriteValue(SettingsNode, "AutoDebug", AutoDebug);
+                WriteValue(SettingsNode, "DebugLogPath", DebugLogPath);
+                WriteValue(SettingsNode, "ErrorLogLength", ErrorLogLength);
+                WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
+                WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
+                WriteValue(SettingsNode, "RenameWithProfession", RenameWithProfession);
+                WriteValue(SettingsNode, "UseUnityStyle", UseUnityStyle);
 
-            // Hidden Settings
-            WriteValue(HiddenNode, "ResourcePartColor", ResourcePartColor);
-            WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
-            WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
-            WriteValue(HiddenNode, "TargetPartCrewColor", TargetPartCrewColor);
-            WriteValue(HiddenNode, "MouseOverColor", MouseOverColor);
-            WriteValue(HiddenNode, "PumpSoundVol", PumpSoundVol);
-            WriteValue(HiddenNode, "CrewSoundVol", CrewSoundVol);
-            WriteValue(HiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
-            WriteValue(HiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
-            WriteValue(HiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
+                // Hidden Settings
+                WriteValue(HiddenNode, "ResourcePartColor", ResourcePartColor);
+                WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
+                WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
+                WriteValue(HiddenNode, "TargetPartCrewColor", TargetPartCrewColor);
+                WriteValue(HiddenNode, "MouseOverColor", MouseOverColor);
+                WriteValue(HiddenNode, "PumpSoundVol", PumpSoundVol);
+                WriteValue(HiddenNode, "CrewSoundVol", CrewSoundVol);
+                WriteValue(HiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
+                WriteValue(HiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
+                WriteValue(HiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
 
-            if (!Directory.Exists(SETTINGS_PATH))
-                Directory.CreateDirectory(SETTINGS_PATH);
-            settings.Save(SETTINGS_FILE);
+                if (!Directory.Exists(SETTINGS_PATH))
+                    Directory.CreateDirectory(SETTINGS_PATH);
+                settings.Save(SETTINGS_FILE);
+            }
         }
 
         private static Rect getRectangle(ConfigNode WindowsNode, string RectName, Rect defaultvalue)
@@ -454,7 +461,7 @@ namespace ShipManifest
         internal static void StoreTempSettings()
         {
             prevRealismMode = RealismMode;
-            prevShowDebugger = WindowDebugger.ShowWindow;
+            //prevShowDebugger = WindowDebugger.ShowWindow;
             prevVerboseLogging = VerboseLogging;
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
@@ -485,15 +492,16 @@ namespace ShipManifest
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
             prevShowToolTips = ShowToolTips;
+            prevDebuggerToolTips = WindowDebugger.ShowToolTips;
             prevManifestToolTips = WindowManifest.ShowToolTips;
             prevTransferToolTips = WindowTransfer.ShowToolTips;
             prevSettingsToolTips = WindowSettings.ShowToolTips;
             prevRosterToolTips = WindowRoster.ShowToolTips;
+            prevControlToolTips = WindowControl.ShowToolTips;
             prevHatchToolTips = TabHatch.ShowToolTips;
             prevPanelToolTips = TabSolarPanel.ShowToolTips;
             prevAntennaToolTips = TabAntenna.ShowToolTips;
             prevLightToolTips = TabLight.ShowToolTips;
-            prevDebuggerToolTips = WindowDebugger.ShowToolTips;
 
             // sounds
 
@@ -504,7 +512,7 @@ namespace ShipManifest
         internal static void RestoreTempSettings()
         {
             RealismMode = prevRealismMode;
-            WindowDebugger.ShowWindow = prevShowDebugger;
+            //WindowDebugger.ShowWindow = prevShowDebugger;
             VerboseLogging = prevVerboseLogging;
             AutoSave = prevAutoSave;
             SaveIntervalSec = prevSaveIntervalSec;
@@ -535,15 +543,16 @@ namespace ShipManifest
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
             SaveLogOnExit = prevSaveLogOnExit;
             ShowToolTips = prevShowToolTips;
+            WindowDebugger.ShowToolTips = prevDebuggerToolTips;
             WindowManifest.ShowToolTips = prevManifestToolTips;
             WindowTransfer.ShowToolTips = prevTransferToolTips;
             WindowSettings.ShowToolTips = prevSettingsToolTips;
             WindowRoster.ShowToolTips = prevRosterToolTips;
+            WindowControl.ShowToolTips = prevControlToolTips;
             TabHatch.ShowToolTips = prevHatchToolTips;
             TabSolarPanel.ShowToolTips = prevPanelToolTips;
             TabAntenna.ShowToolTips = prevAntennaToolTips;
             TabLight.ShowToolTips = prevLightToolTips;
-            WindowDebugger.ShowToolTips = prevDebuggerToolTips;
 
             //debugger Settings
             prevErrorLogLength = ErrorLogLength;

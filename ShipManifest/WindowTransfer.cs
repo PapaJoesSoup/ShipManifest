@@ -300,9 +300,7 @@ namespace ShipManifest
 
         private static void PartsTransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
         {
-            float scrollX = WindowTransfer.Position.x + 20;
-            if (xferMode == SMAddon.XFERMode.TargetToSource)
-                scrollX = WindowTransfer.Position.x + 320;
+            float scrollX = WindowTransfer.Position.x + (xferMode == SMAddon.XFERMode.SourceToTarget ? 20 : 320);
             float scrollY = WindowTransfer.Position.y + 30 - ViewerScrollPosition.y;
             string step = "begin";
             try
@@ -388,9 +386,7 @@ namespace ShipManifest
 
         private static void VesselTransferViewer(List<string> SelectedResources, SMAddon.XFERMode xferMode, Vector2 ViewerScrollPosition)
         {
-            float scrollX = WindowTransfer.Position.x + 20;
-            if (xferMode == SMAddon.XFERMode.TargetToSource)
-                scrollX = WindowTransfer.Position.x + 320;
+            float scrollX = WindowTransfer.Position.x + (xferMode == SMAddon.XFERMode.SourceToTarget ? 20 : 320);
             float scrollY = WindowTransfer.Position.y + 30 - ViewerScrollPosition.y;
             string step = "begin";
             try
@@ -430,10 +426,6 @@ namespace ShipManifest
                         SMHighlighter.MouseOverpart = null;
                         SMHighlighter.MouseOverparts = modDockedVessel.VesselParts;
                     }
-                    //if (Event.current.type == EventType.Repaint)
-                    //{
-                    //    modDockedVessel.Highlight(GUILayoutUtility.GetLastRect());
-                    //}
 
                     // Reset Button enabling.
                     GUI.enabled = true;
@@ -482,9 +474,8 @@ namespace ShipManifest
         private static void CrewDetails(List<Part> SelectedPartsFrom, List<Part> SelectedPartsTo, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
         {
             // Since only one Crew Part can be selected, all lists will use an index of [0].
-            int scrollX = 20;
-            if (xferMode == SMAddon.XFERMode.TargetToSource)
-                scrollX = 320;
+            float xOffset = xferMode == SMAddon.XFERMode.SourceToTarget ? 30 : 330;
+            float yOffset = 160;
 
             if (SelectedPartsFrom.Count > 0)
             {
@@ -506,7 +497,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         }
                         GUI.enabled = true;
                     }
@@ -530,7 +521,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, 190 - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         }
                     }
                     GUI.enabled = true;
@@ -543,16 +534,18 @@ namespace ShipManifest
         {
             if (SMAddon.smController.SelectedPartsSource.Count > 0)
             {
+                float xOffset = 30;
+                float yOffset = 160;
                 PartModule[] modules = ScienceModulesSource.Keys.ToArray();
                 foreach (PartModule pm in modules)
                 {
                     // Containers.
                     int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                     bool isCollectable = true;
-                    if (pm.moduleName == "ModuleScienceContainer")
-                        isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
-                    else if (pm.moduleName == "ModuleScienceExperiment")
+                    if (pm.moduleName == "ModuleScienceExperiment")
                         isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
+                    else if (pm.moduleName == "ModuleScienceContainer")
+                        isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
 
                     GUILayout.BeginHorizontal();
                     if (((IScienceDataContainer)pm).GetScienceCount() > 0)
@@ -575,7 +568,7 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                        ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                     }
                     GUI.enabled = true;
                     GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
@@ -593,7 +586,7 @@ namespace ShipManifest
                             GUI.enabled = true;
                             toolTip = "Realism is off, or Experiment/data is transferable";
                         }
-                        if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                        if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
                         {
                             SMAddon.smController.SelectedModuleSource = pm;
                             TransferScience(SMAddon.smController.SelectedModuleSource, SMAddon.smController.SelectedModuleTarget);
@@ -602,23 +595,34 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                         }
                     }
                     GUILayout.EndHorizontal();
-                    if (ScienceModulesSource[pm] && pm.ClassName == "ModuleScienceContainer")
+                    if (ScienceModulesSource[pm])
                     {
-                        ScienceData[] data = ((ModuleScienceContainer)pm).GetData();
+                        ScienceData[] data = ((IScienceDataContainer)pm).GetData();
+
                         foreach (ScienceData item in data)
                         {
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("", GUILayout.Width(15), GUILayout.Height(20));
+
+                            //toolTip += "\r\n-SubjectID:   " + item.subjectID;
+                            ScienceExperiment se = ResearchAndDevelopment.GetExperiment(item.subjectID.Split('@')[0]);
+                            string key = (from k in se.Results.Keys where item.subjectID.Split('@')[1].Contains(k) select k).SingleOrDefault();
                             toolTip = item.title;
-                            GUILayout.Label(new GUIContent(item.title, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
+                            toolTip += "\r\n-Results:    " + se.Results[key];
+                            toolTip += "\r\n-Data Amt:   " + item.dataAmount.ToString() + " Mits";
+                            toolTip += "\r\n-Xmit Value: " + item.transmitValue.ToString();
+                            toolTip += "\r\n-Lab Value:  " + item.labValue.ToString();
+                            toolTip += "\r\n-Lab Boost:  " + item.labBoost.ToString();
+
+                            GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                             }
                             if (SMSettings.RealismMode && !isCollectable)
                             {
@@ -632,15 +636,15 @@ namespace ShipManifest
                             }
                             if (SMAddon.smController.SelectedModuleTarget != null && scienceCount > 0)
                             {
-                                if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                                if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
                                 {
                                     if (((ModuleScienceContainer)SMAddon.smController.SelectedModuleTarget).AddData(item))
-                                        ((ModuleScienceContainer)pm).RemoveData(item);
+                                        ((IScienceDataContainer)pm).DumpData(item);
                                 }
                                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                                 {
                                     Rect rect = GUILayoutUtility.GetLastRect();
-                                    ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 20, 190 - TargetDetailsViewerScrollPosition.y);
+                                    ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                                 }
                             }
                             GUILayout.EndHorizontal();
@@ -653,6 +657,8 @@ namespace ShipManifest
 
         private static void ScienceDetailsTarget()
         {
+            float xOffset = 330;
+            float yOffset = 160;
             if (SMAddon.smController.SelectedPartsTarget.Count > 0)
             {
                 int count = 0;
@@ -670,7 +676,7 @@ namespace ShipManifest
                     {
                         scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                         GUILayout.BeginHorizontal();
-                        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
+                        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(220), GUILayout.Height(20));
                         // set the conditions for a button style change.
                         bool isReceiveToggled = false;
                         if (pm == SMAddon.smController.SelectedModuleTarget)
@@ -686,14 +692,14 @@ namespace ShipManifest
                         // Only containers can receive science data
                         if (pm.moduleName != "ModuleScienceExperiment")
                         {
-                            if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(50), GUILayout.Height(20)))
+                            if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(40), GUILayout.Height(20)))
                             {
                                 SMAddon.smController.SelectedModuleTarget = pm;
                             }
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 300, 190 - TargetDetailsViewerScrollPosition.y);
+                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -702,34 +708,35 @@ namespace ShipManifest
             }
         }
 
-        private static void ResourceDetails(List<Part> partsSource, List<Part> partsTarget, SMAddon.XFERMode XferMode, Vector2 scrollPosition)
+        private static void ResourceDetails(List<Part> partsSource, List<Part> partsTarget, SMAddon.XFERMode xferMode, Vector2 scrollPosition)
         {
             // This routine assumes that a resource has been selected on the Resource manifest window.
+            // Set scrollX offsets for left and right viewers
+            int xOffset = xferMode == SMAddon.XFERMode.SourceToTarget ? 30 : 330;
+            int yOffset = 160;
+
             // Pass in static vars to improve readability.
             List<string> selectedResources = SMAddon.smController.SelectedResources;
             List<TransferResource> XferResources = SMAddon.smController.ResourcesToXfer;
 
             if (partsSource.Count > 0)
             {
-                TransferResource modResource = TransferResource.GetXferResource(XferResources, XferMode, false);
-                TransferResource ratioResource = TransferResource.GetXferResource(XferResources, XferMode, true);
+                TransferResource modResource = TransferResource.GetXferResource(XferResources, xferMode, false);
+                TransferResource ratioResource = TransferResource.GetXferResource(XferResources, xferMode, true);
                 modResource.XferRatio = 1;
-                ratioResource.XferRatio = TransferResource.CalcRatio(XferResources, XferMode);
+                ratioResource.XferRatio = TransferResource.CalcRatio(XferResources, xferMode);
 
-                double thisXferAmount = modResource.XferAmount(XferMode);
-                double ratioXferAmt = ratioResource.XferAmount(XferMode);
+                double thisXferAmount = modResource.XferAmount(xferMode);
+                double ratioXferAmt = ratioResource.XferAmount(xferMode);
                 
-                string strXferAmount = modResource.XferAmount(XferMode).ToString();
+                string strXferAmount = modResource.XferAmount(xferMode).ToString();
 
                 // Set tooltips directional data
-                string strTarget = XferMode == SMAddon.XFERMode.SourceToTarget ? "Target" : "Source";
+                string strTarget = xferMode == SMAddon.XFERMode.SourceToTarget ? "Target" : "Source";
 
-                // Set scrollX offsets for left and right viewers
-                int scrollX = XferMode == SMAddon.XFERMode.SourceToTarget ? 30 : 330;
-                int scrollY = 180;
 
                 // Resource Flow control Display loop
-                ResourceFlowButtons(partsSource, XferMode, scrollPosition, scrollX, scrollY);
+                ResourceFlowButtons(partsSource, xferMode, scrollPosition, xOffset, yOffset);
 
                 // Xfer Controls Display
                 // let's determine how much of a resource we can move to the target.
@@ -740,7 +747,7 @@ namespace ShipManifest
                     if (TransferResource.ResourceXferActive)
                     {
                         // We want to show this during transfer if the direction is correct...
-                        if (SMAddon.XferMode == XferMode)
+                        if (SMAddon.XferMode == xferMode)
                         {
                             GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
                             GUILayout.Label((modResource.XferAmount(SMAddon.XferMode) - modResource.AmtXferred).ToString("#######0.##"));
@@ -751,30 +758,30 @@ namespace ShipManifest
                     else
                     {
                         // Lets parse the string to allow decimal points.
-                        strXferAmount = modResource.XferAmount(XferMode).ToString();
+                        strXferAmount = modResource.XferAmount(xferMode).ToString();
                         // add the decimal point if it was typed.
-                        strXferAmount = modResource.GetStringDecimal(strXferAmount, XferMode);
+                        strXferAmount = modResource.GetStringDecimal(strXferAmount, xferMode);
                         // add the zero if it was typed.
-                        strXferAmount = modResource.GetStringZero(strXferAmount, XferMode);
+                        strXferAmount = modResource.GetStringZero(strXferAmount, xferMode);
 
                         // Now update the static var
-                        modResource.SetXferAmountString(strXferAmount, XferMode);
+                        modResource.SetXferAmountString(strXferAmount, xferMode);
 
                         GUILayout.Label("Xfer Amt:", GUILayout.Width(60));
                         strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(100), GUILayout.Height(20));
                         // update decimal bool 
-                        modResource.SetStringDecimal(strXferAmount, XferMode);
+                        modResource.SetStringDecimal(strXferAmount, xferMode);
                         //update zero bool 
-                        modResource.SetStringZero(strXferAmount, XferMode);
+                        modResource.SetStringZero(strXferAmount, xferMode);
                         // Update static Xfer Amount var
-                        thisXferAmount = modResource.UpdateXferAmount(strXferAmount, XferMode);
-                        ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.FromCapacity(XferMode) ? ratioResource.FromCapacity(XferMode) : thisXferAmount * ratioResource.XferRatio;
+                        thisXferAmount = modResource.UpdateXferAmount(strXferAmount, xferMode);
+                        ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.FromCapacity(xferMode) ? ratioResource.FromCapacity(xferMode) : thisXferAmount * ratioResource.XferRatio;
                         if (SMAddon.smController.SelectedResources.Count > 1)
                             GUILayout.Label(" | " + ratioXferAmt.ToString("#######0.##"), GUILayout.Width(80));
                     }
                     GUILayout.EndHorizontal();
 
-                    if (IsShipControllable() && CanResourceBeXferred(XferMode, maxXferAmount))
+                    if (IsShipControllable() && CanResourceBeXferred(xferMode, maxXferAmount))
                     {
                         GUILayout.BeginHorizontal();
                         GUIStyle noPad = SMStyle.LabelStyleNoPad;
@@ -793,7 +800,7 @@ namespace ShipManifest
                             if (!TransferResource.ResourceXferActive)
                             {
                                 //Calc amounts and update xfer modules
-                                AssignXferAmounts(XferResources, XferMode, thisXferAmount);
+                                AssignXferAmounts(XferResources, xferMode, thisXferAmount);
                                 TransferResources(partsSource, partsTarget);
 
                             }
@@ -803,12 +810,12 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         }
                         GUILayout.EndHorizontal();
                     }
                     if (!TransferResource.ResourceXferActive)
-                        modResource.UpdateXferAmount(thisXferAmount.ToString(), XferMode);
+                        modResource.UpdateXferAmount(thisXferAmount.ToString(), xferMode);
                 }
             }
         }
@@ -1286,35 +1293,6 @@ namespace ShipManifest
             return displayAmount;
         }
 
-        internal static void MouseOverHighlight(Part _part)
-        {
-            string step = "begin";
-            try
-            {
-                step = "inside box - Part Selection?";
-                SMHighlighter.SetPartHighlight(_part, SMSettings.Colors[SMSettings.MouseOverColor]);
-                SMHighlighter.EdgeHighight(_part, true);
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
-            }
-        }
-
-        internal static void MouseOverHighlight(List<Part> _parts)
-        {
-            string step = "begin";
-            try
-            {
-                step = "inside box - Part Selection?";
-                SMHighlighter.SetPartsHighlight(_parts, SMSettings.Colors[SMSettings.MouseOverColor]);
-                SMHighlighter.EdgeHighight(_parts, true);
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in Light.Highlight at step {0}.  Error:  {1}", step, ex.ToString()), "Error", true);
-            }
-        }
         #endregion
 
     }

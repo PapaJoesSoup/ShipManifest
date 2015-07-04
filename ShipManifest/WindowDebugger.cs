@@ -25,6 +25,7 @@ namespace ShipManifest
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 ShowWindow = false;
+                SMSettings.StoreTempSettings();
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -55,6 +56,7 @@ namespace ShipManifest
             {
                 // Create log file and save.
                 ShowWindow = false;
+                SMSettings.StoreTempSettings();
             }
             GUILayout.EndHorizontal();
 

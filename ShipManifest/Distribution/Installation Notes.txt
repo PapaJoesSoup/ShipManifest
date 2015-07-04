@@ -5,7 +5,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with [url=htt
 I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
 
 ----------------
-Current Version 4.4.0.3 - Release 01 Jul, 2015 - Docked Vessel Transfers Edition.
+Current Version 4.4.1.0 - Release 0x Jul, 2015 - Tooltips & Science Xfer Improvements.
 ----------------
 
 ---------
@@ -33,26 +33,11 @@ Installation steps:
 ------------
 What's New:
 ------------
-Version 4.4.0.3 - Release 01 July, 2015 - Docked Vessel Transfers Edition.
-- New:  Science transfers now allow individual report transfers from a science container.  You can transfer all or any now. Added an Expand/collapse button for clean display.
-- New:  Altered stock Transfer messaging system to show success messages near portraits.  Cleaner look.
-- New:  General clean up of button displays to prevent overflowing of text.
-- Fixed:  When Transferring crew, the user can switch to IVA, causing potential camera issues.  Switching to IVA is now prevented and a message is displayed near portraits.
-- Fixed:  Saving Settings sometimes does not "stick"  When opening and closing settings without saving in Space Center, default values can overwrite saved values.
-- Fixed:  Stock Crew transfer were not being handled correctly, and transfer fail message was always being shown.
-
-Version 4.4.0.2 - Release 24 June, 2015 - Docked Vessel Transfers Edition.
-- New:  Added StockCrewXferOverride flag to SMInterface
-- New:  Added check for full DeepFreezer when Stock Transfer Initiated and Override is On.  Ignore event if Freezer is full, and allow DeepFreeze to handle it.
-
-Version 4.4.0.1 - Release 23 June, 2015 - Docked Vessel Transfers Edition.
-- Fixed:  When switching vessels while in MapView with Crew Selected and CLS installed and enabled, errors are generated in log during transition.
-- Fixed:  With the releae of DeepFreeze 0.16, freeze and thaw commands from Roster Window no longer work and cause errors.
-
-Version 4.4.0.0 - Release 17 June, 2015 - Docked Vessel Transfers Edition.
-- New:  Added ability to transfer, dump/fill resources by Docked vessel.  Multi resource, Docked Vessel(s) <-> Docked vessel(s), Docked Vessel(s) <-> Part(s), and Part(s) <-> Part(s) transfers are now possible.  Huge flexibility.  
-- New:  Highlighting Refactoring.  Docked Vessel highlighting, on mouseover cleanup, and standardized mouseover highlighting model.
-- New:  Opened up SM to allow operation in MapView while in flight.  All features work, and Toolbar button is displayed while in MapView during flight.
+Version 4.4.1.0 - Release 0x July, 2015 - Tooltips & Science Xfer Improvements.
+- New:  Refactored and expanded Tooltips.  Changed background, position, anchor point and color for better readability.  Added more tooltips to various windows and tabs.
+- New:  Added Control Window Tooltip control to settings.  Tied Tab Tooltip settings to the Control Window ToolTip control.  They now act as children.  If control window is off, all tabs are off as well.
+- New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behavior and layout.
+- Fixed:  Control window close button (upper right) did not display tooltip.
 
 ----------
 License:  CC BY-NC-SA 4.0
@@ -74,4 +59,4 @@ Videos:
 
  - Kottabos did a fine review here:  [url]www.youtube.com/watch?v=I_TNxjnW234[/url] (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
 
-This work was based in large part on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.
+This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.

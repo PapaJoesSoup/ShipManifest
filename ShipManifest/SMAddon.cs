@@ -133,7 +133,8 @@ namespace ShipManifest
                         SMSettings.EnableCLS = false;
                         SMSettings.CLSInstalled = false;
                     }
-                    RunSave();
+                    SMSettings.SaveSettings();
+                    //RunSave();
                 }
 
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)
@@ -166,7 +167,8 @@ namespace ShipManifest
                     if (GetCLSAddon())
                     {
                         SMSettings.CLSInstalled = true;
-                        RunSave();
+                        SMSettings.SaveSettings();
+                        //RunSave();
                         UpdateCLSSpaces();
                     }
                     else
@@ -174,7 +176,8 @@ namespace ShipManifest
                         Utilities.LogMessage("Start - CLS is not installed.", "Info", SMSettings.VerboseLogging);
                         SMSettings.EnableCLS = false;
                         SMSettings.CLSInstalled = false;
-                        RunSave();
+                        SMSettings.SaveSettings();
+                        //RunSave();
                     }
                     Utilities.LogMessage("CLS Installed?  " + SMSettings.CLSInstalled.ToString(), "Info", SMSettings.VerboseLogging);
                 }
@@ -189,11 +192,8 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
             try
             {
-                if (SMSettings.Loaded)
-                {
-                    RunSave();
-                    SMSettings.SaveSettings();
-                }
+                SMSettings.SaveSettings();
+
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
                 GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
                 GameEvents.onVesselChange.Remove(OnVesselChange);
@@ -341,11 +341,13 @@ namespace ShipManifest
         private void OnGameSceneLoadRequested(GameScenes RequestedScene)
         {
             Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGameSceneLoadRequested");
-            if (SMSettings.Loaded)
-            {
-                RunSave();
-                SMSettings.SaveSettings();
-            }
+            SMSettings.SaveSettings();
+            //RunSave();
+            //if (SMSettings.Loaded)
+            //{
+            //    RunSave();
+            //    SMSettings.SaveSettings();
+            //}
         }
 
         // UI visible state handlers
@@ -1275,36 +1277,36 @@ namespace ShipManifest
             }
         }
 
-        internal void RunSave()
-        {
-            try
-            {
-                Utilities.LogMessage("RunSave in progress...", "info", SMSettings.VerboseLogging);
-                Save();
-                Utilities.LogMessage("RunSave complete.", "info", SMSettings.VerboseLogging);
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
+        //internal void RunSave()
+        //{
+        //    try
+        //    {
+        //        Utilities.LogMessage("RunSave in progress...", "info", SMSettings.VerboseLogging);
+        //        Save();
+        //        Utilities.LogMessage("RunSave complete.", "info", SMSettings.VerboseLogging);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //    }
+        //}
 
-        private void Save()
-        {
-            try
-            {
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
-                {
-                    Utilities.LogMessage("Save in progress...", "info", SMSettings.VerboseLogging);
-                    SMSettings.SaveSettings();
-                    Utilities.LogMessage("Save comlete.", "info", SMSettings.VerboseLogging);
-                }
-            }
-            catch (Exception ex)
-            {
-                Utilities.LogMessage(string.Format(" in Save.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-            }
-        }
+        //private void Save()
+        //{
+        //    try
+        //    {
+        //        if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
+        //        {
+        //            Utilities.LogMessage("Save in progress...", "info", SMSettings.VerboseLogging);
+        //            SMSettings.SaveSettings();
+        //            Utilities.LogMessage("Save comlete.", "info", SMSettings.VerboseLogging);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Utilities.LogMessage(string.Format(" in Save.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        //    }
+        //}
 
         internal static void FireEventTriggers()
         {

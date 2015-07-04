@@ -43,9 +43,11 @@ namespace ShipManifest
 
         //Filter vars
         internal static bool isAll = true;
+        internal static bool isAssign = false;
         internal static bool isVessel = false;
         internal static bool isAvail = false;
         internal static bool isDead = false;
+        internal static bool isFrozen = false;
 
         internal static bool OnCreate = false;
         internal static bool resetRosterSize
@@ -144,12 +146,15 @@ namespace ShipManifest
             try
             {
                 GUILayout.BeginVertical();
+                // Roster List Header...
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name", GUILayout.Width(140));
                 GUILayout.Label("Gender", GUILayout.Width(50));
                 GUILayout.Label("Profession", GUILayout.Width(70));
                 GUILayout.Label("Skill", GUILayout.Width(30));
                 GUILayout.Label("Status", GUILayout.Width(220));
+                GUILayout.Label("Edit", GUILayout.Width(55));
+                GUILayout.Label("Action", GUILayout.Width(65));
                 GUILayout.EndHorizontal();
 
                 ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
@@ -205,9 +210,9 @@ namespace ShipManifest
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
                         GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
                         GUILayout.Label(kerbal.experienceLevel.ToString().ToString(), labelStyle, GUILayout.Width(30));
-                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(220));
+                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
-                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
+                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                             GUI.enabled = true;
                         else
                             GUI.enabled = false;
@@ -282,8 +287,14 @@ namespace ShipManifest
                             {
                                 GUI.enabled = false;
                                 buttonText = "--";
-                                buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
+                                buttonToolTip = "Kerbal is not available.\r\nCurrent status does not allow any action.";
                             }
+                        }
+                        else
+                        {
+                            GUI.enabled = false;
+                            buttonText = "--";
+                            buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
                         }
 
                         if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
@@ -293,7 +304,7 @@ namespace ShipManifest
                             buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
                         }
 
-                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60), GUILayout.Height(20)))
+                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
                         {
                             if (buttonText == "Add")
                                 TransferCrew.AddCrewMember(kerbal, SMAddon.smController.SelectedPartsSource[0]);
@@ -570,38 +581,57 @@ namespace ShipManifest
             GUILayout.Label("Filter:", GUILayout.Width(40));
             isAll = GUILayout.Toggle(isAll, "All", GUILayout.Width(60));
             if (isAll)
-                isVessel = isAvail = isDead = false;
+                isVessel = isAssign = isAvail = isDead = isFrozen = false;
             else
             {
-                if (!isVessel && !isAvail && !isDead)
+                if (!isVessel && !isAssign && !isAvail && !isDead && !isFrozen)
                     isAll = true;
+            }
+            isAssign = GUILayout.Toggle(isAssign, "Assigned", GUILayout.Width(95));
+            if (isAssign)
+                isAll = isVessel = isAvail = isDead = false;
+            else
+            {
+                if (!isAll && !isVessel && !isAvail && !isDead && !isFrozen)
+                    isAssign = true;
             }
             if (HighLogic.LoadedSceneIsFlight)
             {
                 isVessel = GUILayout.Toggle(isVessel, "Vessel", GUILayout.Width(80));
                 if (isVessel)
-                    isAll = isAvail = isDead = false;
+                    isAll = isAssign = isAvail = isDead = isFrozen = false;
                 else
                 {
-                    if (!isAll && !isAvail && !isDead)
+                    if (!isAll && !isAssign && !isAvail && !isDead && !isFrozen)
                         isVessel = true;
                 }
             }
             isAvail = GUILayout.Toggle(isAvail, "Available", GUILayout.Width(95));
             if (isAvail)
-                isAll = isVessel = isDead = false;
+                isAll = isAssign = isVessel = isDead = isFrozen = false;
             else
             {
-                if (!isAll && !isVessel && !isDead)
+                if (!isAll && !isVessel && !isAssign && !isDead && !isFrozen)
                     isAvail = true;
             }
-            isDead = GUILayout.Toggle(isDead, "Dead/Missing");
+            isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(130));
             if (isDead)
-                isAll = isVessel = isAvail = false;
+                isAll = isAssign = isVessel = isAvail = isFrozen = false;
             else
             {
-                if (!isAll && !isVessel && !isAvail)
+                if (!isAll && !isVessel && !isAssign && !isAvail && !isFrozen)
                     isDead = true;
+            }
+            if (DFInterface.IsDFInstalled)
+            {
+                isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(80));
+                if (isFrozen)
+                    isAll = isAssign = isVessel = isAvail = isDead = false;
+                else
+                {
+                    if (!isAll && !isVessel && !isAssign && !isAvail && !isDead)
+                        isFrozen = true;
+                }
             }
             GUILayout.EndHorizontal();
         }
@@ -612,7 +642,13 @@ namespace ShipManifest
                 return true;
             else if (isVessel && (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (DFInterface.IsDFInstalled && GetFrozenDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", "")))))
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
+            else if (isAssign && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+                return true;
+            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                return true;
+            else if (isDead && ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing))
+                return true;
+            else if (isFrozen && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned))
                 return true;
             else
                 return false;
