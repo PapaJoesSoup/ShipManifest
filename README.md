@@ -1,5 +1,13 @@
 ShipManifest
 ============
+Version 4.4.0.3 - Release 01 July, 2015 - Docked Vessel Transfers Edition.
+- New:  Science transfers now allow individual report transfers from a science container.  You can transfer all or any now. Added an Expand/collapse button for clean display.
+- New:  Altered stock Transfer messaging system to show success messages near portraits.  Cleaner look.
+- New:  General clean up of button displays to prevent overflowing of text.
+- Fixed:  When Transferring crew, the user can switch to IVA, causing potential camera issues.  Switching to IVA is now prevented and a message is displayed near portraits.
+- Fixed:  Saving Settings sometimes does not "stick"  When opening and closing settings without saving in Space Center, default values can overwrite saved values.
+- Fixed:  Stock Crew transfer were not being handled correctly, and transfer fail message was always being shown.
+
 Version 4.4.0.2 - Release 24 June, 2015 - Docked Vessel Transfers Edition.
 - New:  Added StockCrewXferOverride flag to SMInterface
 - New:  Added check for full DeepFreezer when Stock Transfer Initiated and Override is On.  Ignore event if Freezer is full, and allow DeepFreeze to handle it.
