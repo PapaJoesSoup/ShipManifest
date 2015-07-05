@@ -54,10 +54,6 @@ namespace ShipManifest
         private static ApplicationLauncherButton SMRoster_Stock = null;
         internal static bool frameErrTripped = false;
 
-        // Tooltip vars
-        internal static Vector2 ToolTipPos;
-        internal static string toolTip;
-
         internal static bool ShowUI = true;
 
         #endregion
@@ -273,7 +269,7 @@ namespace ShipManifest
                 SMStyle.SetupGUIStyles();
                 Display();
 
-                Utilities.ShowToolTips();
+                SMToolTips.ShowToolTips();
 
             }
             catch (Exception ex)
@@ -1323,19 +1319,20 @@ namespace ShipManifest
             }
         }
 
-        //internal void RunSave()
-        //{
-        //    try
-        //    {
-        //        Utilities.LogMessage("RunSave in progress...", "info", SMSettings.VerboseLogging);
-        //        Save();
-        //        Utilities.LogMessage("RunSave complete.", "info", SMSettings.VerboseLogging);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-        //    }
-        //}
+        // This method is used for autosave...
+        internal void RunSave()
+        {
+            try
+            {
+                Utilities.LogMessage("RunSave in progress...", "info", SMSettings.VerboseLogging);
+                SMSettings.SaveSettings();
+                Utilities.LogMessage("RunSave complete.", "info", SMSettings.VerboseLogging);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            }
+        }
 
         //private void Save()
         //{

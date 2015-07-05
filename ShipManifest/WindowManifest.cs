@@ -54,7 +54,7 @@ namespace ShipManifest
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = SMToolTips.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
             GUI.enabled = true;
             try
             {
@@ -139,7 +139,7 @@ namespace ShipManifest
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-                SMAddon.RepositionWindows("WindowTransfer");
+                SMAddon.RepositionWindows("WindowManifest");
             }
             catch (Exception ex)
             {

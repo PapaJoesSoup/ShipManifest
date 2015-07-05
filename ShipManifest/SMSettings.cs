@@ -174,7 +174,6 @@ namespace ShipManifest
 
         #region Methods
 
-
         internal static ConfigNode loadSettingsFile()
         {
             if (settings == null)
@@ -428,7 +427,7 @@ namespace ShipManifest
         internal static void StoreTempSettings()
         {
             prevRealismMode = RealismMode;
-            //prevShowDebugger = WindowDebugger.ShowWindow;
+            prevShowDebugger = WindowDebugger.ShowWindow;
             prevVerboseLogging = VerboseLogging;
             prevAutoSave = AutoSave;
             prevSaveIntervalSec = SaveIntervalSec;
@@ -479,7 +478,7 @@ namespace ShipManifest
         internal static void RestoreTempSettings()
         {
             RealismMode = prevRealismMode;
-            //WindowDebugger.ShowWindow = prevShowDebugger;
+            WindowDebugger.ShowWindow = prevShowDebugger;
             VerboseLogging = prevVerboseLogging;
             AutoSave = prevAutoSave;
             SaveIntervalSec = prevSaveIntervalSec;

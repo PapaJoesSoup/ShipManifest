@@ -18,6 +18,8 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
+        internal static float xOffset = 80;
+        internal static float yOffset = 90;
 
         //Profession vars
         internal static bool isPilot = false;
@@ -61,6 +63,17 @@ namespace ShipManifest
             }
         }
 
+        private static List<ProtoCrewMember> _rosterList = null;
+        internal static List<ProtoCrewMember> RosterList
+        {
+            get
+            {
+                if (_rosterList == null)
+                   GetRosterList();
+                return _rosterList;
+            }
+        }
+
         private static ModKerbal _selectedKerbal;
         internal static ModKerbal SelectedKerbal
         {
@@ -95,7 +108,7 @@ namespace ShipManifest
 
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = SMToolTips.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
             try
             {
                 GUIStyle style = new GUIStyle(GUI.skin.button);
@@ -114,10 +127,14 @@ namespace ShipManifest
                 else
                 {
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("Create Kerbal", GUILayout.MaxWidth(120), GUILayout.Height(20)))
+                    GUIContent guilabel = new GUIContent("Create Kerbal", "Opens the Kerbal creation editor.");
+                    if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
                     {
                         OnCreate = true;
                     }
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
                     if (SMSettings.RenameWithProfession)
                     {
                         string toolTip = "This action resets all renamed Kerbals to their KSP default professions.\r\nIt removes any non printing chars used to maintain a specific profession.\r\nUse this when you wish to revert a game save to be compatabile with KerbalStats\r\n or some other mod that creates custom professions.";
@@ -128,7 +145,7 @@ namespace ShipManifest
                     }
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                        ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 20 - ScrollViewerPosition.y);
+                        ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
                     GUILayout.EndHorizontal();
                 }
 
@@ -160,12 +177,7 @@ namespace ShipManifest
                 GUILayout.EndHorizontal();
 
                 ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
-                List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-                // Support for DeepFreeze
-                if (DFInterface.IsDFInstalled)
-                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-
-                foreach (ProtoCrewMember kerbal in AllCrew)
+                foreach (ProtoCrewMember kerbal in RosterList)
                 {
                     if (CanDisplayKerbal(kerbal))
                     {
@@ -221,7 +233,7 @@ namespace ShipManifest
 
                         buttonText = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel";
                         if (GUI.enabled)
-                            buttonToolTip = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit this Kerbal's characteristics" : "Cancel any changes to this Kerbal";
+                            buttonToolTip = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit this Kerbal's attributes" : "Cancel any changes to this Kerbal";
                         else
                             buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
 
@@ -239,7 +251,7 @@ namespace ShipManifest
                         }
                         Rect rect = GUILayoutUtility.GetLastRect();
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset-ScrollViewerPosition.y);
 
                         if (HighLogic.LoadedScene != GameScenes.SPACECENTER)
                         {
@@ -326,7 +338,7 @@ namespace ShipManifest
                         }
                         Rect rect2 = GUILayoutUtility.GetLastRect();
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                            ToolTip = Utilities.SetActiveTooltip(rect2, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 20-ScrollViewerPosition.y);
+                            ToolTip = SMToolTips.SetActiveTooltip(rect2, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset-ScrollViewerPosition.y);
                         GUILayout.EndHorizontal();
                         GUI.enabled = true;
                     }
@@ -350,6 +362,23 @@ namespace ShipManifest
             }
             else
                 return new Dictionary<string, KerbalInfo>();
+        }
+
+        internal static void GetRosterList()
+        {
+            try
+            {
+                if (_rosterList != null)
+                    _rosterList.Clear();
+                _rosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+                // Support for DeepFreeze
+                if (DFInterface.IsDFInstalled)
+                    _rosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex.ToString()), "Error", true);
+            }
         }
 
         private static string GetFrozenDetials(ProtoCrewMember kerbal)
@@ -442,7 +471,8 @@ namespace ShipManifest
         {
             DisplaySelectProfession();
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Create", GUILayout.MaxWidth(80), GUILayout.Height(20)))
+            GUIContent guilabel = new GUIContent("Create", "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster.");
+            if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
             {
                 bool kerbalFound = false;
                 while (!kerbalFound)
@@ -453,11 +483,18 @@ namespace ShipManifest
                 }
                 OnCreate = false;
             }
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80), GUILayout.Height(20)))
+            Rect rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+            guilabel = new GUIContent("Cancel", "Cancels current creation and exit editor.");
+            if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
             {
                 OnCreate = false;
                 SelectedKerbal = null;
             }
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
             GUILayout.EndHorizontal();
         }
 
@@ -520,7 +557,7 @@ namespace ShipManifest
             }
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 20);
+                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
             GUILayout.EndHorizontal();
         }
 

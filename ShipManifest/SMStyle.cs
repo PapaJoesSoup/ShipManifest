@@ -195,6 +195,8 @@ namespace ShipManifest
             ToolTipStyle.padding = new RectOffset(5, 5, 5, 5);
             ToolTipStyle.wordWrap = false;
             ToolTipStyle.normal.textColor = Color.green;
+            ToolTipStyle.hover.textColor = Color.green;
+            ToolTipStyle.hover.background = ToolTipStyle.normal.background;
 
             if (!SMSettings.UseUnityStyle)
                 GUI.skin = HighLogic.Skin;

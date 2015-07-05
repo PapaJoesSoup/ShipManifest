@@ -86,7 +86,7 @@ namespace ShipManifest
                 return;
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
             GUI.enabled = true;
             try
             {
@@ -498,7 +498,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         }
                         GUI.enabled = true;
                     }
@@ -522,7 +522,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         }
                     }
                     GUI.enabled = true;
@@ -569,7 +569,7 @@ namespace ShipManifest
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     {
                         Rect rect = GUILayoutUtility.GetLastRect();
-                        ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
+                        ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                     }
                     GUI.enabled = true;
                     GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount.ToString()), GUILayout.Width(205), GUILayout.Height(20));
@@ -596,7 +596,7 @@ namespace ShipManifest
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         {
                             Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                         }
                     }
                     GUILayout.EndHorizontal();
@@ -623,7 +623,7 @@ namespace ShipManifest
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
+                                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                             }
                             if (SMSettings.RealismMode && !isCollectable)
                             {
@@ -645,7 +645,7 @@ namespace ShipManifest
                                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                                 {
                                     Rect rect = GUILayoutUtility.GetLastRect();
-                                    ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
+                                    ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                                 }
                             }
                             GUILayout.EndHorizontal();
@@ -700,7 +700,7 @@ namespace ShipManifest
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
+                                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - TargetDetailsViewerScrollPosition.y);
                             }
                         }
                         GUILayout.EndHorizontal();
@@ -715,6 +715,9 @@ namespace ShipManifest
             // Set scrollX offsets for left and right viewers
             int xOffset = xferMode == SMAddon.XFERMode.SourceToTarget ? 30 : 330;
             int yOffset = 160;
+            string label = "";
+            string toolTip = "";
+            Rect rect = new Rect();
 
             // Pass in static vars to improve readability.
             List<string> selectedResources = SMAddon.smController.SelectedResources;
@@ -767,9 +770,25 @@ namespace ShipManifest
 
                         // Now update the static var
                         modResource.SetXferAmountString(strXferAmount, xferMode);
-
-                        GUILayout.Label("Xfer Amt:", GUILayout.Width(60));
-                        strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(100), GUILayout.Height(20));
+                        if(selectedResources.Count > 1)
+                        {
+                            label = "Xfer Amts:";
+                            toolTip = "Displays xfer amounts of both resourses selected.";
+                            toolTip += "\r\nAllows editing of part's larger capacity resourse xfer value.";
+                            toolTip += "\r\nIt then calculates the smaller xfer amount using a ratio";
+                            toolTip += "\r\n of the smaller capacity resource to the larger.";
+                        }
+                        else
+                        {
+                            label = "Xfer Amt:";
+                            toolTip += "Displays the Amount of selected resource to xfer.";
+                            toolTip += "\r\nAllows editing of the xfer value.";
+                        }
+                        GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(65));
+                        rect = GUILayoutUtility.GetLastRect();
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                        strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
                         // update decimal bool 
                         modResource.SetStringDecimal(strXferAmount, xferMode);
                         //update zero bool 
@@ -778,7 +797,14 @@ namespace ShipManifest
                         thisXferAmount = modResource.UpdateXferAmount(strXferAmount, xferMode);
                         ratioXferAmt = thisXferAmount * ratioResource.XferRatio > ratioResource.FromCapacity(xferMode) ? ratioResource.FromCapacity(xferMode) : thisXferAmount * ratioResource.XferRatio;
                         if (SMAddon.smController.SelectedResources.Count > 1)
-                            GUILayout.Label(" | " + ratioXferAmt.ToString("#######0.##"), GUILayout.Width(80));
+                        {
+                            label = " | " + ratioXferAmt.ToString("#######0.##");
+                            toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioResource.XferRatio.ToString() + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
+                            GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(80));
+                            rect = GUILayoutUtility.GetLastRect();
+                            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                        }
                     }
                     GUILayout.EndHorizontal();
 
@@ -786,7 +812,12 @@ namespace ShipManifest
                     {
                         GUILayout.BeginHorizontal();
                         GUIStyle noPad = SMStyle.LabelStyleNoPad;
-                        GUILayout.Label("Xfer:", noPad, GUILayout.Width(50), GUILayout.Height(20));
+                        label = "Xfer:";
+                        toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.";
+                        GUILayout.Label(new GUIContent(label, toolTip), noPad, GUILayout.Width(50), GUILayout.Height(20));
+                        rect = GUILayoutUtility.GetLastRect();
+                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         thisXferAmount = (double)GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(190));
 
                         // set button style
@@ -803,16 +834,13 @@ namespace ShipManifest
                                 //Calc amounts and update xfer modules
                                 AssignXferAmounts(XferResources, xferMode, thisXferAmount);
                                 TransferResources(partsSource, partsTarget);
-
                             }
                             else if (TransferResource.ResourceXferActive && SMSettings.RealismMode)
                                 TransferResource.XferState = TransferResource.ResourceXFERState.Stop;
                         }
+                        rect = GUILayoutUtility.GetLastRect();
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                        {
-                            Rect rect = GUILayoutUtility.GetLastRect();
-                            ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-                        }
+                            ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                         GUILayout.EndHorizontal();
                     }
                     if (!TransferResource.ResourceXferActive)
@@ -914,7 +942,7 @@ namespace ShipManifest
                             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             {
                                 Rect rect = GUILayoutUtility.GetLastRect();
-                                ToolTip = Utilities.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+                                ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
                             }
                         }
                         GUILayout.EndHorizontal();

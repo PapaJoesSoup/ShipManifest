@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using System.IO;
 using ConnectedLivingSpace;
+using DF;
 
 namespace ShipManifest
 {
@@ -297,8 +298,6 @@ namespace ShipManifest
             }
         }
 
-        //internal GameEvents.FromToAction<Part, Part> evaAction;
-
         #endregion
 
         internal SMController()
@@ -343,6 +342,7 @@ namespace ShipManifest
             GetAntennas();
             GetLights();
             GetSolarPanels();
+            WindowRoster.GetRosterList();
             DockedVessels = null;
         }
 

@@ -86,7 +86,7 @@ namespace ShipManifest
                 ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips)
-                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+                ToolTip = SMToolTips.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
 
             // This is a scroll panel (we are using it to make button lists...)
             GUILayout.BeginVertical();
