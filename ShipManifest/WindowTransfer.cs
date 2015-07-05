@@ -813,7 +813,7 @@ namespace ShipManifest
                         GUILayout.BeginHorizontal();
                         GUIStyle noPad = SMStyle.LabelStyleNoPad;
                         label = "Xfer:";
-                        toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.";
+                        toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.\r\nYou can use this instead of the text box above.";
                         GUILayout.Label(new GUIContent(label, toolTip), noPad, GUILayout.Width(50), GUILayout.Height(20));
                         rect = GUILayoutUtility.GetLastRect();
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
