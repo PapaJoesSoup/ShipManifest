@@ -122,6 +122,7 @@ namespace ShipManifest
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+                SMAddon.RepositionWindows("WindowTransfer");
             }
             catch (Exception ex)
             {

@@ -134,6 +134,7 @@ namespace ShipManifest
 
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+                SMAddon.RepositionWindows("WindowRoster");
             }
             catch (Exception ex)
             {
@@ -148,6 +149,7 @@ namespace ShipManifest
                 GUILayout.BeginVertical();
                 // Roster List Header...
                 GUILayout.BeginHorizontal();
+                GUILayout.Label("", GUILayout.Width(5));
                 GUILayout.Label("Name", GUILayout.Width(140));
                 GUILayout.Label("Gender", GUILayout.Width(50));
                 GUILayout.Label("Profession", GUILayout.Width(70));

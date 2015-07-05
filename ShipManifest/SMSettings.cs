@@ -282,7 +282,7 @@ namespace ShipManifest
             SMStyle.WindowStyle = null;
 
             // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
-            RepositionWindows();
+            SMAddon.RepositionWindows("All");
         }
 
         internal static void SaveSettings()
@@ -407,39 +407,6 @@ namespace ShipManifest
             if (configNode.HasValue(ValueName))
                 configNode.RemoveValue(ValueName);
             configNode.AddValue(ValueName, value.ToString());
-        }
-
-        private static void RepositionWindows()
-        {
-            if (WindowManifest.Position.xMax > Screen.currentResolution.width)
-                WindowManifest.Position.x = Screen.currentResolution.width - WindowManifest.Position.width;
-            if (WindowManifest.Position.yMax > Screen.currentResolution.height)
-                WindowManifest.Position.y = Screen.currentResolution.height - WindowManifest.Position.height;
-
-            if (WindowTransfer.Position.xMax > Screen.currentResolution.width)
-                WindowTransfer.Position.x = Screen.currentResolution.width - WindowTransfer.Position.width;
-            if (WindowTransfer.Position.yMax > Screen.currentResolution.height)
-                WindowTransfer.Position.y = Screen.currentResolution.height - WindowTransfer.Position.height;
-
-            if (WindowDebugger.Position.xMax > Screen.currentResolution.width)
-                WindowDebugger.Position.x = Screen.currentResolution.width - WindowDebugger.Position.width;
-            if (WindowDebugger.Position.yMax > Screen.currentResolution.height)
-                WindowDebugger.Position.y = Screen.currentResolution.height - WindowDebugger.Position.height;
-
-            if (WindowSettings.Position.xMax > Screen.currentResolution.width)
-                WindowSettings.Position.x = Screen.currentResolution.width - WindowSettings.Position.width;
-            if (WindowSettings.Position.yMax > Screen.currentResolution.height)
-                WindowSettings.Position.y = Screen.currentResolution.height - WindowSettings.Position.height;
-
-            if (WindowControl.Position.xMax > Screen.currentResolution.width)
-                WindowControl.Position.x = Screen.currentResolution.width - WindowControl.Position.width;
-            if (WindowControl.Position.yMax > Screen.currentResolution.height)
-                WindowControl.Position.y = Screen.currentResolution.height - WindowControl.Position.height;
-
-            if (WindowRoster.Position.xMax > Screen.currentResolution.width)
-                WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
-            if (WindowRoster.Position.yMax > Screen.currentResolution.height)
-                WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
         }
 
         internal static void LoadColors()

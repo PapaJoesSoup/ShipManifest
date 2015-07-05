@@ -3,7 +3,8 @@
 - New:  Added Control Window Tooltip control to settings.  Tied Control Window Tab Tooltip settings to the Control Window ToolTip control.  They now act as children.  If control window Tooltips is off, all tab settings are disabled as well.
 - New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behavior and layout.
 - New:  Added labels to button headers in Roster Window.
-- New:  Added additional Roster List Filters.  Assigned and Frozen.
+- New:  Added 2 additional Roster List Filters.  "Assigned" and "Frozen".
+- New:  Added active window screen edge managment.  No more positioning windows beyond the screen edge when moving.
 - Fixed:  Control window close button (upper right) did not display tooltip.
 - Fixed:  Some Roster window action buttons have incorrect text when in Space Center.
 

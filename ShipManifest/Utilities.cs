@@ -18,7 +18,6 @@ namespace ShipManifest
         internal static bool strHasDecimal;
         internal static bool strHasZero;
 
-
         private static List<string> _errors = new List<string>();
         internal static List<string> Errors
         {
@@ -163,6 +162,7 @@ namespace ShipManifest
             if (SMSettings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
             {
                 Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
+                // TODO:  check if tooltip is on screen and adjust for position
                 Rect rect = new Rect(toolTipPos.x + 20, toolTipPos.y - 4, size.x, size.y);
                 GUI.Window(0, rect, EmptyWindow, ToolTip, SMStyle.ToolTipStyle);
                 GUI.BringWindowToFront(0);
@@ -197,7 +197,9 @@ namespace ShipManifest
         }
 
         private static void EmptyWindow(int windowId)
-        { }
+        { 
+            
+        }
 
         internal static string GetStringDecimal(string strValue)
         {
