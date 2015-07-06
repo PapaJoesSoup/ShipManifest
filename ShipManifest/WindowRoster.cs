@@ -18,7 +18,7 @@ namespace ShipManifest
         internal static string ToolTip = "";
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
-        internal static float xOffset = 80;
+        internal static float xOffset = 30;
         internal static float yOffset = 90;
 
         //Profession vars

@@ -103,7 +103,7 @@ namespace ShipManifest
         private static void RepositionToolTip()
         {
             if (Position.xMax > Screen.currentResolution.width)
-                Position.x = ControlRect.x - 10 - Position.width - X_Offset;
+                Position.x = ControlRect.x - Position.width - (X_Offset > 30 ? 30 : X_Offset);
             if (Position.yMax > Screen.currentResolution.height)
                 Position.y = Screen.currentResolution.height - Position.height;
         }
