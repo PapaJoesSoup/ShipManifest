@@ -1,5 +1,16 @@
 ShipManifest
 ============
+Version 4.4.1.0 - Release 05 July, 2015 - Tooltips & Science Xfer Improvements.
+- New:  Refactored and expanded Tooltips.  Changed background, positioning, anchor points, font styles & colors for better readability.  Added more tooltips to various windows and tabs.
+- New:  Added Control Window Tooltip control to settings.  If control window Tooltips is off, all tab tooltip settings are disabled.
+- New:  Added linkage of Control Window Tab Tooltip settings to the Control Window ToolTip control.  They now act as children.  
+- New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behavior and layout.
+- New:  Added labels to button headers in Roster Window.
+- New:  Added 2 additional Roster List Filters.  "Assigned" and "Frozen".
+- New:  Added active window screen edge managment.  No more positioning windows beyond the screen edge when moving.
+- Fixed:  Control window close button (upper right) did not display tooltip.
+- Fixed:  Some Roster window action buttons have incorrect text when in Space Center.
+
 Version 4.4.0.3 - Release 01 July, 2015 - Docked Vessel Transfers Edition.
 - New:  Science transfers now allow individual report transfers from a science container.  You can transfer all or any now. Added an Expand/collapse button for clean display.
 - New:  Altered stock Transfer messaging system to show success messages near portraits.  Cleaner look.
