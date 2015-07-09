@@ -188,6 +188,11 @@ namespace ShipManifest
             //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnDestroy");
             try
             {
+                if (HighLogic.LoadedSceneIsFlight)
+                    WindowControl.ShowWindow = WindowManifest.ShowWindow = WindowTransfer.ShowWindow = WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
+
                 SMSettings.SaveSettings();
 
                 GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);

@@ -5,7 +5,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with [url=htt
 I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
 
 ----------------
-Current Version 4.4.1.0 - Release 05 Jul, 2015 - Tooltips & Science Xfer Improvements.
+Current Version 4.4.1.1 - Release 09 Jul, 2015 - Tooltips & Science Xfer Improvements.
 ----------------
 
 ---------
@@ -33,6 +33,9 @@ Installation steps:
 ------------
 What's New:
 ------------
+Version 4.4.1.1 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
+- Fixed:  Correct a display error with science when a result key is not found.  now displays the default key's data.
+
 Version 4.4.1.0 - Release 05 July, 2015 - Tooltips & Science Xfer Improvements.
 - New:  Refactored and expanded Tooltips.  Changed background, positioning, anchor points, font styles & colors for better readability.  Added more tooltips to various windows and tabs.
 - New:  Added Control Window Tooltip control to settings.  If control window Tooltips is off, all tab tooltip settings are disabled.

@@ -609,11 +609,18 @@ namespace ShipManifest
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("", GUILayout.Width(15), GUILayout.Height(20));
 
-                            //toolTip += "\r\n-SubjectID:   " + item.subjectID;
-                            ScienceExperiment se = ResearchAndDevelopment.GetExperiment(item.subjectID.Split('@')[0]);
-                            string key = (from k in se.Results.Keys where item.subjectID.Split('@')[1].Contains(k) select k).SingleOrDefault();
+                            // Get science data from experiment.
+                            string ExpID = item.subjectID.Split('@')[0];
+                            string ExpKey = item.subjectID.Split('@')[1];
+                            ScienceExperiment se = ResearchAndDevelopment.GetExperiment(ExpID);
+                            string key = (from k in se.Results.Keys where ExpKey.Contains(k) select k).FirstOrDefault();
+                            key = key != null ? key : "default";
+                            string results = se.Results[key];
+
+                            // Build Tooltip
                             toolTip = item.title;
-                            toolTip += "\r\n-Results:    " + se.Results[key];
+                            //toolTip += "\r\n-SubjectID:   " + item.subjectID;
+                            toolTip += "\r\n-Results:    " + results;
                             toolTip += "\r\n-Data Amt:   " + item.dataAmount.ToString() + " Mits";
                             toolTip += "\r\n-Xmit Value: " + item.transmitValue.ToString();
                             toolTip += "\r\n-Lab Value:  " + item.labValue.ToString();
