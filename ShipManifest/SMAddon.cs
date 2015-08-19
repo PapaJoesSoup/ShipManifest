@@ -833,6 +833,28 @@ namespace ShipManifest
                     WindowTransfer.xferToolTip = "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
                     return results;
                 }
+                // If one of the parts is a DeepFreeze part and no crew are showing in protoModuleCrew, check it isn't full of frozen Kerbals. 
+                // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
+                // If there is just one spare seat or seat taken by a Thawed Kerbal that is OK because SM will just transfer them into the empty
+                // seat or swap them with a thawed Kerbal.
+                IDeepFreezer sourcepartFrzr = SelectedPartsSource[0].FindModuleImplementing<IDeepFreezer>();
+                IDeepFreezer targetpartFrzr = SelectedPartsTarget[0].FindModuleImplementing<IDeepFreezer>();
+                if (sourcepartFrzr != null)
+                {
+                    if (sourcepartFrzr.DFIFreezerSpace == 0)
+                    {
+                        WindowTransfer.xferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+                        return results;
+                    }
+                }
+                if (targetpartFrzr != null)
+                {
+                    if (targetpartFrzr.DFIFreezerSpace == 0)
+                    {
+                        WindowTransfer.xferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+                        return results;
+                    }
+                }
 
                 // Are there kerbals to move?
                 if (SelectedPartsSource[0].protoModuleCrew.Count == 0)

@@ -5,6 +5,7 @@ using System.Text;
 using UnityEngine;
 using HighlightingSystem;
 using ConnectedLivingSpace;
+using DF;
 
 namespace ShipManifest
 {
@@ -528,6 +529,53 @@ namespace ShipManifest
                     GUI.enabled = true;
                     GUILayout.EndHorizontal();
                 }
+                // Cater for DeepFreeze Continued... parts - list frozen kerbals
+                if (DF.DFInterface.IsDFInstalled)
+                {                    
+                    try
+                    {
+                        IDeepFreezer sourcepartFrzr = SelectedPartsFrom[0].FindModuleImplementing<IDeepFreezer>();
+                        if (sourcepartFrzr.DFIStoredCrewList.Count > 0)
+                        {                            
+                            DF.IDFInterface DFOjbect = DF.DFInterface.GetFrozenKerbals();
+                            foreach (DF.FrznCrewMbr frzncrew in sourcepartFrzr.DFIStoredCrewList)
+                            {
+                                GUILayout.BeginHorizontal();
+                                GUI.enabled = false;
+                                if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
+                                {
+                                    ToolTip = "";                                    
+                                }
+                                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                                {
+                                    Rect rect = GUILayoutUtility.GetLastRect();
+                                    ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                                }
+
+                                string trait = DFOjbect.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
+                                GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
+
+                                if (GUILayout.Button(new GUIContent("Frzn", "This Kerbal is Frozen and cannot be moved"), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+                                {
+                                    ToolTip = "";
+                                }
+                                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                                {
+                                    Rect rect = GUILayoutUtility.GetLastRect();
+                                    ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+                                }
+                                GUI.enabled = true;
+                                GUILayout.EndHorizontal();
+                            }
+                        }                                               
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
+                        Debug.Log(ex.Message);
+                        
+                    }
+                }                               
             }
         }
 

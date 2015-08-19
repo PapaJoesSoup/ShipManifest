@@ -267,7 +267,7 @@ namespace ShipManifest
                         foreach (InternalSeat seat in ToPart.internalModel.seats)
                         {
                             // This supports DeepFreeze frozen kerbals...
-                            if (seat.kerbalRef != null)
+                            if (seat.kerbalRef != null && seat.kerbalRef.protoCrewMember.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
                             {
                                 ToSeat = seat;
                                 break;
