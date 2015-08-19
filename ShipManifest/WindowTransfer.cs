@@ -536,8 +536,7 @@ namespace ShipManifest
                     {
                         IDeepFreezer sourcepartFrzr = SelectedPartsFrom[0].FindModuleImplementing<IDeepFreezer>();
                         if (sourcepartFrzr.DFIStoredCrewList.Count > 0)
-                        {                            
-                            DF.IDFInterface DFOjbect = DF.DFInterface.GetFrozenKerbals();
+                        {                                                       
                             foreach (DF.FrznCrewMbr frzncrew in sourcepartFrzr.DFIStoredCrewList)
                             {
                                 GUILayout.BeginHorizontal();
@@ -552,7 +551,7 @@ namespace ShipManifest
                                     ToolTip = SMToolTips.SetActiveTooltip(rect, WindowTransfer.Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
                                 }
 
-                                string trait = DFOjbect.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
+                                string trait = SMAddon.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
                                 GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
 
                                 if (GUILayout.Button(new GUIContent("Frzn", "This Kerbal is Frozen and cannot be moved"), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
