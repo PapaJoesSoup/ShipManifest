@@ -122,7 +122,7 @@ namespace ShipManifest
                 GUILayout.EndVertical();
                 GUILayout.EndHorizontal();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-                SMAddon.RepositionWindows("WindowTransfer");
+                SMAddon.RepositionWindow(ref WindowTransfer.Position);
             }
             catch (Exception ex)
             {
@@ -540,7 +540,7 @@ namespace ShipManifest
                 PartModule[] modules = ScienceModulesSource.Keys.ToArray();
                 foreach (PartModule pm in modules)
                 {
-                    // Containers.
+                    // experiments/Containers.
                     int scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
                     bool isCollectable = true;
                     if (pm.moduleName == "ModuleScienceExperiment")
@@ -558,7 +558,6 @@ namespace ShipManifest
                     string toolTip = "Expand/Collapse Science detail.";
                     if (!GUI.enabled)
                         toolTip += " (Disabled, nothing to xfer)";
-                    // TODO:  add logic for mananging expand/collapse container list.
                     GUIStyle expandStyle = ScienceModulesSource[pm] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
                     if (ScienceModulesSource[pm])
                         label = "-";

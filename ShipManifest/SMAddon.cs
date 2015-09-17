@@ -1228,50 +1228,26 @@ namespace ShipManifest
             }
         }
 
-        internal static void RepositionWindows(string window = "All")
+        internal static void RepositionWindows()
         {
-            if (window == "All" || window == "WindowManifest")
-            {
-                if (WindowManifest.Position.xMax > Screen.currentResolution.width)
-                    WindowManifest.Position.x = Screen.currentResolution.width - WindowManifest.Position.width;
-                if (WindowManifest.Position.yMax > Screen.currentResolution.height)
-                    WindowManifest.Position.y = Screen.currentResolution.height - WindowManifest.Position.height;
-            }
-            if (window == "All" || window == "WindowTransfer")
-            {
-                if (WindowTransfer.Position.xMax > Screen.currentResolution.width)
-                    WindowTransfer.Position.x = Screen.currentResolution.width - WindowTransfer.Position.width;
-                if (WindowTransfer.Position.yMax > Screen.currentResolution.height)
-                    WindowTransfer.Position.y = Screen.currentResolution.height - WindowTransfer.Position.height;
-            }
-            if (window == "All" || window == "WindowDebugger")
-            {
-                if (WindowDebugger.Position.xMax > Screen.currentResolution.width)
-                    WindowDebugger.Position.x = Screen.currentResolution.width - WindowDebugger.Position.width;
-                if (WindowDebugger.Position.yMax > Screen.currentResolution.height)
-                    WindowDebugger.Position.y = Screen.currentResolution.height - WindowDebugger.Position.height;
-            }
-            if (window == "All" || window == "WindowSettings")
-            {
-                if (WindowSettings.Position.xMax > Screen.currentResolution.width)
-                    WindowSettings.Position.x = Screen.currentResolution.width - WindowSettings.Position.width;
-                if (WindowSettings.Position.yMax > Screen.currentResolution.height)
-                    WindowSettings.Position.y = Screen.currentResolution.height - WindowSettings.Position.height;
-            }
-            if (window == "All" || window == "WindowControl")
-            {
-                if (WindowControl.Position.xMax > Screen.currentResolution.width)
-                    WindowControl.Position.x = Screen.currentResolution.width - WindowControl.Position.width;
-                if (WindowControl.Position.yMax > Screen.currentResolution.height)
-                    WindowControl.Position.y = Screen.currentResolution.height - WindowControl.Position.height;
-            }
-            if (window == "All" || window == "WindowRoster")
-            {
-                if (WindowRoster.Position.xMax > Screen.currentResolution.width)
-                    WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
-                if (WindowRoster.Position.yMax > Screen.currentResolution.height)
-                    WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
-            }
+            RepositionWindow(ref WindowManifest.Position);
+            RepositionWindow(ref WindowTransfer.Position);
+            RepositionWindow(ref WindowDebugger.Position);
+            RepositionWindow(ref WindowSettings.Position);
+            RepositionWindow(ref WindowControl.Position);
+            RepositionWindow(ref WindowRoster.Position);
+        }
+
+        internal static void RepositionWindow(ref Rect windowPosition)
+        {
+            if (windowPosition.x < 0)
+                windowPosition.x = 0;
+            if (windowPosition.y < 0)
+                windowPosition.y = 0;
+            if (windowPosition.xMax > Screen.currentResolution.width)
+                windowPosition.x = Screen.currentResolution.width - windowPosition.width;
+            if (windowPosition.yMax > Screen.currentResolution.height)
+                windowPosition.y = Screen.currentResolution.height - windowPosition.height;
         }
 
         internal static void LoadSounds(string SoundType, string path1, string path2, string path3, double dblVol)
@@ -1338,23 +1314,6 @@ namespace ShipManifest
                 Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
             }
         }
-
-        //private void Save()
-        //{
-        //    try
-        //    {
-        //        if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
-        //        {
-        //            Utilities.LogMessage("Save in progress...", "info", SMSettings.VerboseLogging);
-        //            SMSettings.SaveSettings();
-        //            Utilities.LogMessage("Save comlete.", "info", SMSettings.VerboseLogging);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Utilities.LogMessage(string.Format(" in Save.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-        //    }
-        //}
 
         internal static void FireEventTriggers()
         {

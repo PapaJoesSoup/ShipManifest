@@ -139,7 +139,7 @@ namespace ShipManifest
                 GUILayout.EndHorizontal();
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-                SMAddon.RepositionWindows("WindowManifest");
+                SMAddon.RepositionWindow(ref WindowManifest.Position);
             }
             catch (Exception ex)
             {

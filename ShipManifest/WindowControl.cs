@@ -99,7 +99,7 @@ namespace ShipManifest
             DisplaySelectedActions();
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-            SMAddon.RepositionWindows("WindowControl");
+            SMAddon.RepositionWindow(ref WindowControl.Position);
         }
 
         internal static void DisplayWindowTabs()

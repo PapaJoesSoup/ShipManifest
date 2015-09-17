@@ -67,8 +67,7 @@ namespace ShipManifest
 
         internal static void ExtendAllAntennas()
         {
-            // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
+            // TODO: for realism, add a closing/opening sound
             foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
             {
                 iAntenna.ExtendAntenna();
@@ -77,8 +76,7 @@ namespace ShipManifest
 
         internal static void RetractAllAntennas()
         {
-            // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
+            // TODO: for realism, add a closing/opening sound
             foreach (ModAntenna iAntenna in SMAddon.smController.Antennas)
             {
                 iAntenna.RetractAntenna();

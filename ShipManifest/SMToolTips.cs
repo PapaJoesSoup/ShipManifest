@@ -60,7 +60,6 @@ namespace ShipManifest
             if (SMSettings.ShowToolTips && (ToolTip != null) && (ToolTip.Trim().Length > 0))
             {
                 Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(ToolTip));
-                // TODO:  check if tooltip is on screen and adjust for position
                 Position = new Rect(toolTipPos.x, toolTipPos.y, size.x, size.y);
                 RepositionToolTip();
                 GUI.Window(0, Position, EmptyWindow, ToolTip, SMStyle.ToolTipStyle);

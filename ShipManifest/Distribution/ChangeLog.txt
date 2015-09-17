@@ -1,4 +1,9 @@
-﻿Version 4.4.1.1 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
+﻿Version 4.4.1.2 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
+- Fixed:  Correct a window position loading error on MAC machines.
+- New:  based on feedback, expanded science tooltips to be more useful.
+
+
+Version 4.4.1.1 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
 - Fixed:  Correct a display error with science tooltip when an experiment result key is not found.  Now displays the default key's data.
 
 Version 4.4.1.0 - Release 05 July, 2015 - Tooltips & Science Xfer Improvements.

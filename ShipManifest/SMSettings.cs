@@ -281,7 +281,7 @@ namespace ShipManifest
             SMStyle.WindowStyle = null;
 
             // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
-            SMAddon.RepositionWindows("All");
+            SMAddon.RepositionWindows();
         }
 
         internal static void SaveSettings()
@@ -383,11 +383,19 @@ namespace ShipManifest
         private static Rect getRectangle(ConfigNode WindowsNode, string RectName, Rect defaultvalue)
         {
             Rect thisRect = new Rect();
-            ConfigNode RectNode = WindowsNode.HasNode(RectName) ? WindowsNode.GetNode(RectName) : WindowsNode.AddNode(RectName);
-            thisRect.x = RectNode.HasValue("x") ? int.Parse(RectNode.GetValue("x")) : defaultvalue.x;
-            thisRect.y = RectNode.HasValue("y") ? int.Parse(RectNode.GetValue("y")) : defaultvalue.y;
-            thisRect.width = RectNode.HasValue("width") ? int.Parse(RectNode.GetValue("width")) : defaultvalue.width;
-            thisRect.height = RectNode.HasValue("height") ? int.Parse(RectNode.GetValue("height")) : defaultvalue.height;
+            try
+            {
+                ConfigNode RectNode = WindowsNode.HasNode(RectName) ? WindowsNode.GetNode(RectName) : WindowsNode.AddNode(RectName);
+                thisRect.x = RectNode.HasValue("x") ? float.Parse(RectNode.GetValue("x")) : defaultvalue.x;
+                thisRect.y = RectNode.HasValue("y") ? float.Parse(RectNode.GetValue("y")) : defaultvalue.y;
+                thisRect.width = RectNode.HasValue("width") ? float.Parse(RectNode.GetValue("width")) : defaultvalue.width;
+                thisRect.height = RectNode.HasValue("height") ? float.Parse(RectNode.GetValue("height")) : defaultvalue.height;
+            }
+            catch
+            {
+                thisRect = defaultvalue;
+            }
+
 
             return thisRect;
         }

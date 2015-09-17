@@ -58,7 +58,6 @@ namespace ShipManifest
         internal static void TurnOnAllLights()
         {
             // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
             foreach (ModLight iLight in SMAddon.smController.Lights)
             {
                 iLight.TurnOnLight();
@@ -68,7 +67,6 @@ namespace ShipManifest
         internal static void TurnOffAllLights()
         {
             // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
             foreach (ModLight iLight in SMAddon.smController.Lights)
             {
                 iLight.TurnOffLight();

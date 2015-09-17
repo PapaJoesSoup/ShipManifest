@@ -62,7 +62,7 @@ namespace ShipManifest
 
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-            SMAddon.RepositionWindows("WindowDebugger");
+            SMAddon.RepositionWindow(ref WindowDebugger.Position);
         }
 
         internal static void Savelog()

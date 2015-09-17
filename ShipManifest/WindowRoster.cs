@@ -151,7 +151,7 @@ namespace ShipManifest
 
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-                SMAddon.RepositionWindows("WindowRoster");
+                SMAddon.RepositionWindow(ref WindowRoster.Position);
             }
             catch (Exception ex)
             {

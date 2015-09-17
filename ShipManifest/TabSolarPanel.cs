@@ -75,8 +75,7 @@ namespace ShipManifest
 
         internal static void ExtendAllPanels()
         {
-            // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
+            // TODO: for realism, add a closing/opening sound
             foreach (ModSolarPanel iPanel in SMAddon.smController.SolarPanels)
             {
                 ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)iPanel.PanelModule;
@@ -89,8 +88,7 @@ namespace ShipManifest
 
         internal static void RetractAllPanels()
         {
-            // iterate thru the hatch parts and open hatches
-            // TODO: for realism, add a delay and a closing/opening sound
+            // TODO: for realism, add a closing/opening sound
             foreach (ModSolarPanel iPanel in SMAddon.smController.SolarPanels)
             {
                 ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)iPanel.PanelModule;
