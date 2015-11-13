@@ -54,21 +54,23 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="CLSInterfaces">
       <HintPath>..\..\..\..\..\..\ksp-win-1-0-2\KSP_win\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="DFInterface, Version=0.1.5651.35439, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="DFInterface, Version=0.3.5712.8487, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Distribution\GameData\ShipManifest\Plugins\DFInterface.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-5\KSP_win\GameData\REPOSoftTech\DFInterface\Plugins\DFInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\UnityEngine.dll</HintPath>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -146,8 +148,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-4\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
