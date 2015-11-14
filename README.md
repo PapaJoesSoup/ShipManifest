@@ -1,5 +1,16 @@
 ShipManifest
 ============
+Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
+- New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  
+        KSP 1.0.5 now supports native kerbal profession managment, so kerbal profession now saves to game save.  
+        Updated SM to use new trait attribute of the kerbal object.  Also supports old game saves.  
+        Cleans up old game save automatically, if profession management is ON in settings (now the default)
+- New:  Added Crew Dump/Fill at part level in Transfer Window, when vessel is in a recoverable state and realism is off.
+- New:  based on feedback, expanded science tooltips to be more useful.
+- Fixed:  Correct a window position loading error on MAC machines.
+- Fixed:  Correct issues and deeper integration with DeepFreeze.  (Thanks JPLRepo!)
+- Fixed:  Tooltip display issues with screen boundary
+
 Version 4.4.1.1 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
 - Fixed:  Correct a display error with science tooltip when an experiment result key is not found.  Now displays the default key's data.
 

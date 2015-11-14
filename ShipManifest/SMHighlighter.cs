@@ -16,7 +16,7 @@ namespace ShipManifest
 
         // WindowTransfer part mouseover vars
         internal static bool IsMouseOver = false;
-        internal static SMAddon.XFERMode MouseOverMode = SMAddon.XFERMode.SourceToTarget;
+        internal static SMAddon.XFERDirection MouseOverMode = SMAddon.XFERDirection.SourceToTarget;
         internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
         internal static Part MouseOverpart = null;
         internal static List<Part> MouseOverparts = null;
