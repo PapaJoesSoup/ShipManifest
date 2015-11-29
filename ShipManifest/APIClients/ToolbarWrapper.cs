@@ -23,15 +23,14 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-﻿using System;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
 
-
-namespace ShipManifest
+namespace ShipManifest.APIClients
 {
 
 
@@ -79,10 +78,10 @@ namespace ShipManifest
       {
         if ((toolbarAvailable != false) && (instance_ == null))
         {
-          Type type = ToolbarTypes.getType("Toolbar.ToolbarManager");
+          var type = ToolbarTypes.getType("Toolbar.ToolbarManager");
           if (type != null)
           {
-            object realToolbarManager = ToolbarTypes.getStaticProperty(type, "Instance").GetValue(null, null);
+            var realToolbarManager = ToolbarTypes.getStaticProperty(type, "Instance").GetValue(null, null);
             instance_ = new ToolbarManager(realToolbarManager);
           }
         }
@@ -449,7 +448,7 @@ namespace ShipManifest
 
     public GameScenesVisibility(params GameScenes[] gameScenes)
     {
-      Type gameScenesVisibilityType = ToolbarTypes.getType("Toolbar.GameScenesVisibility");
+      var gameScenesVisibilityType = ToolbarTypes.getType("Toolbar.GameScenesVisibility");
       realGameScenesVisibility = Activator.CreateInstance(gameScenesVisibilityType, new object[] { gameScenes });
       visibleProperty = ToolbarTypes.getProperty(gameScenesVisibilityType, "Visible");
     }
@@ -489,7 +488,7 @@ namespace ShipManifest
 
     public PopupMenuDrawable()
     {
-      Type popupMenuDrawableType = ToolbarTypes.getType("Toolbar.PopupMenuDrawable");
+      var popupMenuDrawableType = ToolbarTypes.getType("Toolbar.PopupMenuDrawable");
       realPopupMenuDrawable = Activator.CreateInstance(popupMenuDrawableType, null);
       updateMethod = ToolbarTypes.getMethod(popupMenuDrawableType, "Update");
       drawMethod = ToolbarTypes.getMethod(popupMenuDrawableType, "Draw");
@@ -516,7 +515,7 @@ namespace ShipManifest
     /// <returns>A button that can be used to register clicks on the menu option.</returns>
     public IButton AddOption(string text)
     {
-      object realButton = addOptionMethod.Invoke(realPopupMenuDrawable, new object[] { text });
+      var realButton = addOptionMethod.Invoke(realPopupMenuDrawable, new object[] { text });
       return new Button(realButton, new ToolbarTypes());
     }
 
@@ -543,7 +542,7 @@ namespace ShipManifest
 
   public partial class ToolbarManager : IToolbarManager
   {
-    private static bool? toolbarAvailable = null;
+    private static bool? toolbarAvailable;
     private static IToolbarManager instance_;
 
     private object realToolbarManager;
@@ -560,7 +559,7 @@ namespace ShipManifest
 
     public IButton add(string ns, string id)
     {
-      object realButton = addMethod.Invoke(realToolbarManager, new object[] { ns, id });
+      var realButton = addMethod.Invoke(realToolbarManager, new object[] { ns, id });
       IButton button = new Button(realButton, types);
       buttons.Add(realButton, button);
       return button;
@@ -587,8 +586,8 @@ namespace ShipManifest
 
     private Delegate attachEventHandler(EventInfo @event, string methodName, object realButton)
     {
-      MethodInfo method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
-      Delegate d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
+      var method = GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Instance);
+      var d = Delegate.CreateDelegate(@event.EventHandlerType, this, method);
       @event.AddEventHandler(realButton, d);
       return d;
     }
@@ -775,7 +774,7 @@ namespace ShipManifest
   {
     internal ClickEvent(object realEvent, IButton button)
     {
-      Type type = realEvent.GetType();
+      var type = realEvent.GetType();
       Button = button;
       MouseButton = (int)type.GetField("MouseButton", BindingFlags.Public | BindingFlags.Instance).GetValue(realEvent);
     }
@@ -818,7 +817,7 @@ namespace ShipManifest
       functionVisibilityType = getType("Toolbar.FunctionVisibility");
       functionDrawableType = getType("Toolbar.FunctionDrawable");
 
-      Type iButtonType = getType("Toolbar.IButton");
+      var iButtonType = getType("Toolbar.IButton");
       button = new ButtonTypes(iButtonType);
     }
 

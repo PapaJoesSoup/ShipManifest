@@ -8,7 +8,7 @@ namespace ShipManifest
   /// See: http://blog.somewhatabstract.com/2012/03/24/strongly-typed-weakreference/
   /// </summary>
   /// <typeparam name="T">The type of object being referenced.</typeparam>
-  internal class WeakReference<T> : WeakReference, ISerializable where T : class
+  internal class WeakReference<T> : WeakReference where T : class
   {
     /// <summary>
     /// Initializes a new instance of the  <see cref="WeakReference&lt;T&gt;"/> class, referencing

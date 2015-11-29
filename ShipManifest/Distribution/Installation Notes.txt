@@ -1,18 +1,38 @@
-Thanks for downloading Ship Manifest!
-
-Ship Manifest is a tool to manage your ship's "things".  I started with [url=http://forum.kerbalspaceprogram.com/threads/60936]Crew Manifest[/url] as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.  
-
-I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
-
 ----------------
-Current Version 4.4.1.1 - Release 09 Jul, 2015 - Tooltips & Science Xfer Improvements.
+Ship Manifest
+----------------
+Current Version 4.5.0.0 - Release xx Dec, 2015 - Refactor Edition.
+
+KSP Version supported:  1.0.5
 ----------------
 
----------
+----------------
 Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
           CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
----------
+Source (Github):  http://github.com/PapaJoesSoup/ShipManifest
+WIKI (Github):  http://github.com/PapaJoesSoup/ShipManifest/wiki
+----------------
+
+----------------
+License:  CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/.  
+          Original license on Crew Manifest was do as you want.  I felt the original and contributing authors deserve due attribution, 
+          since this is a derivative work.
+----------------
+
+----------------
+What's New:
+----------------
+- New:  Massive refactor and reorgainization of code.  
+- Fixed:  Corrected staging error where SM cannot be displayed.  
+
+
+Thanks for downloading Ship Manifest!
+
+Ship Manifest is a tool to manage your ship's "things".  I started with Crew Manifest (http://forum.kerbalspaceprogram.com/threads/60936) as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.  
+
+I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
+
 
 NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
 	- Blizzy's Toolbar. http://forum.kerbalspaceprogram.com/threads/60863.
@@ -26,45 +46,16 @@ NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is de
 --------------------
 Installation steps: 
 --------------------
-
 1.  Remove any previous installation of ShipManifest from your GameData folder.
 2.  Overwrite your GameData folder with the contents of the archive.  
 
-------------
-What's New:
-------------
-Version 4.4.1.1 - Release 09 July, 2015 - Tooltips & Science Xfer Improvements.
-- Fixed:  Correct a display error with science tooltip when an experiment result key is not found.  Now displays the default key's data.
-
-Version 4.4.1.0 - Release 05 July, 2015 - Tooltips & Science Xfer Improvements.
-- New:  Refactored and expanded Tooltips.  Changed background, positioning, anchor points, font styles & colors for better readability.  Added more tooltips to various windows and tabs.
-- New:  Added Control Window Tooltip control to settings.  If control window Tooltips is off, all tab tooltip settings are disabled.
-- New:  Added linkage of Control Window Tab Tooltip settings to the Control Window ToolTip control.  They now act as children.  
-- New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behavior and layout.
-- New:  Added labels to button headers in Roster Window.
-- New:  Added 2 additional Roster List Filters.  "Assigned" and "Frozen".
-- New:  Added active window screen edge managment.  No more positioning windows beyond the screen edge when moving.
-- Fixed:  Control window close button (upper right) did not display tooltip.
-- Fixed:  Some Roster window action buttons have incorrect text when in Space Center.
-
-----------
-License:  CC BY-NC-SA 4.0
-----------
-
-http://creativecommons.org/licenses/by-nc-sa/4.0/.  Original license on Crew Manifest was do as you want.  I felt the original and contributing authors deserve due attribution, since this is a derivative work.
-
----------------
-Source code:  http://github.com/PapaJoesSoup/ShipManifest
----------------
-
----------------
-WIKI:  http://github.com/PapaJoesSoup/ShipManifest/wiki
----------------
 
 ------------	
 Videos:
 ------------	
+ - Kottabos did a fine review here:  www.youtube.com/watch?v=I_TNxjnW234 (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
 
- - Kottabos did a fine review here:  [url]www.youtube.com/watch?v=I_TNxjnW234[/url] (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
-
-This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.
+------------	
+Acknoledgments:
+------------	
+ - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.

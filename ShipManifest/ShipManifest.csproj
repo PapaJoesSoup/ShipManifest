@@ -74,34 +74,42 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ModDockedVessel.cs" />
+    <Compile Include="Modules\ModDockedVessel.cs" />
+    <Compile Include="Process\Transfers.cs" />
+    <Compile Include="SMPart.cs" />
     <Compile Include="SMToolTips.cs" />
-    <Compile Include="TransferCrew.cs" />
-    <Compile Include="InstalledMods.cs" />
-    <Compile Include="ModAntenna.cs" />
-    <Compile Include="CLSClient.cs" />
-    <Compile Include="ModLight.cs" />
-    <Compile Include="ModSolarPanel.cs" />
-    <Compile Include="TransferResource.cs" />
+    <Compile Include="Process\TransferCrew.cs" />
+    <Compile Include="APIClients\InstalledMods.cs" />
+    <Compile Include="Modules\ModAntenna.cs" />
+    <Compile Include="APIClients\CLSClient.cs" />
+    <Compile Include="Modules\ModLight.cs" />
+    <Compile Include="Modules\ModSolarPanel.cs" />
+    <Compile Include="Process\TransferResource.cs" />
     <Compile Include="SMHighlighter.cs" />
-    <Compile Include="TabAntenna.cs" />
-    <Compile Include="UtilsGui.cs" />
-    <Compile Include="WindowControl.cs" />
-    <Compile Include="WindowDebugger.cs" />
-    <Compile Include="ModHatch.cs" />
-    <Compile Include="TabHatch.cs" />
+    <Compile Include="APIClients\ToolbarWrapper.cs" />
+    <Compile Include="Windows\Tabs\TabAntenna.cs" />
+    <Compile Include="Windows\Tabs\TabConfig.cs" />
+    <Compile Include="Windows\Tabs\TabHighlight.cs" />
+    <Compile Include="Windows\Tabs\TabInstalledMods.cs" />
+    <Compile Include="Windows\Tabs\TabRealism.cs" />
+    <Compile Include="Windows\Tabs\TabSounds.cs" />
+    <Compile Include="Windows\Tabs\TabToolTips.cs" />
+    <Compile Include="Windows\UtilsGui.cs" />
+    <Compile Include="Windows\WindowControl.cs" />
+    <Compile Include="Windows\WindowDebugger.cs" />
+    <Compile Include="Modules\ModHatch.cs" />
+    <Compile Include="Windows\Tabs\TabHatch.cs" />
     <Compile Include="SMStyle.cs" />
-    <Compile Include="ModKerbal.cs" />
-    <Compile Include="TabLight.cs" />
-    <Compile Include="WindowRoster.cs" />
+    <Compile Include="Modules\ModKerbal.cs" />
+    <Compile Include="Windows\Tabs\TabLight.cs" />
+    <Compile Include="Windows\WindowRoster.cs" />
     <Compile Include="SMSettings.cs" />
-    <Compile Include="WindowSettings.cs" />
+    <Compile Include="Windows\WindowSettings.cs" />
     <Compile Include="SMAddon.cs" />
-    <Compile Include="WindowManifest.cs" />
-    <Compile Include="ToolbarWrapper.cs" />
-    <Compile Include="TabSolarPanel.cs" />
-    <Compile Include="WindowTransfer.cs" />
-    <Compile Include="SMController.cs" />
+    <Compile Include="Windows\WindowManifest.cs" />
+    <Compile Include="Windows\Tabs\TabSolarPanel.cs" />
+    <Compile Include="Windows\WindowTransfer.cs" />
+    <Compile Include="SMVessel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="WeakReference.cs" />
@@ -109,6 +117,11 @@
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\DFInterface.dll" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll.mdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.pdb" />
+    <Content Include="Distribution\GameData\ShipManifest\Plugins\SMInterface.pdb" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />
@@ -128,10 +141,6 @@
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_38.png" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Distribution\GameData\ShipManifest\Plugins\PluginData\SMSettings.dat" />
     <None Include="Distribution\GameData\ShipManifest\ShipManifest.version" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\14214-1.ogg" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\14214-2.ogg" />
@@ -146,15 +155,28 @@
       <Name>SMInterface</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Distribution\GameData\ShipManifest\Plugins\PluginData\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.pdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\SMInterface.pdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
 copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
 copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+
 copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
 copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
 copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-</PostBuildEvent>
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.pdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\SMInterface.pdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+
+cd "$(TargetDir)"
+call "E:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin\cli.bat"  "E:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe" ShipManifest.dll
+
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.dll.mdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.dll.mdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

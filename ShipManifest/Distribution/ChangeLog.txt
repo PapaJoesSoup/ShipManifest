@@ -1,4 +1,8 @@
-﻿Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
+﻿Version 4.5.0.0 - Release xx Dec, 2015 - Refactor Edition.
+- New:  Massive refactor and reorgainization of code.  
+- Fixed:  Corrected staging error where SM cannot be displayed.  
+
+Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
 - New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  
         KSP 1.0.5 now supports native kerbal profession managment, so kerbal profession now saves to game save.  
         Updated SM to use new trait attribute of the kerbal object.  Also supports old game saves.  
