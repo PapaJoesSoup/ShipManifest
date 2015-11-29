@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using ShipManifest.APIClients;
-using ShipManifest.Modules;
+﻿using System.Globalization;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -372,12 +369,6 @@ namespace ShipManifest.Windows.Tabs
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
-    }
-
-    private static Rect GetRect(Rect  _rect, float scrollX, float scrollY)
-    {
-      var new_rect = new Rect(scrollX + _rect.x, scrollY + _rect.y, _rect.width, _rect.height);
-      return new_rect;
     }
   }
 }

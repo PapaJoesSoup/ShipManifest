@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using ConnectedLivingSpace;
-using ShipManifest.Modules;
 
 namespace ShipManifest.Windows.Tabs
 {

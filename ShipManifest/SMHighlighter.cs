@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using HighlightingSystem;
-using ConnectedLivingSpace;
 
 namespace ShipManifest
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using ShipManifest.APIClients;
-using ShipManifest.Modules;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
 {
@@ -27,8 +23,8 @@ namespace ShipManifest.Windows.Tabs
       ToolTipActive = false;
 
       Position = WindowSettings.Position;
-      var scrollX = Position.x + 20;
-      var scrollY = Position.y + 50 - displayViewerPosition.y;
+      var scrollX = 20;
+      var scrollY = 50;
 
       // Enable Tool Tips
       GUI.enabled = true;
@@ -93,7 +89,8 @@ namespace ShipManifest.Windows.Tabs
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
-      GUI.enabled = SMSettings.ShowToolTips && WindowControl.ShowToolTips;
+
+      GUI.enabled = SMSettings.ShowToolTips && WindowSettings.ShowToolTips;
 
       GUILayout.BeginHorizontal();
       _label = "Realism Tab Tool Tips";
@@ -153,7 +150,7 @@ namespace ShipManifest.Windows.Tabs
       _toolTip += "Requires global ToolTips setting to be enabled.";
       _toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
+      GUILayout.Space(40);
       TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, _guiLabel, GUILayout.Width(300));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
@@ -166,7 +163,7 @@ namespace ShipManifest.Windows.Tabs
       _toolTip += "\r\nRequires global ToolTips setting to be enabled.";
       _toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
+      GUILayout.Space(40);
       TabInstalledMods.ShowToolTips = GUILayout.Toggle(TabInstalledMods.ShowToolTips, _guiLabel, GUILayout.Width(300));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
@@ -174,6 +171,7 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       GUI.enabled = true;
+
       GUILayout.BeginHorizontal();
       _label = "Roster Window Tool Tips";
       _toolTip = "Turns tooltips On or Off for the Roster Window only.";
@@ -185,6 +183,7 @@ namespace ShipManifest.Windows.Tabs
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+
       GUILayout.BeginHorizontal();
       _label = "Control Window Tool Tips";
       _toolTip = "Turns tooltips On or Off for the Control Window only.";

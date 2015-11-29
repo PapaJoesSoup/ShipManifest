@@ -283,6 +283,24 @@ namespace ShipManifest
         WindowSettings.ShowToolTips = settingsNode.HasValue("SettingsToolTips")
           ? bool.Parse(settingsNode.GetValue("SettingsToolTips"))
           : WindowSettings.ShowToolTips;
+        TabRealism.ShowToolTips = settingsNode.HasValue("RealismToolTips")
+          ? bool.Parse(settingsNode.GetValue("RealismToolTips"))
+          : TabRealism.ShowToolTips;
+        TabHighlight.ShowToolTips = settingsNode.HasValue("HighlightingToolTips")
+          ? bool.Parse(settingsNode.GetValue("HighlightingToolTips"))
+          : TabHighlight.ShowToolTips;
+        TabToolTips.ShowToolTips = settingsNode.HasValue("ToolTipsToolTips")
+          ? bool.Parse(settingsNode.GetValue("ToolTipsToolTips"))
+          : TabToolTips.ShowToolTips;
+        TabSounds.ShowToolTips = settingsNode.HasValue("SoundsToolTips")
+          ? bool.Parse(settingsNode.GetValue("SoundsToolTips"))
+          : TabSounds.ShowToolTips;
+        TabConfig.ShowToolTips = settingsNode.HasValue("ConfigToolTips")
+          ? bool.Parse(settingsNode.GetValue("ConfigToolTips"))
+          : TabConfig.ShowToolTips;
+        TabInstalledMods.ShowToolTips = settingsNode.HasValue("InstalledModsToolTips")
+          ? bool.Parse(settingsNode.GetValue("InstalledModsToolTips"))
+          : TabInstalledMods.ShowToolTips;
         WindowRoster.ShowToolTips = settingsNode.HasValue("RosterToolTips")
           ? bool.Parse(settingsNode.GetValue("RosterToolTips"))
           : WindowRoster.ShowToolTips;
@@ -442,6 +460,12 @@ namespace ShipManifest
         WriteValue(settingsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
         WriteValue(settingsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
         WriteValue(settingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
+        WriteValue(settingsNode, "RealismToolTips", TabRealism.ShowToolTips);
+        WriteValue(settingsNode, "HighlightingToolTips", TabHighlight.ShowToolTips);
+        WriteValue(settingsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
+        WriteValue(settingsNode, "SoundsToolTips", TabSounds.ShowToolTips);
+        WriteValue(settingsNode, "ConfigToolTips", TabConfig.ShowToolTips);
+        WriteValue(settingsNode, "InstalledModsToolTips", TabInstalledMods.ShowToolTips);
         WriteValue(settingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
         WriteValue(settingsNode, "ControlToolTips", WindowControl.ShowToolTips);
         WriteValue(settingsNode, "HatchToolTips", TabHatch.ShowToolTips);

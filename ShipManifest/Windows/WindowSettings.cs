@@ -1,6 +1,4 @@
-﻿using System.Globalization;
-using ShipManifest.APIClients;
-using ShipManifest.Windows.Tabs;
+﻿using ShipManifest.Windows.Tabs;
 using UnityEngine;
 
 namespace ShipManifest.Windows

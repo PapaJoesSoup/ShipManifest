@@ -1,8 +1,4 @@
-﻿using System;
-using System.Globalization;
-using ShipManifest.APIClients;
-using ShipManifest.Modules;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
 {
@@ -27,8 +23,8 @@ namespace ShipManifest.Windows.Tabs
       ToolTipActive = false;
 
       Position = WindowSettings.Position;
-      var scrollX = Position.x + 20;
-      var scrollY = Position.y + 50 - displayViewerPosition.y;
+      var scrollX = 20;
+      var scrollY = 50;
 
       GUILayout.Label("Sounds", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));

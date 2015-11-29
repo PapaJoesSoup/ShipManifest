@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using ShipManifest.APIClients;
-using ShipManifest.Modules;
+﻿using ShipManifest.APIClients;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -11,10 +8,10 @@ namespace ShipManifest.Windows.Tabs
     internal static bool ShowAllAssemblies;
 
     // GUI tooltip and label support
-    private static string _toolTip = "";
-    private static Rect _rect;
-    private static string _label = "";
-    private static GUIContent _guiLabel;
+    //private static string _toolTip = "";
+    //private static Rect _rect;
+    //private static string _label = "";
+    //private static GUIContent _guiLabel;
 
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -27,8 +24,8 @@ namespace ShipManifest.Windows.Tabs
       ToolTipActive = false;
 
       Position = WindowSettings.Position;
-      var scrollX = Position.x + 20;
-      var scrollY = Position.y + 50 - displayViewerPosition.y;
+      //var scrollX = 20;
+      //var scrollY = 50;
 
       GUILayout.BeginHorizontal();
       GUILayout.Label("Installed Mods  ", SMStyle.LabelTabHeader, GUILayout.Width(180));
