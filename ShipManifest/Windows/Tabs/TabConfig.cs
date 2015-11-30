@@ -16,12 +16,15 @@ namespace ShipManifest.Windows.Tabs
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private static bool _canShowToolTips = true;
+
     internal static Rect Position = WindowSettings.Position;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
       ToolTipActive = false;
+      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
       var scrollX = 20;
@@ -45,7 +48,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableBlizzyToolbar = GUILayout.Toggle(SMSettings.EnableBlizzyToolbar, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       GUI.enabled = true;
@@ -56,7 +59,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.UseUnityStyle = GUILayout.Toggle(SMSettings.UseUnityStyle, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       if (SMSettings.UseUnityStyle != SMSettings.PrevUseUnityStyle)
         SMStyle.WindowStyle = null;
@@ -67,7 +70,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       _label = "Enable Verbose Logging";
@@ -76,7 +79,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.VerboseLogging = GUILayout.Toggle(SMSettings.VerboseLogging, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       _label = "Enable SM Debug Window On Error";
@@ -85,7 +88,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.AutoDebug = GUILayout.Toggle(SMSettings.AutoDebug, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       _label = "Save Error log on Exit";
@@ -94,7 +97,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.SaveLogOnExit = GUILayout.Toggle(SMSettings.SaveLogOnExit, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       // create Limit Error Log Length slider;
@@ -106,7 +109,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(140));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       SMSettings.ErrorLogLength = GUILayout.TextField(SMSettings.ErrorLogLength, GUILayout.Width(40));
       GUILayout.Label("(lines)", GUILayout.Width(50));
@@ -117,7 +120,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       if (!SMSettings.EnableKerbalRename)
@@ -132,7 +135,7 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.RenameWithProfession = GUILayout.Toggle(SMSettings.RenameWithProfession, _guiLabel, GUILayout.Width(300));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUI.enabled = true;
 
@@ -141,7 +144,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.AutoSave = GUILayout.Toggle(SMSettings.AutoSave, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       GUILayout.BeginHorizontal();
@@ -151,7 +154,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(120));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       TxtSaveInterval = GUILayout.TextField(TxtSaveInterval, GUILayout.Width(40));
       GUILayout.Label("(sec)", GUILayout.Width(40));

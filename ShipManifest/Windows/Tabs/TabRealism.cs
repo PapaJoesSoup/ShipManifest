@@ -16,12 +16,14 @@ namespace ShipManifest.Windows.Tabs
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private static bool _canShowToolTips = true;
     internal static Rect Position = WindowSettings.Position;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
       ToolTipActive = false;
+      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position; 
       var scrollX = 20;
@@ -46,7 +48,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.RealismMode = GUILayout.Toggle(SMSettings.RealismMode, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       // EnableCrew Mode
@@ -59,7 +61,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableCrew = GUILayout.Toggle(SMSettings.EnableCrew, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       GUILayout.EndHorizontal();
@@ -86,7 +88,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Space(20);
       SMSettings.OverrideStockCrewXfer = GUILayout.Toggle(SMSettings.OverrideStockCrewXfer, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       GUILayout.EndHorizontal();
@@ -105,7 +107,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableCls = GUILayout.Toggle(SMSettings.EnableCls, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -132,7 +134,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableScience = GUILayout.Toggle(SMSettings.EnableScience, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -153,7 +155,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableResources = GUILayout.Toggle(SMSettings.EnableResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -177,7 +179,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnablePfResources = GUILayout.Toggle(SMSettings.EnablePfResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -191,7 +193,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableXferCost = GUILayout.Toggle(SMSettings.EnableXferCost, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -205,7 +207,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
 
       // Lets parse the string to allow decimal points.
@@ -222,7 +224,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -253,7 +255,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       strFlowRate = GUILayout.TextField(strFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
@@ -263,7 +265,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strFlowRate, out newRate))
@@ -279,7 +281,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
@@ -291,7 +293,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       strMinFlowRate = GUILayout.TextField(strMinFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
@@ -299,7 +301,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMinFlowRate, out newRate))
@@ -313,7 +315,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       strMaxFlowRate = GUILayout.TextField(strMaxFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
@@ -321,7 +323,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowRate, out newRate))
@@ -339,7 +341,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       strMaxFlowTime = GUILayout.TextField(strMaxFlowTime, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Sec";
@@ -351,7 +353,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowTime, out newRate))
@@ -367,7 +369,7 @@ namespace ShipManifest.Windows.Tabs
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
     }
   }

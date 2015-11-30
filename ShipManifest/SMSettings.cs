@@ -613,13 +613,11 @@ namespace ShipManifest
       PrevLightToolTips = TabLight.ShowToolTips;
 
       PrevRealismToolTips = TabRealism.ShowToolTips;
-      PrevLightToolTips = TabToolTips.ShowToolTips;
-      PrevLightToolTips = TabSounds.ShowToolTips;
-      PrevLightToolTips = TabHighlight.ShowToolTips;
-      PrevLightToolTips = TabConfig.ShowToolTips;
-      PrevLightToolTips = TabInstalledMods.ShowToolTips;
-
-      // sounds
+      PrevToolTipsToolTips = TabToolTips.ShowToolTips;
+      PrevSoundsToolTips = TabSounds.ShowToolTips;
+      PrevHighlightToolTips = TabHighlight.ShowToolTips;
+      PrevConfigToolTips = TabConfig.ShowToolTips;
+      PrevModsToolTips = TabInstalledMods.ShowToolTips;
 
       //debugger Settings
       PrevErrorLogLength = ErrorLogLength;
@@ -669,6 +667,13 @@ namespace ShipManifest
       TabSolarPanel.ShowToolTips = PrevPanelToolTips;
       TabAntenna.ShowToolTips = PrevAntennaToolTips;
       TabLight.ShowToolTips = PrevLightToolTips;
+
+      TabRealism.ShowToolTips = PrevRealismToolTips;
+      TabHighlight.ShowToolTips = PrevHighlightToolTips;
+      TabToolTips.ShowToolTips = PrevToolTipsToolTips;
+      TabSounds.ShowToolTips = PrevSoundsToolTips;
+      TabConfig.ShowToolTips = PrevConfigToolTips;
+      TabInstalledMods.ShowToolTips = PrevModsToolTips;
 
       //debugger Settings
       PrevErrorLogLength = ErrorLogLength;

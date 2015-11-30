@@ -20,6 +20,9 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -117,11 +120,6 @@
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\DFInterface.dll" />
-    <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll.mdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.pdb" />
-    <Content Include="Distribution\GameData\ShipManifest\Plugins\SMInterface.pdb" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />
@@ -139,6 +137,11 @@
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_Off_38.png" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_24.png" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_38.png" />
+    <Content Include="LocalDev\7za_dir.txt" />
+    <Content Include="LocalDev\dist_dir.txt" />
+    <Content Include="LocalDev\ksp_dir.txt" />
+    <Content Include="LocalDev\mono_exe.txt" />
+    <Content Include="LocalDev\pdb2mdb_exe.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Distribution\GameData\ShipManifest\ShipManifest.version" />
@@ -160,23 +163,39 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.pdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\SMInterface.pdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"
+    <PostBuildEvent>echo set build Localization vars...
+set /p KSP_DIR=&lt;"$(ProjectDir)LocalDev\ksp_dir.txt"
+set /p MONO_EXE_DIR=&lt;"$(ProjectDir)LocalDev\mono_exe.txt"
+set /p PDB2MDB_EXE_DIR=&lt;"$(ProjectDir)LocalDev\pdb2mdb_exe.txt"
+set /p ZA_DIR=&lt;"$(ProjectDir)LocalDev\7za_dir.txt"
+set /p DIST_DIR=&lt;"$(ProjectDir)LocalDev\dist_dir.txt"
 
-copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\DFInterface.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\CLSInterfaces.dll" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.pdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\SMInterface.pdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
+echo Copying files to test env...
+copy /Y "$(TargetPath)" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)ShipManifest.pdb" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)SMInterface.pdb" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)CLSInterfaces.dll" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)DFInterface.dll" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
 
+echo distributing files...
+copy /Y "$(TargetPath)" "$(ProjectDir)Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)DFInterface.dll" "$(ProjectDir)Distribution\GameData\ShipManifest\Plugins\"
+copy /Y "$(TargetDir)CLSInterfaces.dll" "$(ProjectDir)Distribution\GameData\ShipManifest\Plugins\"
+
+echo building .mdb file...
 cd "$(TargetDir)"
-call "E:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\bin\cli.bat"  "E:\Program Files (x86)\Unity\Editor\Data\MonoBleedingEdge\lib\mono\4.0\pdb2mdb.exe" ShipManifest.dll
+call "%25MONO_EXE_DIR%25\cli.bat"  "%25PDB2MDB_EXE_DIR%25\pdb2mdb.exe" ShipManifest.dll
 
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.dll.mdb" "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\"
-copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipManifest.dll.mdb" "E:\KSP\ksp-win-1-0-5\KSP_win\GameData\ShipManifest\Plugins\"</PostBuildEvent>
+copy /Y "$(TargetDir)ShipManifest.dll.mdb" "%25KSP_DIR%25\GameData\ShipManifest\Plugins\"
+
+echo packaging files...
+if exist "E:\KSP\Mods\PJS\Releases\ShipManifest\Build\ShipManifest*.zip" del "E:\KSP\Mods\PJS\Releases\ShipManifest\Build\ShipManifest*.zip"
+call "%25ZA_DIR%25\7za.exe" a -tzip -r  "%25DIST_DIR%25\ShipManifest.@(VersionNumber)_%25DATE:~4,2%25%25DATE:~7,2%25%25DATE:~10,4%25.zip" "$(ProjectDir)Distribution\*.*"
+echo Build complete!</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -185,4 +204,23 @@ copy /Y "E:\KSP\Mods\PJS\Git\Source\ShipManifest\ShipManifest\bin\Debug\ShipMani
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="PostBuildMacros">
+    <GetAssemblyIdentity AssemblyFiles="$(TargetPath)">
+      <Output TaskParameter="Assemblies" ItemName="Targets" />
+    </GetAssemblyIdentity>
+    <ItemGroup>
+      <VersionNumber Include="@(Targets->'%(Version)')" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup>
+    <PostBuildEventDependsOn>
+    $(PostBuildEventDependsOn);
+    PostBuildMacros;
+  </PostBuildEventDependsOn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
+    <CurrentMonth>$([System.DateTime]::Now.Month)</CurrentMonth>
+    <CurrentDay>$([System.DateTime]::Now.Day)</CurrentDay>
+  </PropertyGroup>
 </Project>

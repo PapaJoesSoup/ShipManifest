@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using DF;
 using ShipManifest.Windows;
 using UnityEngine;
@@ -142,5 +143,6 @@ namespace ShipManifest
       else
         StrHasDecimal = false;
     }
+
   }
 }

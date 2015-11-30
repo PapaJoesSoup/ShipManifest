@@ -18,7 +18,6 @@ namespace ShipManifest.Windows.Tabs
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
-      ShowToolTips = SMSettings.ShowToolTips;
 
       GUILayout.BeginVertical();
       GUI.enabled = true;

@@ -1,6 +1,10 @@
-﻿Version 4.5.0.0 - Release xx Dec, 2015 - Refactor Edition.
+﻿Version 4.5.0.0 - Release xx Dec, 2015 - Refactoring Edition.
 - New:  Massive refactor and reorgainization of code.  
-- Fixed:  Corrected staging error where SM cannot be displayed.  
+- New:  Added build automation and distribution
+- Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
+- Fixed:  Corrected nested control displays in settings.
+- Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
+- Fixed:  Corrected staging error where SM cannot be displayed during launch.  
 
 Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
 - New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  

@@ -63,7 +63,7 @@ namespace ShipManifest
         toolTip = TabInstalledMods.ToolTip;
 
       // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
-      // Tooltip will not display if changes are made during the curreint OnGUI.  
+      // Tooltip will not display if changes are made during the current OnGUI.  
       // (Unity uses onGUI callbacks so we need to allow for the callback)
       ToolTip = toolTip;
     }

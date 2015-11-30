@@ -1,7 +1,7 @@
 ----------------
 Ship Manifest
 ----------------
-Current Version 4.5.0.0 - Release xx Dec, 2015 - Refactor Edition.
+Current Version 4.5.0.0 - Release xx Dec, 2015 - Refactoring Edition.
 
 KSP Version supported:  1.0.5
 ----------------
@@ -24,7 +24,12 @@ License:  CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/.
 What's New:
 ----------------
 - New:  Massive refactor and reorgainization of code.  
-- Fixed:  Corrected staging error where SM cannot be displayed.  
+- New:  Added build automation and distribution
+- Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
+- Fixed:  Corrected nested control displays in settings.
+- Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
+- Fixed:  Corrected staging error where SM cannot be displayed during launch.  
+----------------
 
 
 Thanks for downloading Ship Manifest!
