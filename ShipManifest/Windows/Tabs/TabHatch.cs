@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using UnityEngine;
 using ConnectedLivingSpace;
+using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
 {
-  static class TabHatch
+  internal static class TabHatch
   {
 
     internal static string ToolTip = "";

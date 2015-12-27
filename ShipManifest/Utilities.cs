@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using DF;
 using ShipManifest.Windows;
 using UnityEngine;
@@ -10,8 +9,8 @@ namespace ShipManifest
 {
   internal static class Utilities
   {
-    internal static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
-    internal static String PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
+    internal static string AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
+    internal static string PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
     internal static Vector2 DebugScrollPosition = Vector2.zero;
 
     // decimal string handlers for tex box
@@ -25,10 +24,10 @@ namespace ShipManifest
       get { return _errors; }
     }
 
-    internal static void LoadTexture(ref Texture2D tex, String fileName)
+    internal static void LoadTexture(ref Texture2D tex, string fileName)
     {
-      LogMessage(String.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info", SMSettings.VerboseLogging);
-      var img1 = new WWW(String.Format("file://{0}{1}", PlugInPath, fileName));
+      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info", SMSettings.VerboseLogging);
+      var img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
       img1.LoadImageIntoTexture(tex);
     }
 
@@ -47,29 +46,30 @@ namespace ShipManifest
             totAmount += part.Resources[selectedResource].maxAmount;
           }
         }
-        else if (selectedResource == "Crew")
+        switch (selectedResource)
         {
-          currAmount = SMAddon.SmVessel.Vessel.GetCrewCount();
-          totAmount = SMAddon.SmVessel.Vessel.GetCrewCapacity();
+          case "Crew":
+            currAmount = SMAddon.SmVessel.Vessel.GetCrewCount();
+            totAmount = SMAddon.SmVessel.Vessel.GetCrewCapacity();
 
-          // if DF installed, get total frozen and add to count.
-          if (DFInterface.IsDFInstalled)
-          {
-            var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            currAmount = cryofreezers.Select(cryoFreezer => (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault()).Aggregate(currAmount, (current, deepFreezer) => current + ((IDeepFreezer)deepFreezer).DFITotalFrozen);
-          }
+            // if DF installed, get total frozen and add to count.
+            if (DFInterface.IsDFInstalled)
+            {
+              var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+              // ReSharper disable once SuspiciousTypeConversion.Global
+              currAmount = cryofreezers.Select(cryoFreezer => (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault()).Aggregate(currAmount, (current, deepFreezer) => current + ((IDeepFreezer)deepFreezer).DFITotalFrozen);
+            }
 
-          // Now check for occupied external seats
-          // external seats that are occupied will show up in getcrewcount and getcrewcapacity
-          // Since we cannot yet xfer external crew, we need to remove them from the count..
-          var seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts where iPart.Modules.Contains("KerbalSeat") from PartModule iModule in iPart.Modules where iModule.ClassName == "KerbalSeat" select (KerbalSeat)iModule into kSeat where kSeat.Occupant != null select kSeat).ToList();
-          currAmount -= seatCount.Count;
-          totAmount -= seatCount.Count;          
-        }
-        else if (selectedResource == "Science")
-        {
-          currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double) module.GetScienceCount());
+            // Now check for occupied external seats
+            // external seats that are occupied will show up in getcrewcount and getcrewcapacity
+            // Since we cannot yet xfer external crew, we need to remove them from the count..
+            var seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts where iPart.Modules.Contains("KerbalSeat") from PartModule iModule in iPart.Modules where iModule.ClassName == "KerbalSeat" select (KerbalSeat)iModule into kSeat where kSeat.Occupant != null select kSeat).ToList();
+            currAmount -= seatCount.Count;
+            totAmount -= seatCount.Count;
+            break;
+          case "Science":
+            currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double) module.GetScienceCount());
+            break;
         }
         displayAmount = selectedResource != "Science" ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0")) : string.Format(" - ({0})", currAmount.ToString("#######0"));
       }

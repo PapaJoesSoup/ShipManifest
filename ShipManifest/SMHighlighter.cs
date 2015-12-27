@@ -216,7 +216,7 @@ namespace ShipManifest
                 if (SMSettings.EnableHighlighting)
                 {
                     step = "Showhipmanifest = true";
-                    if (SMAddon.CanShowShipManifest())
+                    if (Conditions.CanShowShipManifest())
                     {
                         step = "Clear old highlighting";
                         // Clear Highlighting on everything, start fresh

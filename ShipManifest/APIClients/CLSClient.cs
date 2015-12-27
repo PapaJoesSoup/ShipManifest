@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace ShipManifest.APIClients
 {
-  class ClsClient
+  internal class ClsClient
   {
     private static ConnectedLivingSpace.ICLSAddon _cls;
     private static bool? _clsAvailable;
@@ -11,11 +11,9 @@ namespace ShipManifest.APIClients
     public static ConnectedLivingSpace.ICLSAddon GetCls()
     {
       var clsAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ConnectedLivingSpace.CLSAddon");
-      if (clsAddonType != null)
-      {
-        var realClsAddon = clsAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
-        _cls = (ConnectedLivingSpace.ICLSAddon)realClsAddon;
-      }
+      if (clsAddonType == null) return _cls;
+      var realClsAddon = clsAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
+      _cls = (ConnectedLivingSpace.ICLSAddon)realClsAddon;
       return _cls;
     }
 

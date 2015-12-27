@@ -1,4 +1,5 @@
-﻿using ShipManifest.Windows.Tabs;
+﻿using System;
+using ShipManifest.Windows.Tabs;
 using UnityEngine;
 
 namespace ShipManifest.Windows
@@ -13,92 +14,7 @@ namespace ShipManifest.Windows
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static string ToolTip = "";
-
-    private static bool _showRealismTab = true;
-    private static bool _showHighlightTab;
-    private static bool _showConfigTab;
-    private static bool _showSoundsTab;
-    private static bool _showToolTipTab;
-    private static bool _showModsTab;
-
-    internal static bool ShowRealismTab
-    {
-      get
-      {
-        return _showRealismTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showRealismTab = value;
-      }
-    }
-    internal static bool ShowHighlightTab
-    {
-      get
-      {
-        return _showHighlightTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showHighlightTab = value;
-      }
-    }
-    internal static bool ShowConfigTab
-    {
-      get
-      {
-        return _showConfigTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showConfigTab = value;
-      }
-    }
-    internal static bool ShowSoundsTab
-    {
-      get
-      {
-        return _showSoundsTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showSoundsTab = value;
-      }
-    }
-    internal static bool ShowToolTipTab
-    {
-      get
-      {
-        return _showToolTipTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showToolTipTab = value;
-      }
-    }
-    internal static bool ShowModsTab
-    {
-      get
-      {
-        return _showModsTab;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showModsTab = value;
-      }
-    }
+    private static Tab _selectedTab = Tab.Realism;
 
     private static Vector2 _displayViewerPosition = Vector2.zero;
     internal static void Display(int windowId)
@@ -167,61 +83,76 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
 
-      var realismStyle = ShowRealismTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Realism", realismStyle, GUILayout.Height(20)))
       {
-        ShowRealismTab = true;
+        _selectedTab = Tab.Realism;
       }
       GUI.enabled = true;
-      var highlightStyle = ShowHighlightTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Highlight", highlightStyle, GUILayout.Height(20)))
       {
-        ShowHighlightTab = true;
+        _selectedTab = Tab.Highlight;
       }
-      var tooltipStyle = ShowToolTipTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("ToolTip", tooltipStyle, GUILayout.Height(20)))
       {
-        ShowToolTipTab = true;
+        _selectedTab = Tab.ToolTips;
       }
-      var soundStyle = ShowSoundsTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Sound", soundStyle, GUILayout.Height(20)))
       {
-        ShowSoundsTab = true;
+        _selectedTab = Tab.Sounds;
       }
-      var configStyle = ShowConfigTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Config", configStyle, GUILayout.Height(20)))
       {
-        ShowConfigTab = true;
+        _selectedTab = Tab.Config;
       }
-      var modStyle = ShowModsTab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var modStyle = _selectedTab == Tab.Mods ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Mods", modStyle, GUILayout.Height(20)))
       {
-        ShowModsTab = true;
+        _selectedTab = Tab.Mods;
       }
       GUILayout.EndHorizontal();
     }
 
     internal static void DisplaySelectedTab(Vector2 displayViewerPosition)
     {
-      if (ShowRealismTab)
-        TabRealism.Display(displayViewerPosition);
-      else if (ShowHighlightTab)
-        TabHighlight.Display(displayViewerPosition);
-      else if (ShowSoundsTab)
-        TabSounds.Display(displayViewerPosition);
-      else if (ShowToolTipTab)
-        TabToolTips.Display(displayViewerPosition);
-      else if (ShowConfigTab)
-        TabConfig.Display(displayViewerPosition);
-      else if (ShowModsTab)
-        TabInstalledMods.Display(displayViewerPosition);
+      switch (_selectedTab)
+      {
+        case Tab.Realism:
+          TabRealism.Display(displayViewerPosition);
+          break;
+        case Tab.Config:
+          TabConfig.Display(displayViewerPosition);
+          break;
+        case Tab.Highlight:
+          TabHighlight.Display(displayViewerPosition);
+          break;
+        case Tab.Mods:
+          TabInstalledMods.Display(displayViewerPosition);
+          break;
+        case Tab.Sounds:
+          TabSounds.Display(displayViewerPosition);
+          break;
+        case Tab.ToolTips:
+          TabToolTips.Display(displayViewerPosition);
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
     }
 
-    private static void ResetTabs()
+    private enum Tab
     {
-      _showRealismTab = _showHighlightTab = _showToolTipTab = _showSoundsTab = _showConfigTab = _showModsTab = false;
+      Realism,
+      Config,
+      Highlight,
+      Mods,
+      Sounds,
+      ToolTips
     }
-
     #endregion
   }
 }

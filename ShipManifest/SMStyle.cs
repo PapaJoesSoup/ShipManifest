@@ -32,11 +32,9 @@ namespace ShipManifest
 
     internal static void SetupGuiStyles()
     {
-      if (WindowStyle == null)
-      {
-        SMSettings.LoadColors();
-        SetStyles();
-      }
+      if (WindowStyle != null) return;
+      SMSettings.LoadColors();
+      SetStyles();
     }
 
     internal static void SetStyles()

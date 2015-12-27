@@ -12,64 +12,7 @@ namespace ShipManifest.Windows
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-
-    private static bool _showHatch;
-    private static bool _showPanel;
-    private static bool _showAntenna;
-    private static bool _showLight;
-
-    internal static bool ShowHatch
-    {
-      get
-      {
-        return _showHatch;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showHatch = value;
-      }
-    }
-    internal static bool ShowPanel
-    {
-      get
-      {
-        return _showPanel;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showPanel = value;
-      }
-    }
-    internal static bool ShowAntenna
-    {
-      get
-      {
-        return _showAntenna;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showAntenna = value;
-      }
-    }
-    internal static bool ShowLight
-    {
-      get
-      {
-        return _showLight;
-      }
-      set
-      {
-        if (value)
-          ResetTabs();
-        _showLight = value;
-      }
-    }
+    private static Tab _selectedTab = Tab.None;
 
     private static Vector2 _displayViewerPosition = Vector2.zero;
     internal static void Display(int windowId)
@@ -106,14 +49,14 @@ namespace ShipManifest.Windows
 
       if (!SMSettings.EnableCls)
         GUI.enabled = false;
-      var hatchesStyle = ShowHatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))
       {
         try
         {
           SMAddon.UpdateClsSpaces();
           SMAddon.SmVessel.GetHatches();
-          ShowHatch = !ShowHatch;
+          _selectedTab = Tab.Hatch;
         }
         catch (Exception ex)
         {
@@ -121,39 +64,39 @@ namespace ShipManifest.Windows
         }
       }
       GUI.enabled = true;
-      var panelsStyle = ShowPanel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Solar Panels", panelsStyle, GUILayout.Height(20)))
       {
         try
         {
           SMAddon.SmVessel.GetSolarPanels();
-          ShowPanel = !ShowPanel;
+          _selectedTab = Tab.Panel;
         }
         catch (Exception ex)
         {
           Utilities.LogMessage(string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
-      var antennaStyle = ShowAntenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Antennas", antennaStyle, GUILayout.Height(20)))
       {
         try
         {
           SMAddon.SmVessel.GetAntennas();
-          ShowAntenna = !ShowAntenna;
+          _selectedTab = Tab.Antenna;
         }
         catch (Exception ex)
         {
           Utilities.LogMessage(string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
-      var lightsStyle = ShowLight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      var lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Lights", lightsStyle, GUILayout.Height(20)))
       {
         try
         {
           SMAddon.SmVessel.GetLights();
-          ShowLight = !ShowLight;
+          _selectedTab = Tab.Light;
         }
         catch (Exception ex)
         {
@@ -165,67 +108,77 @@ namespace ShipManifest.Windows
 
     internal static void DisplaySelectedTab(Vector2 displayViewerPosition)
     {
-      if (ShowHatch)
-        TabHatch.Display(displayViewerPosition);
-      else if (ShowPanel)
-        TabSolarPanel.Display(displayViewerPosition);
-      else if (ShowAntenna)
-        TabAntenna.Display(displayViewerPosition);
-      else if (ShowLight)
-        TabLight.Display(displayViewerPosition);
+      switch (_selectedTab)
+      {
+        case Tab.Hatch:
+          TabHatch.Display(displayViewerPosition);
+          break;
+        case Tab.Panel:
+          TabSolarPanel.Display(displayViewerPosition);
+          break;
+        case Tab.Antenna:
+          TabAntenna.Display(displayViewerPosition);
+          break;
+        case Tab.Light:
+          TabLight.Display(displayViewerPosition);
+          break;
+        case Tab.None:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
     }
 
     internal static void DisplaySelectedActions()
     {
-      if (ShowPanel)
+      switch (_selectedTab)
       {
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Retract All Solar Panels", GUILayout.Height(20)))
-          TabSolarPanel.RetractAllPanels();
-
-        if (GUILayout.Button("Extend All Solar Panels", GUILayout.Height(20)))
-          TabSolarPanel.ExtendAllPanels();
-
-        GUILayout.EndHorizontal();
-      }
-      else if (ShowHatch)
-      {
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Close All Hatches", GUILayout.Height(20)))
-          TabHatch.CloseAllHatches();
-
-        if (GUILayout.Button("Open All Hatches", GUILayout.Height(20)))
-          TabHatch.OpenAllHatches();
-
-        GUILayout.EndHorizontal();
-      }
-      else if (ShowAntenna)
-      {
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Retract All Antennas", GUILayout.Height(20)))
-          TabAntenna.RetractAllAntennas();
-
-        if (GUILayout.Button("Extend All Antennas", GUILayout.Height(20)))
-          TabAntenna.ExtendAllAntennas();
-
-        GUILayout.EndHorizontal();
-      }
-      else if (ShowLight)
-      {
-        GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Turn Off All Lights", GUILayout.Height(20)))
-          TabLight.TurnOffAllLights();
-
-        if (GUILayout.Button("Turn On All Lights", GUILayout.Height(20)))
-          TabLight.TurnOnAllLights();
-
-        GUILayout.EndHorizontal();
+        case Tab.Panel:
+          GUILayout.BeginHorizontal();
+          if (GUILayout.Button("Retract All Solar Panels", GUILayout.Height(20)))
+            TabSolarPanel.RetractAllPanels();
+          if (GUILayout.Button("Extend All Solar Panels", GUILayout.Height(20)))
+            TabSolarPanel.ExtendAllPanels();
+          GUILayout.EndHorizontal();
+          break;
+        case Tab.Hatch:
+          GUILayout.BeginHorizontal();
+          if (GUILayout.Button("Close All Hatches", GUILayout.Height(20)))
+            TabHatch.CloseAllHatches();
+          if (GUILayout.Button("Open All Hatches", GUILayout.Height(20)))
+            TabHatch.OpenAllHatches();
+          GUILayout.EndHorizontal();
+          break;
+        case Tab.Antenna:
+          GUILayout.BeginHorizontal();
+          if (GUILayout.Button("Retract All Antennas", GUILayout.Height(20)))
+            TabAntenna.RetractAllAntennas();
+          if (GUILayout.Button("Extend All Antennas", GUILayout.Height(20)))
+            TabAntenna.ExtendAllAntennas();
+          GUILayout.EndHorizontal();
+          break;
+        case Tab.Light:
+          GUILayout.BeginHorizontal();
+          if (GUILayout.Button("Turn Off All Lights", GUILayout.Height(20)))
+            TabLight.TurnOffAllLights();
+          if (GUILayout.Button("Turn On All Lights", GUILayout.Height(20)))
+            TabLight.TurnOnAllLights();
+          GUILayout.EndHorizontal();
+          break;
+        case Tab.None:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
       }
     }
 
-    private static void ResetTabs()
+    private enum Tab
     {
-      _showHatch = _showPanel = _showAntenna = _showLight = false;
+      None,
+      Hatch,
+      Panel,
+      Antenna,
+      Light
     }
   }
 }

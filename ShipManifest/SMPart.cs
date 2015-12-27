@@ -48,12 +48,14 @@ namespace ShipManifest
 
     internal static void DumpResource(Part part, string resourceName)
     {
+      // TODO:  add time delay to dump for realism mode.
       if (part.Resources.Contains(resourceName))
         part.Resources[resourceName].amount = 0;
     }
 
     internal static void DumpResource(List<Part> partList, string resourceName)
     {
+      // TODO:  add time delay to dump for realism mode.
       foreach (var part in partList.Where(part => part.Resources.Contains(resourceName)))
       {
         part.Resources[resourceName].amount = 0;

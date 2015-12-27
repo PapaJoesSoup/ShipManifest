@@ -170,19 +170,17 @@ namespace ShipManifest.Windows
         }
         GUILayout.EndHorizontal();
 
-        if (SMSettings.EnablePfResources)
+        if (!SMSettings.EnablePfResources) return;
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("Fill Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
         {
-          GUILayout.BeginHorizontal();
-          if (GUILayout.Button("Fill Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
-          {
-            SMAddon.SmVessel.FillResources();
-          }
-          if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
-          {
-            SMAddon.SmVessel.DumpResources();
-          }
-          GUILayout.EndHorizontal();
+          SMAddon.SmVessel.FillResources();
         }
+        if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+        {
+          SMAddon.SmVessel.DumpResources();
+        }
+        GUILayout.EndHorizontal();
       }
       catch (Exception ex)
       {
@@ -200,8 +198,10 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           var width = 273;
-          if ((!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable) && resourceName != "Crew" && resourceName != "Science")
+          if (!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && resourceName != "Crew" && resourceName != "Science")
             width = 185;
+          else if (SMSettings.RealismMode && resourceName != "Crew" && resourceName != "Science")
+            width = 223;
 
           var displayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
           var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -209,12 +209,16 @@ namespace ShipManifest.Windows
           {
             ResourceButtonToggled(resourceName);
           }
-          if ((!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable) && resourceName != "Crew" && resourceName != "Science")
+          if (resourceName != "Crew" && resourceName != "Science")
           {
-            if (GUILayout.Button(string.Format("{0}", "Dump"), SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
+            if (GUILayout.Button(string.Format("{0}", "Dump"), SMStyle.ButtonStyle, GUILayout.Width(45),
+              GUILayout.Height(20)))
             {
               SMAddon.SmVessel.DumpResource(resourceName);
             }
+          }
+          if ((!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable) && resourceName != "Crew" && resourceName != "Science")
+          {
             if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.FillResource(resourceName);
@@ -233,70 +237,66 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (!SMAddon.SmVessel.TransferCrewObj.CrewXferActive && !TransferResource.ResourceXferActive)
-        {
-          // First, lets clear any highlighting...
-          SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
+        if (SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferResource.ResourceXferActive) return;
+        // First, lets clear any highlighting...
+        SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
 
-          // Now let's update our lists...
-          if (!SMAddon.SmVessel.SelectedResources.Contains(resourceName))
+        // Now let's update our lists...
+        if (!SMAddon.SmVessel.SelectedResources.Contains(resourceName))
+        {
+          // now lets determine what to do with selection
+          if (resourceName == "Crew" || resourceName == "Science" || resourceName == "ElectricCharge")
           {
-            // now lets determine what to do with selection
-            if (resourceName == "Crew" || resourceName == "Science" || resourceName == "ElectricCharge")
+            SMAddon.SmVessel.SelectedResources.Clear();
+            SMAddon.SmVessel.SelectedResources.Add(resourceName);
+          }
+          else
+          {
+            if (SMAddon.SmVessel.SelectedResources.Contains("Crew") || SMAddon.SmVessel.SelectedResources.Contains("Science") || SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge"))
             {
               SMAddon.SmVessel.SelectedResources.Clear();
               SMAddon.SmVessel.SelectedResources.Add(resourceName);
             }
+            else if (SMAddon.SmVessel.SelectedResources.Count > 1)
+            {
+              SMAddon.SmVessel.SelectedResources.RemoveRange(0, 1);
+              SMAddon.SmVessel.SelectedResources.Add(resourceName);
+            }
             else
-            {
-              if (SMAddon.SmVessel.SelectedResources.Contains("Crew") || SMAddon.SmVessel.SelectedResources.Contains("Science") || SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge"))
-              {
-                SMAddon.SmVessel.SelectedResources.Clear();
-                SMAddon.SmVessel.SelectedResources.Add(resourceName);
-              }
-              else if (SMAddon.SmVessel.SelectedResources.Count > 1)
-              {
-                SMAddon.SmVessel.SelectedResources.RemoveRange(0, 1);
-                SMAddon.SmVessel.SelectedResources.Add(resourceName);
-              }
-              else
-                SMAddon.SmVessel.SelectedResources.Add(resourceName);
-            }
+              SMAddon.SmVessel.SelectedResources.Add(resourceName);
           }
-          else if (SMAddon.SmVessel.SelectedResources.Contains(resourceName))
-          {
-            SMAddon.SmVessel.SelectedResources.Remove(resourceName);
-          }
-
-          // Now, refresh the resources parts list
-          SMAddon.SmVessel.GetSelectedResourcesParts();
-
-          // now lets reconcile the selected parts based on the new list of resources...
-          ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
-
-          // Now lets update the Xfer Objects...
-          SMAddon.SmVessel.ResourcesToXfer.Clear();
-          if (!SMAddon.SmVessel.SelectedResources.Contains("Crew") && !SMAddon.SmVessel.SelectedResources.Contains("Science"))
-          {
-            foreach (var resource in SMAddon.SmVessel.SelectedResources)
-            {
-              // Lets create a Xfer Object for managing xfer options and data.
-              var modResource = new TransferResource(resource)
-              {
-                SrcXferAmount =
-                  TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsSource,
-                    SMAddon.SmVessel.SelectedPartsTarget, resource),
-                TgtXferAmount =
-                  TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsTarget,
-                    SMAddon.SmVessel.SelectedPartsSource, resource)
-              };
-              SMAddon.SmVessel.ResourcesToXfer.Add(modResource);
-            }
-          }
-
-          // Now, based on the resourceselection, do we show the Transfer window?
-          WindowTransfer.ShowWindow = SMAddon.SmVessel.SelectedResources.Count > 0;
         }
+        else if (SMAddon.SmVessel.SelectedResources.Contains(resourceName))
+        {
+          SMAddon.SmVessel.SelectedResources.Remove(resourceName);
+        }
+
+        // Now, refresh the resources parts list
+        SMAddon.SmVessel.GetSelectedResourcesParts();
+
+        // now lets reconcile the selected parts based on the new list of resources...
+        ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+
+        // Now lets update the Xfer Objects...
+        SMAddon.SmVessel.ResourcesToXfer.Clear();
+        if (!SMAddon.SmVessel.SelectedResources.Contains("Crew") && !SMAddon.SmVessel.SelectedResources.Contains("Science"))
+        {
+          foreach (var modResource in SMAddon.SmVessel.SelectedResources.Select(resource => new TransferResource(resource)
+          {
+            SrcXferAmount =
+              TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsSource,
+                SMAddon.SmVessel.SelectedPartsTarget, resource),
+            TgtXferAmount =
+              TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsTarget,
+                SMAddon.SmVessel.SelectedPartsSource, resource)
+          }))
+          {
+            SMAddon.SmVessel.ResourcesToXfer.Add(modResource);
+          }
+        }
+
+        // Now, based on the resourceselection, do we show the Transfer window?
+        WindowTransfer.ShowWindow = SMAddon.SmVessel.SelectedResources.Count > 0;
       }
       catch (Exception ex)
       {
@@ -317,10 +317,9 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedPartsSource = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
             if (!WindowTransfer.ShowTargetVessels)
             {
-              foreach (var part in SMAddon.SmVessel.SelectedPartsSource)
+              foreach (var part in SMAddon.SmVessel.SelectedPartsSource.Where(part => SMAddon.SmVessel.SelectedPartsTarget.Contains(part)))
               {
-                if (SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
-                  SMAddon.SmVessel.SelectedPartsTarget.Remove(part);
+                SMAddon.SmVessel.SelectedPartsTarget.Remove(part);
               }
             }
           }
@@ -352,10 +351,9 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedPartsTarget = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
             if (!WindowTransfer.ShowSourceVessels)
             {
-              foreach (var part in SMAddon.SmVessel.SelectedPartsTarget)
+              foreach (var part in SMAddon.SmVessel.SelectedPartsTarget.Where(part => SMAddon.SmVessel.SelectedPartsSource.Contains(part)))
               {
-                if (SMAddon.SmVessel.SelectedPartsSource.Contains(part))
-                  SMAddon.SmVessel.SelectedPartsSource.Remove(part);
+                SMAddon.SmVessel.SelectedPartsSource.Remove(part);
               }
             }
           }
@@ -381,11 +379,9 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedPartsTarget.Clear();
             SMAddon.SmVessel.SelectedPartsTarget = newTargets;
           }
-          if (resourceNames.Contains("Crew") || resourceNames.Contains("Science"))
-          {
-            SMAddon.SmVessel.SelectedVesselsSource.Clear();
-            SMAddon.SmVessel.SelectedVesselsTarget.Clear();
-          }
+          if (!resourceNames.Contains("Crew") && !resourceNames.Contains("Science")) return;
+          SMAddon.SmVessel.SelectedVesselsSource.Clear();
+          SMAddon.SmVessel.SelectedVesselsTarget.Clear();
         }
         else
         {
@@ -454,6 +450,13 @@ namespace ShipManifest.Windows
       }
       GUILayout.EndVertical();
       GUILayout.EndScrollView();
+    }
+
+    internal enum ResourceType
+    {
+      Crew,
+      Science,
+      Other
     }
 
     #endregion
