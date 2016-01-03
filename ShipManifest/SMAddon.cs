@@ -15,9 +15,7 @@ namespace ShipManifest
   // ReSharper disable once InconsistentNaming
   internal class SMAddon : MonoBehaviour
   {
-    ///
-    /// Object Scope:  Current Unity/KSP Scene.  Object will be destroyed and recreated when scene changes!
-    ///
+    // Object Scope:  Current Unity/KSP Scene.  Object will be destroyed and recreated when scene changes!
 
     #region Static Properties
 
@@ -47,7 +45,8 @@ namespace ShipManifest
     internal static double Elapsed;
 
     // Resource xfer vars
-    internal static XferDirection XferMode = XferDirection.SourceToTarget;
+    // This is still very entrenched.   Need to look at implications for conversion to instanced.
+    internal static TransferPump.PumpType ActivePumpType = TransferPump.PumpType.SourceToTarget;
 
     // Toolbar Integration.
     private static IButton _smButtonBlizzy;
@@ -259,6 +258,7 @@ namespace ShipManifest
         Utilities.LogMessage("Error in:  SmAddon.OnDestroy.  " + ex, "Error", true);
       }
     }
+
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
@@ -289,15 +289,22 @@ namespace ShipManifest
           if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
           {
             //Instantiate the controller for the active vessel.
-            SmVessel = SMVessel.GetInstance(FlightGlobals.ActiveVessel);
+            //SmVessel = SMVessel.GetInstance(FlightGlobals.ActiveVessel);
             SMHighlighter.Update_Highlighter();
 
             // Realism Mode Resource transfer operation (real time)
             // XferOn is flagged in the Resource Controller
-            if (TransferResource.ResourceXferActive)
+            if (TransferPump.PumpXferActive)
             {
-              TransferResource.ResourceTransferProcess();
+              TransferPump.ProcessTransfer();
             }
+            else if (TransferPump.PumpDumpActive)
+            {
+              // Realism Mode Resource Dump operation (real time)
+              // XferOn is flagged in the Resource Controller
+              TransferPump.ProcessDump();
+            }
+
 
             // Realism Mode Crew transfer operation (real time)
             if (SmVessel.TransferCrewObj.CrewXferActive)
@@ -396,32 +403,6 @@ namespace ShipManifest
         SmVessel.TransferCrewObj.FromCrewMember = action.host;
         if (SmVessel.TransferCrewObj.FromPart != null && SmVessel.TransferCrewObj.ToPart != null)
           SmVessel.TransferCrewObj.IsStockXfer = true;
-      }
-    }
-
-    internal static void DisplayScreenMsg(string strMessage)
-    {
-      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-      var smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
-      {
-        var smessagesToRemove = smessages.activeMessages.Where(x => Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
-        var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
-        ScreenMessages.PostScreenMessage(strMessage, failmessage, true);
-      }
-    }
-
-    internal static void RemoveScreenMsg()
-    {
-      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-      var smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
-      {
-        var smessagesToRemove = smessages.activeMessages.Where(x => Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
       }
     }
 
@@ -626,7 +607,7 @@ namespace ShipManifest
     }
 
     // Stock Toolbar Startup and cleanup
-    private static void OnGuiAppLauncherReady()
+    private void OnGuiAppLauncherReady()
     {
       Utilities.LogMessage("SmAddon.OnGUIAppLauncherReady active...", "Info", SMSettings.VerboseLogging);
       try
@@ -691,7 +672,7 @@ namespace ShipManifest
         Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherReady.  " + ex, "Error", true);
       }
     }
-    private static void OnGuiAppLauncherDestroyed()
+    private void OnGuiAppLauncherDestroyed()
     {
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUIAppLauncherDestroyed");
       try
@@ -725,7 +706,7 @@ namespace ShipManifest
         if (WindowManifest.ShowWindow)
         {
           // SM is showing.  Turn off.
-          if (SmVessel.TransferCrewObj.CrewXferActive || TransferResource.ResourceXferActive)
+          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpXferActive)
             return;
 
           SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -737,7 +718,7 @@ namespace ShipManifest
         else
         {
           // SM is not showing. turn on if we can.
-          if (Conditions.CanShowShipManifest(true))
+          if (SMConditions.CanShowShipManifest(true))
             WindowManifest.ShowWindow = !WindowManifest.ShowWindow;
           else
             return;
@@ -799,7 +780,100 @@ namespace ShipManifest
 
     #endregion
 
-    #region Logic Methods
+    #region GUI Methods
+
+    internal void Display()
+    {
+      var step = "";
+      try
+      {
+        step = "0 - Start";
+        if (WindowDebugger.ShowWindow)
+          WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display, WindowDebugger.Title, GUILayout.MinHeight(20));
+
+        if ((HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER) && ShowUi)
+        {
+          if (WindowSettings.ShowWindow)
+          {
+            step = "4 - Show Settings";
+            WindowSettings.Position = GUILayout.Window(398546, WindowSettings.Position, WindowSettings.Display, WindowSettings.Title, GUILayout.MinHeight(20));
+          }
+
+          if (WindowRoster.ShowWindow)
+          {
+            step = "6 - Show Roster";
+            if (WindowRoster.ResetRosterSize)
+              WindowRoster.Position.height = SMSettings.UseUnityStyle ? 330 : 350;
+            WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display, WindowRoster.Title, GUILayout.MinHeight(20));
+          }
+        }
+        if (HighLogic.LoadedScene == GameScenes.FLIGHT && (FlightGlobals.fetch == null || (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
+        {
+          step = "0a - Vessel Change";
+          SmVessel.SelectedPartsSource.Clear();
+          SmVessel.SelectedPartsTarget.Clear();
+          SmVessel.SelectedResources.Clear();
+          return;
+        }
+
+        step = "1 - Show Interface(s)";
+        // Is the scene one we want to be visible in?
+        if (SMConditions.CanShowShipManifest())
+        {
+          // What windows do we want to show?
+          step = "2 - Can Show Manifest - true";
+          WindowManifest.Position = GUILayout.Window(398544, WindowManifest.Position, WindowManifest.Display, WindowManifest.Title, GUILayout.MinHeight(20));
+
+          if (WindowTransfer.ShowWindow && SmVessel.SelectedResources.Count > 0)
+          {
+            step = "3 - Show Transfer";
+            // Lets build the running totals for each resource for display in title...
+            WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display, WindowTransfer.Title, GUILayout.MinHeight(20));
+          }
+
+          if (!WindowManifest.ShowWindow || !WindowControl.ShowWindow) return;
+          step = "7 - Show Control";
+          WindowControl.Position = GUILayout.Window(398548, WindowControl.Position, WindowControl.Display, WindowControl.Title, GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+        }
+        else
+        {
+          step = "2 - Can Show Manifest = false";
+          if (!SMSettings.EnableCls || SmVessel == null) return;
+          if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+            SMHighlighter.HighlightClsVessel(false, true);
+        }
+      }
+      catch (Exception ex)
+      {
+        if (!FrameErrTripped)
+        {
+          Utilities.LogMessage(string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          FrameErrTripped = true;
+        }
+      }
+    }
+
+    internal static void RepositionWindows()
+    {
+      RepositionWindow(ref WindowManifest.Position);
+      RepositionWindow(ref WindowTransfer.Position);
+      RepositionWindow(ref WindowDebugger.Position);
+      RepositionWindow(ref WindowSettings.Position);
+      RepositionWindow(ref WindowControl.Position);
+      RepositionWindow(ref WindowRoster.Position);
+    }
+
+    internal static void RepositionWindow(ref Rect windowPosition)
+    {
+      if (windowPosition.x < 0)
+        windowPosition.x = 0;
+      if (windowPosition.y < 0)
+        windowPosition.y = 0;
+      if (windowPosition.xMax > Screen.currentResolution.width)
+        windowPosition.x = Screen.currentResolution.width - windowPosition.width;
+      if (windowPosition.yMax > Screen.currentResolution.height)
+        windowPosition.y = Screen.currentResolution.height - windowPosition.height;
+    }
 
     #endregion
 
@@ -814,16 +888,15 @@ namespace ShipManifest
         {
           if (SmVessel.TransferCrewObj.CrewXferActive && !SmVessel.TransferCrewObj.IvaDelayActive)
             SmVessel.TransferCrewObj.CrewTransferAbort();
-          if (TransferResource.ResourceXferActive && SMSettings.RealismMode)
-            TransferResource.ResourceTransferAbort();
+          if ((TransferPump.PumpXferActive || TransferPump.PumpDumpActive) && SMSettings.RealismMode)
+            TransferPump.AbortTransferProcess();
         }
 
-        if (SmVessel.Vessel != null && Conditions.CanShowShipManifest())
+        if (SmVessel.Vessel != null && SMConditions.CanShowShipManifest())
         {
           if (newVessel.isEVA && !SmVessel.Vessel.isEVA)
           {
-            if (WindowManifest.ShowWindow)
-              OnSmButtonToggle();
+            if (WindowManifest.ShowWindow) OnSmButtonToggle();
 
             // kill selected resource and its associated highlighting.
             SmVessel.SelectedResources.Clear();
@@ -985,99 +1058,6 @@ namespace ShipManifest
       }
     }
 
-    internal void Display()
-    {
-      var step = "";
-      try
-      {
-        step = "0 - Start";
-        if (WindowDebugger.ShowWindow)
-          WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display, WindowDebugger.Title, GUILayout.MinHeight(20));
-
-        if ((HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER) && ShowUi)
-        {
-          if (WindowSettings.ShowWindow)
-          {
-            step = "4 - Show Settings";
-            WindowSettings.Position = GUILayout.Window(398546, WindowSettings.Position, WindowSettings.Display, WindowSettings.Title, GUILayout.MinHeight(20));
-          }
-
-          if (WindowRoster.ShowWindow)
-          {
-            step = "6 - Show Roster";
-            if (WindowRoster.ResetRosterSize)
-              WindowRoster.Position.height = SMSettings.UseUnityStyle ? 330 : 350;
-            WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display, WindowRoster.Title, GUILayout.MinHeight(20));
-          }
-        }
-        if (HighLogic.LoadedScene == GameScenes.FLIGHT && (FlightGlobals.fetch == null || (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
-        {
-          step = "0a - Vessel Change";
-          SmVessel.SelectedPartsSource.Clear();
-          SmVessel.SelectedPartsTarget.Clear();
-          SmVessel.SelectedResources.Clear();
-          return;
-        }
-
-        step = "1 - Show Interface(s)";
-        // Is the scene one we want to be visible in?
-        if (Conditions.CanShowShipManifest())
-        {
-          // What windows do we want to show?
-          step = "2 - Can Show Manifest - true";
-          WindowManifest.Position = GUILayout.Window(398544, WindowManifest.Position, WindowManifest.Display, WindowManifest.Title, GUILayout.MinHeight(20));
-
-          if (WindowTransfer.ShowWindow && SmVessel.SelectedResources.Count > 0)
-          {
-            step = "3 - Show Transfer";
-            // Lets build the running totals for each resource for display in title...
-            WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display, WindowTransfer.Title, GUILayout.MinHeight(20));
-          }
-
-          if (!WindowManifest.ShowWindow || !WindowControl.ShowWindow) return;
-          step = "7 - Show Control";
-          WindowControl.Position = GUILayout.Window(398548, WindowControl.Position, WindowControl.Display, WindowControl.Title, GUILayout.MinWidth(350), GUILayout.MinHeight(20));
-        }
-        else
-        {
-          step = "2 - Can Show Manifest = false";
-          if (!SMSettings.EnableCls || SmVessel == null) return;
-          if (SmVessel.SelectedResources.Contains("Crew"))
-            SMHighlighter.HighlightClsVessel(false, true);
-        }
-      }
-      catch (Exception ex)
-      {
-        if (!FrameErrTripped)
-        {
-          Utilities.LogMessage(string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-          FrameErrTripped = true;
-        }
-      }
-    }
-
-    internal static void RepositionWindows()
-    {
-      RepositionWindow(ref WindowManifest.Position);
-      RepositionWindow(ref WindowTransfer.Position);
-      RepositionWindow(ref WindowDebugger.Position);
-      RepositionWindow(ref WindowSettings.Position);
-      RepositionWindow(ref WindowControl.Position);
-      RepositionWindow(ref WindowRoster.Position);
-    }
-
-    internal static void RepositionWindow(ref Rect windowPosition)
-    {
-      if (windowPosition.x < 0)
-        windowPosition.x = 0;
-      if (windowPosition.y < 0)
-        windowPosition.y = 0;
-      if (windowPosition.xMax > Screen.currentResolution.width)
-        windowPosition.x = Screen.currentResolution.width - windowPosition.width;
-      if (windowPosition.yMax > Screen.currentResolution.height)
-        windowPosition.y = Screen.currentResolution.height - windowPosition.height;
-    }
-
     internal static void LoadSounds(string soundType, string path1, string path2, string path3, double dblVol)
     {
       try
@@ -1129,6 +1109,40 @@ namespace ShipManifest
       }
     }
 
+    internal static void FireEventTriggers()
+    {
+      // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
+      // and instructions for using CLS API by codepoet.
+      Utilities.LogMessage("FireEventTriggers:  Active.", "info", SMSettings.VerboseLogging);
+      GameEvents.onVesselChange.Fire(SmVessel.Vessel);
+    }
+
+    internal static void DisplayScreenMsg(string strMessage)
+    {
+      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+      var smessages = FindObjectOfType<ScreenMessages>();
+      if (smessages != null)
+      {
+        var smessagesToRemove = smessages.activeMessages.Where(x => Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+        foreach (var m in smessagesToRemove)
+          ScreenMessages.RemoveMessage(m);
+        var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
+        ScreenMessages.PostScreenMessage(strMessage, failmessage, true);
+      }
+    }
+
+    internal static void RemoveScreenMsg()
+    {
+      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+      var smessages = FindObjectOfType<ScreenMessages>();
+      if (smessages != null)
+      {
+        var smessagesToRemove = smessages.activeMessages.Where(x => Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance && x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+        foreach (var m in smessagesToRemove)
+          ScreenMessages.RemoveMessage(m);
+      }
+    }
+
     // This method is used for autosave...
     internal void RunSave()
     {
@@ -1144,30 +1158,7 @@ namespace ShipManifest
       }
     }
 
-    internal static void FireEventTriggers()
-    {
-      // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
-      // and instructions for using CLS API by codepoet.
-      Utilities.LogMessage("FireEventTriggers:  Active.", "info", SMSettings.VerboseLogging);
-      GameEvents.onVesselChange.Fire(SmVessel.Vessel);
-    }
-
     #endregion
-
-    internal enum XferDirection
-    {
-      SourceToTarget,
-      TargetToSource
-    }
-
-    internal enum Window
-    {
-      WindowControl,
-      WindowDebugger,
-      WindowManifest,
-      WindowSettings,
-      WindowTransfer
-    }
   }
 
   internal class ShipManifestModule : PartModule
@@ -1190,180 +1181,4 @@ namespace ShipManifest
     }
   }
 
-  internal static class Conditions
-  {   
-    internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
-    {
-      var results = false;
-      try
-      {
-        if (SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferResource.ResourceXferActive)
-        {
-          WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
-          return false;
-        }
-        if (selectedPartsSource.Count == 0 || selectedPartsTarget.Count == 0)
-        {
-          WindowTransfer.XferToolTip = "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
-          return false;
-        }
-        if (selectedPartsSource[0] == selectedPartsTarget[0])
-        {
-          WindowTransfer.XferToolTip = "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
-          return false;
-        }
-        // If one of the parts is a DeepFreeze part and no crew are showing in protoModuleCrew, check it isn't full of frozen Kerbals. 
-        // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
-        // If there is just one spare seat or seat taken by a Thawed Kerbal that is OK because SM will just transfer them into the empty
-        // seat or swap them with a thawed Kerbal.
-        var sourcepartFrzr = selectedPartsSource[0].FindModuleImplementing<IDeepFreezer>();
-        var targetpartFrzr = selectedPartsTarget[0].FindModuleImplementing<IDeepFreezer>();
-        if (sourcepartFrzr != null)
-        {
-          if (sourcepartFrzr.DFIFreezerSpace == 0)
-          {
-            WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
-            return false;
-          }
-        }
-        if (targetpartFrzr != null)
-        {
-          if (targetpartFrzr.DFIFreezerSpace == 0)
-          {
-            WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
-            return false;
-          }
-        }
-
-        // Are there kerbals to move?
-        if (selectedPartsSource[0].protoModuleCrew.Count == 0)
-        {
-          WindowTransfer.XferToolTip = "No Kerbals to Move.";
-          return false;
-        }
-        // now if realism mode, are the parts connected to each other in the same living space?
-        results = IsClsInSameSpace();
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-      }
-      if (WindowTransfer.XferToolTip == "")
-        WindowTransfer.XferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
-      return results;
-    }
-
-    private static bool IsClsInSameSpace()
-    {
-      var results = false;
-      try
-      {
-        if (SMSettings.EnableCls && SMSettings.RealismMode)
-        {
-          if (SMAddon.ClsAddon.Vessel != null)
-          {
-            if (SMAddon.SmVessel.ClsSpaceSource == null || SMAddon.SmVessel.ClsSpaceTarget == null)
-              SMAddon.UpdateClsSpaces();
-            if (SMAddon.SmVessel.ClsSpaceSource != null && SMAddon.SmVessel.ClsSpaceTarget != null)
-            {
-              if (SMAddon.SmVessel.ClsSpaceSource == SMAddon.SmVessel.ClsSpaceTarget)
-              {
-                WindowTransfer.XferToolTip = "Source & Target Part are in the same space.\r\nInternal Xfers are allowed.";
-                results = true;
-              }
-              else
-                WindowTransfer.XferToolTip = "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
-            }
-            else
-              WindowTransfer.XferToolTip = "You should NOT be seeing this, as Source or Target Space is missing.\r\nPlease reselect source or target part.";
-          }
-          else
-            WindowTransfer.XferToolTip = "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
-        }
-        else
-        {
-          WindowTransfer.XferToolTip = "Realism and/or CLS disabled.\r\nXfers anywhere are allowed.";
-          results = true;
-        }
-      }
-      catch (Exception ex)
-      {
-        if (!SMAddon.FrameErrTripped)
-        {
-          Utilities.LogMessage(string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-          SMAddon.FrameErrTripped = true;
-        }
-      }
-      //Utilities.LogMessage("IsInCLS() - results = " + results.ToString() , "info", Settings.VerboseLogging);
-      return results;
-    }
-
-    internal static bool CanShowShipManifest(bool ignoreShowSm = false)
-    {
-      try
-      {
-        var canShow = false;
-        if (SMAddon.ShowUi
-            && HighLogic.LoadedScene == GameScenes.FLIGHT
-          //&& !MapView.MapIsEnabled
-            && !IsPauseMenuOpen()
-            && !IsFlightDialogDisplaying()
-            && FlightGlobals.fetch != null
-            && FlightGlobals.ActiveVessel != null
-            && !FlightGlobals.ActiveVessel.isEVA
-            && FlightGlobals.ActiveVessel.vesselType != VesselType.Flag
-            && FlightGlobals.ActiveVessel.vesselType != VesselType.Debris
-            && FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
-            && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
-            )
-          canShow = ignoreShowSm || WindowManifest.ShowWindow;
-        return canShow;
-      }
-      catch (Exception ex)
-      {
-        if (!SMAddon.FrameErrTripped)
-        {
-          var values = "SmAddon.ShowUI = " + SMAddon.ShowUi + "\r\n";
-          values += "HighLogic.LoadedScene = " + HighLogic.LoadedScene + "\r\n";
-          //values += "!MapView.MapIsEnabled = " +MapView.MapIsEnabled.ToString() + "\r\n";
-          values += "PauseMenu.isOpen = " + IsPauseMenuOpen() + "\r\n";
-          values += "FlightResultsDialog.isDisplaying = " + IsFlightDialogDisplaying() + "\r\n";
-          values += "FlightGlobals.fetch != null = " + (FlightGlobals.fetch != null) + "\r\n";
-          values += "FlightGlobals.ActiveVessel != null = " + (FlightGlobals.ActiveVessel != null) + "\r\n";
-          values += "!FlightGlobals.ActiveVessel.isEVA = " + (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA) + "\r\n";
-          if (FlightGlobals.ActiveVessel != null)
-            values += "FlightGlobals.ActiveVessel.vesselType = " + FlightGlobals.ActiveVessel.vesselType + "\r\n";
-          values += "CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = " + (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
-
-          Utilities.LogMessage(string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}", ex.Message, ex.StackTrace, values), "Error", true);
-          SMAddon.FrameErrTripped = true;
-        }
-        return false;
-      }
-    }
-
-    internal static bool IsFlightDialogDisplaying()
-    {
-      try
-      {
-        return FlightResultsDialog.isDisplaying;
-      }
-      catch
-      {
-        return false;
-      }
-    }
-
-    internal static bool IsPauseMenuOpen()
-    {
-      try
-      {
-        return PauseMenu.isOpen;
-      }
-      catch
-      {
-        return false;
-      }
-    }
-  }
 }

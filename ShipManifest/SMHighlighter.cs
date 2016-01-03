@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ShipManifest.Process;
 
 namespace ShipManifest
 {
@@ -12,7 +13,7 @@ namespace ShipManifest
 
         // WindowTransfer part mouseover vars
         internal static bool IsMouseOver;
-        internal static SMAddon.XferDirection MouseOverMode = SMAddon.XferDirection.SourceToTarget;
+        internal static TransferPump.PumpType MouseOverMode = TransferPump.PumpType.SourceToTarget;
         internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
         internal static Part MouseOverpart;
         internal static List<Part> MouseOverparts;
@@ -216,7 +217,7 @@ namespace ShipManifest
                 if (SMSettings.EnableHighlighting)
                 {
                     step = "Showhipmanifest = true";
-                    if (Conditions.CanShowShipManifest())
+                    if (SMConditions.CanShowShipManifest())
                     {
                         step = "Clear old highlighting";
                         // Clear Highlighting on everything, start fresh
@@ -245,7 +246,7 @@ namespace ShipManifest
                         if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
                         {
                             // If Crew and cls, perform cls Highlighting
-                            if (SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains("Crew"))
+                            if (SMConditions.IsClsHighlightingEnabled())
                             {
                                 step = "Highlight CLS vessel";
                                 HighlightClsVessel(true, true);
@@ -262,7 +263,7 @@ namespace ShipManifest
                             var partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
 
                             // match color used by CLS if active
-                            if (SMAddon.SmVessel.SelectedResources.Contains("Crew") && SMSettings.EnableCls)
+                            if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMSettings.EnableCls)
                                 partColor = Color.green;
 
                             step = "Set Resource Part Colors";
@@ -273,7 +274,7 @@ namespace ShipManifest
 
                             step = "Set Selected Part Colors";
                             SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
-                            if (SMAddon.SmVessel.SelectedResources.Contains("Crew") && SMSettings.EnableCls)
+                            if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMSettings.EnableCls)
                                 SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartCrewColor]);
                             else
                                 SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);

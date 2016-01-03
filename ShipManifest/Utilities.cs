@@ -38,7 +38,7 @@ namespace ShipManifest
       double totAmount = 0;
       try
       {
-        if (selectedResource != "Crew" && selectedResource != "Science")
+        if (SMConditions.IsResourceTypeOther(selectedResource))
         {
           foreach (var part in SMAddon.SmVessel.PartsByResource[selectedResource])
           {
@@ -46,9 +46,9 @@ namespace ShipManifest
             totAmount += part.Resources[selectedResource].maxAmount;
           }
         }
-        switch (selectedResource)
+        switch (SMConditions.TypeOfResource(selectedResource))
         {
-          case "Crew":
+          case SMConditions.ResourceType.Crew:
             currAmount = SMAddon.SmVessel.Vessel.GetCrewCount();
             totAmount = SMAddon.SmVessel.Vessel.GetCrewCapacity();
 
@@ -67,11 +67,11 @@ namespace ShipManifest
             currAmount -= seatCount.Count;
             totAmount -= seatCount.Count;
             break;
-          case "Science":
+          case SMConditions.ResourceType.Science:
             currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double) module.GetScienceCount());
             break;
         }
-        displayAmount = selectedResource != "Science" ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0")) : string.Format(" - ({0})", currAmount.ToString("#######0"));
+        displayAmount = selectedResource != SMConditions.ResourceType.Science.ToString() ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0")) : string.Format(" - ({0})", currAmount.ToString("#######0"));
       }
       catch (Exception ex)
       {

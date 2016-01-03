@@ -208,7 +208,7 @@ namespace ShipManifest.Process
                 var path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
                 var path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
 
-                SMAddon.LoadSounds("Crew", path1, path2, path3, SMSettings.CrewSoundVol);
+                SMAddon.LoadSounds(SMConditions.ResourceType.Crew.ToString(), path1, path2, path3, SMSettings.CrewSoundVol);
               }
               break;
 

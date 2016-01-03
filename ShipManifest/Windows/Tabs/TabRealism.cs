@@ -68,7 +68,7 @@ namespace ShipManifest.Windows.Tabs
 
       if (!SMSettings.EnableCrew && HighLogic.LoadedSceneIsFlight)
       {
-        if (SMAddon.SmVessel.SelectedResources.Contains("Crew"))
+        if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
           // Clear Resource selection.
           SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
@@ -115,12 +115,12 @@ namespace ShipManifest.Windows.Tabs
       {
         if (!SMSettings.EnableCls)
           SMHighlighter.HighlightClsVessel(false, true);
-        else if (SMAddon.SmVessel.SelectedResources.Contains("Crew"))
+        else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
           // Update spaces and reassign the resource to observe new settings.
           SMAddon.UpdateClsSpaces();
           SMAddon.SmVessel.SelectedResources.Clear();
-          SMAddon.SmVessel.SelectedResources.Add("Crew");
+          SMAddon.SmVessel.SelectedResources.Add(SMConditions.ResourceType.Crew.ToString());
         }
       }
 
@@ -141,7 +141,7 @@ namespace ShipManifest.Windows.Tabs
       if (!SMSettings.EnableScience && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
-        if (SMAddon.SmVessel.SelectedResources.Contains("Science"))
+        if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
           SMAddon.SmVessel.SelectedResources.Clear();
       }
 
@@ -162,7 +162,7 @@ namespace ShipManifest.Windows.Tabs
       if (!SMSettings.EnableResources && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
-        if (SMAddon.SmVessel.SelectedResources.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains("Crew") && !SMAddon.SmVessel.SelectedResources.Contains("Science"))
+        if (SMAddon.SmVessel.SelectedResources.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
           SMAddon.SmVessel.SelectedResources.Clear();
       }
 

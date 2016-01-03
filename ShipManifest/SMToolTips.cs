@@ -17,55 +17,14 @@ namespace ShipManifest
 
     internal static void ShowToolTips()
     {
-      if (ToolTip != null && ToolTip.Trim().Length > 0)
+      if (!string.IsNullOrEmpty(ToolTip))
       {
         //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), "Info", Settings.VerboseLogging);
         ShowToolTip(ToolTipPos, ToolTip);
       }
 
       // Obtain the new value from the last repaint.
-      var toolTip = "";
-      if (WindowTransfer.ToolTip != null && WindowTransfer.ToolTip.Trim().Length > 0)
-        toolTip = WindowTransfer.ToolTip;
-      if (WindowRoster.ToolTip != null && WindowRoster.ToolTip.Trim().Length > 0)
-        toolTip = WindowRoster.ToolTip;
-      if (WindowDebugger.ToolTip != null && WindowDebugger.ToolTip.Trim().Length > 0)
-        toolTip = WindowDebugger.ToolTip;
-      if (WindowManifest.ToolTip != null && WindowManifest.ToolTip.Trim().Length > 0)
-        toolTip = WindowManifest.ToolTip;
-
-      // Control Window Tab switches
-      if (WindowControl.ToolTip != null && WindowControl.ToolTip.Trim().Length > 0)
-        toolTip = WindowControl.ToolTip;
-      if (TabHatch.ToolTip != null && TabHatch.ToolTip.Trim().Length > 0)
-        toolTip = TabHatch.ToolTip;
-      if (TabSolarPanel.ToolTip != null && TabSolarPanel.ToolTip.Trim().Length > 0)
-        toolTip = TabSolarPanel.ToolTip;
-      if (TabAntenna.ToolTip != null && TabAntenna.ToolTip.Trim().Length > 0)
-        toolTip = TabAntenna.ToolTip;
-      if (TabLight.ToolTip != null && TabLight.ToolTip.Trim().Length > 0)
-        toolTip = TabLight.ToolTip;
-
-      // Settings Window Tab switches
-      if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
-        toolTip = WindowSettings.ToolTip;
-      if (TabRealism.ToolTip != null && TabRealism.ToolTip.Trim().Length > 0)
-        toolTip = TabRealism.ToolTip;
-      if (TabHighlight.ToolTip != null && TabHighlight.ToolTip.Trim().Length > 0)
-        toolTip = TabHighlight.ToolTip;
-      if (TabSounds.ToolTip != null && TabSounds.ToolTip.Trim().Length > 0)
-        toolTip = TabSounds.ToolTip;
-      if (TabToolTips.ToolTip != null && TabToolTips.ToolTip.Trim().Length > 0)
-        toolTip = TabToolTips.ToolTip;
-      if (TabConfig.ToolTip != null && TabConfig.ToolTip.Trim().Length > 0)
-        toolTip = TabConfig.ToolTip;
-      if (TabInstalledMods.ToolTip != null && TabInstalledMods.ToolTip.Trim().Length > 0)
-        toolTip = TabInstalledMods.ToolTip;
-
-      // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
-      // Tooltip will not display if changes are made during the current OnGUI.  
-      // (Unity uses onGUI callbacks so we need to allow for the callback)
-      ToolTip = toolTip;
+      ToolTip = GetCurrentToolTip();
     }
 
     internal static void ShowToolTip(Vector2 toolTipPos, string toolTip)
@@ -112,6 +71,38 @@ namespace ShipManifest
       return toolTip;
     }
 
+    private static string GetCurrentToolTip()
+    {
+      // Only one of these values can be active at a time (onMouseOver), so this will trap it.
+      // (Brute force, but functional)
+      string toolTip = "";
+      if (!string.IsNullOrEmpty(WindowTransfer.ToolTip)) toolTip = WindowTransfer.ToolTip;
+      if (!string.IsNullOrEmpty(WindowRoster.ToolTip)) toolTip = WindowRoster.ToolTip;
+      if (!string.IsNullOrEmpty(WindowDebugger.ToolTip)) toolTip = WindowDebugger.ToolTip;
+      if (!string.IsNullOrEmpty(WindowManifest.ToolTip)) toolTip = WindowManifest.ToolTip;
+      if (!string.IsNullOrEmpty(WindowControl.ToolTip)) toolTip = WindowControl.ToolTip;
+      if (!string.IsNullOrEmpty(WindowSettings.ToolTip)) toolTip = WindowSettings.ToolTip;
+
+      // Control Window Tab switches
+      if (!string.IsNullOrEmpty(TabHatch.ToolTip)) toolTip = TabHatch.ToolTip;
+      if (!string.IsNullOrEmpty(TabSolarPanel.ToolTip)) toolTip = TabSolarPanel.ToolTip;
+      if (!string.IsNullOrEmpty(TabAntenna.ToolTip)) toolTip = TabAntenna.ToolTip;
+      if (!string.IsNullOrEmpty(TabLight.ToolTip)) toolTip = TabLight.ToolTip;
+
+      // Settings Window Tab switches
+      if (!string.IsNullOrEmpty(TabRealism.ToolTip)) toolTip = TabRealism.ToolTip;
+      if (!string.IsNullOrEmpty(TabHighlight.ToolTip)) toolTip = TabHighlight.ToolTip;
+      if (!string.IsNullOrEmpty(TabSounds.ToolTip)) toolTip = TabSounds.ToolTip;
+      if (!string.IsNullOrEmpty(TabToolTips.ToolTip)) toolTip = TabToolTips.ToolTip;
+      if (!string.IsNullOrEmpty(TabConfig.ToolTip)) toolTip = TabConfig.ToolTip;
+      if (!string.IsNullOrEmpty(TabInstalledMods.ToolTip)) toolTip = TabInstalledMods.ToolTip;
+
+      // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
+      // Tooltip will not display if changes are made during the current OnGUI.  
+      // (Unity uses onGUI async callbacks so we need to allow for the callback)
+      return toolTip;
+    }
+
     private static void RepositionToolTip()
     {
       if (Position.xMax > Screen.currentResolution.width)
@@ -119,6 +110,7 @@ namespace ShipManifest
       if (Position.yMax > Screen.currentResolution.height)
         Position.y = Screen.currentResolution.height - Position.height;
     }
+
     private static void EmptyWindow(int windowId)
     {
 

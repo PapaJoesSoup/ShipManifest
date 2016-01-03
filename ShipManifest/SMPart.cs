@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DF;
+using ShipManifest.Process;
 
 namespace ShipManifest
 {
@@ -48,18 +49,26 @@ namespace ShipManifest
 
     internal static void DumpResource(Part part, string resourceName)
     {
-      // TODO:  add time delay to dump for realism mode.
-      if (part.Resources.Contains(resourceName))
-        part.Resources[resourceName].amount = 0;
+      // This is fired by the part dump button on the TransferWindow interface.
+      DumpResource(new List<Part>() { part }, new List<string>(){ resourceName });
     }
 
-    internal static void DumpResource(List<Part> partList, string resourceName)
+    internal static void DumpResource(List<Part> partList, List<string> resourceNames)
     {
-      // TODO:  add time delay to dump for realism mode.
-      foreach (var part in partList.Where(part => part.Resources.Contains(resourceName)))
+      // This routiine is called by the dump docked vessel button on the Transfer window interface.
+      if (!TransferPump.PumpDumpActive)
       {
-        part.Resources[resourceName].amount = 0;
+        foreach (var resource in resourceNames)
+        {
+          //Calc amounts and update xfer modules
+          var xferPump = new TransferPump(resource, TransferPump.PumpType.Dump);
+          xferPump.DumpParts = partList;
+          SMAddon.SmVessel.TransferPumps.Add(xferPump);
+        }
+        ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
+      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
+        TransferPump.ProcessState = TransferPump.PumpState.Stop;
     }
 
     internal static void FillResource(Part part, string resourceName)

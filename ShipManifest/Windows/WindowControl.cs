@@ -37,7 +37,7 @@ namespace ShipManifest.Windows
       DisplaySelectedTab(_displayViewerPosition);
       GUILayout.EndScrollView();
 
-      DisplaySelectedActions();
+      DisplayTabActions();
       GUILayout.EndVertical();
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
       SMAddon.RepositionWindow(ref Position);
@@ -129,47 +129,41 @@ namespace ShipManifest.Windows
       }
     }
 
-    internal static void DisplaySelectedActions()
+    internal static void DisplayTabActions()
     {
+      GUILayout.BeginHorizontal();
       switch (_selectedTab)
       {
         case Tab.Panel:
-          GUILayout.BeginHorizontal();
           if (GUILayout.Button("Retract All Solar Panels", GUILayout.Height(20)))
             TabSolarPanel.RetractAllPanels();
           if (GUILayout.Button("Extend All Solar Panels", GUILayout.Height(20)))
             TabSolarPanel.ExtendAllPanels();
-          GUILayout.EndHorizontal();
           break;
         case Tab.Hatch:
-          GUILayout.BeginHorizontal();
           if (GUILayout.Button("Close All Hatches", GUILayout.Height(20)))
             TabHatch.CloseAllHatches();
           if (GUILayout.Button("Open All Hatches", GUILayout.Height(20)))
             TabHatch.OpenAllHatches();
-          GUILayout.EndHorizontal();
           break;
         case Tab.Antenna:
-          GUILayout.BeginHorizontal();
           if (GUILayout.Button("Retract All Antennas", GUILayout.Height(20)))
             TabAntenna.RetractAllAntennas();
           if (GUILayout.Button("Extend All Antennas", GUILayout.Height(20)))
             TabAntenna.ExtendAllAntennas();
-          GUILayout.EndHorizontal();
           break;
         case Tab.Light:
-          GUILayout.BeginHorizontal();
           if (GUILayout.Button("Turn Off All Lights", GUILayout.Height(20)))
             TabLight.TurnOffAllLights();
           if (GUILayout.Button("Turn On All Lights", GUILayout.Height(20)))
             TabLight.TurnOnAllLights();
-          GUILayout.EndHorizontal();
           break;
         case Tab.None:
           break;
         default:
           throw new ArgumentOutOfRangeException();
       }
+      GUILayout.EndHorizontal();
     }
 
     private enum Tab

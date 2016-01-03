@@ -1,8 +1,9 @@
-﻿Version 4.5.0.0 - Release xx Dec, 2015 - Refactoring Edition.
-- New:  Massive refactor and reorgainization of code.  
-- New:  Added build automation and distribution.
-y New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
+﻿Version 4.5.0.0 - Release xx Jan, 2016 - New Years's Refactored Edition. NEW! Realism resource dumps.
+- New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
         per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
+- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
+        A tremendous amount of work for very little visible effect except maybe performance :). 
+- New:  Added build automation and distribution.
 - Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
 - Fixed:  Corrected nested control displays in settings.
 - Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.

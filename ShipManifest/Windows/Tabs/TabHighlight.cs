@@ -48,13 +48,13 @@ namespace ShipManifest.Windows.Tabs
       {
         if (SMSettings.EnableCls)
         {
-          if (SMAddon.SmVessel.SelectedResources.Contains("Crew"))
+          if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
             // Update spaces and reassign the resource to observe new settings.
             SMHighlighter.HighlightClsVessel(SMSettings.EnableHighlighting, true);
             SMAddon.UpdateClsSpaces();
             SMAddon.SmVessel.SelectedResources.Clear();
-            SMAddon.SmVessel.SelectedResources.Add("Crew");
+            SMAddon.SmVessel.SelectedResources.Add(SMConditions.ResourceType.Crew.ToString());
           }
         }
       }
@@ -77,13 +77,13 @@ namespace ShipManifest.Windows.Tabs
       if (SMSettings.OnlySourceTarget && (!SMSettings.PrevOnlySourceTarget || SMSettings.EnableClsHighlighting))
       {
         SMSettings.EnableClsHighlighting = false;
-        if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls && SMAddon.SmVessel.SelectedResources.Contains("Crew"))
+        if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
           // Update spaces and reassign the resource to observe new settings.
           SMHighlighter.HighlightClsVessel(false, true);
           SMAddon.UpdateClsSpaces();
           SMAddon.SmVessel.SelectedResources.Clear();
-          SMAddon.SmVessel.SelectedResources.Add("Crew");
+          SMAddon.SmVessel.SelectedResources.Add(SMConditions.ResourceType.Crew.ToString());
         }
       }
       // Enable CLS Highlighting Mode
@@ -106,7 +106,7 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
       if (SMSettings.EnableClsHighlighting && (!SMSettings.PrevEnableClsHighlighting || SMSettings.OnlySourceTarget))
         SMSettings.OnlySourceTarget = false;
-      if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls && SMAddon.SmVessel.SelectedResources.Contains("Crew") && WindowTransfer.ShowWindow)
+      if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && WindowTransfer.ShowWindow)
       {
         if (SMSettings.EnableClsHighlighting != SMSettings.PrevEnableClsHighlighting)
           SMHighlighter.HighlightClsVessel(SMSettings.EnableClsHighlighting);

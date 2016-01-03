@@ -92,18 +92,18 @@ namespace ShipManifest
               {
                 var vResourceFound = false;
                 // is resource in the list yet?.
-                if (_partsByResource.Keys.Contains("Crew"))
+                if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Crew.ToString()))
                 {
                   // found resource.  lets add part to its list.
                   vResourceFound = true;
-                  var eParts = _partsByResource["Crew"];
+                  var eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
                   eParts.Add(part);
                 }
                 if (!vResourceFound)
                 {
                   // found a new resource.  lets add it to the list of resources.
                   var nParts = new List<Part> { part };
-                  _partsByResource.Add("Crew", nParts);
+                  _partsByResource.Add(SMConditions.ResourceType.Crew.ToString(), nParts);
                 }
               }
               // Let's Get any Science...
@@ -114,15 +114,15 @@ namespace ShipManifest
                 {
                   // is resource in the list yet?.
                   // We only need the first match on the part so stop.
-                  if (_partsByResource.Keys.Contains("Science"))
+                  if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Science.ToString()))
                   {
-                    _partsByResource["Science"].Add(part);
+                    _partsByResource[SMConditions.ResourceType.Science.ToString()].Add(part);
                   }
                   else
                   {
                     // found a new resource.  lets add it to the list of resources.
                     var nParts = new List<Part> { part };
-                    _partsByResource.Add("Science", nParts);
+                    _partsByResource.Add(SMConditions.ResourceType.Science.ToString(), nParts);
                   }
                 }
               }
@@ -173,7 +173,7 @@ namespace ShipManifest
     // dataSource for Resource manifest and ResourceTransfer windows
     // Holds the Resource.info.name selected in the Resource Manifest Window.
     internal List<string> SelectedResources = new List<string>();
-    internal List<TransferResource> ResourcesToXfer = new List<TransferResource>();
+    internal List<TransferPump> TransferPumps = new List<TransferPump>();
 
     // Multi-Part Xfer Storage
     private List<ModDockedVessel> _dockedVessels;
@@ -282,25 +282,7 @@ namespace ShipManifest
       // now lets reconcile the selected parts based on the new list of resources...
       WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
 
-      // Now lets update the Resource Xfer Objects...
-      SMAddon.SmVessel.ResourcesToXfer.Clear();
-      if (!SMAddon.SmVessel.SelectedResources.Contains("Crew") && !SMAddon.SmVessel.SelectedResources.Contains("Science"))
-      {
-        foreach (var modResource in SMAddon.SmVessel.SelectedResources.Select(resource => new TransferResource(resource)
-        {
-          SrcXferAmount =
-            TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsSource,
-              SMAddon.SmVessel.SelectedPartsTarget, resource),
-          TgtXferAmount =
-            TransferResource.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsTarget,
-              SMAddon.SmVessel.SelectedPartsSource, resource)
-        }))
-        {
-          SMAddon.SmVessel.ResourcesToXfer.Add(modResource);
-        }
-      }
-
-      if (SMSettings.EnableCls && Conditions.CanShowShipManifest())
+      if (SMSettings.EnableCls && SMConditions.CanShowShipManifest())
       {
         if (SMAddon.GetClsAddon())
         {
@@ -504,7 +486,7 @@ namespace ShipManifest
 
     internal void FillCrew()
     {
-      foreach (var part in _partsByResource["Crew"])
+      foreach (var part in _partsByResource[SMConditions.ResourceType.Crew.ToString()])
       {
         SMPart.FillCrew(part);
       }
@@ -513,7 +495,7 @@ namespace ShipManifest
 
     internal void EmptyCrew()
     {
-      foreach (var part in _partsByResource["Crew"])
+      foreach (var part in _partsByResource[SMConditions.ResourceType.Crew.ToString()])
       {
         for (var i = part.protoModuleCrew.Count - 1; i >= 0; i--)
         {
@@ -523,34 +505,43 @@ namespace ShipManifest
       }
     }
 
-    internal void FillResources()
-    {
-      var resources = _partsByResource.Keys.ToList();
-      foreach (var resource in resources.Where(resourceName => resourceName != "Crew" && resourceName != "Science").SelectMany(resourceName => (from part in _partsByResource[resourceName] from PartResource resource in part.Resources where resource.info.name == resourceName select resource)))
-      {
-        resource.amount = resource.maxAmount;
-      }
-    }
-
     internal void DumpResources()
     {
-      // TODO:  add time delay to dump for realism mode.
-      var resources = _partsByResource.Keys.ToList();
-      foreach (var resource in from resourceName in resources where resourceName != "Crew" && resourceName != "Science" from part in _partsByResource[resourceName] from PartResource resource in part.Resources where resource.info.name == resourceName select resource)
+      if (!TransferPump.PumpDumpActive)
       {
-        resource.amount = 0;
+        var otherResourcesList = (from s in SMAddon.SmVessel.ResourceList where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Other select s).ToList();
+        foreach (var resource in otherResourcesList)
+        {
+          var pump = new TransferPump(resource, TransferPump.PumpType.Dump);
+          pump.DumpParts = SMAddon.SmVessel.PartsByResource[resource];
+          SMAddon.SmVessel.TransferPumps.Add(pump);
+        }
+        ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
+      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
+        TransferPump.ProcessState = TransferPump.PumpState.Stop;
     }
 
     internal void DumpResource(string resourceName)
     {
-      // TODO:  add time delay to dump for realism mode.
-      foreach (var resource in from part in _partsByResource[resourceName] from PartResource resource in part.Resources 
-        where resource.info.name == resourceName 
-        select resource)
-        {
-          resource.amount = 0;
-        }
+      if (!TransferPump.PumpDumpActive)
+      {
+        var pump = new TransferPump(resourceName, TransferPump.PumpType.Dump);
+        pump.DumpParts = SMAddon.SmVessel.PartsByResource[resourceName];
+        SMAddon.SmVessel.TransferPumps.Add(pump);
+        ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
+      }
+      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
+        TransferPump.ProcessState = TransferPump.PumpState.Stop;
+    }
+
+    internal void FillResources()
+    {
+      var resources = _partsByResource.Keys.ToList();
+      foreach (var resource in resources.Where(resourceName => resourceName != SMConditions.ResourceType.Crew.ToString() && resourceName != SMConditions.ResourceType.Science.ToString()).SelectMany(resourceName => (from part in _partsByResource[resourceName] from PartResource resource in part.Resources where resource.info.name == resourceName select resource)))
+      {
+        resource.amount = resource.maxAmount;
+      }
     }
 
     internal void FillResource(string resourceName)

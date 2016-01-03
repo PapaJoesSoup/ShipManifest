@@ -79,7 +79,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Modules\ModDockedVessel.cs" />
-    <Compile Include="Process\Transfers.cs" />
+    <Compile Include="Process\ProcessController.cs" />
+    <Compile Include="SMConditions.cs" />
     <Compile Include="SMPart.cs" />
     <Compile Include="SMToolTips.cs" />
     <Compile Include="Process\TransferCrew.cs" />
@@ -88,7 +89,7 @@
     <Compile Include="APIClients\CLSClient.cs" />
     <Compile Include="Modules\ModLight.cs" />
     <Compile Include="Modules\ModSolarPanel.cs" />
-    <Compile Include="Process\TransferResource.cs" />
+    <Compile Include="Process\TransferPump.cs" />
     <Compile Include="SMHighlighter.cs" />
     <Compile Include="APIClients\ToolbarWrapper.cs" />
     <Compile Include="Windows\Tabs\TabAntenna.cs" />
