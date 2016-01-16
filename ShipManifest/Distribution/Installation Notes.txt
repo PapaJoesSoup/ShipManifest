@@ -1,7 +1,7 @@
 ----------------
 Ship Manifest
 ----------------
-Current Version 4.5.0.0 - Release xx Dec, 2015 - Refactoring Edition.
+Current Version 5.0.0.0 - Release xx Jan, 2015 - Refactoring Edition.
 
 KSP Version supported:  1.0.5
 ----------------
@@ -10,8 +10,8 @@ KSP Version supported:  1.0.5
 Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
           CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
-Source (Github):  http://github.com/PapaJoesSoup/ShipManifest
-WIKI (Github):  http://github.com/PapaJoesSoup/ShipManifest/wiki
+Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
+WIKI:     Github - http://github.com/PapaJoesSoup/ShipManifest/wiki
 ----------------
 
 ----------------
@@ -23,8 +23,13 @@ License:  CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/.
 ----------------
 What's New:
 ----------------
-- New:  Massive refactor and reorgainization of code.  
-- New:  Added build automation and distribution
+- New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
+        with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
+- New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
+        per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
+- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
+        A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
+- New:  Added build automation and distribution.
 - Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
 - Fixed:  Corrected nested control displays in settings.
 - Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
@@ -34,9 +39,9 @@ What's New:
 
 Thanks for downloading Ship Manifest!
 
-Ship Manifest is a tool to manage your ship's "things".  I started with Crew Manifest (http://forum.kerbalspaceprogram.com/threads/60936) as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.  
+Ship Manifest is a tool to manage your ship's "things".  I started with Crew Manifest (http://forum.kerbalspaceprogram.com/threads/60936) as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.
 
-I've now re-imagined it into Ship Manifest, using the same easy to navigate system that vXSovereignXv used.  Many changes and refactoring have occurred, so SM no longer resembles Crew Manifest in use or "under the hood". Even the original crew transfers have been greatly modified.
+I've now re-imagined it into Ship Manifest, using the same easy to navigate visual system that vXSovereignXv used.  SM has since been expanded and refactored to the point that it is now a completely original work.
 
 
 NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
@@ -63,4 +68,4 @@ Videos:
 ------------	
 Acknoledgments:
 ------------	
- - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.
+ - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.  

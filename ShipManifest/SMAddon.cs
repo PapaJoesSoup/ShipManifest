@@ -33,20 +33,29 @@ namespace ShipManifest
     internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
 
     // Resource transfer vars
-    internal static AudioSource Source1;
-    internal static AudioSource Source2;
-    internal static AudioSource Source3;
+    internal static AudioSource AudioSourcePumpStart;
+    internal static AudioSource AudioSourcePumpRun;
+    internal static AudioSource AudioSourcePumpStop;
 
-    internal static AudioClip Sound1;
-    internal static AudioClip Sound2;
-    internal static AudioClip Sound3;
+    internal static AudioClip AudioClipPumpStart;
+    internal static AudioClip AudioClipPumpRun;
+    internal static AudioClip AudioClipPumpStop;
+
+    // Crew transfer vars
+    internal static AudioSource AudioSourceCrewStart;
+    internal static AudioSource AudioSourceCrewRun;
+    internal static AudioSource AudioSourceCrewStop;
+
+    internal static AudioClip AudioClipCrewStart;
+    internal static AudioClip AudioClipCrewRun;
+    internal static AudioClip AudioClipCrewStop;
 
     [KSPField(isPersistant = true)]
     internal static double Elapsed;
 
     // Resource xfer vars
     // This is still very entrenched.   Need to look at implications for conversion to instanced.
-    internal static TransferPump.PumpType ActivePumpType = TransferPump.PumpType.SourceToTarget;
+    internal static TransferPump.TypePump ActivePumpType = TransferPump.TypePump.SourceToTarget;
 
     // Toolbar Integration.
     private static IButton _smButtonBlizzy;
@@ -101,12 +110,12 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.Awake.  Error:  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.Awake.  Error:  " + ex, "Error", true);
       }
     }
     internal void Start()
     {
-      Utilities.LogMessage("SmAddon.Start.", "Info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("SMAddon.Start.", "Info", SMSettings.VerboseLogging);
       try
       {
         // Reset frame error latch if set
@@ -167,16 +176,20 @@ namespace ShipManifest
         }
         else
         {
-          Utilities.LogMessage("Start - CLS is not installed.", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("SMAddon.Start - CLS is not installed.", "Info", SMSettings.VerboseLogging);
           SMSettings.EnableCls = false;
           SMSettings.ClsInstalled = false;
           SMSettings.SaveSettings();
         }
-        Utilities.LogMessage("CLS Installed?  " + SMSettings.ClsInstalled, "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.Start - CLS Installed?  " + SMSettings.ClsInstalled, "Info", SMSettings.VerboseLogging);
+
+        // Load sounds for transfers.
+        SMAddon.LoadSounds(SMConditions.ResourceType.Crew, TransferCrew.path1, TransferCrew.path2, TransferCrew.path3, SMSettings.CrewSoundVol);
+        SMAddon.LoadSounds(SMConditions.ResourceType.Pump, TransferPump.path1, TransferPump.path2, TransferPump.path3, SMSettings.PumpSoundVol);
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.Start.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.Start.  " + ex, "Error", true);
       }
     }
     internal void OnDestroy()
@@ -255,14 +268,14 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SmAddon.OnDestroy.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, "Error", true);
       }
     }
 
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGUI");
+      Debug.Log("[ShipManifest]:  SMAddon.OnGUI");
       try
       {
         GUI.skin = SMSettings.UseUnityStyle ? null : HighLogic.Skin;
@@ -275,7 +288,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUI.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnGUI.  " + ex, "Error", true);
       }
     }
     internal void Update()
@@ -293,18 +306,19 @@ namespace ShipManifest
             SMHighlighter.Update_Highlighter();
 
             // Realism Mode Resource transfer operation (real time)
-            // XferOn is flagged in the Resource Controller
-            if (TransferPump.PumpXferActive)
+            // PumpActive is flagged in the Resource Controller
+            if (TransferPump.PumpActive)
             {
-              TransferPump.ProcessTransfer();
+              if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
+                TransferPump.ProcessPumps();
+              else
+                TransferPump.PumpActive = false;
             }
-            else if (TransferPump.PumpDumpActive)
-            {
-              // Realism Mode Resource Dump operation (real time)
-              // XferOn is flagged in the Resource Controller
-              TransferPump.ProcessDump();
-            }
-
+            else 
+              foreach (var pump in (from pump in SmVessel.TransferPumps where pump.IsPumpOn && pump.PumpStatus != TransferPump.PumpState.Off select pump).ToList())
+              {
+                SmVessel.TransferPumps.Remove(pump);
+              }
 
             // Realism Mode Crew transfer operation (real time)
             if (SmVessel.TransferCrewObj.CrewXferActive)
@@ -331,7 +345,7 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          Utilities.LogMessage(string.Format(" in Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(string.Format(" in SMAddon.Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
           FrameErrTripped = true;
         }
       }
@@ -340,25 +354,19 @@ namespace ShipManifest
     // save settings on scene changes
     private void OnGameSceneLoadRequested(GameScenes requestedScene)
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnGameSceneLoadRequested");
+      Debug.Log("[ShipManifest]:  SMAddon.OnGameSceneLoadRequested");
       SMSettings.SaveSettings();
-      //RunSave();
-      //if (SMSettings.Loaded)
-      //{
-      //    RunSave();
-      //    SMSettings.SaveSettings();
-      //}
     }
 
     // SM UI toggle handlers
     private void OnShowUi()
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnShowUI");
+      Debug.Log("[ShipManifest]:  SMAddon.OnShowUI");
       ShowUi = true;
     }
     private void OnHideUi()
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnHideUI");
+      Debug.Log("[ShipManifest]:  SMAddon.OnHideUI");
       ShowUi = false;
     }
 
@@ -417,13 +425,13 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselWasModified.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnVesselWasModified.  " + ex, "Error", true);
       }
     }
     internal void OnVesselChange(Vessel newVessel)
     {
       //Utilities.LogMessage("SmAddon.OnVesselChange active...", "Info", true);
-      Utilities.LogMessage("SmAddon.OnVesselChange active...", "Info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("SMAddon.OnVesselChange active...", "Info", SMSettings.VerboseLogging);
       try
       {
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -431,7 +439,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in SmAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
     private void OnFlightReady()
@@ -443,12 +451,12 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnFlightReady.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnFlightReady.  " + ex, "Error", true);
       }
     }
     private void OnVesselLoaded(Vessel data)
     {
-      Utilities.LogMessage("SmAddon.OnVesselLoaded active...", "Info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("SMAddon.OnVesselLoaded active...", "Info", SMSettings.VerboseLogging);
       try
       {
         if (data.Equals(FlightGlobals.ActiveVessel) && data != SmVessel.Vessel)
@@ -459,7 +467,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SmAddon.OnVesselLoaded.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex, "Error", true);
       }
     }
     private void OnVesselTerminated(ProtoVessel data)
@@ -471,7 +479,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselTerminated.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnVesselTerminated.  " + ex, "Error", true);
       }
     }
     private void OnPartDie(Part data)
@@ -483,7 +491,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnPartDie.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnPartDie.  " + ex, "Error", true);
       }
     }
     private void OnPartExplode(GameEvents.ExplosionReaction data)
@@ -495,7 +503,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnPartExplode.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnPartExplode.  " + ex, "Error", true);
       }
     }
     private void OnPartUndock(Part data)
@@ -503,11 +511,11 @@ namespace ShipManifest
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnPartUndock");
       try
       {
-        Utilities.LogMessage("OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.OnPartUnDock:  Active. - Part name:  " + data.partInfo.name, "Info", SMSettings.VerboseLogging);
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnPartUndock.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnPartUndock.  " + ex, "Error", true);
       }
     }
     private void OnStageSeparation(EventReport eventReport)
@@ -518,7 +526,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnStageSeparation.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnStageSeparation.  " + ex, "Error", true);
       }
     }
     private void OnUndock(EventReport eventReport)
@@ -530,31 +538,31 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnUndock.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnUndock.  " + ex, "Error", true);
       }
     }
     private void OnVesselDestroy(Vessel data)
     {
-      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselDestroy");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnVesselDestroy");
       try
       {
 
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselDestroy.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnVesselDestroy.  " + ex, "Error", true);
       }
     }
     private void OnVesselCreate(Vessel data)
     {
-      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnVesselCreate");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnVesselCreate");
       try
       {
 
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnVesselCreate.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnVesselCreate.  " + ex, "Error", true);
       }
     }
 
@@ -564,14 +572,14 @@ namespace ShipManifest
       if (SMSettings.EnableBlizzyToolbar && !SMSettings.PrevEnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
-        Utilities.LogMessage("CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", SMSettings.VerboseLogging);
         if (!ActivateBlizzyToolBar())
         {
           // We failed to activate the toolbar, so revert to stock
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
 
-          Utilities.LogMessage("SmAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
           SMSettings.EnableBlizzyToolbar = SMSettings.PrevEnableBlizzyToolbar;
         }
         else
@@ -591,7 +599,7 @@ namespace ShipManifest
       else if (!SMSettings.EnableBlizzyToolbar && SMSettings.PrevEnableBlizzyToolbar)
       {
         // Use stock Toolbar
-        Utilities.LogMessage("SmAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
         if (HighLogic.LoadedSceneIsFlight)
           _smButtonBlizzy.Visible = false;
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -609,7 +617,7 @@ namespace ShipManifest
     // Stock Toolbar Startup and cleanup
     private void OnGuiAppLauncherReady()
     {
-      Utilities.LogMessage("SmAddon.OnGUIAppLauncherReady active...", "Info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("SMAddon.OnGUIAppLauncherReady active...", "Info", SMSettings.VerboseLogging);
       try
       {
         // Setup SM WIndow button
@@ -669,7 +677,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherReady.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnGUIAppLauncherReady.  " + ex, "Error", true);
       }
     }
     private void OnGuiAppLauncherDestroyed()
@@ -693,7 +701,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnGUIAppLauncherDestroyed.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnGUIAppLauncherDestroyed.  " + ex, "Error", true);
       }
     }
 
@@ -706,7 +714,7 @@ namespace ShipManifest
         if (WindowManifest.ShowWindow)
         {
           // SM is showing.  Turn off.
-          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpXferActive)
+          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpActive)
             return;
 
           SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -732,12 +740,12 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMButtonToggle.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnSMButtonToggle.  " + ex, "Error", true);
       }
     }
     internal static void OnSmRosterToggle()
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMRosterToggle");
+      Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle");
       try
       {
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -754,12 +762,12 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMRosterToggle.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnSMRosterToggle.  " + ex, "Error", true);
       }
     }
     internal static void OnSmSettingsToggle()
     {
-      Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
+      Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
       try
       {
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -774,7 +782,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.OnSMSettingsToggle.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.OnSMSettingsToggle.  " + ex, "Error", true);
       }
     }
 
@@ -888,8 +896,7 @@ namespace ShipManifest
         {
           if (SmVessel.TransferCrewObj.CrewXferActive && !SmVessel.TransferCrewObj.IvaDelayActive)
             SmVessel.TransferCrewObj.CrewTransferAbort();
-          if ((TransferPump.PumpXferActive || TransferPump.PumpDumpActive) && SMSettings.RealismMode)
-            TransferPump.AbortTransferProcess();
+          if (TransferPump.PumpActive)  TransferPump.PumpActive = false;
         }
 
         if (SmVessel.Vessel != null && SMConditions.CanShowShipManifest())
@@ -900,7 +907,7 @@ namespace ShipManifest
 
             // kill selected resource and its associated highlighting.
             SmVessel.SelectedResources.Clear();
-            Utilities.LogMessage("New Vessel is a Kerbal on EVA.  ", "Info", SMSettings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.UpdateSMcontroller - New Vessel is a Kerbal on EVA.  ", "Info", SMSettings.VerboseLogging);
           }
         }
 
@@ -910,7 +917,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  ShipManifestAddon.UpdateSMcontroller.  " + ex, "Error", true);
+        Utilities.LogMessage("Error in:  SMAddon.UpdateSMcontroller.  " + ex, "Error", true);
       }
     }
 
@@ -961,7 +968,7 @@ namespace ShipManifest
       ClsAddon = ClsClient.GetCls();
       if (ClsAddon == null)
       {
-        Utilities.LogMessage("GetCLSVessel - ClsAddon is null.", "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.GetClsAddon - ClsAddon is null.", "Info", SMSettings.VerboseLogging);
         return false;
       }
       return true;
@@ -971,7 +978,7 @@ namespace ShipManifest
     {
       try
       {
-        Utilities.LogMessage("GetCLSVessel - Active.", "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.GetCLSVessel - Active.", "Info", SMSettings.VerboseLogging);
 
         if (ClsAddon.Vessel != null)
         {
@@ -979,13 +986,13 @@ namespace ShipManifest
         }
         else
         {
-          Utilities.LogMessage("GetCLSVessel - clsVessel is null.", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("SMAddon.GetCLSVessel - clsVessel is null.", "Info", SMSettings.VerboseLogging);
           return false;
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in SMAddon.GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         return false;
       }
     }
@@ -1034,76 +1041,105 @@ namespace ShipManifest
                 OnSmRosterToggle();
               };
             }
-            Utilities.LogMessage("Blizzy Toolbar available!", "Info", SMSettings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar available!", "Info", SMSettings.VerboseLogging);
             return true;
           }
           else
           {
-            Utilities.LogMessage("Blizzy Toolbar not available!", "Info", SMSettings.VerboseLogging);
+            Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar not available!", "Info", SMSettings.VerboseLogging);
             return false;
           }
         }
         catch (Exception ex)
         {
           // Blizzy Toolbar instantiation error.
-          Utilities.LogMessage("Error in EnableBlizzyToolbar... Error:  " + ex, "Error", true);
+          Utilities.LogMessage("Error in SMAddon.ActivateBlizzyToolBar... Error:  " + ex, "Error", true);
           return false;
         }
       }
       else
       {
         // No Blizzy Toolbar
-        Utilities.LogMessage("Blizzy Toolbar not Enabled...", "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar not Enabled...", "Info", SMSettings.VerboseLogging);
         return false;
       }
     }
 
-    internal static void LoadSounds(string soundType, string path1, string path2, string path3, double dblVol)
+    internal static void LoadSounds(SMConditions.ResourceType soundType, string path1, string path2, string path3, double dblVol)
     {
       try
       {
-        Elapsed = 0;
-        Utilities.LogMessage("Loading " + soundType + " sounds...", "Info", SMSettings.VerboseLogging);
-
+        Utilities.LogMessage("SMAddon.LoadSounds - Loading " + soundType.ToString() + " sounds...", "Info", SMSettings.VerboseLogging);
         var go = new GameObject("Audio");
-
-        Source1 = go.AddComponent<AudioSource>();
-        Source2 = go.AddComponent<AudioSource>();
-        Source3 = go.AddComponent<AudioSource>();
-
-        if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) && GameDatabase.Instance.ExistsAudioClip(path3))
+        switch (soundType)
         {
-          Sound1 = GameDatabase.Instance.GetAudioClip(path1);
-          Sound2 = GameDatabase.Instance.GetAudioClip(path2);
-          Sound3 = GameDatabase.Instance.GetAudioClip(path3);
-          Utilities.LogMessage(soundType + " sounds loaded...", "Info", SMSettings.VerboseLogging);
+          case SMConditions.ResourceType.Crew:
+            AudioSourceCrewStart = go.AddComponent<AudioSource>();
+            AudioSourceCrewRun = go.AddComponent<AudioSource>();
+            AudioSourceCrewStop = go.AddComponent<AudioSource>();
 
-          // configure sources
-          Source1.clip = Sound1; // Start sound
-          Source1.volume = (float)dblVol;
-          Source1.pitch = 1f;
+            if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) && GameDatabase.Instance.ExistsAudioClip(path3))
+            {
+              AudioClipCrewStart = GameDatabase.Instance.GetAudioClip(path1);
+              AudioClipCrewRun = GameDatabase.Instance.GetAudioClip(path2);
+              AudioClipCrewStop = GameDatabase.Instance.GetAudioClip(path3);
+              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sounds loaded...", "Info", SMSettings.VerboseLogging);
 
-          Source2.clip = Sound2; // Run sound
-          Source2.loop = true;
-          Source2.volume = (float)dblVol;
-          Source2.pitch = 1f;
+              // configure sources
+              AudioSourceCrewStart.clip = AudioClipPumpStart; // Start sound
+              AudioSourceCrewStart.volume = (float)dblVol;
+              AudioSourceCrewStart.pitch = 1f;
 
-          Source3.clip = Sound3; // Stop Sound
-          Source3.volume = (float)dblVol;
-          Source3.pitch = 1f;
+              AudioSourceCrewRun.clip = AudioClipPumpRun; // Run sound
+              AudioSourceCrewRun.loop = true;
+              AudioSourceCrewRun.volume = (float)dblVol;
+              AudioSourceCrewRun.pitch = 1f;
 
-          // now let's play the Pump start sound.
-          Source1.Play();
-          Utilities.LogMessage("Play " + soundType + " sound (start)...", "Info", SMSettings.VerboseLogging);
-        }
-        else
-        {
-          Utilities.LogMessage(soundType + " sound failed to load...", "Info", SMSettings.VerboseLogging);
+              AudioSourceCrewStop.clip = AudioClipPumpStop; // Stop Sound
+              AudioSourceCrewStop.volume = (float)dblVol;
+              AudioSourceCrewStop.pitch = 1f;
+            }
+            else
+            {
+              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sound failed to load...", "Info", SMSettings.VerboseLogging);
+            }
+            break;
+          case SMConditions.ResourceType.Pump:
+            AudioSourcePumpStart = go.AddComponent<AudioSource>();
+            AudioSourcePumpRun = go.AddComponent<AudioSource>();
+            AudioSourcePumpStop = go.AddComponent<AudioSource>();
+
+            if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) && GameDatabase.Instance.ExistsAudioClip(path3))
+            {
+              AudioClipPumpStart = GameDatabase.Instance.GetAudioClip(path1);
+              AudioClipPumpRun = GameDatabase.Instance.GetAudioClip(path2);
+              AudioClipPumpStop = GameDatabase.Instance.GetAudioClip(path3);
+              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sounds loaded...", "Info", SMSettings.VerboseLogging);
+
+              // configure sources
+              AudioSourcePumpStart.clip = AudioClipPumpStart; // Start sound
+              AudioSourcePumpStart.volume = (float)dblVol;
+              AudioSourcePumpStart.pitch = 1f;
+
+              AudioSourcePumpRun.clip = AudioClipPumpRun; // Run sound
+              AudioSourcePumpRun.loop = true;
+              AudioSourcePumpRun.volume = (float)dblVol;
+              AudioSourcePumpRun.pitch = 1f;
+
+              AudioSourcePumpStop.clip = AudioClipPumpStop; // Stop Sound
+              AudioSourcePumpStop.volume = (float)dblVol;
+              AudioSourcePumpStop.pitch = 1f;
+            }
+            else
+            {
+              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sound failed to load...", "Info", SMSettings.VerboseLogging);
+            }
+            break;
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         // ReSharper disable once PossibleIntendedRethrow
         throw ex;
       }
@@ -1113,7 +1149,7 @@ namespace ShipManifest
     {
       // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
       // and instructions for using CLS API by codepoet.
-      Utilities.LogMessage("FireEventTriggers:  Active.", "info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("SMAddon.FireEventTriggers:  Active.", "info", SMSettings.VerboseLogging);
       GameEvents.onVesselChange.Fire(SmVessel.Vessel);
     }
 
@@ -1148,13 +1184,13 @@ namespace ShipManifest
     {
       try
       {
-        Utilities.LogMessage("RunSave in progress...", "info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.RunSave in progress...", "info", SMSettings.VerboseLogging);
         SMSettings.SaveSettings();
-        Utilities.LogMessage("RunSave complete.", "info", SMSettings.VerboseLogging);
+        Utilities.LogMessage("SMAddon.RunSave complete.", "info", SMSettings.VerboseLogging);
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in SMAddon.RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 

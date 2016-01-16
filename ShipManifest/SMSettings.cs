@@ -38,7 +38,7 @@ namespace ShipManifest
     internal static double FlowRate = 100;
     internal static double MinFlowRate;
     internal static double MaxFlowRate = 1000;
-    internal static double Tolerance = 0.0000001;
+    internal static double Tolerance = 0.000001;
     internal static int MaxFlowTimeSec = 180;
     internal static bool LockSettings;
 

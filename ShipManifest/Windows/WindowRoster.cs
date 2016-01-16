@@ -252,7 +252,7 @@ namespace ShipManifest.Windows
       switch (currentFilter)
       {
         case KerbalFilters.All:
-          break;
+            return  true;
         case KerbalFilters.Assigned:
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned) 
             return  true;

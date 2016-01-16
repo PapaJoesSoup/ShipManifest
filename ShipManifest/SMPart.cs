@@ -47,28 +47,28 @@ namespace ShipManifest
       return deepFreezer != null && deepFreezer.DFIPartFull;
     }
 
-    internal static void DumpResource(Part part, string resourceName)
+    internal static void ToggleDumpResource(Part part, List<string> resourceNames, uint pumpId)
     {
       // This is fired by the part dump button on the TransferWindow interface.
-      DumpResource(new List<Part>() { part }, new List<string>(){ resourceName });
+      ToggleDumpResource(new List<Part>(){ part }, resourceNames, pumpId);
     }
 
-    internal static void DumpResource(List<Part> partList, List<string> resourceNames)
+    internal static void ToggleDumpResource(List<Part> partList, List<string> resourceNames, uint pumpId)
     {
-      // This routiine is called by the dump docked vessel button on the Transfer window interface.
-      if (!TransferPump.PumpDumpActive)
+      // This routine is called by the dump part buttin on the Transfer Window interface.
+      // This routine is called by the dump docked vessel button on the Transfer window interface.
+      List<TransferPump> pumpList = new List<TransferPump>();
+      foreach (var resource in resourceNames)
       {
-        foreach (var resource in resourceNames)
-        {
-          //Calc amounts and update xfer modules
-          var xferPump = new TransferPump(resource, TransferPump.PumpType.Dump);
-          xferPump.DumpParts = partList;
-          SMAddon.SmVessel.TransferPumps.Add(xferPump);
-        }
-        ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
+        //Calc amounts and update xfer modules
+        var xferPump = new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer, TransferPump.CalcRemainingResource(partList, resource));
+        xferPump.PartsFrom = partList;
+        xferPump.PumpId = pumpId;
+        pumpList.Add(xferPump);
       }
-      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
-        TransferPump.ProcessState = TransferPump.PumpState.Stop;
+      if (!TransferPump.PumpsInProgress(pumpId).Any())
+        ProcessController.DumpResources(pumpList);
+      else TransferPump.AbortPumpProcess(pumpId);
     }
 
     internal static void FillResource(Part part, string resourceName)
@@ -76,7 +76,6 @@ namespace ShipManifest
       if (part.Resources.Contains(resourceName))
         part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
     }
-
     internal static void FillResource(List<Part> partList, string resourceName)
     {
       foreach (var part in partList.Where(part => part.Resources.Contains(resourceName)))

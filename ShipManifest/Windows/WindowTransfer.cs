@@ -26,6 +26,9 @@ namespace ShipManifest.Windows
     internal static bool ShowSourceVessels;
     internal static bool ShowTargetVessels;
 
+    // this list is for display use.  Transfers are executed against a separate list.  These objects may be used to derive objgectes to be added to the process queue.
+    internal static List<TransferPump> DisplayPumps = new List<TransferPump>();
+
     private static Dictionary<PartModule, bool> _scienceModulesSource;
     internal static Dictionary<PartModule, bool> ScienceModulesSource
     {
@@ -65,6 +68,7 @@ namespace ShipManifest.Windows
         label = new GUIContent("", "Action in progress.  Cannot close window");
         GUI.enabled = false;
       }
+
       var rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, label))
       {
@@ -80,6 +84,10 @@ namespace ShipManifest.Windows
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+
+      // Update the pumps for this event.
+      TransferPump.UpdateDisplayPumps(false);
+
       GUI.enabled = true;
       try
       {
@@ -92,7 +100,7 @@ namespace ShipManifest.Windows
         SourceTransferViewer();
 
         // Text above Source Details. (Between viewers)
-        TextBetweenViewers(SMAddon.SmVessel.SelectedPartsSource, TransferPump.PumpType.SourceToTarget);
+        TextBetweenViewers(SMAddon.SmVessel.SelectedPartsSource, TransferPump.TypePump.SourceToTarget);
 
         // Build Details ScrollViewer
         SourceDetailsViewer();
@@ -107,7 +115,7 @@ namespace ShipManifest.Windows
         TargetTransferViewer();
 
         // Text between viewers
-        TextBetweenViewers(SMAddon.SmVessel.SelectedPartsTarget, TransferPump.PumpType.TargetToSource);
+        TextBetweenViewers(SMAddon.SmVessel.SelectedPartsTarget, TransferPump.TypePump.TargetToSource);
 
         // Build Target details Viewer
         TargetDetailsViewer();
@@ -123,7 +131,7 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.PumpType pumpType)
+    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypePump pumpType)
     {
       var labelText = "";
       GUILayout.BeginHorizontal();
@@ -144,7 +152,7 @@ namespace ShipManifest.Windows
       GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(200));
       if (CanShowVessels())
       {
-        if (pumpType == TransferPump.PumpType.SourceToTarget)
+        if (pumpType == TransferPump.TypePump.SourceToTarget)
         {
           var prevValue = ShowSourceVessels;
           ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, "Vessels", GUILayout.Width(90));
@@ -179,9 +187,9 @@ namespace ShipManifest.Windows
         GUILayout.BeginVertical();
 
         if (ShowSourceVessels && CanShowVessels())
-          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.PumpType.SourceToTarget, _sourceTransferViewerScrollPosition);
+          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget, _sourceTransferViewerScrollPosition);
         else
-          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.PumpType.SourceToTarget, _sourceTransferViewerScrollPosition);
+          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget, _sourceTransferViewerScrollPosition);
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
@@ -204,7 +212,7 @@ namespace ShipManifest.Windows
 
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, TransferPump.PumpType.SourceToTarget, _sourceDetailsViewerScrollPosition);
+          CrewDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
@@ -213,7 +221,7 @@ namespace ShipManifest.Windows
         else
         {
           // Other resources are left....
-          ResourceDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, TransferPump.PumpType.SourceToTarget, _sourceDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
         }
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
@@ -244,9 +252,9 @@ namespace ShipManifest.Windows
         GUILayout.BeginVertical();
 
         if (ShowTargetVessels && CanShowVessels())
-          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.PumpType.TargetToSource, _targetTransferViewerScrollPosition);
+          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource, _targetTransferViewerScrollPosition);
         else
-          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.PumpType.TargetToSource, _targetTransferViewerScrollPosition);
+          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource, _targetTransferViewerScrollPosition);
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
@@ -269,7 +277,7 @@ namespace ShipManifest.Windows
         // --------------------------------------------------------------------------
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, TransferPump.PumpType.TargetToSource, _targetDetailsViewerScrollPosition);
+          CrewDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
@@ -277,7 +285,7 @@ namespace ShipManifest.Windows
         }
         else
         {
-          ResourceDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, TransferPump.PumpType.TargetToSource, _targetDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
         }
         // --------------------------------------------------------------------------
         GUILayout.EndVertical();
@@ -292,9 +300,9 @@ namespace ShipManifest.Windows
 
     #region Viewer Details (GUI Layout)
 
-    private static void PartsTransferViewer(List<string> selectedResources, TransferPump.PumpType pumpType, Vector2 viewerScrollPosition)
+    private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType, Vector2 viewerScrollPosition)
     {
-      var scrollX = Position.x + (pumpType == TransferPump.PumpType.SourceToTarget ? 20 : 320);
+      var scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       var scrollY = Position.y + 30 - viewerScrollPosition.y;
       var step = "begin";
       try
@@ -341,14 +349,17 @@ namespace ShipManifest.Windows
           step = "Render dump/fill buttons";
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
           {
-            var style1 = pumpType == TransferPump.PumpType.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
-            GUI.enabled = IsPartDumpable(pumpType, part);
-            if (GUILayout.Button("Dump", style1, GUILayout.Width(45), GUILayout.Height(20)))
+            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part, pumpType, TransferPump.TriggerButton.Transfer);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+            var style1 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            GUI.enabled = CanDumpPart(pumpType, part);
+
+            if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
             {
-              SMPart.DumpResource(new List<Part>(){part}, selectedResources);
+              SMPart.ToggleDumpResource(part, selectedResources, pumpId);
             }
 
-            var style2 = pumpType == TransferPump.PumpType.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var style2 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
             if (!SMSettings.RealismMode)
             {
               if (selectedResources[0] == SMConditions.ResourceType.Crew.ToString())
@@ -385,9 +396,9 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void VesselTransferViewer(List<string> selectedResources, TransferPump.PumpType pumpType, Vector2 viewerScrollPosition)
+    private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType, Vector2 viewerScrollPosition)
     {
-      var scrollX = Position.x + (pumpType == TransferPump.PumpType.SourceToTarget ? 20 : 320);
+      var scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       var scrollY = Position.y + 30 - viewerScrollPosition.y;
       var step = "begin";
       try
@@ -411,7 +422,7 @@ namespace ShipManifest.Windows
           GUILayout.BeginHorizontal();
 
           // Now let's account for any target buttons already pressed. (sources and targets for resources cannot be the same)
-          GUI.enabled = IsVesselSelectable(pumpType, modDockedVessel);
+          GUI.enabled = CanSelectVessel(pumpType, modDockedVessel);
 
           step = "Render part Buttons";
           if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
@@ -438,13 +449,15 @@ namespace ShipManifest.Windows
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[0]) > 0 || TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[1]) > 0;
             else
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[0]) > 0;
-            var style1 = pumpType == TransferPump.PumpType.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
-            if (GUILayout.Button("Dump", style1, GUILayout.Width(45), GUILayout.Height(20)))
+            var style1 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), modDockedVessel.VesselParts.First(), modDockedVessel.VesselParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this Part") : new GUIContent("Stop", "Halts the dumping of the selected resource in this part");
+            if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
             {
-              SMPart.DumpResource(modDockedVessel.VesselParts, selectedResources);
+              SMPart.ToggleDumpResource(modDockedVessel.VesselParts, selectedResources, pumpId);
             }
 
-            var style2 = pumpType == TransferPump.PumpType.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var style2 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
             if (selectedResources.Count > 1)
               GUI.enabled = TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0 || TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0;
             else
@@ -470,10 +483,10 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, TransferPump.PumpType pumpType, Vector2 scrollPosition)
+    private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, TransferPump.TypePump pumpType, Vector2 scrollPosition)
     {
       // Since only one Crew Part can be selected, all lists will use an index of [0].
-      float xOffset = pumpType == TransferPump.PumpType.SourceToTarget ? 30 : 330;
+      float xOffset = pumpType == TransferPump.TypePump.SourceToTarget ? 30 : 330;
       const float yOffset = 160;
 
       if (selectedPartsFrom.Count <= 0) return;
@@ -745,66 +758,63 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceDetails(List<Part> partsSource, List<Part> partsTarget, TransferPump.PumpType pumpType, Vector2 scrollPosition)
+    private static void ResourceDetailsViewer(TransferPump.TypePump pumpType, Vector2 scrollPosition)
     {
-      if (partsSource.Count <= 0) return;
+      // Let's get the pump objects we may use...
+      var selectedResources = SMAddon.SmVessel.SelectedResources;
+      List<TransferPump> pumps = TransferPump.GetDisplayPumpsByType(pumpType);
+      if (pumps[0].PartsFrom.Count <= 0) return;
+
       // This routine assumes that a resource has been selected on the Resource manifest window.
       // Set scrollX offsets for left and right viewers
-      var xOffset = pumpType == TransferPump.PumpType.SourceToTarget ? 30 : 330;
+      var xOffset = pumpType == TransferPump.TypePump.SourceToTarget ? 30 : 330;
       const int yOffset = 160;
       var toolTip = "";
 
-      // Let's build the pump objects we may use...
-      var selectedResources = SMAddon.SmVessel.SelectedResources;
-      List<TransferPump> xferPumps = TransferPump.CreateTransferPumps(selectedResources, pumpType);
-      foreach (var pump in xferPumps)
-      {
-        pump.SourceParts = pumpType == TransferPump.PumpType.SourceToTarget ? partsSource : partsTarget;
-        pump.TargetParts = pumpType == TransferPump.PumpType.SourceToTarget ? partsTarget : partsSource;
-      }
-      var activePump = TransferPump.GetXferPump(xferPumps, pumpType);
-      var ratioPump = TransferPump.GetXferPump(xferPumps, pumpType, true);
-      activePump.XferRatio = 1;
-      ratioPump.XferRatio = TransferPump.CalcRatio(xferPumps, pumpType);
+      var activePump = TransferPump.GetRatioPump(pumps);
+      var ratioPump = TransferPump.GetRatioPump(pumps, true);
+      activePump.PumpRatio = 1;
+      ratioPump.PumpRatio = TransferPump.CalcRatio(pumps);
 
-      var thisXferAmount = activePump.XferAmount(pumpType);
+      var strPumpAmount = activePump.DisplayPumpAmount;
+      var thisXferAmount = double.Parse(strPumpAmount);
 
       // Set tooltips directional data
-      var strTarget = pumpType == TransferPump.PumpType.SourceToTarget ? "Target" : "Source";
+      var strTarget = pumpType == TransferPump.TypePump.SourceToTarget ? "Target" : "Source";
 
 
       // Resource Flow control Display loop
-      ResourceFlowButtons(partsSource, pumpType, scrollPosition, xOffset, yOffset);
+      ResourceFlowButtons(pumpType, scrollPosition, xOffset, yOffset);
 
       // Xfer Controls Display
       // let's determine how much of a resource we can move to the target.
-      var maxXferAmount = TransferPump.CalcMaxXferAmt(partsSource, partsTarget, selectedResources);
-      if (!(maxXferAmount > 0) && !TransferPump.PumpXferActive) return;
+      var maxPumpAmount = TransferPump.CalcMaxPumpAmt(pumps[0].PartsFrom, pumps[0].PartsTo, selectedResources);
+      if (!(maxPumpAmount > 0) && !TransferPump.PumpActive) return;
       GUILayout.BeginHorizontal();
       string label;
       Rect rect;
-      if (TransferPump.PumpXferActive)
+      if (TransferPump.PumpActive)
       {
         // We want to show this during transfer if the direction is correct...
         if (SMAddon.ActivePumpType == pumpType)
         {
           GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
-          GUILayout.Label((activePump.XferAmount(SMAddon.ActivePumpType) - activePump.AmtXferred).ToString("#######0.##"));
+          GUILayout.Label((activePump.PumpBalance).ToString("#######0.##"));
           if (SMAddon.SmVessel.SelectedResources.Count > 1)
-            GUILayout.Label(" | " + (ratioPump.XferAmount(SMAddon.ActivePumpType) - ratioPump.AmtXferred).ToString("#######0.##"));
+            GUILayout.Label(" | " + (ratioPump.PumpBalance).ToString("#######0.##"));
         }
       }
       else
       {
         // Lets parse the string to allow decimal points.
-        var strXferAmount = activePump.XferAmount(pumpType).ToString(CultureInfo.InvariantCulture);
+        strPumpAmount = activePump.DisplayPumpAmount.ToString(CultureInfo.InvariantCulture);
         // add the decimal point if it was typed.
-        strXferAmount = activePump.GetStringDecimal(strXferAmount, pumpType);
+        strPumpAmount = activePump.GetStringDecimal(strPumpAmount);
         // add the zero if it was typed.
-        strXferAmount = activePump.GetStringZero(strXferAmount, pumpType);
+        strPumpAmount = activePump.GetStringZero(strPumpAmount);
 
         // Now update the static var
-        activePump.SetXferAmountString(strXferAmount, pumpType);
+        activePump.SetXferAmountString(strPumpAmount);
         if (selectedResources.Count > 1)
         {
           label = "Xfer Amts:";
@@ -823,18 +833,18 @@ namespace ShipManifest.Windows
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-        strXferAmount = GUILayout.TextField(strXferAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
+        strPumpAmount = GUILayout.TextField(strPumpAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
         // update decimal bool 
-        activePump.SetStringDecimal(strXferAmount, pumpType);
+        activePump.SetStringDecimal(strPumpAmount);
         //update zero bool 
-        activePump.SetStringZero(strXferAmount, pumpType);
+        activePump.SetStringZero(strPumpAmount);
         // Update static Xfer Amount var
-        thisXferAmount = activePump.UpdateXferAmount(strXferAmount, pumpType);
-        var ratioXferAmt = thisXferAmount * ratioPump.XferRatio > ratioPump.FromCapacity(pumpType) ? ratioPump.FromCapacity(pumpType) : thisXferAmount * ratioPump.XferRatio;
+        thisXferAmount = activePump.UpdateXferAmount(strPumpAmount);
+        var ratioXferAmt = thisXferAmount * ratioPump.PumpRatio > ratioPump.FromCapacity() ? ratioPump.FromCapacity() : thisXferAmount * ratioPump.PumpRatio;
         if (SMAddon.SmVessel.SelectedResources.Count > 1)
         {
           label = " | " + ratioXferAmt.ToString("#######0.##");
-          toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.XferRatio + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
+          toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.PumpRatio + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
           GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(80));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -843,7 +853,7 @@ namespace ShipManifest.Windows
       }
       GUILayout.EndHorizontal();
 
-      if (SMConditions.IsShipControllable() && SMConditions.CanResourceBeXferred(pumpType, maxXferAmount))
+      if (SMConditions.IsShipControllable() && SMConditions.CanResourceBeXferred(pumpType, maxPumpAmount))
       {
         GUILayout.BeginHorizontal();
         var noPad = SMStyle.LabelStyleNoPad;
@@ -853,92 +863,42 @@ namespace ShipManifest.Windows
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-        thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxXferAmount, GUILayout.Width(190));
+        thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount, GUILayout.Width(190));
 
         // set Xfer button style
-        var xferContent = !TransferPump.PumpXferActive ? new GUIContent("Xfer", "Transfers the selected resource\r\nto the selected " + strTarget + " Part") : new GUIContent("Stop", "Halts the Transfer of the selected resource\r\nto the selected " + strTarget + " Part");
+        var xferContent = !TransferPump.PumpActive ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected " + strTarget + " Part(s)") : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected " + strTarget + " Part(s)");
 
         if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
         {
-          if (!TransferPump.PumpXferActive)
+          var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), pumps[0].PartsFrom.First(), pumps[0].PartsTo.Last(), pumpType, TransferPump.TriggerButton.Transfer);
+          if (!TransferPump.PumpActive)
           {
             //Calc amounts and update xfer modules
-            AssignXferAmounts(xferPumps, pumpType, thisXferAmount);
-            ProcessController.TransferResources(partsSource, partsTarget);
+            TransferPump.AssignPumpAmounts(pumps, thisXferAmount, pumpId);
+            ProcessController.TransferResources(pumps);
           }
-          else if (TransferPump.PumpXferActive && SMSettings.RealismMode)
-            TransferPump.ProcessState = TransferPump.PumpState.Stop;
+          else TransferPump.AbortPumpProcess(pumpId);
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
         GUILayout.EndHorizontal();
       }
-      if (!TransferPump.PumpXferActive)
-        activePump.UpdateXferAmount(thisXferAmount.ToString(CultureInfo.InvariantCulture), pumpType);
+      if (!TransferPump.PumpActive)
+        activePump.UpdateXferAmount(thisXferAmount.ToString(CultureInfo.InvariantCulture));
     }
 
-    private static void AssignXferAmounts(List<TransferPump> xferPumps, TransferPump.PumpType pumpType, double thisXferAmount)
-    {
-      if (xferPumps.Count > 1)
-      {
-        // Calculate Ratio and transfer amounts.  Ratio is based off the largest amount to move, so will always be less than 1.
-        var ratio = TransferPump.CalcRatio(xferPumps, pumpType);
-
-        if (xferPumps[0].ToCapacity(pumpType) > xferPumps[1].ToCapacity(pumpType))
-        {
-          xferPumps[0].XferRatio = 1;
-          xferPumps[1].XferRatio = ratio;
-          if (pumpType == TransferPump.PumpType.SourceToTarget)
-          {
-            xferPumps[0].SrcXferAmount = thisXferAmount;
-            xferPumps[1].SrcXferAmount = thisXferAmount * ratio <= xferPumps[1].FromCapacity(pumpType) ? thisXferAmount * ratio : xferPumps[1].FromCapacity(pumpType);
-          }
-          else
-          {
-            xferPumps[0].TgtXferAmount = thisXferAmount;
-            xferPumps[1].TgtXferAmount = thisXferAmount * ratio <= xferPumps[1].FromCapacity(pumpType) ? thisXferAmount * ratio : xferPumps[1].FromCapacity(pumpType);
-          }
-        }
-        else
-        {
-          xferPumps[1].XferRatio = 1;
-          xferPumps[0].XferRatio = ratio;
-          if (pumpType == TransferPump.PumpType.SourceToTarget)
-          {
-            xferPumps[1].SrcXferAmount = thisXferAmount;
-            xferPumps[0].SrcXferAmount = thisXferAmount * ratio <= xferPumps[0].FromCapacity(pumpType) ? thisXferAmount * ratio : xferPumps[0].FromCapacity(pumpType);
-          }
-          else
-          {
-            xferPumps[1].TgtXferAmount = thisXferAmount;
-            xferPumps[0].TgtXferAmount = thisXferAmount * ratio <= xferPumps[0].FromCapacity(pumpType) ? thisXferAmount * ratio : xferPumps[0].FromCapacity(pumpType);
-          }
-        }
-      }
-      else
-      {
-        xferPumps[0].XferRatio = 1;
-        if (pumpType == TransferPump.PumpType.SourceToTarget)
-          xferPumps[0].SrcXferAmount = thisXferAmount;
-        else
-          xferPumps[0].TgtXferAmount = thisXferAmount;
-      }
-    }
-
-    private static void ResourceFlowButtons(List<Part> partsSource, TransferPump.PumpType pumpType, Vector2 scrollPosition, int scrollX, int scrollY)
+    private static void ResourceFlowButtons(TransferPump.TypePump pumpType, Vector2 scrollPosition, int scrollX, int scrollY)
     {
       var step = "";
       try
       {
-        if (partsSource.Count <= 0) return;
-        step = "We have parts.";
-        foreach (var pump in SMAddon.SmVessel.TransferPumps)
+        foreach (var pump in DisplayPumps)
         {
           var resource = pump.ResourceName;
 
           // this var is used for button state change management
-          var flowState = partsSource.Any(part => !part.Resources[resource].flowState);
+          var flowState = pump.PartsFrom.Any(part => !part.Resources[resource].flowState);
           var flowtext = flowState ? "On" : "Off";
 
           // Flow control Display
@@ -946,14 +906,14 @@ namespace ShipManifest.Windows
 
           GUILayout.BeginHorizontal();
 
-          GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, pump.FromAmtRemaining(pumpType).ToString("#######0.##"), pump.FromCapacity(pumpType).ToString("######0.##")), SMStyle.LabelStyleNoWrap, GUILayout.Width(220), GUILayout.Height(18));
+          GUILayout.Label(string.Format("{0}: ({1}/{2})", resource, pump.FromRemaining().ToString("#######0.##"), pump.FromCapacity().ToString("######0.##")), SMStyle.LabelStyleNoWrap, GUILayout.Width(220), GUILayout.Height(18));
           GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(20), GUILayout.Height(18));
           if (SMAddon.SmVessel.Vessel.IsControllable)
           {
             step = "render flow button(s)";
             if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s)."), GUILayout.Width(40), GUILayout.Height(20)))
             {
-              foreach (var part in partsSource)
+              foreach (var part in pump.PartsFrom)
               {
                 part.Resources[resource].flowState = !flowState;
               }
@@ -983,13 +943,13 @@ namespace ShipManifest.Windows
 
     #region Button Action Methods
 
-    private static void PartButtonToggled(TransferPump.PumpType pumpType, Part part)
+    private static void PartButtonToggled(TransferPump.TypePump pumpType, Part part)
     {
       var step = "Part Button Toggled";
       try
       {
         if (SMConditions.IsTransferInProgress()) return;
-        if (pumpType == TransferPump.PumpType.SourceToTarget)
+        if (pumpType == TransferPump.TypePump.SourceToTarget)
         {
           // Now lets update the list...
           if (SMAddon.SmVessel.SelectedPartsSource.Contains(part))
@@ -1025,12 +985,7 @@ namespace ShipManifest.Windows
         }
         step = "Set Xfer amounts?";
         if (!SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources)) return;
-        step = "Set Xfer amounts = yes";
-        foreach (var pump in SMAddon.SmVessel.TransferPumps)
-        {
-          pump.SrcXferAmount = TransferPump.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, pump.ResourceName);
-          pump.TgtXferAmount = TransferPump.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, pump.ResourceName);
-        }
+        TransferPump.UpdateDisplayPumps(true);
       }
       catch (Exception ex)
       {
@@ -1042,12 +997,12 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void VesselButtonToggled(TransferPump.PumpType pumpType, ModDockedVessel modVessel)
+    private static void VesselButtonToggled(TransferPump.TypePump pumpType, ModDockedVessel modVessel)
     {
       var step = "Vessel Button Toggled";
       try
       {
-        if (pumpType == TransferPump.PumpType.SourceToTarget)
+        if (pumpType == TransferPump.TypePump.SourceToTarget)
         {
           // Now lets update the list...
           if (SMAddon.SmVessel.SelectedVesselsSource.Contains(modVessel))
@@ -1065,12 +1020,6 @@ namespace ShipManifest.Windows
           SMAddon.SmVessel.SelectedPartsTarget = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, SMAddon.SmVessel.SelectedResources);
         }
         WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
-        step = "Set Xfer amounts?";
-        foreach (var pump in SMAddon.SmVessel.TransferPumps)
-        {
-          pump.SrcXferAmount = TransferPump.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, pump.ResourceName);
-          pump.TgtXferAmount = TransferPump.CalcMaxResourceXferAmt(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, pump.ResourceName);
-        }
       }
       catch (Exception ex)
       {
@@ -1099,11 +1048,11 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static bool IsPartSelectable(string selectedResource, TransferPump.PumpType pumpType, Part part)
+    private static bool IsPartSelectable(string selectedResource, TransferPump.TypePump pumpType, Part part)
     {
       if (selectedResource == SMConditions.ResourceType.Crew.ToString() || selectedResource == SMConditions.ResourceType.Science.ToString()) return true;
       var isSelectable = true;
-      if (pumpType == TransferPump.PumpType.SourceToTarget)
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
         if (SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
           isSelectable = false;
@@ -1116,32 +1065,21 @@ namespace ShipManifest.Windows
       return isSelectable;
     }
 
-    private static bool IsPartDumpable(TransferPump.PumpType pumpType, Part part)
+    private static bool CanDumpPart(TransferPump.TypePump pumpType, Part part)
     {
       var isDumpable = false;
-      if (pumpType == TransferPump.PumpType.SourceToTarget)
-      {
-        if (SMAddon.SmVessel.SelectedPartsSource.Contains(part)) isDumpable = true;
-      }
+      if (SMAddon.SmVessel.SelectedResources.Count > 1)
+        isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0 || part.Resources[SMAddon.SmVessel.SelectedResources[1]].amount > 0;
       else
-      {
-        if (SMAddon.SmVessel.SelectedPartsTarget.Contains(part)) isDumpable = true;
-      }
-
-      if (isDumpable)
-        if (SMAddon.SmVessel.SelectedResources.Count > 1)
-          isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0 || part.Resources[SMAddon.SmVessel.SelectedResources[1]].amount > 0;
-        else
-          isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0;
+        isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0;
 
       return isDumpable;
-
     }
 
-    private static bool IsVesselSelectable(TransferPump.PumpType pumpType, ModDockedVessel modDockedVessel)
+    private static bool CanSelectVessel(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
     {
       var isSelectable = true;
-      if (pumpType == TransferPump.PumpType.SourceToTarget)
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
         if (SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel))
           isSelectable = false;
@@ -1154,10 +1092,10 @@ namespace ShipManifest.Windows
       return isSelectable;
     }
 
-    private static GUIStyle GetPartButtonStyle(TransferPump.PumpType pumpType, Part part)
+    private static GUIStyle GetPartButtonStyle(TransferPump.TypePump pumpType, Part part)
     {
       GUIStyle style;
-      if (pumpType == TransferPump.PumpType.SourceToTarget)
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
         style = SMAddon.SmVessel.SelectedPartsSource.Contains(part) ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
       }
@@ -1168,10 +1106,10 @@ namespace ShipManifest.Windows
       return style;
     }
 
-    private static GUIStyle GetVesselButtonStyle(TransferPump.PumpType pumpType, ModDockedVessel modDockedVessel)
+    private static GUIStyle GetVesselButtonStyle(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
     {
       GUIStyle style;
-      if (pumpType == TransferPump.PumpType.SourceToTarget)
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
         style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel) ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
       }

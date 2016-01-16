@@ -13,7 +13,7 @@ namespace ShipManifest
 
         // WindowTransfer part mouseover vars
         internal static bool IsMouseOver;
-        internal static TransferPump.PumpType MouseOverMode = TransferPump.PumpType.SourceToTarget;
+        internal static TransferPump.TypePump MouseOverMode = TransferPump.TypePump.SourceToTarget;
         internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
         internal static Part MouseOverpart;
         internal static List<Part> MouseOverparts;

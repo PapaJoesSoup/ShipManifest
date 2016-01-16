@@ -22,9 +22,9 @@ namespace ShipManifest
       return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealismMode) || !SMSettings.RealismMode;
     }
 
-    internal static bool CanResourceBeXferred(TransferPump.PumpType thisXferMode, double maxXferAmount)
+    internal static bool CanResourceBeXferred(TransferPump.TypePump thisXferMode, double maxXferAmount)
     {
-      return (!TransferPump.PumpXferActive && maxXferAmount > 0) || (TransferPump.PumpXferActive && SMAddon.ActivePumpType == thisXferMode);
+      return (!TransferPump.PumpActive && maxXferAmount > 0) || (TransferPump.PumpActive && SMAddon.ActivePumpType == thisXferMode);
     }
 
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
@@ -203,17 +203,19 @@ namespace ShipManifest
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return !SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && SMConditions.AreSelectedResourcesTypeOther(new List<string>() { resourceName });
+      return (!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && SMConditions.AreSelectedResourcesTypeOther(new List<string>() { resourceName })) 
+        && TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance;
     }
 
     internal static bool CanResourceBeDumped(string resourceName)
     {
-      return SMSettings.RealismMode && SMConditions.AreSelectedResourcesTypeOther(new List<string>() { resourceName });
+      return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance &&
+        SMConditions.IsResourceTypeOther(resourceName);
     }
 
     internal static bool IsTransferInProgress()
     {
-      return SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpXferActive;
+      return SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpActive;
     }
 
     internal static bool ResourceIsSingleton(string resourceName)
@@ -229,6 +231,11 @@ namespace ShipManifest
     internal static bool IsResourceTypeOther(string resourceName)
     {
       return !resourceName.Contains(SMConditions.ResourceType.Crew.ToString()) && !resourceName.Contains(SMConditions.ResourceType.Science.ToString());
+    }
+
+    internal static bool IsSelectedResourceTypeOther(string resourceName)
+    {
+      return AreSelectedResourcesTypeOther(new List<string>() { resourceName });
     }
 
     internal static bool AreSelectedResourcesTypeOther(List<string> resourceNames)
@@ -303,14 +310,14 @@ namespace ShipManifest
     {
       if (resourceName == SMConditions.ResourceType.Crew.ToString()) return ResourceType.Crew;
       if (resourceName == SMConditions.ResourceType.Science.ToString()) return ResourceType.Science;
-      return ResourceType.Other;
+      return ResourceType.Pump;
     }
 
     internal enum ResourceType
     {
       Crew,
       Science,
-      Other
+      Pump
     }
 
     internal enum Window

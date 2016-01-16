@@ -178,7 +178,7 @@ namespace ShipManifest.Windows
         }
         if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
         {
-          SMAddon.SmVessel.DumpResources();
+          SMAddon.SmVessel.DumpAllResources();
        }
         GUILayout.EndHorizontal();
       }
@@ -198,8 +198,8 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           var width = 273;
-          if (SMConditions.CanResourceBeFilled(resourceName)) width = 185;
-          else if (SMConditions.CanResourceBeDumped(resourceName)) width = 223;
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName)) width = 185;
+          else if (SMConditions.IsResourceTypeOther(resourceName)) width = 223;
 
           var displayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
           var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -207,23 +207,25 @@ namespace ShipManifest.Windows
           {
             ResourceButtonToggled(resourceName);
           }
-          if (SMConditions.CanResourceBeDumped(resourceName))
+          if (SMConditions.IsResourceTypeOther(resourceName))
           {
-            GUI.enabled = SMAddon.SmVessel.SelectedResources.Contains(resourceName);
-            var dumpContent = !TransferPump.PumpXferActive ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+            var pumpId = TransferPump.GetPumpIdFromHash(resourceName, SMAddon.SmVessel.PartsByResource[resourceName].First(), SMAddon.SmVessel.PartsByResource[resourceName].Last(), TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+            GUI.enabled = SMConditions.CanResourceBeDumped(resourceName);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
-              SMAddon.SmVessel.DumpResource(resourceName);
+              SMAddon.SmVessel.ToggleDumpResource(resourceName, pumpId);
             }
-            GUI.enabled = true;
           }
-          if (SMConditions.CanResourceBeFilled(resourceName))
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName))
           {
+            GUI.enabled = SMConditions.CanResourceBeFilled(resourceName);
             if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.FillResource(resourceName);
             }
           }
+          GUI.enabled = true;
           GUILayout.EndHorizontal();
         }
       }

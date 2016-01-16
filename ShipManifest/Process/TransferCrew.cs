@@ -5,6 +5,12 @@ namespace ShipManifest.Process
   public class TransferCrew : ICrewTransfer
   {
 
+    // Default sound license: CC-By-SA
+    // http://www.freesound.org/people/adcbicycle/sounds/14214/
+    internal static string path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
+    internal static string path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
+    internal static string path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
+
     // OnCrewTransferred Event Handling Flags
     internal static DateTime Timestamp;
     internal static bool FireSourceXferEvent;
@@ -199,17 +205,6 @@ namespace ShipManifest.Process
               // We're just starting loop, so set some evnironment stuff.
               Timestamp = DateTime.Now;
               CrewXferState = XferState.Start;
-
-              if (SMSettings.RealismMode)
-              {
-                // Default sound license: CC-By-SA
-                // http://www.freesound.org/people/adcbicycle/sounds/14214/
-                var path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
-                var path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
-                var path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
-
-                SMAddon.LoadSounds(SMConditions.ResourceType.Crew.ToString(), path1, path2, path3, SMSettings.CrewSoundVol);
-              }
               break;
 
             case XferState.Start:
@@ -219,10 +214,10 @@ namespace ShipManifest.Process
               if (SMSettings.RealismMode)
               {
                 // Play run sound when start sound is nearly done. (repeats)
-                if (SMAddon.Elapsed >= SMAddon.Source1.clip.length - 0.25)
+                if (SMAddon.Elapsed >= SMAddon.AudioClipPumpStart.length - 0.25)
                 {
-                  Utilities.LogMessage("Source2.play():  started.", "info", SMSettings.VerboseLogging);
-                  SMAddon.Source2.Play();
+                  Utilities.LogMessage("SourceRun.play():  started.", "info", SMSettings.VerboseLogging);
+                  SMAddon.AudioSourcePumpRun.Play();
                   SMAddon.Elapsed = 0;
                   CrewXferState = XferState.Transfer;
                 }
@@ -256,8 +251,8 @@ namespace ShipManifest.Process
               if (SMSettings.RealismMode)
               {
                 // play crew sit.
-                SMAddon.Source2.Stop();
-                SMAddon.Source3.Play();
+                SMAddon.AudioSourcePumpRun.Stop();
+                SMAddon.AudioSourcePumpStop.Play();
               }
               SMAddon.Elapsed = 0;
               CrewTransferAction();
@@ -403,8 +398,8 @@ namespace ShipManifest.Process
     {
       if (SMSettings.RealismMode)
       {
-        SMAddon.Source2.Stop();
-        SMAddon.Source3.Play();
+        SMAddon.AudioSourcePumpRun.Stop();
+        SMAddon.AudioSourcePumpStop.Play();
       }
       SMAddon.Elapsed = 0;
       SMAddon.SmVessel.TransferCrewObj.IvaDelayActive = false;

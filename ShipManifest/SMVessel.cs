@@ -46,8 +46,6 @@ namespace ShipManifest
     #region Instance Properties
 
     // variables used for tracking xfer sliders for resources.
-    internal double AmtXferred = 0;
-
     internal Vessel Vessel
     {
       get { return _controllers.Single(p => p.Value == this).Key.Target; }
@@ -282,13 +280,16 @@ namespace ShipManifest
       // now lets reconcile the selected parts based on the new list of resources...
       WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
 
+      // Now lets update the Resource Xfer Objects...
+      TransferPump.UpdateDisplayPumps(false);
+
+      // now SM settings / hatches.
       if (SMSettings.EnableCls && SMConditions.CanShowShipManifest())
       {
         if (SMAddon.GetClsAddon())
         {
           SMAddon.UpdateClsSpaces();
-          if (SMAddon.GetClsVessel())
-            GetHatches();
+          if (SMAddon.GetClsVessel()) GetHatches();
         }
       }
 
@@ -505,34 +506,38 @@ namespace ShipManifest
       }
     }
 
-    internal void DumpResources()
+    internal void DumpAllResources()
     {
-      if (!TransferPump.PumpDumpActive)
+      var otherResourcesList = (from s in SMAddon.SmVessel.ResourceList where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump select s).ToList();
+      List<TransferPump> pumpList = new List<TransferPump>();
+      var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()), SMAddon.SmVessel.Vessel.parts.First(),SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight);
+      foreach (var resource in otherResourcesList)
       {
-        var otherResourcesList = (from s in SMAddon.SmVessel.ResourceList where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Other select s).ToList();
-        foreach (var resource in otherResourcesList)
-        {
-          var pump = new TransferPump(resource, TransferPump.PumpType.Dump);
-          pump.DumpParts = SMAddon.SmVessel.PartsByResource[resource];
-          SMAddon.SmVessel.TransferPumps.Add(pump);
-        }
+        var pump = new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight, TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resource], resource));
+        pump.PartsFrom = SMAddon.SmVessel.PartsByResource[resource];
+        pump.PumpId = pumpId;
+        pumpList.Add(pump);
+      }
+      if (!TransferPump.PumpsInProgress(pumpId).Any())
+      {
+        SMAddon.SmVessel.TransferPumps.AddRange(pumpList);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
-        TransferPump.ProcessState = TransferPump.PumpState.Stop;
+      else TransferPump.AbortPumpProcess(pumpId);
     }
 
-    internal void DumpResource(string resourceName)
+    internal void ToggleDumpResource(string resourceName, uint pumpId)
     {
-      if (!TransferPump.PumpDumpActive)
+      //Fired by Resource Dump on Manifest Window.
+      var pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest, TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName));
+      pump.PartsFrom = SMAddon.SmVessel.PartsByResource[resourceName];
+      pump.PumpId = pumpId;
+      if (!TransferPump.IsPumpInProgress(pumpId))
       {
-        var pump = new TransferPump(resourceName, TransferPump.PumpType.Dump);
-        pump.DumpParts = SMAddon.SmVessel.PartsByResource[resourceName];
         SMAddon.SmVessel.TransferPumps.Add(pump);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else if (TransferPump.PumpDumpActive && SMSettings.RealismMode)
-        TransferPump.ProcessState = TransferPump.PumpState.Stop;
+      else TransferPump.AbortPumpProcess(pumpId);
     }
 
     internal void FillResources()
