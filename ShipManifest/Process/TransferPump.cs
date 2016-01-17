@@ -53,7 +53,6 @@ namespace ShipManifest.Process
     // process vars
     internal double PumpRatio = 1;
     internal double AmtPumped;
-    internal double AmtPumpedOld;
     internal double PumpBalance
     {
       get
@@ -64,7 +63,22 @@ namespace ShipManifest.Process
 
 
     // for Viewers
-    internal string DisplayPumpAmount = "0";
+    private string _editSliderAmount = "0";
+    internal string EditSliderAmount
+    {
+      get
+      {
+        return _editSliderAmount;
+      }
+      set
+      {
+        _editSliderAmount = value;
+        SetStringDecimal(_editSliderAmount);
+        SetStringZero(_editSliderAmount);
+        GetStringDecimal(_editSliderAmount);
+        GetStringZero(_editSliderAmount);
+      }
+    }
     internal bool PumpAmountHasDecimal;
     internal bool PumpAmountHasZero;
 
@@ -101,9 +115,9 @@ namespace ShipManifest.Process
           switch (pump.PumpStatus)
           {
             case PumpState.Off:
+              pump.TimeStamp = DateTime.Now;
               pump.Start();
               pump.PumpStatus = PumpState.Start;
-              pump.TimeStamp = DateTime.Now;
               Utilities.LogMessage(string.Format("TransferPump.ProcessPumps: Off. Resource:  {0}, PumpBalance = {1}, IsPumpOn = {2}, PumpStatus = {3}", pump.ResourceName, pump.PumpBalance, pump.IsPumpOn, pump.PumpStatus.ToString()), "Info", SMSettings.VerboseLogging);
               break;
             case PumpState.Start:
@@ -159,20 +173,22 @@ namespace ShipManifest.Process
       // reset counters
       Elapsed = 0;
       FlowRate = SMSettings.FlowRate;
-      AmtPumped = AmtPumpedOld = 0;
+      AmtPumped = 0;
       SMAddon.AudioSourcePumpStart.Play();
-      Utilities.LogMessage("TransferPump.TransferPump.Start - Play start sound...", "Info", SMSettings.VerboseLogging);
+      Utilities.LogMessage("TransferPump.TransferPump.Start:  Play start sound...", "Info", SMSettings.VerboseLogging);
     }
 
     private void Run()
     {
       if (Elapsed >= SMAddon.AudioSourcePumpStart.clip.length - 0.25)
       {
+        if (SMAddon.AudioSourcePumpStart.isPlaying) SMAddon.AudioSourcePumpStart.Stop();
+
         // This is the run sound.  we need this only if it is not already playing..
         if (!SMAddon.AudioSourcePumpRun.isPlaying)
         {
           SMAddon.AudioSourcePumpRun.Play();
-          Utilities.LogMessage("TransferPump.PransferPump.Run - Play Run sound...", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("TransferPump.PransferPump.Run:  Play Run sound...", "Info", SMSettings.VerboseLogging);
         }
         Elapsed = 0;
         IsPumpOn = true;
@@ -214,13 +230,14 @@ namespace ShipManifest.Process
     {
       // Reset transfer related pump vars.
       IsPumpOn = false;
-      AmtPumped = AmtPumpedOld = 0;
+      AmtPumped = 0;
 
       if ((from pump in SMAddon.SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
         SMAddon.AudioSourcePumpRun.Stop();
       // play pump shutdown.
       SMAddon.AudioSourcePumpStop.Play();
       Elapsed = 0;
+      Utilities.LogMessage("TransferPump.TransferPump.Start:  Play start sound...", "Info", SMSettings.VerboseLogging);
     }
 
     internal static void ProcessSinglePump(TransferPump pump, double pumpCycleAmount)
@@ -493,48 +510,31 @@ namespace ShipManifest.Process
 
     #region Logic/State Methods
 
-    // these methods are for managing textbox string data entry for xfer amounts 
-    internal void SetXferAmountString(string xferAmount)
+    internal string GetStringDecimal(string strPumpAmount)
     {
-      // Needed so we can alter slider controls on both the source and target windows.
-      DisplayPumpAmount = xferAmount;
+      if (PumpAmountHasDecimal && !strPumpAmount.Contains(".")) strPumpAmount += ".";
+      return strPumpAmount;
     }
 
-    internal float UpdateXferAmount(string strXferAmount)
+    internal string GetStringZero(string strPumpAmount)
     {
-      // Needed so we can alter slider controls on both the source and target windows.
-      // Also, slider requires a float number...
-      float newAmount;
-      if (float.TryParse(strXferAmount, out newAmount))
-        PumpAmount = newAmount;
-      return newAmount;
+      if (PumpAmountHasZero && !strPumpAmount.EndsWith("0")) strPumpAmount += "0";
+      return strPumpAmount;
     }
 
-    internal string GetStringDecimal(string strXferAmount)
-    {
-      if (PumpAmountHasDecimal) strXferAmount += ".";
-      return strXferAmount;
-    }
-
-    internal string GetStringZero(string strXferAmount)
-    {
-      if (PumpAmountHasZero) strXferAmount += "0";
-      return strXferAmount;
-    }
-
-    internal void SetStringZero(string strXferAmount)
+    internal void SetStringZero(string strPumpAmount)
     {
       // sets static vars at a higher scope than calling routine.
-      if (strXferAmount.Contains(".") && strXferAmount.EndsWith("0"))
+      if (strPumpAmount.Contains(".") && strPumpAmount.EndsWith("0"))
         PumpAmountHasZero = true;
       else
         PumpAmountHasZero = false;
     }
 
-    internal void SetStringDecimal(string strXferAmount)
+    internal void SetStringDecimal(string strPumpAmount)
     {
       // sets static vars at a higher scope than calling routine.
-      if (strXferAmount.EndsWith(".") || strXferAmount.EndsWith(".0"))
+      if (strPumpAmount.Contains("."))
         PumpAmountHasDecimal = true;
       else
         PumpAmountHasDecimal = false;
@@ -643,7 +643,7 @@ namespace ShipManifest.Process
           // Lets update pump data (it persists).
           pump.PartsFrom = pump.PumpType == TypePump.SourceToTarget ? SMAddon.SmVessel.SelectedPartsSource : SMAddon.SmVessel.SelectedPartsTarget;
           pump.PartsTo = pump.PumpType == TypePump.SourceToTarget ? SMAddon.SmVessel.SelectedPartsTarget : SMAddon.SmVessel.SelectedPartsSource;
-          if (resetAmt) pump.PumpAmount = pump.MaxPumpAmt();
+          if (resetAmt) pump.EditSliderAmount = pump.MaxPumpAmt().ToString();
         }
       }
     }

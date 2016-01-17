@@ -776,9 +776,6 @@ namespace ShipManifest.Windows
       activePump.PumpRatio = 1;
       ratioPump.PumpRatio = TransferPump.CalcRatio(pumps);
 
-      var strPumpAmount = activePump.DisplayPumpAmount;
-      var thisXferAmount = double.Parse(strPumpAmount);
-
       // Set tooltips directional data
       var strTarget = pumpType == TransferPump.TypePump.SourceToTarget ? "Target" : "Source";
 
@@ -788,6 +785,7 @@ namespace ShipManifest.Windows
 
       // Xfer Controls Display
       // let's determine how much of a resource we can move to the target.
+      var thisXferAmount = double.Parse(activePump.EditSliderAmount);
       var maxPumpAmount = TransferPump.CalcMaxPumpAmt(pumps[0].PartsFrom, pumps[0].PartsTo, selectedResources);
       if (!(maxPumpAmount > 0) && !TransferPump.PumpActive) return;
       GUILayout.BeginHorizontal();
@@ -806,15 +804,6 @@ namespace ShipManifest.Windows
       }
       else
       {
-        // Lets parse the string to allow decimal points.
-        strPumpAmount = activePump.DisplayPumpAmount.ToString(CultureInfo.InvariantCulture);
-        // add the decimal point if it was typed.
-        strPumpAmount = activePump.GetStringDecimal(strPumpAmount);
-        // add the zero if it was typed.
-        strPumpAmount = activePump.GetStringZero(strPumpAmount);
-
-        // Now update the static var
-        activePump.SetXferAmountString(strPumpAmount);
         if (selectedResources.Count > 1)
         {
           label = "Xfer Amts:";
@@ -833,13 +822,8 @@ namespace ShipManifest.Windows
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-        strPumpAmount = GUILayout.TextField(strPumpAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
-        // update decimal bool 
-        activePump.SetStringDecimal(strPumpAmount);
-        //update zero bool 
-        activePump.SetStringZero(strPumpAmount);
-        // Update static Xfer Amount var
-        thisXferAmount = activePump.UpdateXferAmount(strPumpAmount);
+        activePump.EditSliderAmount = GUILayout.TextField(activePump.EditSliderAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
+        thisXferAmount = double.Parse(activePump.EditSliderAmount);
         var ratioXferAmt = thisXferAmount * ratioPump.PumpRatio > ratioPump.FromCapacity() ? ratioPump.FromCapacity() : thisXferAmount * ratioPump.PumpRatio;
         if (SMAddon.SmVessel.SelectedResources.Count > 1)
         {
@@ -864,7 +848,7 @@ namespace ShipManifest.Windows
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
         thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount, GUILayout.Width(190));
-
+        activePump.EditSliderAmount = thisXferAmount.ToString();
         // set Xfer button style
         var xferContent = !TransferPump.PumpActive ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected " + strTarget + " Part(s)") : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected " + strTarget + " Part(s)");
 
@@ -884,8 +868,6 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
         GUILayout.EndHorizontal();
       }
-      if (!TransferPump.PumpActive)
-        activePump.UpdateXferAmount(thisXferAmount.ToString(CultureInfo.InvariantCulture));
     }
 
     private static void ResourceFlowButtons(TransferPump.TypePump pumpType, Vector2 scrollPosition, int scrollX, int scrollY)
