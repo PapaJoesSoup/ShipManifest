@@ -875,12 +875,13 @@ namespace ShipManifest.Windows
       var step = "";
       try
       {
-        foreach (var pump in DisplayPumps)
+        var displayPumps = TransferPump.GetDisplayPumpsByType(pumpType);
+        foreach (var pump in displayPumps)
         {
           var resource = pump.ResourceName;
 
           // this var is used for button state change management
-          var flowState = pump.PartsFrom.Any(part => !part.Resources[resource].flowState);
+          var flowState = pump.PartsFrom.Any(part => part.Resources[resource].flowState);
           var flowtext = flowState ? "On" : "Off";
 
           // Flow control Display
