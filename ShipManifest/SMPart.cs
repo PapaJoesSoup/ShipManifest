@@ -54,11 +54,11 @@ namespace ShipManifest
 
     internal static void ToggleDumpResource(List<Part> partList, List<string> resourceNames, uint pumpId)
     {
-      // This routine is called by the dump part buttin on the Transfer Window interface.
+      // This routine is called by the dump part button on the Transfer Window interface.
       // This routine is also called by the dump docked vessel button on the Transfer window interface.
       List<TransferPump> pumpList = resourceNames.Select(resource => new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer, TransferPump.CalcRemainingResource(partList, resource))
       {
-        FromParts = partList, PumpId = pumpId
+        FromParts = partList, PumpId = pumpId, PumpRatio = 1
       }).ToList();
       if (!TransferPump.PumpsInProgress(pumpId).Any())
         ProcessController.DumpResources(pumpList);

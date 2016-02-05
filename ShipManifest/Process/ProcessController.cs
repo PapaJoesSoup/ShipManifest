@@ -100,6 +100,7 @@ namespace ShipManifest.Process
           // Turn on Pumps for timed process...
           foreach (var pump in pumps)
           {
+            pump.PumpRatio = 1;
             pump.IsPumpOn = true;
           }
           // Add pumps to pump queue
