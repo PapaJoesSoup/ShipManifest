@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DF;
+using ShipManifest.APIClients;
 using ShipManifest.Windows;
 using UnityEngine;
 
@@ -53,11 +53,11 @@ namespace ShipManifest
             totAmount = SMAddon.SmVessel.Vessel.GetCrewCapacity();
 
             // if DF installed, get total frozen and add to count.
-            if (DFInterface.IsDFInstalled)
+            if (InstalledMods.IsDfInstalled)
             {
               var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
               // ReSharper disable once SuspiciousTypeConversion.Global
-              currAmount = cryofreezers.Select(cryoFreezer => (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault()).Aggregate(currAmount, (current, deepFreezer) => current + ((IDeepFreezer)deepFreezer).DFITotalFrozen);
+              currAmount = cryofreezers.Select(cryoFreezer => (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault()).Aggregate(currAmount, (current, deepFreezer) => current + new DFWrapper.DeepFreezer(deepFreezer).TotalFrozen);
             }
 
             // Now check for occupied external seats
@@ -68,7 +68,7 @@ namespace ShipManifest
             totAmount -= seatCount.Count;
             break;
           case SMConditions.ResourceType.Science:
-            currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double) module.GetScienceCount());
+            currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double)module.GetScienceCount());
             break;
         }
         displayAmount = selectedResource != SMConditions.ResourceType.Science.ToString() ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0")) : string.Format(" - ({0})", currAmount.ToString("#######0"));
@@ -84,13 +84,13 @@ namespace ShipManifest
     internal static int GetPartCrewCount(Part part)
     {
       var crewCount = 0;
-      if (!DFInterface.IsDFInstalled) return crewCount + part.protoModuleCrew.Count;
+      if (!InstalledMods.IsDfInstalled) return crewCount + part.protoModuleCrew.Count;
       if (part.Modules.Contains("DeepFreezer"))
       {
-        var deepFreezer = (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        var freezerModule = (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
         // ReSharper disable once SuspiciousTypeConversion.Global
-        var freezer = (IDeepFreezer)deepFreezer;
-        if (freezer != null) crewCount += freezer.DFITotalFrozen;
+        var freezer = new DFWrapper.DeepFreezer(freezerModule);
+        crewCount += freezer.TotalFrozen;
       }
       return crewCount + part.protoModuleCrew.Count;
     }

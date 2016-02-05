@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ShipManifest.Windows;
+using ShipManifest.APIClients;
 using ShipManifest.Process;
-using DF;
+using ShipManifest.Windows;
 
 namespace ShipManifest
 {
@@ -13,6 +11,7 @@ namespace ShipManifest
   /// This will likely get refactored out as a better understanding of the various conditions is realized with this refactor.  
   /// All are bools, and many are being refactored into enums.  Therefore, enums and their supporting methods reside here as well.
   /// </summary>
+  // ReSharper disable once InconsistentNaming
   internal static class SMConditions
   {
     #region Condition Methods
@@ -24,7 +23,7 @@ namespace ShipManifest
 
     internal static bool CanResourceBeXferred(TransferPump.TypePump thisXferMode, double maxXferAmount)
     {
-      return (!TransferPump.PumpActive && maxXferAmount > 0) || (TransferPump.PumpActive && SMAddon.ActivePumpType == thisXferMode);
+      return (!TransferPump.PumpProcessOn && maxXferAmount > 0) || (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
     }
 
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
@@ -32,7 +31,7 @@ namespace ShipManifest
       var results = false;
       try
       {
-        if (SMConditions.IsTransferInProgress())
+        if (IsTransferInProgress())
         {
           WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
           return false;
@@ -51,11 +50,11 @@ namespace ShipManifest
         // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
         // If there is just one spare seat or seat taken by a Thawed Kerbal that is OK because SM will just transfer them into the empty
         // seat or swap them with a thawed Kerbal.
-        var sourcepartFrzr = selectedPartsSource[0].FindModuleImplementing<IDeepFreezer>();
-        var targetpartFrzr = selectedPartsTarget[0].FindModuleImplementing<IDeepFreezer>();
+        var sourcepartFrzr = selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+        var targetpartFrzr = selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
         if (sourcepartFrzr != null)
         {
-          if (sourcepartFrzr.DFIFreezerSpace == 0)
+          if (sourcepartFrzr.FreezerSpace == 0)
           {
             WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
@@ -63,7 +62,7 @@ namespace ShipManifest
         }
         if (targetpartFrzr != null)
         {
-          if (targetpartFrzr.DFIFreezerSpace == 0)
+          if (targetpartFrzr.FreezerSpace == 0)
           {
             WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
@@ -203,54 +202,54 @@ namespace ShipManifest
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return (!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && SMConditions.AreSelectedResourcesTypeOther(new List<string>() { resourceName })) 
+      return (!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> { resourceName })) 
         && TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance;
     }
 
     internal static bool CanResourceBeDumped(string resourceName)
     {
       return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance &&
-        SMConditions.IsResourceTypeOther(resourceName);
+        IsResourceTypeOther(resourceName);
     }
 
     internal static bool IsTransferInProgress()
     {
-      return SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpActive;
+      return SMAddon.SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpProcessOn;
     }
 
     internal static bool ResourceIsSingleton(string resourceName)
     {
-      return resourceName == SMConditions.ResourceType.Crew.ToString() || resourceName == SMConditions.ResourceType.Science.ToString() || resourceName == "ElectricCharge";
+      return resourceName == ResourceType.Crew.ToString() || resourceName == ResourceType.Science.ToString() || resourceName == "ElectricCharge";
     }
 
     internal static bool ResourcesContainSingleton(List<string> resourceNames)
     {
-      return resourceNames.Contains(SMConditions.ResourceType.Crew.ToString()) || resourceNames.Contains(SMConditions.ResourceType.Science.ToString()) || SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge");
+      return resourceNames.Contains(ResourceType.Crew.ToString()) || resourceNames.Contains(ResourceType.Science.ToString()) || SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge");
     }
 
     internal static bool IsResourceTypeOther(string resourceName)
     {
-      return !resourceName.Contains(SMConditions.ResourceType.Crew.ToString()) && !resourceName.Contains(SMConditions.ResourceType.Science.ToString());
+      return !resourceName.Contains(ResourceType.Crew.ToString()) && !resourceName.Contains(ResourceType.Science.ToString());
     }
 
     internal static bool IsSelectedResourceTypeOther(string resourceName)
     {
-      return AreSelectedResourcesTypeOther(new List<string>() { resourceName });
+      return AreSelectedResourcesTypeOther(new List<string> { resourceName });
     }
 
     internal static bool AreSelectedResourcesTypeOther(List<string> resourceNames)
     {
-      return !resourceNames.Contains(SMConditions.ResourceType.Crew.ToString()) && !resourceNames.Contains(SMConditions.ResourceType.Science.ToString());
+      return !resourceNames.Contains(ResourceType.Crew.ToString()) && !resourceNames.Contains(ResourceType.Science.ToString());
     }
 
     internal static bool IsClsActive()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString());
+      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool IsClsHighlightingEnabled()
     {
-      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString());
+      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool CanKerbalBeReSpawned(ProtoCrewMember kerbal)
@@ -308,8 +307,8 @@ namespace ShipManifest
 
     internal static ResourceType TypeOfResource(string resourceName)
     {
-      if (resourceName == SMConditions.ResourceType.Crew.ToString()) return ResourceType.Crew;
-      if (resourceName == SMConditions.ResourceType.Science.ToString()) return ResourceType.Science;
+      if (resourceName == ResourceType.Crew.ToString()) return ResourceType.Crew;
+      if (resourceName == ResourceType.Science.ToString()) return ResourceType.Science;
       return ResourceType.Pump;
     }
 

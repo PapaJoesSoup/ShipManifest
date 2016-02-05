@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
 using UnityEngine;
-using DF;  // DeepFreeze
 using ShipManifest.APIClients;
 using ShipManifest.Process;
 using ShipManifest.Windows;
@@ -13,7 +12,7 @@ namespace ShipManifest
 {
   [KSPAddon(KSPAddon.Startup.EveryScene, false)]
   // ReSharper disable once InconsistentNaming
-  internal class SMAddon : MonoBehaviour
+  internal class SMAddon : MonoBehaviour, ITransferProcess
   {
     // Object Scope:  Current Unity/KSP Scene.  Object will be destroyed and recreated when scene changes!
 
@@ -30,7 +29,7 @@ namespace ShipManifest
     internal static string SaveMessage = string.Empty;
 
     // DeepFreeze Frozen Crew interface
-    internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
+    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals = new Dictionary<string, DFWrapper.KerbalInfo>();
 
     // Resource transfer vars
     internal static AudioSource AudioSourcePumpStart;
@@ -70,6 +69,22 @@ namespace ShipManifest
 
     // SM UI toggle
     internal static bool ShowUi = true;
+
+    // SMInterface.ITransferProcess properties
+    public ITransferProcess Instance
+    { get { return this; } }
+
+    public bool PumpProcessOn
+    { get { return TransferPump.PumpProcessOn; } }
+
+    public bool CrewProcessOn
+    { get { return SmVessel.TransferCrewObj.CrewXferActive; } }
+
+    public ITransferCrew CrewTransferProcess
+    { get { return SmVessel.TransferCrewObj; } }
+
+    public List<ITransferPump> PumpsInProgress
+    { get { return (from pump in SmVessel.TransferPumps select (ITransferPump)pump).ToList(); } }
 
     #endregion
 
@@ -184,8 +199,8 @@ namespace ShipManifest
         Utilities.LogMessage("SMAddon.Start - CLS Installed?  " + SMSettings.ClsInstalled, "Info", SMSettings.VerboseLogging);
 
         // Load sounds for transfers.
-        SMAddon.LoadSounds(SMConditions.ResourceType.Crew, TransferCrew.path1, TransferCrew.path2, TransferCrew.path3, SMSettings.CrewSoundVol);
-        SMAddon.LoadSounds(SMConditions.ResourceType.Pump, TransferPump.path1, TransferPump.path2, TransferPump.path3, SMSettings.PumpSoundVol);
+        LoadSounds(SMConditions.ResourceType.Crew, TransferCrew.Path1, TransferCrew.Path2, TransferCrew.Path3, SMSettings.CrewSoundVol);
+        LoadSounds(SMConditions.ResourceType.Pump, TransferPump.Path1, TransferPump.Path2, TransferPump.Path3, SMSettings.PumpSoundVol);
       }
       catch (Exception ex)
       {
@@ -275,7 +290,7 @@ namespace ShipManifest
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnGUI");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnGUI");
       try
       {
         GUI.skin = SMSettings.UseUnityStyle ? null : HighLogic.Skin;
@@ -307,18 +322,16 @@ namespace ShipManifest
 
             // Realism Mode Resource transfer operation (real time)
             // PumpActive is flagged in the Resource Controller
-            if (TransferPump.PumpActive)
+            if (TransferPump.PumpProcessOn)
             {
               if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
-                TransferPump.ProcessPumps();
+                TransferPump.ProcessActivePumps();
               else
-                TransferPump.PumpActive = false;
-            }
-            else 
-              foreach (var pump in (from pump in SmVessel.TransferPumps where pump.IsPumpOn && pump.PumpStatus != TransferPump.PumpState.Off select pump).ToList())
               {
-                SmVessel.TransferPumps.Remove(pump);
+                TransferPump.PumpProcessOn = false;
+                SmVessel.TransferPumps.Clear();
               }
+            }
 
             // Realism Mode Crew transfer operation (real time)
             if (SmVessel.TransferCrewObj.CrewXferActive)
@@ -397,10 +410,8 @@ namespace ShipManifest
       else
       {
         //Check for DeepFreezer full. if full, abort handling Xfer.
-        if (DFInterface.IsDFInstalled && action.to.Modules.Contains("DeepFreezer"))
-          // ReSharper disable once SuspiciousTypeConversion.Global
-          if (((IDeepFreezer)action.to.Modules["DeepFreezer"]).DFIFreezerSpace == 0)
-            return;
+        if (InstalledMods.IsDfInstalled && action.to.Modules.Contains("DeepFreezer"))
+          if (new DFWrapper.DeepFreezer(action.to.Modules["DeepFreezer"]).FreezerSpace == 0) return;
 
         // If we are here, then we want to override the Stock Xfer...
         RemoveScreenMsg();
@@ -430,7 +441,6 @@ namespace ShipManifest
     }
     internal void OnVesselChange(Vessel newVessel)
     {
-      //Utilities.LogMessage("SmAddon.OnVesselChange active...", "Info", true);
       Utilities.LogMessage("SMAddon.OnVesselChange active...", "Info", SMSettings.VerboseLogging);
       try
       {
@@ -714,7 +724,7 @@ namespace ShipManifest
         if (WindowManifest.ShowWindow)
         {
           // SM is showing.  Turn off.
-          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpActive)
+          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpProcessOn)
             return;
 
           SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -896,7 +906,7 @@ namespace ShipManifest
         {
           if (SmVessel.TransferCrewObj.CrewXferActive && !SmVessel.TransferCrewObj.IvaDelayActive)
             SmVessel.TransferCrewObj.CrewTransferAbort();
-          if (TransferPump.PumpActive)  TransferPump.PumpActive = false;
+          if (TransferPump.PumpProcessOn)  TransferPump.PumpProcessOn = false;
         }
 
         if (SmVessel.Vessel != null && SMConditions.CanShowShipManifest())

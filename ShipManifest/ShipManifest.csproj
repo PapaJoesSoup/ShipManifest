@@ -67,10 +67,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
     </Reference>
-    <Reference Include="DFInterface, Version=0.3.5712.8487, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ksp-win-1-0-5\KSP_win\GameData\REPOSoftTech\DFInterface\Plugins\DFInterface.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -78,6 +74,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIClients\DFWrapper.cs" />
+    <Compile Include="SMInterface.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Process\ProcessController.cs" />
     <Compile Include="SMConditions.cs" />
@@ -121,7 +119,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
-    <Content Include="Distribution\GameData\ShipManifest\Plugins\DFInterface.dll" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />
@@ -176,7 +173,6 @@ set /p DIST_DIR=&lt;"$(ProjectDir)LocalDev\dist_dir.txt"
 
 echo distributing $(Targetname) files...
 copy /Y "$(TargetPath)" "$(ProjectDir)Distribution\GameData\$(Targetname)\Plugins\"
-copy /Y "$(TargetDir)DFInterface.dll" "$(ProjectDir)Distribution\GameData\$(Targetname)\Plugins\"
 copy /Y "$(TargetDir)CLSInterfaces.dll" "$(ProjectDir)Distribution\GameData\$(Targetname)\Plugins\"
 
 echo building $(Targetname).dll.mdb file...

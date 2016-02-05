@@ -8,37 +8,26 @@ namespace ShipManifest.APIClients
 {
   class InstalledMods
   {
+    // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
+    private static readonly bool? DfInstalled = null; 
+
+    internal static bool IsDfInstalled
+    { get { return DfInstalled ?? DFWrapper.InitDFWrapper(); } }
 
     internal static bool IsRtInstalled
-    {
-      get
-      {
-        return IsModInstalled("RemoteTech");
-      }
-    }
-    internal static bool IsSmInstalled
-    {
-      get
-      {
-        return IsModInstalled("ShipManifest");
-      }
-    }
-    internal static bool IsKisInstalled
-    {
-      get
-      {
-        return IsModInstalled("KIS");
-      }
-    }
-    internal static bool IsClsInstalled
-    {
-      get
-      {
-        return IsModInstalled("ConnectedLivingSpace");
-      }
-    }
+    { get { return IsModInstalled("RemoteTech"); } }
 
+    internal static bool IsSmInstalled
+    { get { return IsModInstalled("ShipManifest"); } }
+
+    internal static bool IsKisInstalled
+    { get { return IsModInstalled("KIS"); } }
+
+    internal static bool IsClsInstalled
+    { get { return IsModInstalled("ConnectedLivingSpace"); } }
+
+    // Methods
     internal static void DisplayAssemblyList()
     {
       var sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();

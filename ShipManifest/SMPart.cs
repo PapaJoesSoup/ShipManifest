@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DF;
+using ShipManifest.APIClients;
 using ShipManifest.Process;
 
 namespace ShipManifest
@@ -40,11 +40,10 @@ namespace ShipManifest
 
     internal static bool IsCrewFull(Part part)
     {
-      if (!DFInterface.IsDFInstalled || !part.Modules.Contains("DeepFreezer"))
+      if (!InstalledMods.IsDfInstalled || !part.Modules.Contains("DeepFreezer"))
         return part.protoModuleCrew.Count < part.CrewCapacity;
-      // ReSharper disable once SuspiciousTypeConversion.Global
-      var deepFreezer = (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select (IDeepFreezer)pm).SingleOrDefault();
-      return deepFreezer != null && deepFreezer.DFIPartFull;
+      var deepFreezer = (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+      return deepFreezer != null && deepFreezer.PartFull;
     }
 
     internal static void ToggleDumpResource(Part part, List<string> resourceNames, uint pumpId)
@@ -56,16 +55,11 @@ namespace ShipManifest
     internal static void ToggleDumpResource(List<Part> partList, List<string> resourceNames, uint pumpId)
     {
       // This routine is called by the dump part buttin on the Transfer Window interface.
-      // This routine is called by the dump docked vessel button on the Transfer window interface.
-      List<TransferPump> pumpList = new List<TransferPump>();
-      foreach (var resource in resourceNames)
+      // This routine is also called by the dump docked vessel button on the Transfer window interface.
+      List<TransferPump> pumpList = resourceNames.Select(resource => new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer, TransferPump.CalcRemainingResource(partList, resource))
       {
-        //Calc amounts and update xfer modules
-        var xferPump = new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer, TransferPump.CalcRemainingResource(partList, resource));
-        xferPump.PartsFrom = partList;
-        xferPump.PumpId = pumpId;
-        pumpList.Add(xferPump);
-      }
+        FromParts = partList, PumpId = pumpId
+      }).ToList();
       if (!TransferPump.PumpsInProgress(pumpId).Any())
         ProcessController.DumpResources(pumpList);
       else TransferPump.AbortPumpProcess(pumpId);

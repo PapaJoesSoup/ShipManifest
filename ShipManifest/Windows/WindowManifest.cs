@@ -10,7 +10,7 @@ namespace ShipManifest.Windows
   {
     #region Manifest Window - Gui Layout Code
 
-    internal static string Title = "Ship's Manifest - ";
+    internal static string Title = string.Format("Ship Manifest {0} - ", SMSettings.CurVersion);
     internal static Rect Position = new Rect(0, 0, 0, 0);
     private static bool _showWindow;
     internal static bool ShowWindow
@@ -25,7 +25,6 @@ namespace ShipManifest.Windows
           SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
         _showWindow = value;
       }
-
     }
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -37,7 +36,7 @@ namespace ShipManifest.Windows
     private static Vector2 _resourceScrollViewerPosition = Vector2.zero;
     internal static void Display(int windowId)
     {
-      Title = "Ship's Manifest - " + SMAddon.SmVessel.Vessel.vesselName;
+      Title = string.Format("SM {0} - {1}", SMSettings.CurVersion, SMAddon.SmVessel.Vessel.vesselName);
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -68,10 +67,11 @@ namespace ShipManifest.Windows
         }
 
         // Now the Resource Buttons
-        ResourceButtonList();
+        ResourceButtonsList();
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
+
         var resLabel = "No Resource Selected";
         if (SMAddon.SmVessel.SelectedResources.Count == 1)
           resLabel = SMAddon.SmVessel.SelectedResources[0];
@@ -81,7 +81,6 @@ namespace ShipManifest.Windows
 
         // Resource Details List Viewer
         ResourceDetailsViewer();
-
         GUILayout.BeginHorizontal();
 
         var settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -188,7 +187,7 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceButtonList()
+    private static void ResourceButtonsList()
     {
       try
       {
@@ -197,27 +196,34 @@ namespace ShipManifest.Windows
         foreach (var resourceName in keys)
         {
           GUILayout.BeginHorizontal();
+
+          // Button Widths
           var width = 273;
           if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName)) width = 185;
           else if (SMConditions.IsResourceTypeOther(resourceName)) width = 223;
 
-          var displayAmounts = Utilities.DisplayVesselResourceTotals(resourceName);
+          // Resource Button
+          var displayAmounts = string.Format("{0}{1}", resourceName, Utilities.DisplayVesselResourceTotals(resourceName));
           var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-          if (GUILayout.Button(string.Format("{0}", resourceName + displayAmounts), style, GUILayout.Width(width), GUILayout.Height(20)))
+          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
           {
             ResourceButtonToggled(resourceName);
           }
-          if (SMConditions.IsResourceTypeOther(resourceName))
+
+          // Dump Button
+          if (SMConditions.IsResourceTypeOther(resourceName) && SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
           {
             var pumpId = TransferPump.GetPumpIdFromHash(resourceName, SMAddon.SmVessel.PartsByResource[resourceName].First(), SMAddon.SmVessel.PartsByResource[resourceName].Last(), TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest);
             var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
             GUI.enabled = SMConditions.CanResourceBeDumped(resourceName);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
-              SMAddon.SmVessel.ToggleDumpResource(resourceName, pumpId);
+              SMVessel.ToggleDumpResource(resourceName, pumpId);
             }
           }
-          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName))
+
+          // Fill Button
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName) && SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(resourceName);
             if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
@@ -239,7 +245,9 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (SMConditions.IsTransferInProgress()) return;
+        // TODO:  Do we still want this?   (Do we want to allow simultaneous Crew and resource transfers?)
+        if (SMConditions.IsTransferInProgress()) return; 
+
         // First, lets clear any highlighting...
         SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
 
@@ -363,7 +371,13 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedPartsTarget.Clear();
             SMAddon.SmVessel.SelectedPartsTarget = newTargets;
           }
-          if (SMConditions.AreSelectedResourcesTypeOther(resourceNames)) return;
+
+          if (SMConditions.AreSelectedResourcesTypeOther(resourceNames))
+          {
+            TransferPump.CreateDisplayPumps();
+            return;
+          }
+            
           SMAddon.SmVessel.SelectedVesselsSource.Clear();
           SMAddon.SmVessel.SelectedVesselsTarget.Clear();
         }

@@ -2,14 +2,14 @@
 
 namespace ShipManifest.Process
 {
-  public class TransferCrew : ICrewTransfer
+  public class TransferCrew : ITransferCrew, ICrewTransfer
   {
 
     // Default sound license: CC-By-SA
     // http://www.freesound.org/people/adcbicycle/sounds/14214/
-    internal static string path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
-    internal static string path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
-    internal static string path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
+    internal static string Path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
+    internal static string Path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
+    internal static string Path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
 
     // OnCrewTransferred Event Handling Flags
     internal static DateTime Timestamp;
@@ -77,12 +77,18 @@ namespace ShipManifest.Process
 
     public InternalSeat ToSeat { get; set; }
 
+    /// <summary>
+    /// Deprecated. Use XferVesselId instead.  Returns the vessel Id
+    /// </summary>
     public Guid XferVesselID
     {
-      get
-      {
-        return SMAddon.SmVessel.Vessel.id;
-      }
+      get { return SMAddon.SmVessel.Vessel.id; }
+    }
+
+
+    public Guid XferVesselId
+    {
+      get { return SMAddon.SmVessel.Vessel.id; }
     }
 
     // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew

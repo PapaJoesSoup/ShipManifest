@@ -1,7 +1,7 @@
 ----------------
 Ship Manifest
 ----------------
-Current Version 5.0.0.0 - Release xx Jan, 2015 - Refactoring Edition.
+Current Version 5.0.0.0 - Release xx Jan, 2015 - Refactoring Edition.  New!!  Fuel Depot Operations - multiple transfers & dumps at the same time!
 
 KSP Version supported:  1.0.5
 ----------------
@@ -30,6 +30,7 @@ What's New:
 - New:  Massive refactor and reorgainization of code (nothing was left untouched). 
         A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
 - New:  Added build automation and distribution.
+- New:  Removed need for DFInterface.dll.  Now using new reflection class method for soft dependency to DeepFreeze.
 - Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
 - Fixed:  Corrected nested control displays in settings.
 - Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
@@ -44,7 +45,7 @@ Ship Manifest is a tool to manage your ship's "things".  I started with Crew Man
 I've now re-imagined it into Ship Manifest, using the same easy to navigate visual system that vXSovereignXv used.  SM has since been expanded and refactored to the point that it is now a completely original work.
 
 
-NOTE:   SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
+NOTE:  SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
 	- Blizzy's Toolbar. http://forum.kerbalspaceprogram.com/threads/60863.
 	- Connected Living Space (Verson 1.1.1.0 or higher)  http://forum.kerbalspaceprogram.com/threads/70161.
 	- Module Manager  http://forum.kerbalspaceprogram.com/threads/55219

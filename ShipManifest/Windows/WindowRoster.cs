@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using DF;
+using ShipManifest.APIClients;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 
@@ -46,7 +46,7 @@ namespace ShipManifest.Windows
       Missing,
       Vessel
     }
-    internal static KerbalFilters currentFilter = KerbalFilters.All;
+    internal static KerbalFilters CurrentFilter = KerbalFilters.All;
 
     internal static bool OnCreate;
     internal static bool ResetRosterSize
@@ -154,15 +154,15 @@ namespace ShipManifest.Windows
       }
     }
 
-    internal static Dictionary<string, KerbalInfo> GetFrozenKerbals()
+    internal static Dictionary<string, DFWrapper.KerbalInfo> GetFrozenKerbals()
     {
-      if (DFInterface.IsDFInstalled)
+      if (InstalledMods.IsDfInstalled)
       {
-        var freezer = DFInterface.GetFrozenKerbals();
-        return freezer.FrozenKerbals;
+        var freezer = DFWrapper.DeepFreezeAPI.FrozenKerbals;
+        return freezer;
       }
       else
-        return new Dictionary<string, KerbalInfo>();
+        return new Dictionary<string, DFWrapper.KerbalInfo>();
     }
 
     internal static void GetRosterList()
@@ -173,7 +173,7 @@ namespace ShipManifest.Windows
           _rosterList.Clear();
         _rosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
         // Support for DeepFreeze
-        if (DFInterface.IsDFInstalled)
+        if (InstalledMods.IsDfInstalled)
           _rosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
       }
       catch (Exception ex)
@@ -186,7 +186,7 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (DFInterface.IsDFInstalled)
+        if (InstalledMods.IsDfInstalled)
         {
           var iKerbal = SMAddon.FrozenKerbals[kerbalName];
 
@@ -196,7 +196,7 @@ namespace ShipManifest.Windows
             if (cryoFreezer.flightID == iKerbal.partID)
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select (IDeepFreezer)pm).SingleOrDefault();
+              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
               if (deepFreezer != null) deepFreezer.beginThawKerbal(kerbalName);
               break;
             }
@@ -204,7 +204,7 @@ namespace ShipManifest.Windows
         }
         else
         {
-          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", DFInterface.IsDFInstalled), "Info", true);
+          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info", true);
         }
       }
       catch (Exception ex)
@@ -217,7 +217,7 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (DFInterface.IsDFInstalled)
+        if (InstalledMods.IsDfInstalled)
         {
           var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
           foreach (var cryoFreezer in cryofreezers)
@@ -225,7 +225,7 @@ namespace ShipManifest.Windows
             if (cryoFreezer.protoModuleCrew.Contains(kerbal))
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select (IDeepFreezer)pm).SingleOrDefault();
+              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
               if (deepFreezer != null) deepFreezer.beginFreezeKerbal(kerbal);
               break;
             }
@@ -249,7 +249,7 @@ namespace ShipManifest.Windows
 
     private static bool CanDisplayKerbal(ProtoCrewMember kerbal)
     {
-      switch (currentFilter)
+      switch (CurrentFilter)
       {
         case KerbalFilters.All:
             return  true;
@@ -262,7 +262,7 @@ namespace ShipManifest.Windows
             return true;
           break;
         case KerbalFilters.Dead:
-          if (((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)) 
+          if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing) 
             return true;
           break;
         case KerbalFilters.Frozen:
@@ -274,7 +274,7 @@ namespace ShipManifest.Windows
             return true;
           break;
         case KerbalFilters.Vessel:
-          if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (DFInterface.IsDFInstalled && GetFrozenKerbalDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
+          if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (InstalledMods.IsDfInstalled && GetFrozenKerbalDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
             return true;
           break;
       }
@@ -316,14 +316,14 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       GUILayout.Label("Profession:", GUILayout.Width(85));
-      var IsPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, "Pilot", GUILayout.Width(90));
-      if (IsPilot) KerbalProfession = Professions.Pilot;
+      var isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, "Pilot", GUILayout.Width(90));
+      if (isPilot) KerbalProfession = Professions.Pilot;
 
-      var IsEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, "Engineer", GUILayout.Width(90));
-      if (IsEngineer) KerbalProfession = Professions.Engineer;
+      var isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, "Engineer", GUILayout.Width(90));
+      if (isEngineer) KerbalProfession = Professions.Engineer;
 
-      var IsScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, "Scientist", GUILayout.Width(90));
-      if (IsScientist) KerbalProfession = Professions.Scientist;
+      var isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, "Scientist", GUILayout.Width(90));
+      if (isScientist) KerbalProfession = Professions.Scientist;
       GUILayout.EndHorizontal();
     }
 
@@ -332,28 +332,28 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       GUILayout.Label("Filter:", GUILayout.Width(40));
 
-      var IsAll = GUILayout.Toggle(currentFilter == KerbalFilters.All, "All", GUILayout.Width(60));
-      if (IsAll) currentFilter = KerbalFilters.All;
+      var isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, "All", GUILayout.Width(60));
+      if (isAll) CurrentFilter = KerbalFilters.All;
 
-      var IsAssign = GUILayout.Toggle(currentFilter == KerbalFilters.Assigned, "Assigned", GUILayout.Width(95));
-      if (IsAssign) currentFilter = KerbalFilters.Assigned;
+      var isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, "Assigned", GUILayout.Width(95));
+      if (isAssign) CurrentFilter = KerbalFilters.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        var IsVessel = GUILayout.Toggle(currentFilter == KerbalFilters.Vessel, "Vessel", GUILayout.Width(80));
-        if (IsVessel) currentFilter = KerbalFilters.Vessel;
+        var isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, "Vessel", GUILayout.Width(80));
+        if (isVessel) CurrentFilter = KerbalFilters.Vessel;
       }
 
-      var IsAvail = GUILayout.Toggle(currentFilter == KerbalFilters.Available, "Available", GUILayout.Width(95));
-      if (IsAvail) currentFilter = KerbalFilters.Available;
+      var isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, "Available", GUILayout.Width(95));
+      if (isAvail) CurrentFilter = KerbalFilters.Available;
 
-      var IsDead = GUILayout.Toggle(currentFilter == KerbalFilters.Dead, "Dead/Missing", GUILayout.Width(130));
-      if (IsDead) currentFilter = KerbalFilters.Dead;
+      var isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, "Dead/Missing", GUILayout.Width(130));
+      if (isDead) CurrentFilter = KerbalFilters.Dead;
 
-      if (DFInterface.IsDFInstalled)
+      if (InstalledMods.IsDfInstalled)
       {
-        var IsFrozen = GUILayout.Toggle(currentFilter == KerbalFilters.Frozen, "Frozen", GUILayout.Width(80));
-        if (IsFrozen) currentFilter = KerbalFilters.Frozen;
+        var isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, "Frozen", GUILayout.Width(80));
+        if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
       }
       GUILayout.EndHorizontal();
     }
@@ -401,7 +401,7 @@ namespace ShipManifest.Windows
                 }
               }
             }
-            else if (DFInterface.IsDFInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+            else if (InstalledMods.IsDfInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
             {
               // This kerbal could be frozen.  Lets find out...
               rosterDetails = GetFrozenKerbalDetials(kerbal);

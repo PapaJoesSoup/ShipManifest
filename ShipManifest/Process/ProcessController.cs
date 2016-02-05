@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ShipManifest.Windows;
 
 namespace ShipManifest.Process
 {
@@ -74,14 +73,14 @@ namespace ShipManifest.Process
           SMAddon.SmVessel.TransferPumps.AddRange(xferPumps);
 
           // Start the process.  This flag is checked in SMAddon.Update()
-          TransferPump.PumpActive = true;
+          TransferPump.PumpProcessOn = true;
         }
         else
         {
           //Not in Realism mode, so just move the resource...
           foreach (var pump in xferPumps)
           {
-            TransferPump.ProcessSinglePump(pump, pump.PumpAmount);
+            pump.RunCycle(pump.PumpAmount);
           }
         }
       }
@@ -110,13 +109,13 @@ namespace ShipManifest.Process
           Utilities.LogMessage("ProcessController.DumpResources: Starting Pump Operation...", "Info", SMSettings.VerboseLogging);
 
           // Start the process.  This flag is checked in SMAddon.Update()
-          TransferPump.PumpActive = true;
+          TransferPump.PumpProcessOn = true;
         }
         else
         {
           foreach (var pump in pumps)
           {
-            TransferPump.ProcessSinglePump(pump, pump.PumpAmount);
+            pump.RunCycle(pump.PumpAmount);
           }
           SMAddon.SmVessel.TransferPumps.Clear();
         }

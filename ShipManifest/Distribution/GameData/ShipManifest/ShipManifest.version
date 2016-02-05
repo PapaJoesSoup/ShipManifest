@@ -3,9 +3,9 @@
   "URL":"http://ksp-avc.cybutek.net/version.php?id=124",
   "DOWNLOAD":"http://kerbalstuff.com/mod/261/Ship%20Manifest",
   "VERSION": {
-    "MAJOR": 4, 
-    "MINOR": 4,
-    "PATCH": 2,
+    "MAJOR": 5, 
+    "MINOR": 0,
+    "PATCH": 0,
 	  "BUILD": 0
   },
   "KSP_VERSION": {
