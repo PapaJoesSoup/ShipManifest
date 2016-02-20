@@ -6,26 +6,36 @@ using UnityEngine;
 
 namespace ShipManifest.APIClients
 {
-  class InstalledMods
+  internal class InstalledMods
   {
     // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
-    private static readonly bool? DfInstalled = null; 
+    private static readonly bool? DfInstalled = null;
 
     internal static bool IsDfInstalled
-    { get { return DfInstalled ?? DFWrapper.InitDFWrapper(); } }
+    {
+      get { return DfInstalled ?? DFWrapper.InitDFWrapper(); }
+    }
 
     internal static bool IsRtInstalled
-    { get { return IsModInstalled("RemoteTech"); } }
+    {
+      get { return IsModInstalled("RemoteTech"); }
+    }
 
     internal static bool IsSmInstalled
-    { get { return IsModInstalled("ShipManifest"); } }
+    {
+      get { return IsModInstalled("ShipManifest"); }
+    }
 
     internal static bool IsKisInstalled
-    { get { return IsModInstalled("KIS"); } }
+    {
+      get { return IsModInstalled("KIS"); }
+    }
 
     internal static bool IsClsInstalled
-    { get { return IsModInstalled("ConnectedLivingSpace"); } }
+    {
+      get { return IsModInstalled("ConnectedLivingSpace"); }
+    }
 
     // Methods
     internal static void DisplayAssemblyList()
@@ -62,8 +72,8 @@ namespace ShipManifest.APIClients
       try
       {
         var assembly = (from a in Assemblies
-                             where a.FullName.Split(',')[0] == assemblyName
-                             select a).First();
+          where a.FullName.Split(',')[0] == assemblyName
+          select a).First();
         return assembly != null;
       }
       catch

@@ -256,7 +256,6 @@ namespace ShipManifest
 
       if (!SMSettings.UseUnityStyle)
         GUI.skin = HighLogic.Skin;
-
     }
   }
 }

@@ -19,6 +19,7 @@ namespace ShipManifest
 
     // ReSharper disable once FieldCanBeMadeReadOnly.Local
     private static List<string> _errors = new List<string>();
+
     internal static List<string> Errors
     {
       get { return _errors; }
@@ -26,7 +27,8 @@ namespace ShipManifest
 
     internal static void LoadTexture(ref Texture2D tex, string fileName)
     {
-      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info", SMSettings.VerboseLogging);
+      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info",
+        SMSettings.VerboseLogging);
       var img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
       img1.LoadImageIntoTexture(tex);
     }
@@ -55,27 +57,46 @@ namespace ShipManifest
             // if DF installed, get total frozen and add to count.
             if (InstalledMods.IsDfInstalled)
             {
-              var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+              var cryofreezers =
+                (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
               // ReSharper disable once SuspiciousTypeConversion.Global
-              currAmount = cryofreezers.Select(cryoFreezer => (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault()).Aggregate(currAmount, (current, deepFreezer) => current + new DFWrapper.DeepFreezer(deepFreezer).TotalFrozen);
+              currAmount =
+                cryofreezers.Select(
+                  cryoFreezer =>
+                    (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm)
+                      .SingleOrDefault())
+                  .Aggregate(currAmount,
+                    (current, deepFreezer) => current + new DFWrapper.DeepFreezer(deepFreezer).TotalFrozen);
             }
 
             // Now check for occupied external seats
             // external seats that are occupied will show up in getcrewcount and getcrewcapacity
             // Since we cannot yet xfer external crew, we need to remove them from the count..
-            var seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts where iPart.Modules.Contains("KerbalSeat") from PartModule iModule in iPart.Modules where iModule.ClassName == "KerbalSeat" select (KerbalSeat)iModule into kSeat where kSeat.Occupant != null select kSeat).ToList();
+            var seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts
+              where iPart.Modules.Contains("KerbalSeat")
+              from PartModule iModule in iPart.Modules
+              where iModule.ClassName == "KerbalSeat"
+              select (KerbalSeat) iModule
+              into kSeat
+              where kSeat.Occupant != null
+              select kSeat).ToList();
             currAmount -= seatCount.Count;
             totAmount -= seatCount.Count;
             break;
           case SMConditions.ResourceType.Science:
-            currAmount += SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>()).OfType<IScienceDataContainer>().Sum(module => (double)module.GetScienceCount());
+            currAmount +=
+              SMAddon.SmVessel.PartsByResource[selectedResource].SelectMany(part => part.Modules.Cast<PartModule>())
+                .OfType<IScienceDataContainer>()
+                .Sum(module => (double) module.GetScienceCount());
             break;
         }
-        displayAmount = selectedResource != SMConditions.ResourceType.Science.ToString() ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0")) : string.Format(" - ({0})", currAmount.ToString("#######0"));
+        displayAmount = selectedResource != SMConditions.ResourceType.Science.ToString()
+          ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"))
+          : string.Format(" - ({0})", currAmount.ToString("#######0"));
       }
       catch (Exception ex)
       {
-        LogMessage(String.Format(" in DisplayResourceTotals().  Error:  {0}", ex), "Error", true);
+        LogMessage(string.Format(" in DisplayResourceTotals().  Error:  {0}", ex), "Error", true);
       }
 
       return displayAmount;
@@ -87,7 +108,8 @@ namespace ShipManifest
       if (!InstalledMods.IsDfInstalled) return crewCount + part.protoModuleCrew.Count;
       if (part.Modules.Contains("DeepFreezer"))
       {
-        var freezerModule = (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        var freezerModule =
+          (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
         // ReSharper disable once SuspiciousTypeConversion.Global
         var freezer = new DFWrapper.DeepFreezer(freezerModule);
         crewCount += freezer.TotalFrozen;
@@ -143,6 +165,5 @@ namespace ShipManifest
       else
         StrHasDecimal = false;
     }
-
   }
 }

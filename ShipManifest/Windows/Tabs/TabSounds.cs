@@ -29,7 +29,8 @@ namespace ShipManifest.Windows.Tabs
       var scrollY = 50;
 
       GUILayout.Label("Sounds", SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       GUILayout.Label("Transfer Pump:", GUILayout.Height(20));
 
@@ -42,7 +43,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.PumpSoundStart = GUILayout.TextField(SMSettings.PumpSoundStart, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -55,7 +57,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.PumpSoundRun = GUILayout.TextField(SMSettings.PumpSoundRun, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -68,7 +71,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.PumpSoundStop = GUILayout.TextField(SMSettings.PumpSoundStop, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -83,7 +87,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.CrewSoundStart = GUILayout.TextField(SMSettings.CrewSoundStart, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -96,7 +101,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.CrewSoundRun = GUILayout.TextField(SMSettings.CrewSoundRun, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -109,7 +115,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       SMSettings.CrewSoundStop = GUILayout.TextField(SMSettings.CrewSoundStop, GUILayout.Width(220));
       GUILayout.EndHorizontal();
     }

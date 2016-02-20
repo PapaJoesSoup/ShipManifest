@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
 {
-  static class TabAntenna
+  internal static class TabAntenna
   {
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -24,7 +24,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(
         InstalledMods.IsRtInstalled ? "Antenna Control Center  (RemoteTech detected)" : "Antenna Control Center ",
         SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       var step = "start";
       try
       {
@@ -55,7 +56,9 @@ namespace ShipManifest.Windows.Tabs
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          "Error", true);
       }
       GUILayout.EndVertical();
     }
@@ -77,6 +80,5 @@ namespace ShipManifest.Windows.Tabs
         iAntenna.RetractAntenna();
       }
     }
-
   }
 }

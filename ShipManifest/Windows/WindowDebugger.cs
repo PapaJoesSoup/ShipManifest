@@ -31,7 +31,8 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
 
       GUILayout.BeginVertical();
-      Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(300), GUILayout.Width(500));
+      Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, SMStyle.ScrollStyle,
+        GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
       foreach (var error in Utilities.Errors)
@@ -69,7 +70,11 @@ namespace ShipManifest.Windows
       try
       {
         // time to create a file...
-        var filename = "DebugLog_" + DateTime.Now.ToString(CultureInfo.InvariantCulture).Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
+        var filename = "DebugLog_" +
+                       DateTime.Now.ToString(CultureInfo.InvariantCulture)
+                         .Replace(" ", "_")
+                         .Replace("/", "")
+                         .Replace(":", "") + ".txt";
 
         var path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
         if (SMSettings.DebugLogPath.StartsWith(@"\\"))
@@ -102,9 +107,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+          true);
       }
     }
-
   }
 }

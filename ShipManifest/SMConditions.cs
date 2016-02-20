@@ -7,9 +7,11 @@ using ShipManifest.Windows;
 namespace ShipManifest
 {
   /// <summary>
-  /// This class contains nothing but conditional logic methods and enums
-  /// This will likely get refactored out as a better understanding of the various conditions is realized with this refactor.  
-  /// All are bools, and many are being refactored into enums.  Therefore, enums and their supporting methods reside here as well.
+  ///   This class contains nothing but conditional logic methods and enums
+  ///   This will likely get refactored out as a better understanding of the various conditions is realized with this
+  ///   refactor.
+  ///   All are bools, and many are being refactored into enums.  Therefore, enums and their supporting methods reside here
+  ///   as well.
   /// </summary>
   // ReSharper disable once InconsistentNaming
   internal static class SMConditions
@@ -23,7 +25,8 @@ namespace ShipManifest
 
     internal static bool CanResourceBeXferred(TransferPump.TypePump thisXferMode, double maxXferAmount)
     {
-      return (!TransferPump.PumpProcessOn && maxXferAmount > 0) || (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
+      return (!TransferPump.PumpProcessOn && maxXferAmount > 0) ||
+             (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
     }
 
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
@@ -38,7 +41,8 @@ namespace ShipManifest
         }
         if (selectedPartsSource.Count == 0 || selectedPartsTarget.Count == 0)
         {
-          WindowTransfer.XferToolTip = "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
+          WindowTransfer.XferToolTip =
+            "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
           return false;
         }
         if (selectedPartsSource[0] == selectedPartsTarget[0])
@@ -56,7 +60,8 @@ namespace ShipManifest
         {
           if (sourcepartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+            WindowTransfer.XferToolTip =
+              "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
         }
@@ -64,7 +69,8 @@ namespace ShipManifest
         {
           if (targetpartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip = "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+            WindowTransfer.XferToolTip =
+              "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
         }
@@ -80,7 +86,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
       if (WindowTransfer.XferToolTip == "")
         WindowTransfer.XferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
@@ -102,17 +109,21 @@ namespace ShipManifest
             {
               if (SMAddon.SmVessel.ClsSpaceSource == SMAddon.SmVessel.ClsSpaceTarget)
               {
-                WindowTransfer.XferToolTip = "Source & Target Part are in the same space.\r\nInternal Xfers are allowed.";
+                WindowTransfer.XferToolTip =
+                  "Source & Target Part are in the same space.\r\nInternal Xfers are allowed.";
                 results = true;
               }
               else
-                WindowTransfer.XferToolTip = "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
+                WindowTransfer.XferToolTip =
+                  "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
             }
             else
-              WindowTransfer.XferToolTip = "You should NOT be seeing this, as Source or Target Space is missing.\r\nPlease reselect source or target part.";
+              WindowTransfer.XferToolTip =
+                "You should NOT be seeing this, as Source or Target Space is missing.\r\nPlease reselect source or target part.";
           }
           else
-            WindowTransfer.XferToolTip = "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
+            WindowTransfer.XferToolTip =
+              "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
         }
         else
         {
@@ -124,7 +135,9 @@ namespace ShipManifest
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage(string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -149,7 +162,7 @@ namespace ShipManifest
             && FlightGlobals.ActiveVessel.vesselType != VesselType.Debris
             && FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
             && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
-            )
+          )
           canShow = ignoreShowSm || WindowManifest.ShowWindow;
         return canShow;
       }
@@ -164,12 +177,16 @@ namespace ShipManifest
           values += "FlightResultsDialog.isDisplaying = " + IsFlightDialogDisplaying() + "\r\n";
           values += "FlightGlobals.fetch != null = " + (FlightGlobals.fetch != null) + "\r\n";
           values += "FlightGlobals.ActiveVessel != null = " + (FlightGlobals.ActiveVessel != null) + "\r\n";
-          values += "!FlightGlobals.ActiveVessel.isEVA = " + (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA) + "\r\n";
+          values += "!FlightGlobals.ActiveVessel.isEVA = " +
+                    (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA) + "\r\n";
           if (FlightGlobals.ActiveVessel != null)
             values += "FlightGlobals.ActiveVessel.vesselType = " + FlightGlobals.ActiveVessel.vesselType + "\r\n";
-          values += "CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = " + (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
+          values += "CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = " +
+                    (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
 
-          Utilities.LogMessage(string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}", ex.Message, ex.StackTrace, values), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
+              ex.Message, ex.StackTrace, values), "Error", true);
           SMAddon.FrameErrTripped = true;
         }
         return false;
@@ -202,14 +219,18 @@ namespace ShipManifest
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return (!SMSettings.RealismMode || SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> { resourceName })) 
-        && TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance;
+      return (!SMSettings.RealismMode ||
+              SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> {resourceName}))
+             &&
+             TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
+             SMSettings.Tolerance;
     }
 
     internal static bool CanResourceBeDumped(string resourceName)
     {
-      return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) > SMSettings.Tolerance &&
-        IsResourceTypeOther(resourceName);
+      return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
+             SMSettings.Tolerance &&
+             IsResourceTypeOther(resourceName);
     }
 
     internal static bool IsTransferInProgress()
@@ -219,42 +240,51 @@ namespace ShipManifest
 
     internal static bool ResourceIsSingleton(string resourceName)
     {
-      return resourceName == ResourceType.Crew.ToString() || resourceName == ResourceType.Science.ToString() || resourceName == "ElectricCharge";
+      return resourceName == ResourceType.Crew.ToString() || resourceName == ResourceType.Science.ToString() ||
+             resourceName == "ElectricCharge";
     }
 
     internal static bool ResourcesContainSingleton(List<string> resourceNames)
     {
-      return resourceNames.Contains(ResourceType.Crew.ToString()) || resourceNames.Contains(ResourceType.Science.ToString()) || SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge");
+      return resourceNames.Contains(ResourceType.Crew.ToString()) ||
+             resourceNames.Contains(ResourceType.Science.ToString()) ||
+             SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge");
     }
 
     internal static bool IsResourceTypeOther(string resourceName)
     {
-      return !resourceName.Contains(ResourceType.Crew.ToString()) && !resourceName.Contains(ResourceType.Science.ToString());
+      return !resourceName.Contains(ResourceType.Crew.ToString()) &&
+             !resourceName.Contains(ResourceType.Science.ToString());
     }
 
     internal static bool IsSelectedResourceTypeOther(string resourceName)
     {
-      return AreSelectedResourcesTypeOther(new List<string> { resourceName });
+      return AreSelectedResourcesTypeOther(new List<string> {resourceName});
     }
 
     internal static bool AreSelectedResourcesTypeOther(List<string> resourceNames)
     {
-      return !resourceNames.Contains(ResourceType.Crew.ToString()) && !resourceNames.Contains(ResourceType.Science.ToString());
+      return !resourceNames.Contains(ResourceType.Crew.ToString()) &&
+             !resourceNames.Contains(ResourceType.Science.ToString());
     }
 
     internal static bool IsClsActive()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
+      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null &&
+             SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool IsClsHighlightingEnabled()
     {
-      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null && SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
+      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null &&
+             SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool CanKerbalBeReSpawned(ProtoCrewMember kerbal)
     {
-      return (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing;
+      return (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
+              kerbal.type != ProtoCrewMember.KerbalType.Unowned) ||
+             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing;
     }
 
     #endregion
@@ -263,22 +293,30 @@ namespace ShipManifest
 
     internal static bool CanKerbalBeAdded(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.SmVessel.SelectedPartsSource.Count > 0 && !SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
+      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
+             SMAddon.SmVessel.SelectedPartsSource.Count > 0 &&
+             !SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
     }
 
     internal static bool FrozenKerbalNotThawable(ProtoCrewMember kerbal)
     {
-      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned && SMAddon.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
+      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
+             kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
+             SMAddon.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool FrozenKerbalIsThawable(ProtoCrewMember kerbal)
     {
-      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned && SMAddon.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
+      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
+             kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
+             SMAddon.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool CanKerbalBeFrozen(ProtoCrewMember kerbal)
     {
-      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) && IsKerbalReadyToFreeze(kerbal);
+      return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned &&
+             FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) && IsKerbalReadyToFreeze(kerbal);
     }
 
     internal static bool IsKerbalReadyToFreeze(ProtoCrewMember kerbal)
@@ -288,17 +326,22 @@ namespace ShipManifest
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
+      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned &&
+             FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeAddedNoSource(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMAddon.SmVessel.SelectedPartsSource.Count == 0;
+      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
+             SMAddon.SmVessel.SelectedPartsSource.Count == 0;
     }
 
     internal static bool KerbalCannotBeAddedRealism(ProtoCrewMember kerbal)
     {
-      return SMSettings.RealismMode && !SMAddon.SmVessel.IsRecoverable && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
+      return SMSettings.RealismMode && !SMAddon.SmVessel.IsRecoverable &&
+             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 
     #endregion

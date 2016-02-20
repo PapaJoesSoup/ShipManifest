@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using ShipManifest.APIClients;
 using ShipManifest.Modules;
 using ShipManifest.Process;
+using UnityEngine;
 
 namespace ShipManifest.Windows
 {
@@ -20,47 +20,30 @@ namespace ShipManifest.Windows
     internal static bool ShowToolTips = true;
     internal static float XOffset = 30;
     internal static float YOffset = 90;
-
-    //Profession vars
-    internal enum Professions
-    {
-      Pilot,
-      Engineer,
-      Scientist,
-      Tourist,
-      Other
-    }
     internal static Professions KerbalProfession;
 
     // Gender var
     internal static ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
-
-    //Filter vars
-    internal enum KerbalFilters
-    {
-      All,
-      Assigned,
-      Available,
-      Dead,
-      Frozen,
-      Missing,
-      Vessel
-    }
     internal static KerbalFilters CurrentFilter = KerbalFilters.All;
 
     internal static bool OnCreate;
+
+    private static List<ProtoCrewMember> _rosterList;
+
+    private static ModKerbal _selectedKerbal;
+
+    private static Vector2 _scrollViewerPosition = Vector2.zero;
+
     internal static bool ResetRosterSize
     {
       get
       {
         if (!OnCreate && SelectedKerbal == null)
           return true;
-        else
-          return false;
+        return false;
       }
     }
 
-    private static List<ProtoCrewMember> _rosterList;
     internal static List<ProtoCrewMember> RosterList
     {
       get
@@ -71,7 +54,6 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static ModKerbal _selectedKerbal;
     internal static ModKerbal SelectedKerbal
     {
       get { return _selectedKerbal; }
@@ -85,10 +67,8 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static Vector2 _scrollViewerPosition = Vector2.zero;
     internal static void Display(int windowId)
     {
-
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -102,7 +82,6 @@ namespace ShipManifest.Windows
           SMAddon.OnSmRosterToggle();
         else
           ShowWindow = false;
-
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
@@ -150,7 +129,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -161,8 +141,7 @@ namespace ShipManifest.Windows
         var freezer = DFWrapper.DeepFreezeAPI.FrozenKerbals;
         return freezer;
       }
-      else
-        return new Dictionary<string, DFWrapper.KerbalInfo>();
+      return new Dictionary<string, DFWrapper.KerbalInfo>();
     }
 
     internal static void GetRosterList()
@@ -190,13 +169,17 @@ namespace ShipManifest.Windows
         {
           var iKerbal = SMAddon.FrozenKerbals[kerbalName];
 
-          var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+          var cryofreezers =
+            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
           foreach (var cryoFreezer in cryofreezers)
           {
             if (cryoFreezer.flightID == iKerbal.partID)
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+              var deepFreezer =
+                (from PartModule pm in cryoFreezer.Modules
+                  where pm.moduleName == "DeepFreezer"
+                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
               if (deepFreezer != null) deepFreezer.beginThawKerbal(kerbalName);
               break;
             }
@@ -204,12 +187,14 @@ namespace ShipManifest.Windows
         }
         else
         {
-          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info", true);
+          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
+            true);
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -219,13 +204,17 @@ namespace ShipManifest.Windows
       {
         if (InstalledMods.IsDfInstalled)
         {
-          var cryofreezers = (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+          var cryofreezers =
+            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
           foreach (var cryoFreezer in cryofreezers)
           {
             if (cryoFreezer.protoModuleCrew.Contains(kerbal))
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer = (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+              var deepFreezer =
+                (from PartModule pm in cryoFreezer.Modules
+                  where pm.moduleName == "DeepFreezer"
+                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
               if (deepFreezer != null) deepFreezer.beginFreezeKerbal(kerbal);
               break;
             }
@@ -234,7 +223,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -252,21 +242,24 @@ namespace ShipManifest.Windows
       switch (CurrentFilter)
       {
         case KerbalFilters.All:
-            return  true;
+          return true;
         case KerbalFilters.Assigned:
-          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned) 
-            return  true;
+          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+            return true;
           break;
         case KerbalFilters.Available:
-          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available) 
+          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
             return true;
           break;
         case KerbalFilters.Dead:
-          if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing) 
+          if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
+               kerbal.type != ProtoCrewMember.KerbalType.Unowned) ||
+              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
             return true;
           break;
         case KerbalFilters.Frozen:
-          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned) 
+          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
+              kerbal.type == ProtoCrewMember.KerbalType.Unowned)
             return true;
           break;
         case KerbalFilters.Missing:
@@ -274,7 +267,9 @@ namespace ShipManifest.Windows
             return true;
           break;
         case KerbalFilters.Vessel:
-          if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) || (InstalledMods.IsDfInstalled && GetFrozenKerbalDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
+          if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) ||
+              (InstalledMods.IsDfInstalled &&
+               GetFrozenKerbalDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
             return true;
           break;
       }
@@ -285,7 +280,8 @@ namespace ShipManifest.Windows
     {
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
-      var guilabel = new GUIContent("Create", "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster.");
+      var guilabel = new GUIContent("Create",
+        "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster.");
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         var kerbalFound = false;
@@ -375,13 +371,15 @@ namespace ShipManifest.Windows
         GUILayout.Label("Action", GUILayout.Width(65));
         GUILayout.EndHorizontal();
 
-        _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
+        _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
+          GUILayout.Height(230), GUILayout.Width(680));
         foreach (var kerbal in RosterList)
         {
           if (CanDisplayKerbal(kerbal))
           {
             GUIStyle labelStyle;
-            if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+            if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
+                kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
               labelStyle = SMStyle.LabelStyleRed;
             else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
               labelStyle = SMStyle.LabelStyleYellow;
@@ -423,7 +421,8 @@ namespace ShipManifest.Windows
 
             SetupEditButton(kerbal, out buttonText, out buttonToolTip);
 
-            if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20), GUILayout.Height(20)))
+            if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
+              GUILayout.Height(20)))
             {
               if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
               {
@@ -437,7 +436,8 @@ namespace ShipManifest.Windows
             }
             var rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, XOffset, YOffset - _scrollViewerPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, XOffset,
+                YOffset - _scrollViewerPosition.y);
 
             // Setup buttons with gui state, button text and tooltip.
             SetupActionButton(kerbal, out buttonText, out buttonToolTip);
@@ -462,7 +462,8 @@ namespace ShipManifest.Windows
             }
             var rect2 = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect2, Position, GUI.tooltip, ref ToolTipActive, XOffset, YOffset - _scrollViewerPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect2, Position, GUI.tooltip, ref ToolTipActive, XOffset,
+                YOffset - _scrollViewerPosition.y);
             GUILayout.EndHorizontal();
             GUI.enabled = true;
           }
@@ -470,11 +471,11 @@ namespace ShipManifest.Windows
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
-
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 
@@ -489,7 +490,8 @@ namespace ShipManifest.Windows
         GUILayout.EndHorizontal();
       }
       else
-        GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Trait + ")", SMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+        GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Trait + ")", SMStyle.LabelStyleBold,
+          GUILayout.MaxWidth(300));
 
       if (!string.IsNullOrEmpty(SMAddon.SaveMessage))
       {
@@ -521,7 +523,8 @@ namespace ShipManifest.Windows
         SelectedKerbal = null;
       }
       var label = "Apply";
-      var toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
+      var toolTip =
+        "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
       if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
       {
         if (SMSettings.EnableKerbalRename && SMSettings.RenameWithProfession)
@@ -585,10 +588,11 @@ namespace ShipManifest.Windows
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit" : "Cancel";
       if (GUI.enabled)
-        buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit this Kerbal's attributes" : "Cancel any changes to this Kerbal";
+        buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
+          ? "Edit this Kerbal's attributes"
+          : "Cancel any changes to this Kerbal";
       else
         buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
-
     }
 
     private static void SetupActionButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
@@ -605,7 +609,8 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = false;
           buttonText = "Thaw";
-          buttonToolTip = "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
+          buttonToolTip =
+            "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.FrozenKerbalIsThawable(kerbal))
         {
@@ -617,7 +622,8 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = true;
           buttonText = "Freeze";
-          buttonToolTip = "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
+          buttonToolTip =
+            "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
         }
         else if (SMConditions.CanKerbalBeRemoved(kerbal))
         {
@@ -629,13 +635,15 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = false;
           buttonText = "Add";
-          buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
+          buttonToolTip =
+            "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
         }
         else if (SMConditions.KerbalCannotBeAddedRealism(kerbal))
         {
           GUI.enabled = false;
           buttonText = "Add";
-          buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
+          buttonToolTip =
+            "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
         }
         else
         {
@@ -648,7 +656,8 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = false;
         buttonText = "--";
-        buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
+        buttonToolTip =
+          "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
@@ -657,6 +666,28 @@ namespace ShipManifest.Windows
         buttonText = "Respawn";
         buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
       }
+    }
+
+    //Profession vars
+    internal enum Professions
+    {
+      Pilot,
+      Engineer,
+      Scientist,
+      Tourist,
+      Other
+    }
+
+    //Filter vars
+    internal enum KerbalFilters
+    {
+      All,
+      Assigned,
+      Available,
+      Dead,
+      Frozen,
+      Missing,
+      Vessel
     }
   }
 }

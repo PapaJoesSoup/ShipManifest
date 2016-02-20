@@ -5,9 +5,8 @@ using UnityEngine;
 namespace ShipManifest
 {
   // ReSharper disable once InconsistentNaming
-  static class SMToolTips
+  internal static class SMToolTips
   {
-
     // Tooltip vars
     internal static Rect ControlRect;
     internal static Vector2 ToolTipPos;
@@ -40,9 +39,9 @@ namespace ShipManifest
       }
     }
 
-    internal static string SetActiveToolTip(Rect controlPosition, Rect windowPosition, string toolTip, ref bool toolTipActive, float xOffset, float yOffset)
+    internal static string SetActiveToolTip(Rect controlPosition, Rect windowPosition, string toolTip,
+      ref bool toolTipActive, float xOffset, float yOffset)
     {
-
       if (!toolTipActive && controlPosition.Contains(Event.current.mousePosition))
       {
         toolTipActive = true;
@@ -75,7 +74,7 @@ namespace ShipManifest
     {
       // Only one of these values can be active at a time (onMouseOver), so this will trap it.
       // (Brute force, but functional)
-      string toolTip = "";
+      var toolTip = "";
       if (!string.IsNullOrEmpty(WindowTransfer.ToolTip)) toolTip = WindowTransfer.ToolTip;
       if (!string.IsNullOrEmpty(WindowRoster.ToolTip)) toolTip = WindowRoster.ToolTip;
       if (!string.IsNullOrEmpty(WindowDebugger.ToolTip)) toolTip = WindowDebugger.ToolTip;
@@ -113,8 +112,6 @@ namespace ShipManifest
 
     private static void EmptyWindow(int windowId)
     {
-
     }
-
   }
 }

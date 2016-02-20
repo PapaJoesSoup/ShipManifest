@@ -1,6 +1,6 @@
 ﻿using System;
-using UnityEngine;
 using ShipManifest.Windows.Tabs;
+using UnityEngine;
 
 namespace ShipManifest.Windows
 {
@@ -15,6 +15,7 @@ namespace ShipManifest.Windows
     private static Tab _selectedTab = Tab.None;
 
     private static Vector2 _displayViewerPosition = Vector2.zero;
+
     internal static void Display(int windowId)
     {
       // Reset Tooltip active flag...
@@ -33,7 +34,8 @@ namespace ShipManifest.Windows
       GUILayout.BeginVertical();
       DisplayWindowTabs();
       // This is a scroll panel (we are using it to make button lists...)
-      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(200), GUILayout.Width(370));
+      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
+        GUILayout.Height(200), GUILayout.Width(370));
       DisplaySelectedTab(_displayViewerPosition);
       GUILayout.EndScrollView();
 
@@ -60,7 +62,8 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage(string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
       GUI.enabled = true;
@@ -74,7 +77,9 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage(string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            true);
         }
       }
       var antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -87,7 +92,8 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage(string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
       var lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -100,7 +106,8 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage(string.Format(" opening Lights Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" opening Lights Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
       GUILayout.EndHorizontal();

@@ -14,7 +14,8 @@ namespace ShipManifest
     #region Static Singleton stuff
 
     // ReSharper disable once FieldCanBeMadeReadOnly.Local
-    private static Dictionary<WeakReference<Vessel>, SMVessel> _controllers = new Dictionary<WeakReference<Vessel>, SMVessel>();
+    private static Dictionary<WeakReference<Vessel>, SMVessel> _controllers =
+      new Dictionary<WeakReference<Vessel>, SMVessel>();
 
     internal static SMVessel GetInstance(Vessel vessel)
     {
@@ -66,6 +67,7 @@ namespace ShipManifest
     // Provides a list of resources and the parts that contain that resource.
     internal List<string> ResourceList = new List<string>();
     private Dictionary<string, List<Part>> _partsByResource;
+
     internal Dictionary<string, List<Part>> PartsByResource
     {
       get
@@ -80,7 +82,6 @@ namespace ShipManifest
     internal List<string> SelectedResources = new List<string>();
     internal List<TransferPump> TransferPumps = new List<TransferPump>();
 
-
     // Multi-Part Xfer Storage
     private List<ModDockedVessel> _dockedVessels;
     internal List<ModDockedVessel> DockedVessels
@@ -90,10 +91,7 @@ namespace ShipManifest
         if (_dockedVessels == null) UpdateDockedVessels();
         return _dockedVessels ?? new List<ModDockedVessel>();
       }
-      set
-      {
-        _dockedVessels = value;
-      }
+      set { _dockedVessels = value; }
     }
 
     internal List<ModDockedVessel> SelectedVesselsSource = new List<ModDockedVessel>();
@@ -115,6 +113,7 @@ namespace ShipManifest
 
     // Control Window parts
     private List<ModHatch> _hatches = new List<ModHatch>();
+
     internal List<ModHatch> Hatches
     {
       get { return _hatches ?? (_hatches = new List<ModHatch>()); }
@@ -126,6 +125,7 @@ namespace ShipManifest
     }
 
     private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
+
     internal List<ModSolarPanel> SolarPanels
     {
       get { return _solarPanels ?? (_solarPanels = new List<ModSolarPanel>()); }
@@ -137,6 +137,7 @@ namespace ShipManifest
     }
 
     private List<ModLight> _lights = new List<ModLight>();
+
     internal List<ModLight> Lights
     {
       get { return _lights ?? (_lights = new List<ModLight>()); }
@@ -148,6 +149,7 @@ namespace ShipManifest
     }
 
     private List<ModAntenna> _antennas = new List<ModAntenna>();
+
     internal List<ModAntenna> Antennas
     {
       get { return _antennas ?? (_antennas = new List<ModAntenna>()); }
@@ -221,7 +223,7 @@ namespace ShipManifest
               if (!vResourceFound)
               {
                 // found a new resource.  lets add it to the list of resources.
-                var nParts = new List<Part> { part };
+                var nParts = new List<Part> {part};
                 _partsByResource.Add(SMConditions.ResourceType.Crew.ToString(), nParts);
               }
             }
@@ -240,7 +242,7 @@ namespace ShipManifest
                 else
                 {
                   // found a new resource.  lets add it to the list of resources.
-                  var nParts = new List<Part> { part };
+                  var nParts = new List<Part> {part};
                   _partsByResource.Add(SMConditions.ResourceType.Science.ToString(), nParts);
                 }
               }
@@ -252,7 +254,8 @@ namespace ShipManifest
               foreach (PartResource resource in part.Resources)
               {
                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                if (!SMSettings.RealismMode || (SMSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                if (!SMSettings.RealismMode ||
+                    (SMSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
                 {
                   var vResourceFound = false;
                   // is resource in the list yet?.
@@ -265,7 +268,7 @@ namespace ShipManifest
                   if (!vResourceFound)
                   {
                     // found a new resource.  lets add it to the list of resources.
-                    var nParts = new List<Part> { part };
+                    var nParts = new List<Part> {part};
                     _partsByResource.Add(resource.info.name, nParts);
                   }
                 }
@@ -276,7 +279,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
         _partsByResource = null;
       }
 
@@ -295,7 +299,7 @@ namespace ShipManifest
         var dNodes = (from PartModule m in dPart.Modules where m.moduleName == "ModuleDockingNode" select m).ToList();
         foreach (var pModule in dNodes)
         {
-          var dockedInfo = ((ModuleDockingNode)pModule).vesselInfo;
+          var dockedInfo = ((ModuleDockingNode) pModule).vesselInfo;
           if (dockedInfo != null)
           {
             var modDockedVessel = new ModDockedVessel(dockedInfo);
@@ -317,7 +321,10 @@ namespace ShipManifest
           break;
         case 2:
           SelectedResourcesParts.Clear();
-          foreach (var part in Vessel.Parts.Where(part => part.Resources.Contains(SelectedResources[0]) && part.Resources.Contains(SelectedResources[1])))
+          foreach (
+            var part in
+              Vessel.Parts.Where(
+                part => part.Resources.Contains(SelectedResources[0]) && part.Resources.Contains(SelectedResources[1])))
           {
             SelectedResourcesParts.Add(part);
           }
@@ -334,10 +341,10 @@ namespace ShipManifest
           from PartModule pModule in iPart.Part.Modules
           where pModule.moduleName == "ModuleDockingHatch"
           select new ModHatch
-            {
-              HatchModule = pModule,
-              ClsPart = iPart
-            })))
+          {
+            HatchModule = pModule,
+            ClsPart = iPart
+          })))
         {
           _hatches.Add(pHatch);
         }
@@ -353,8 +360,11 @@ namespace ShipManifest
       _solarPanels.Clear();
       try
       {
-        foreach (var pPanel in from pPart in Vessel.Parts from PartModule pModule in pPart.Modules where pModule.moduleName == "ModuleDeployableSolarPanel" 
-          let iModule = (ModuleDeployableSolarPanel)pModule where iModule.Events["Extend"].active || iModule.Events["Retract"].active 
+        foreach (var pPanel in from pPart in Vessel.Parts
+          from PartModule pModule in pPart.Modules
+          where pModule.moduleName == "ModuleDeployableSolarPanel"
+          let iModule = (ModuleDeployableSolarPanel) pModule
+          where iModule.Events["Extend"].active || iModule.Events["Retract"].active
           select new ModSolarPanel
           {
             PanelModule = pModule,
@@ -379,14 +389,15 @@ namespace ShipManifest
         foreach (var pPart in Vessel.Parts)
         {
           if (!pPart.Modules.Contains("ModuleDataTransmitter") && !pPart.Modules.Contains("ModuleRTAntenna")) continue;
-          var pAntenna = new ModAntenna { SPart = pPart };
+          var pAntenna = new ModAntenna {SPart = pPart};
           foreach (PartModule pModule in pPart.Modules)
           {
             if (pModule.moduleName == "ModuleDataTransmitter" || pModule.moduleName == "ModuleRTAntenna")
             {
               pAntenna.XmitterModule = pModule;
             }
-            if (pModule.moduleName == "ModuleAnimateGeneric" && (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
+            if (pModule.moduleName == "ModuleAnimateGeneric" &&
+                (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
             {
               pAntenna.AnimateModule = pModule;
             }
@@ -438,8 +449,8 @@ namespace ShipManifest
           {
             resourcePartList.AddRange(selectedResources.Count > 1
               ? (from p in modDockedvessel.VesselParts
-                 where p.Resources.Contains(selectedResources[0]) && p.Resources.Contains(selectedResources[1])
-                 select p).ToList()
+                where p.Resources.Contains(selectedResources[0]) && p.Resources.Contains(selectedResources[1])
+                select p).ToList()
               : (from p in modDockedvessel.VesselParts where p.Resources.Contains(selectedResources[0]) select p).ToList
                 ());
           }
@@ -460,7 +471,8 @@ namespace ShipManifest
       {
         if (vesselInfo != null)
         {
-          var vesselRoot = (from p in Vessel.parts where p.flightID == vesselInfo.rootPartUId select p).SingleOrDefault();
+          var vesselRoot =
+            (from p in Vessel.parts where p.flightID == vesselInfo.rootPartUId select p).SingleOrDefault();
           if (vesselRoot != null)
           {
             vesselpartList = (from p in Vessel.parts where p.launchID == vesselRoot.launchID select p).ToList();
@@ -514,12 +526,22 @@ namespace ShipManifest
 
     internal void DumpAllResources()
     {
-      var otherResourcesList = (from s in SMAddon.SmVessel.ResourceList where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump select s).ToList();
-      var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()), SMAddon.SmVessel.Vessel.parts.First(),SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight);
-      List<TransferPump> pumpList = otherResourcesList.Select(resource => new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight, TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resource], resource))
-      {
-        FromParts = SMAddon.SmVessel.PartsByResource[resource], PumpId = pumpId
-      }).ToList();
+      var otherResourcesList =
+        (from s in SMAddon.SmVessel.ResourceList
+          where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump
+          select s).ToList();
+      var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()),
+        SMAddon.SmVessel.Vessel.parts.First(), SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump,
+        TransferPump.TriggerButton.Preflight);
+      var pumpList =
+        otherResourcesList.Select(
+          resource =>
+            new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight,
+              TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resource], resource))
+            {
+              FromParts = SMAddon.SmVessel.PartsByResource[resource],
+              PumpId = pumpId
+            }).ToList();
       if (!TransferPump.PumpsInProgress(pumpId).Any())
       {
         SMAddon.SmVessel.TransferPumps.AddRange(pumpList);
@@ -548,7 +570,16 @@ namespace ShipManifest
     internal void FillResources()
     {
       var resources = PartsByResource.Keys.ToList();
-      foreach (var resource in resources.Where(resourceName => resourceName != SMConditions.ResourceType.Crew.ToString() && resourceName != SMConditions.ResourceType.Science.ToString()).SelectMany(resourceName => (from part in PartsByResource[resourceName] from PartResource resource in part.Resources where resource.info.name == resourceName select resource)))
+      foreach (
+        var resource in
+          resources.Where(
+            resourceName =>
+              resourceName != SMConditions.ResourceType.Crew.ToString() &&
+              resourceName != SMConditions.ResourceType.Science.ToString())
+            .SelectMany(resourceName => (from part in PartsByResource[resourceName]
+              from PartResource resource in part.Resources
+              where resource.info.name == resourceName
+              select resource)))
       {
         resource.amount = resource.maxAmount;
       }
@@ -556,12 +587,13 @@ namespace ShipManifest
 
     internal void FillResource(string resourceName)
     {
-      foreach (var resource in from part in PartsByResource[resourceName] from PartResource resource in part.Resources 
-        where resource.info.name == resourceName 
+      foreach (var resource in from part in PartsByResource[resourceName]
+        from PartResource resource in part.Resources
+        where resource.info.name == resourceName
         select resource)
-        {
-          resource.amount = resource.maxAmount;
-        }
+      {
+        resource.amount = resource.maxAmount;
+      }
     }
 
     #endregion

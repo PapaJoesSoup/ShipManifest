@@ -7,7 +7,6 @@ namespace ShipManifest.Windows.Tabs
 {
   internal static class TabHatch
   {
-
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -23,7 +22,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       var step = "start";
       try
       {
@@ -65,18 +65,22 @@ namespace ShipManifest.Windows.Tabs
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Hatches Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Hatches Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          "Error", true);
       }
       GUI.enabled = true;
       GUILayout.EndVertical();
-
     }
 
     internal static void OpenAllHatches()
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      foreach (var iModule in SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch)iHatch.HatchModule).Where(iModule => iModule.IsDocked))
+      foreach (
+        var iModule in
+          SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
+            .Where(iModule => iModule.IsDocked))
       {
         iModule.HatchEvents["CloseHatch"].active = true;
         iModule.HatchEvents["OpenHatch"].active = false;
@@ -89,7 +93,10 @@ namespace ShipManifest.Windows.Tabs
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      foreach (var iModule in SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch)iHatch.HatchModule).Where(iModule => iModule.IsDocked))
+      foreach (
+        var iModule in
+          SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
+            .Where(iModule => iModule.IsDocked))
       {
         iModule.HatchEvents["CloseHatch"].active = false;
         iModule.HatchEvents["OpenHatch"].active = true;

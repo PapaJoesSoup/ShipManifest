@@ -25,7 +25,7 @@ namespace ShipManifest.Windows.Tabs
       ToolTipActive = false;
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
-      Position = WindowSettings.Position; 
+      Position = WindowSettings.Position;
       var scrollX = 20;
       var scrollY = 50;
 
@@ -34,7 +34,8 @@ namespace ShipManifest.Windows.Tabs
         !SMSettings.LockSettings
           ? "Realism Settings / Options"
           : "Realism Settings / Options  (Locked.  To unlock, edit SMSettings.dat file)", SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       var isEnabled = !SMSettings.LockSettings;
       // Realism Mode
@@ -49,7 +50,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.RealismMode = GUILayout.Toggle(SMSettings.RealismMode, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // EnableCrew Mode
       GUI.enabled = isEnabled;
@@ -62,7 +64,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnableCrew = GUILayout.Toggle(SMSettings.EnableCrew, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUILayout.EndHorizontal();
 
@@ -86,10 +89,12 @@ namespace ShipManifest.Windows.Tabs
       _toolTip += "\r\nWhen Off (or Realism is off), Stock Crew transfers behave normally.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
-      SMSettings.OverrideStockCrewXfer = GUILayout.Toggle(SMSettings.OverrideStockCrewXfer, _guiLabel, GUILayout.Width(300));
+      SMSettings.OverrideStockCrewXfer = GUILayout.Toggle(SMSettings.OverrideStockCrewXfer, _guiLabel,
+        GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUILayout.EndHorizontal();
 
@@ -108,7 +113,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnableCls = GUILayout.Toggle(SMSettings.EnableCls, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       if (SMSettings.EnableCls != SMSettings.PrevEnableCls && HighLogic.LoadedSceneIsFlight)
@@ -135,7 +141,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnableScience = GUILayout.Toggle(SMSettings.EnableScience, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       if (!SMSettings.EnableScience && HighLogic.LoadedSceneIsFlight)
@@ -156,13 +163,16 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnableResources = GUILayout.Toggle(SMSettings.EnableResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       if (!SMSettings.EnableResources && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
-        if (SMAddon.SmVessel.SelectedResources.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
+        if (SMAddon.SmVessel.SelectedResources.Count > 0 &&
+            !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
+            !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
           SMAddon.SmVessel.SelectedResources.Clear();
       }
 
@@ -180,7 +190,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnablePfResources = GUILayout.Toggle(SMSettings.EnablePfResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       // EnableXferCost Mode
@@ -194,7 +205,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.EnableXferCost = GUILayout.Toggle(SMSettings.EnableXferCost, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       // Resource Xfer EC cost
@@ -208,7 +220,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // Lets parse the string to allow decimal points.
       StrFlowCost = SMSettings.FlowCost.ToString(CultureInfo.InvariantCulture);
@@ -225,7 +238,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       // update decimal bool 
@@ -256,7 +270,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       strFlowRate = GUILayout.TextField(strFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
       _toolTip = "Sets the rate that resources Xfer when Realism Mode is on.";
@@ -266,23 +281,27 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strFlowRate, out newRate))
-        SMSettings.FlowRate = (int)newRate;
+        SMSettings.FlowRate = (int) newRate;
 
       // Resource Flow rate Slider
       GUILayout.BeginHorizontal();
       GUILayout.Space(30);
-      GUILayout.Label(SMSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture), GUILayout.Width(10), GUILayout.Height(20));
-      SMSettings.FlowRate = GUILayout.HorizontalSlider((float)SMSettings.FlowRate, (float)SMSettings.MinFlowRate, (float)SMSettings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
+      GUILayout.Label(SMSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture), GUILayout.Width(10),
+        GUILayout.Height(20));
+      SMSettings.FlowRate = GUILayout.HorizontalSlider((float) SMSettings.FlowRate, (float) SMSettings.MinFlowRate,
+        (float) SMSettings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
       _label = SMSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
       _toolTip = "Slide control to change the Resource Flow Rate shown above.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
 
       // Min Flow Rate for Slider
@@ -294,7 +313,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       strMinFlowRate = GUILayout.TextField(strMinFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
       _toolTip = "Sets the lowest range (left side) on the Flow rate Slider control.";
@@ -302,10 +322,11 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMinFlowRate, out newRate))
-        SMSettings.MinFlowRate = (int)newRate;
+        SMSettings.MinFlowRate = (int) newRate;
 
       // Max Flow Rate for Slider
       GUILayout.BeginHorizontal();
@@ -316,7 +337,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       strMaxFlowRate = GUILayout.TextField(strMaxFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Units/Sec";
       _toolTip = "Sets the highest range (right side) on the Flow rate Slider control.";
@@ -324,10 +346,11 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowRate, out newRate))
-        SMSettings.MaxFlowRate = (int)newRate;
+        SMSettings.MaxFlowRate = (int) newRate;
 
       // Max Flow Time 
       GUILayout.BeginHorizontal();
@@ -342,7 +365,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       strMaxFlowTime = GUILayout.TextField(strMaxFlowTime, 20, GUILayout.Height(20), GUILayout.Width(80));
       _label = "Sec";
       _toolTip = "Sets the maximum duration (in sec) of a resource transfer.";
@@ -354,10 +378,11 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowTime, out newRate))
-        SMSettings.MaxFlowTimeSec = (int)newRate;
+        SMSettings.MaxFlowTimeSec = (int) newRate;
 
       // reset gui.enabled to default
       GUI.enabled = isEnabled;
@@ -370,7 +395,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
     }
   }
 }

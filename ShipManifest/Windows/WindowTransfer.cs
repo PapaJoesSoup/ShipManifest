@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ShipManifest.APIClients;
-using UnityEngine;
 using ShipManifest.Modules;
 using ShipManifest.Process;
+using UnityEngine;
+using Enumerable = System.Linq.Enumerable;
 
 namespace ShipManifest.Windows
 {
@@ -30,6 +31,7 @@ namespace ShipManifest.Windows
     internal static List<TransferPump> DisplayPumps = new List<TransferPump>();
 
     private static Dictionary<PartModule, bool> _scienceModulesSource;
+
     internal static Dictionary<PartModule, bool> ScienceModulesSource
     {
       get
@@ -39,7 +41,7 @@ namespace ShipManifest.Windows
         if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return _scienceModulesSource;
         var modules = SMAddon.SmVessel.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
         if (modules.Length <= 0) return _scienceModulesSource;
-        foreach (var pm in modules.Cast<PartModule>())
+        foreach (var pm in Enumerable.Cast<PartModule>(modules))
         {
           _scienceModulesSource.Add(pm, false);
         }
@@ -127,7 +129,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 
@@ -156,56 +159,68 @@ namespace ShipManifest.Windows
         {
           var prevValue = ShowSourceVessels;
           ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, "Vessels", GUILayout.Width(90));
-          if (!prevValue && ShowSourceVessels) WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+          if (!prevValue && ShowSourceVessels)
+            WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
         }
         else
         {
           var prevValue = ShowSourceVessels;
           ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, "Vessels", GUILayout.Width(90));
-          if (!prevValue && ShowSourceVessels) WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+          if (!prevValue && ShowSourceVessels)
+            WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
         }
       }
       GUILayout.EndHorizontal();
     }
 
     #region Source Viewers (GUI Layout)
+
     // Transfer Window components
     private static Vector2 _sourceTransferViewerScrollPosition = Vector2.zero;
+
     internal static void SourceTransferViewer()
     {
       try
       {
         // This is a scroll panel (we are using it to make button lists...)
-        _sourceTransferViewerScrollPosition = GUILayout.BeginScrollView(_sourceTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+        _sourceTransferViewerScrollPosition = GUILayout.BeginScrollView(_sourceTransferViewerScrollPosition,
+          SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         if (ShowSourceVessels && CanShowVessels())
-          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget, _sourceTransferViewerScrollPosition);
+          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget,
+            _sourceTransferViewerScrollPosition);
         else
-          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget, _sourceTransferViewerScrollPosition);
+          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget,
+            _sourceTransferViewerScrollPosition);
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Ship Manifest Window - SourceTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Ship Manifest Window - SourceTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
+            ex.StackTrace), "Error", true);
       }
     }
 
     private static Vector2 _sourceDetailsViewerScrollPosition = Vector2.zero;
+
     private static void SourceDetailsViewer()
     {
       try
       {
         // Source Part resource Details
         // this Scroll viewer is for the details of the part selected above.
-        _sourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(_sourceDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
+        _sourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(_sourceDetailsViewerScrollPosition,
+          SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
+          CrewDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget,
+            TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
@@ -221,7 +236,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in WindowTransfer.SourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in WindowTransfer.SourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -230,47 +247,57 @@ namespace ShipManifest.Windows
     #region Target Viewers (GUI Layout)
 
     private static Vector2 _targetTransferViewerScrollPosition = Vector2.zero;
+
     private static void TargetTransferViewer()
     {
       try
       {
         // Adjust target style colors for part selectors when using/not using CLS highlighting
-        if (SMSettings.EnableClsHighlighting && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+        if (SMSettings.EnableClsHighlighting &&
+            SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
           SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
         else
           SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
 
         // This is a scroll panel (we are using it to make button lists...)
-        _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+        _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition,
+          SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         if (ShowTargetVessels && CanShowVessels())
-          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource, _targetTransferViewerScrollPosition);
+          VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource,
+            _targetTransferViewerScrollPosition);
         else
-          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource, _targetTransferViewerScrollPosition);
+          PartsTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource,
+            _targetTransferViewerScrollPosition);
 
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Ship Manifest Window - TargetTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Ship Manifest Window - TargetTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
+            ex.StackTrace), "Error", true);
       }
     }
 
     private static Vector2 _targetDetailsViewerScrollPosition = Vector2.zero;
+
     private static void TargetDetailsViewer()
     {
       try
       {
         // Target Part resource details
-        _targetDetailsViewerScrollPosition = GUILayout.BeginScrollView(_targetDetailsViewerScrollPosition, SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
+        _targetDetailsViewerScrollPosition = GUILayout.BeginScrollView(_targetDetailsViewerScrollPosition,
+          SMStyle.ScrollStyle, GUILayout.Height(120), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         // --------------------------------------------------------------------------
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
+          CrewDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource,
+            TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
@@ -286,14 +313,18 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in WindowTransfer.TargetDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in WindowTransfer.TargetDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
+
     #endregion
 
     #region Viewer Details (GUI Layout)
 
-    private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType, Vector2 viewerScrollPosition)
+    private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
+      Vector2 viewerScrollPosition)
     {
       var scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       var scrollY = Position.y + 30 - viewerScrollPosition.y;
@@ -308,7 +339,7 @@ namespace ShipManifest.Windows
           var strDescription = GetResourceDescription(selectedResources, part);
 
           // set the conditions for a button style change.
-          var btnWidth = 273;  // Start with full witth button...
+          var btnWidth = 273; // Start with full witth button...
           if (SMSettings.RealismMode && SMConditions.AreSelectedResourcesTypeOther(selectedResources))
             btnWidth = 223;
           else if (!SMSettings.RealismMode && !selectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
@@ -342,9 +373,14 @@ namespace ShipManifest.Windows
           step = "Render dump/fill buttons";
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
           {
-            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part, pumpType, TransferPump.TriggerButton.Transfer);
-            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
-            var style1 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part,
+              pumpType, TransferPump.TriggerButton.Transfer);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+              ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
+              : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+            var style1 = pumpType == TransferPump.TypePump.SourceToTarget
+              ? SMStyle.ButtonSourceStyle
+              : SMStyle.ButtonTargetStyle;
             GUI.enabled = CanDumpPart(part);
 
             if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
@@ -352,7 +388,9 @@ namespace ShipManifest.Windows
               SMPart.ToggleDumpResource(part, selectedResources, pumpId);
             }
 
-            var style2 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var style2 = pumpType == TransferPump.TypePump.SourceToTarget
+              ? SMStyle.ButtonSourceStyle
+              : SMStyle.ButtonTargetStyle;
             if (!SMSettings.RealismMode)
             {
               if (selectedResources[0] == SMConditions.ResourceType.Crew.ToString())
@@ -383,13 +421,16 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage("Error in Windowtransfer.PartsTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex, "Error", true);
+          Utilities.LogMessage(
+            "Error in Windowtransfer.PartsTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }
     }
 
-    private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType, Vector2 viewerScrollPosition)
+    private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
+      Vector2 viewerScrollPosition)
     {
       var scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       var scrollY = Position.y + 30 - viewerScrollPosition.y;
@@ -418,7 +459,8 @@ namespace ShipManifest.Windows
           GUI.enabled = CanSelectVessel(pumpType, modDockedVessel);
 
           step = "Render vessel Buttons";
-          if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
+          if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth),
+            GUILayout.Height(20)))
           {
             VesselButtonToggled(pumpType, modDockedVessel);
           }
@@ -439,20 +481,30 @@ namespace ShipManifest.Windows
           if (!SMSettings.RealismMode)
           {
             if (selectedResources.Count > 1)
-              GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[0]) > 0 || TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[1]) > 0;
+              GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[0]) > 0 ||
+                            TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[1]) > 0;
             else
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessel.VesselParts, selectedResources[0]) > 0;
-            var style1 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
-            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), modDockedVessel.VesselParts.First(), modDockedVessel.VesselParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
-            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this Part") : new GUIContent("Stop", "Halts the dumping of the selected resource in this part");
+            var style1 = pumpType == TransferPump.TypePump.SourceToTarget
+              ? SMStyle.ButtonSourceStyle
+              : SMStyle.ButtonTargetStyle;
+            var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
+              Enumerable.First(modDockedVessel.VesselParts), Enumerable.Last(modDockedVessel.VesselParts), pumpType,
+              TransferPump.TriggerButton.Transfer);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+              ? new GUIContent("Dump", "Dumps the selected resource in this Part")
+              : new GUIContent("Stop", "Halts the dumping of the selected resource in this part");
             if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
             {
               SMPart.ToggleDumpResource(modDockedVessel.VesselParts, selectedResources, pumpId);
             }
 
-            var style2 = pumpType == TransferPump.TypePump.SourceToTarget ? SMStyle.ButtonSourceStyle : SMStyle.ButtonTargetStyle;
+            var style2 = pumpType == TransferPump.TypePump.SourceToTarget
+              ? SMStyle.ButtonSourceStyle
+              : SMStyle.ButtonTargetStyle;
             if (selectedResources.Count > 1)
-              GUI.enabled = TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0 || TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0;
+              GUI.enabled = TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0 ||
+                            TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0;
             else
               GUI.enabled = TransferPump.CalcRemainingCapacity(modDockedVessel.VesselParts, selectedResources[0]) > 0;
             if (GUILayout.Button("Fill", style2, GUILayout.Width(30), GUILayout.Height(20)))
@@ -470,13 +522,16 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage("Error in Windowtransfer.VesselTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex, "Error", true);
+          Utilities.LogMessage(
+            "Error in Windowtransfer.VesselTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }
     }
 
-    private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, TransferPump.TypePump pumpType, Vector2 scrollPosition)
+    private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo,
+      TransferPump.TypePump pumpType, Vector2 scrollPosition)
     {
       // Since only one Crew Part can be selected, all lists will use an index of [0].
       float xOffset = pumpType == TransferPump.TypePump.SourceToTarget ? 30 : 330;
@@ -493,7 +548,8 @@ namespace ShipManifest.Windows
           if (SMConditions.IsTransferInProgress())
             GUI.enabled = false;
 
-          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+            GUILayout.Width(15), GUILayout.Height(20)))
           {
             ToolTip = "";
             SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsFrom[0]);
@@ -501,20 +557,24 @@ namespace ShipManifest.Windows
           if (Event.current.type == EventType.Repaint && ShowToolTips)
           {
             var rect = GUILayoutUtility.GetLastRect();
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+              yOffset - scrollPosition.y);
           }
           GUI.enabled = true;
         }
-        GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"), GUILayout.Width(190), GUILayout.Height(20));
+        GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"),
+          GUILayout.Width(190), GUILayout.Height(20));
         GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
-        if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember || SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
+        if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember ||
+             SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
         {
           GUI.enabled = true;
           GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
         }
         else
         {
-          if (GUILayout.Button(new GUIContent("Xfer", XferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent("Xfer", XferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50),
+            GUILayout.Height(20)))
           {
             SMAddon.SmVessel.TransferCrewObj.FromCrewMember = crewMember;
             SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsTo[0]);
@@ -522,7 +582,8 @@ namespace ShipManifest.Windows
           if (Event.current.type == EventType.Repaint && ShowToolTips)
           {
             var rect = GUILayoutUtility.GetLastRect();
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+              yOffset - scrollPosition.y);
           }
         }
         GUI.enabled = true;
@@ -541,21 +602,25 @@ namespace ShipManifest.Windows
           {
             GUILayout.BeginHorizontal();
             GUI.enabled = false;
-            if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle, GUILayout.Width(15), GUILayout.Height(20)))
+            if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+              GUILayout.Width(15), GUILayout.Height(20)))
             {
               ToolTip = "";
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips)
             {
               var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+                yOffset - scrollPosition.y);
             }
 
             var trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
             GUI.enabled = true;
-            GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
+            GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
+              GUILayout.Width(190), GUILayout.Height(20));
 
-            if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"), SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+            if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"),
+              SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
             {
               WindowRoster.ThawKerbal(frzncrew.CrewName);
               ToolTip = "";
@@ -563,7 +628,8 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
             {
               var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+                yOffset - scrollPosition.y);
             }
             GUILayout.EndHorizontal();
           }
@@ -572,7 +638,6 @@ namespace ShipManifest.Windows
         {
           Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
           Debug.Log(ex.Message);
-
         }
       }
     }
@@ -582,24 +647,24 @@ namespace ShipManifest.Windows
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
       const float yOffset = 160;
-      var modules = ScienceModulesSource.Keys.ToArray();
+      var modules = Enumerable.ToArray(ScienceModulesSource.Keys);
       foreach (var pm in modules)
       {
         // experiments/Containers.
-        var scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+        var scienceCount = ((IScienceDataContainer) pm).GetScienceCount();
         var isCollectable = true;
         switch (pm.moduleName)
         {
           case "ModuleScienceExperiment":
-            isCollectable = ((ModuleScienceExperiment)pm).dataIsCollectable;
+            isCollectable = ((ModuleScienceExperiment) pm).dataIsCollectable;
             break;
           case "ModuleScienceContainer":
-            isCollectable = ((ModuleScienceContainer)pm).dataIsCollectable;
+            isCollectable = ((ModuleScienceContainer) pm).dataIsCollectable;
             break;
         }
 
         GUILayout.BeginHorizontal();
-        GUI.enabled = ((IScienceDataContainer)pm).GetScienceCount() > 0;
+        GUI.enabled = ((IScienceDataContainer) pm).GetScienceCount() > 0;
 
         var label = "+";
         var toolTip = "Expand/Collapse Science detail.";
@@ -615,10 +680,12 @@ namespace ShipManifest.Windows
         if (Event.current.type == EventType.Repaint && ShowToolTips)
         {
           var rect = GUILayoutUtility.GetLastRect();
-          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - _targetDetailsViewerScrollPosition.y);
+          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+            yOffset - _targetDetailsViewerScrollPosition.y);
         }
         GUI.enabled = true;
-        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount), GUILayout.Width(205), GUILayout.Height(20));
+        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount), GUILayout.Width(205),
+          GUILayout.Height(20));
 
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
@@ -633,22 +700,25 @@ namespace ShipManifest.Windows
             GUI.enabled = true;
             toolTip = "Realism is off, or Experiment/data is transferable";
           }
-          if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40),
+            GUILayout.Height(20)))
           {
             SMAddon.SmVessel.SelectedModuleSource = pm;
-            ProcessController.TransferScience(SMAddon.SmVessel.SelectedModuleSource, SMAddon.SmVessel.SelectedModuleTarget);
+            ProcessController.TransferScience(SMAddon.SmVessel.SelectedModuleSource,
+              SMAddon.SmVessel.SelectedModuleTarget);
             SMAddon.SmVessel.SelectedModuleSource = null;
           }
           if (Event.current.type == EventType.Repaint && ShowToolTips)
           {
             var rect = GUILayoutUtility.GetLastRect();
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - _targetDetailsViewerScrollPosition.y);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+              yOffset - _targetDetailsViewerScrollPosition.y);
           }
         }
         GUILayout.EndHorizontal();
         if (ScienceModulesSource[pm])
         {
-          var data = ((IScienceDataContainer)pm).GetData();
+          var data = ((IScienceDataContainer) pm).GetData();
 
           foreach (var item in data)
           {
@@ -659,7 +729,7 @@ namespace ShipManifest.Windows
             var expId = item.subjectID.Split('@')[0];
             var expKey = item.subjectID.Split('@')[1];
             var se = ResearchAndDevelopment.GetExperiment(expId);
-            var key = (from k in se.Results.Keys where expKey.Contains(k) select k).FirstOrDefault();
+            var key = (from k in se.Results.Keys where expKey.Contains((string) k) select k).FirstOrDefault();
             key = key ?? "default";
             var results = se.Results[key];
 
@@ -672,11 +742,13 @@ namespace ShipManifest.Windows
             toolTip += "\r\n-Lab Value:  " + item.labValue;
             toolTip += "\r\n-Lab Boost:  " + item.labBoost;
 
-            GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
+            GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205),
+              GUILayout.Height(20));
             if (Event.current.type == EventType.Repaint && ShowToolTips)
             {
               var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - _targetDetailsViewerScrollPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+                yOffset - _targetDetailsViewerScrollPosition.y);
             }
             if (SMSettings.RealismMode && !isCollectable)
             {
@@ -690,15 +762,17 @@ namespace ShipManifest.Windows
             }
             if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
             {
-              if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
+              if (GUILayout.Button(new GUIContent("Xfer", toolTip), SMStyle.ButtonStyle, GUILayout.Width(40),
+                GUILayout.Height(20)))
               {
-                if (((ModuleScienceContainer)SMAddon.SmVessel.SelectedModuleTarget).AddData(item))
-                  ((IScienceDataContainer)pm).DumpData(item);
+                if (((ModuleScienceContainer) SMAddon.SmVessel.SelectedModuleTarget).AddData(item))
+                  ((IScienceDataContainer) pm).DumpData(item);
               }
               if (Event.current.type == EventType.Repaint && ShowToolTips)
               {
                 var rect = GUILayoutUtility.GetLastRect();
-                ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - _targetDetailsViewerScrollPosition.y);
+                ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+                  yOffset - _targetDetailsViewerScrollPosition.y);
               }
             }
             GUILayout.EndHorizontal();
@@ -713,15 +787,18 @@ namespace ShipManifest.Windows
       float xOffset = 330;
       float yOffset = 160;
       if (SMAddon.SmVessel.SelectedPartsTarget.Count <= 0) return;
-      var count = SMAddon.SmVessel.SelectedPartsTarget[0].Modules.Cast<PartModule>().Count(tpm => tpm is IScienceDataContainer && tpm.moduleName != "ModuleScienceExperiment");
+      var count =
+        SMAddon.SmVessel.SelectedPartsTarget[0].Modules.Cast<PartModule>()
+          .Count(tpm => tpm is IScienceDataContainer && tpm.moduleName != "ModuleScienceExperiment");
 
       foreach (PartModule pm in SMAddon.SmVessel.SelectedPartsTarget[0].Modules)
       {
         // Containers.
         if (!(pm is IScienceDataContainer) || pm.moduleName == "ModuleScienceExperiment") continue;
-        var scienceCount = ((IScienceDataContainer)pm).GetScienceCount();
+        var scienceCount = ((IScienceDataContainer) pm).GetScienceCount();
         GUILayout.BeginHorizontal();
-        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount), GUILayout.Width(220), GUILayout.Height(20));
+        GUILayout.Label(string.Format("{0} - ({1})", pm.moduleName, scienceCount), GUILayout.Width(220),
+          GUILayout.Height(20));
         // set the conditions for a button style change.
         var isReceiveToggled = false;
         if (pm == SMAddon.SmVessel.SelectedModuleTarget)
@@ -737,14 +814,16 @@ namespace ShipManifest.Windows
         // Only containers can receive science data
         if (pm.moduleName != "ModuleScienceExperiment")
         {
-          if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style, GUILayout.Width(40), GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent("Recv", "Set this module as the receiving container"), style,
+            GUILayout.Width(40), GUILayout.Height(20)))
           {
             SMAddon.SmVessel.SelectedModuleTarget = pm;
           }
           if (Event.current.type == EventType.Repaint && ShowToolTips)
           {
             var rect = GUILayoutUtility.GetLastRect();
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - _targetDetailsViewerScrollPosition.y);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+              yOffset - _targetDetailsViewerScrollPosition.y);
           }
         }
         GUILayout.EndHorizontal();
@@ -755,7 +834,7 @@ namespace ShipManifest.Windows
     {
       // Let's get the pump objects we may use...
       var selectedResources = SMAddon.SmVessel.SelectedResources;
-      List<TransferPump> pumps = TransferPump.GetDisplayPumpsByType(pumpType);
+      var pumps = TransferPump.GetDisplayPumpsByType(pumpType);
       if (!(from pump in pumps where pump.FromParts.Count > 0 select pump).Any()) return;
 
       // This routine assumes that a resource has been selected on the Resource manifest window.
@@ -814,18 +893,24 @@ namespace ShipManifest.Windows
         GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(65));
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-        activePump.EditSliderAmount = GUILayout.TextField(activePump.EditSliderAmount, 20, GUILayout.Width(95), GUILayout.Height(20));
+          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+            yOffset - scrollPosition.y);
+        activePump.EditSliderAmount = GUILayout.TextField(activePump.EditSliderAmount, 20, GUILayout.Width(95),
+          GUILayout.Height(20));
         thisXferAmount = double.Parse(activePump.EditSliderAmount);
-        var ratioXferAmt = thisXferAmount * ratioPump.PumpRatio > ratioPump.FromCapacity ? ratioPump.FromCapacity : thisXferAmount * ratioPump.PumpRatio;
+        var ratioXferAmt = thisXferAmount*ratioPump.PumpRatio > ratioPump.FromCapacity
+          ? ratioPump.FromCapacity
+          : thisXferAmount*ratioPump.PumpRatio;
         if (SMAddon.SmVessel.SelectedResources.Count > 1)
         {
           label = " | " + ratioXferAmt.ToString("#######0.##");
-          toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.PumpRatio + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
+          toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.PumpRatio +
+                    ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
           GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(80));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+              yOffset - scrollPosition.y);
         }
       }
       GUILayout.EndHorizontal();
@@ -835,19 +920,26 @@ namespace ShipManifest.Windows
         GUILayout.BeginHorizontal();
         var noPad = SMStyle.LabelStyleNoPad;
         label = "Xfer:";
-        toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.\r\nYou can use this instead of the text box above.";
+        toolTip =
+          "Xfer amount slider control.\r\nMove slider to select a different value.\r\nYou can use this instead of the text box above.";
         GUILayout.Label(new GUIContent(label, toolTip), noPad, GUILayout.Width(50), GUILayout.Height(20));
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
-        thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount, GUILayout.Width(190));
+          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+            yOffset - scrollPosition.y);
+        thisXferAmount = GUILayout.HorizontalSlider((float) thisXferAmount, 0, (float) maxPumpAmount,
+          GUILayout.Width(190));
         activePump.EditSliderAmount = thisXferAmount.ToString(CultureInfo.InvariantCulture);
         // set Xfer button style
-        var xferContent = !TransferPump.PumpProcessOn ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected " + strTarget + " Part(s)") : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected " + strTarget + " Part(s)");
+        var xferContent = !TransferPump.PumpProcessOn
+          ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected " + strTarget + " Part(s)")
+          : new GUIContent("Stop",
+            "Halts the Transfer of the selected resource(s)\r\nto the selected " + strTarget + " Part(s)");
 
         if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
         {
-          var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), pumps[0].FromParts.First(), pumps[0].ToParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
+          var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
+            pumps[0].FromParts.First(), pumps[0].ToParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
           if (!TransferPump.PumpProcessOn)
           {
             //Calc amounts and update xfer modules
@@ -858,12 +950,14 @@ namespace ShipManifest.Windows
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset, yOffset - scrollPosition.y);
+          ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, xOffset,
+            yOffset - scrollPosition.y);
         GUILayout.EndHorizontal();
       }
     }
 
-    private static void ResourceFlowButtons(TransferPump.TypePump pumpType, Vector2 scrollPosition, int scrollX, int scrollY)
+    private static void ResourceFlowButtons(TransferPump.TypePump pumpType, Vector2 scrollPosition, int scrollX,
+      int scrollY)
     {
       var step = "";
       try
@@ -880,12 +974,18 @@ namespace ShipManifest.Windows
 
           GUILayout.BeginHorizontal();
 
-          GUILayout.Label(string.Format("{0}: ({1}/{2})", pump.Resource, pump.FromRemaining.ToString("#######0.##"), pump.FromCapacity.ToString("######0.##")), SMStyle.LabelStyleNoWrap, GUILayout.Width(220), GUILayout.Height(18));
+          GUILayout.Label(
+            string.Format("{0}: ({1}/{2})", pump.Resource, pump.FromRemaining.ToString("#######0.##"),
+              pump.FromCapacity.ToString("######0.##")), SMStyle.LabelStyleNoWrap, GUILayout.Width(220),
+            GUILayout.Height(18));
           GUILayout.Label(string.Format("{0}", flowtext), GUILayout.Width(20), GUILayout.Height(18));
           if (SMAddon.SmVessel.Vessel.IsControllable)
           {
             step = "render flow button(s)";
-            if (GUILayout.Button(new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s)."), GUILayout.Width(40), GUILayout.Height(20)))
+            if (
+              GUILayout.Button(
+                new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s)."),
+                GUILayout.Width(40), GUILayout.Height(20)))
             {
               foreach (var part in pump.FromParts)
               {
@@ -895,7 +995,8 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
             {
               var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - scrollPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+                scrollY - scrollPosition.y);
             }
           }
           GUILayout.EndHorizontal();
@@ -905,7 +1006,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage(string.Format(" in WindowTransfer.ResourceFlowButtons at step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" in WindowTransfer.ResourceFlowButtons at step:  " + step + ".  Error:  {0} \r\n\r\n{1}",
+              ex.Message, ex.StackTrace), "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -965,7 +1068,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage("Error in WindowTransfer.PartButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex, "Error", true);
+          Utilities.LogMessage(
+            "Error in WindowTransfer.PartButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -983,7 +1088,9 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedVesselsSource.Remove(modVessel);
           else
             SMAddon.SmVessel.SelectedVesselsSource.Add(modVessel);
-          SMAddon.SmVessel.SelectedPartsSource = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, SMAddon.SmVessel.SelectedResources);
+          SMAddon.SmVessel.SelectedPartsSource =
+            SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
+              SMAddon.SmVessel.SelectedResources);
         }
         else
         {
@@ -991,7 +1098,9 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedVesselsTarget.Remove(modVessel);
           else
             SMAddon.SmVessel.SelectedVesselsTarget.Add(modVessel);
-          SMAddon.SmVessel.SelectedPartsTarget = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, SMAddon.SmVessel.SelectedResources);
+          SMAddon.SmVessel.SelectedPartsTarget =
+            SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
+              SMAddon.SmVessel.SelectedResources);
         }
         WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
       }
@@ -999,7 +1108,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage("Error in WindowTransfer.VesselButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex, "Error", true);
+          Utilities.LogMessage(
+            "Error in WindowTransfer.VesselButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -1011,7 +1122,9 @@ namespace ShipManifest.Windows
 
     private static bool CanShowVessels()
     {
-      return SMAddon.SmVessel.DockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString());
+      return SMAddon.SmVessel.DockedVessels.Count > 0 &&
+             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
+             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString());
     }
 
     private static int GetScienceCount(Part part)
@@ -1022,14 +1135,16 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
         return 0;
       }
     }
 
     private static bool IsPartSelectable(string selectedResource, TransferPump.TypePump pumpType, Part part)
     {
-      if (selectedResource == SMConditions.ResourceType.Crew.ToString() || selectedResource == SMConditions.ResourceType.Science.ToString()) return true;
+      if (selectedResource == SMConditions.ResourceType.Crew.ToString() ||
+          selectedResource == SMConditions.ResourceType.Science.ToString()) return true;
       var isSelectable = true;
       if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
@@ -1048,7 +1163,8 @@ namespace ShipManifest.Windows
     {
       bool isDumpable;
       if (SMAddon.SmVessel.SelectedResources.Count > 1)
-        isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0 || part.Resources[SMAddon.SmVessel.SelectedResources[1]].amount > 0;
+        isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0 ||
+                     part.Resources[SMAddon.SmVessel.SelectedResources[1]].amount > 0;
       else
         isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0;
 
@@ -1076,11 +1192,15 @@ namespace ShipManifest.Windows
       GUIStyle style;
       if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
-        style = SMAddon.SmVessel.SelectedPartsSource.Contains(part) ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
+        style = SMAddon.SmVessel.SelectedPartsSource.Contains(part)
+          ? SMStyle.ButtonToggledSourceStyle
+          : SMStyle.ButtonSourceStyle;
       }
       else
       {
-        style = SMAddon.SmVessel.SelectedPartsTarget.Contains(part) ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
+        style = SMAddon.SmVessel.SelectedPartsTarget.Contains(part)
+          ? SMStyle.ButtonToggledTargetStyle
+          : SMStyle.ButtonTargetStyle;
       }
       return style;
     }
@@ -1090,11 +1210,15 @@ namespace ShipManifest.Windows
       GUIStyle style;
       if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
-        style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel) ? SMStyle.ButtonToggledSourceStyle : SMStyle.ButtonSourceStyle;
+        style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel)
+          ? SMStyle.ButtonToggledSourceStyle
+          : SMStyle.ButtonSourceStyle;
       }
       else
       {
-        style = SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel) ? SMStyle.ButtonToggledTargetStyle : SMStyle.ButtonTargetStyle;
+        style = SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel)
+          ? SMStyle.ButtonToggledTargetStyle
+          : SMStyle.ButtonTargetStyle;
       }
       return style;
     }
@@ -1114,14 +1238,16 @@ namespace ShipManifest.Windows
       }
       else
       {
-        strDescription = part.Resources[selectedResources[0]].amount.ToString("######0.##") + " - " + part.partInfo.title;
+        strDescription = part.Resources[selectedResources[0]].amount.ToString("######0.##") + " - " +
+                         part.partInfo.title;
       }
       return strDescription;
     }
 
     private static string GetResourceDescription(List<string> selectedResources, ModDockedVessel modDockedVvessel)
     {
-      var strDescription = GetVesselResourceTotals(modDockedVvessel, selectedResources) + " - " + modDockedVvessel.VesselName;
+      var strDescription = GetVesselResourceTotals(modDockedVvessel, selectedResources) + " - " +
+                           modDockedVvessel.VesselName;
       return strDescription;
     }
 
@@ -1148,6 +1274,5 @@ namespace ShipManifest.Windows
     }
 
     #endregion
-
   }
 }

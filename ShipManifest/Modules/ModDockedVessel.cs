@@ -3,19 +3,28 @@ using System.Linq;
 
 namespace ShipManifest.Modules
 {
-  class ModDockedVessel
+  internal class ModDockedVessel
   {
-    private DockedVesselInfo _vesselInfo;
-    internal DockedVesselInfo VesselInfo
-    {
-      get { return _vesselInfo; }
-      set { _vesselInfo = value; }
-    }
+    private readonly List<Part> _vesselParts;
 
     private Part _rootPart;
+
+    internal ModDockedVessel()
+    {
+    }
+
+    internal ModDockedVessel(DockedVesselInfo vesselInfo)
+    {
+      VesselInfo = vesselInfo;
+      _vesselParts = SMAddon.SmVessel.GetDockedVesselParts(VesselInfo);
+    }
+
+    internal DockedVesselInfo VesselInfo { get; set; }
+
     internal Part Rootpart
     {
-      get {
+      get
+      {
         return _rootPart ??
                (_rootPart =
                  (from p in SMAddon.SmVessel.Vessel.parts where p.flightID == VesselInfo.rootPartUId select p)
@@ -26,10 +35,7 @@ namespace ShipManifest.Modules
 
     internal uint LaunchId
     {
-      get
-      {
-        return Rootpart.launchID;
-      }
+      get { return Rootpart.launchID; }
     }
 
     internal string VesselName
@@ -41,20 +47,9 @@ namespace ShipManifest.Modules
       }
     }
 
-    private readonly List<Part> _vesselParts;
     internal List<Part> VesselParts
     {
-      get
-      {
-        return _vesselParts;
-      }
-    }
-
-    internal ModDockedVessel() { }
-    internal ModDockedVessel(DockedVesselInfo vesselInfo)
-    {
-      VesselInfo = vesselInfo;
-      _vesselParts = SMAddon.SmVessel.GetDockedVesselParts(_vesselInfo);
+      get { return _vesselParts; }
     }
   }
 }

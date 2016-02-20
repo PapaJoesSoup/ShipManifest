@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 
 namespace ShipManifest
 {
@@ -81,8 +81,8 @@ namespace ShipManifest
         const string assemblyName = "ShipManifest";
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
         var assembly = (from a in assemblies
-                        where a.FullName.Contains(assemblyName)
-                        select a).SingleOrDefault();
+          where a.FullName.Contains(assemblyName)
+          select a).SingleOrDefault();
         _smInstalled = assembly != null;
         _smChecked = true;
         return _smInstalled;
@@ -91,11 +91,13 @@ namespace ShipManifest
 
     public static ITransferProcess GetSmProcesses()
     {
-      var smAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest.SMAddon");
+      var smAddonType =
+        AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes())
+          .SingleOrDefault(t => t.FullName == "ShipManifest.SMAddon");
       if (smAddonType == null) return null;
-      var transferProcess = smAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
-      return (ITransferProcess)transferProcess;
+      var transferProcess = smAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static)
+        .GetValue(null, null);
+      return (ITransferProcess) transferProcess;
     }
   }
-
 }

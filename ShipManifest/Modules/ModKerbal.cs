@@ -4,14 +4,12 @@ namespace ShipManifest.Modules
 {
   public class ModKerbal
   {
-    public ProtoCrewMember Kerbal { get; set; }
-    public bool IsNew { get; set; }
-    public float Stupidity;
-    public float Courage;
     public bool Badass;
-    public string Name;
-    public string Trait;
+    public float Courage;
     public ProtoCrewMember.Gender Gender;
+    public string Name;
+    public float Stupidity;
+    public string Trait;
 
     public ModKerbal(ProtoCrewMember kerbal, bool isNew)
     {
@@ -25,6 +23,9 @@ namespace ShipManifest.Modules
       IsNew = isNew;
     }
 
+    public ProtoCrewMember Kerbal { get; set; }
+    public bool IsNew { get; set; }
+
     public string SubmitChanges()
     {
       if (NameExists())
@@ -37,9 +38,10 @@ namespace ShipManifest.Modules
       if (IsNew)
       {
         // Add to roster.
-        var dynMethod = HighLogic.CurrentGame.CrewRoster.GetType().GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
+        var dynMethod = HighLogic.CurrentGame.CrewRoster.GetType()
+          .GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
         Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-        dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] { Kerbal });
+        dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] {Kerbal});
       }
 
       return string.Empty;
@@ -76,6 +78,5 @@ namespace ShipManifest.Modules
 
       return false;
     }
-
   }
 }

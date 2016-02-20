@@ -1,7 +1,17 @@
 ﻿namespace ShipManifest.Modules
 {
-  class ModSolarPanel
+  internal class ModSolarPanel
   {
+    internal ModSolarPanel()
+    {
+    }
+
+    internal ModSolarPanel(PartModule pModule, Part iPart)
+    {
+      PanelModule = pModule;
+      SPart = iPart;
+    }
+
     internal PartModule PanelModule { get; set; }
 
     internal Part SPart { get; set; }
@@ -25,7 +35,9 @@
     {
       get
       {
-        if (SMSettings.RealismMode && !Retractable && (PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED || PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
+        if (SMSettings.RealismMode && !Retractable &&
+            (PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED ||
+             PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
           return false;
         return true;
       }
@@ -50,14 +62,7 @@
 
     private ModuleDeployableSolarPanel Module
     {
-      get { return (ModuleDeployableSolarPanel)PanelModule; }
-    }
-
-    internal ModSolarPanel() { }
-    internal ModSolarPanel(PartModule pModule, Part iPart)
-    {
-      PanelModule = pModule;
-      SPart = iPart;
+      get { return (ModuleDeployableSolarPanel) PanelModule; }
     }
 
     internal void ExtendPanel()
@@ -69,6 +74,5 @@
     {
       Module.Retract();
     }
-
   }
 }

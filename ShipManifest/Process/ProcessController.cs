@@ -9,43 +9,55 @@ namespace ShipManifest.Process
     {
       try
       {
-        var moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
+        var moduleScience = (IScienceDataContainer) source != null ? ((IScienceDataContainer) source).GetData() : null;
 
         if (moduleScience != null && moduleScience.Length > 0)
         {
-          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", "Info",
+            SMSettings.VerboseLogging);
 
-          if ((IScienceDataContainer)target != null)
+          if ((IScienceDataContainer) target != null)
           {
             // Lets store the data from the source.
-            if (((ModuleScienceContainer)target).StoreData(new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
+            if (
+              ((ModuleScienceContainer) target).StoreData(
+                new List<IScienceDataContainer> {(IScienceDataContainer) source}, false))
             {
-              Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored", "Info", SMSettings.VerboseLogging);
+              Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
+                "Info", SMSettings.VerboseLogging);
               foreach (var data in moduleScience)
-                ((IScienceDataContainer)source).DumpData(data);
+                ((IScienceDataContainer) source).DumpData(data);
 
               if (SMSettings.RealismMode)
-                Utilities.LogMessage("ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data", "Info", SMSettings.VerboseLogging);
+                Utilities.LogMessage(
+                  "ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data", "Info",
+                  SMSettings.VerboseLogging);
               else
               {
-                Utilities.LogMessage("ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data, reset Experiment", "Info", SMSettings.VerboseLogging);
-                ((ModuleScienceExperiment)source).ResetExperiment();
+                Utilities.LogMessage(
+                  "ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data, reset Experiment",
+                  "Info", SMSettings.VerboseLogging);
+                ((ModuleScienceExperiment) source).ResetExperiment();
               }
             }
             else
             {
-              Utilities.LogMessage("ProcessController.TransferScience:  Science Data transfer failed...", "Info", SMSettings.VerboseLogging);
+              Utilities.LogMessage("ProcessController.TransferScience:  Science Data transfer failed...", "Info",
+                SMSettings.VerboseLogging);
             }
           }
           else
           {
-            Utilities.LogMessage("ProcessController.TransferScience:  ((IScienceDataContainer)target) is null", "Info", SMSettings.VerboseLogging);
+            Utilities.LogMessage("ProcessController.TransferScience:  ((IScienceDataContainer)target) is null", "Info",
+              SMSettings.VerboseLogging);
           }
-          Utilities.LogMessage("ProcessController.TransferScience:  Transfer Complete.", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("ProcessController.TransferScience:  Transfer Complete.", "Info",
+            SMSettings.VerboseLogging);
         }
         else if (moduleScience == null)
         {
-          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience is null...", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience is null...", "Info",
+            SMSettings.VerboseLogging);
         }
       }
       catch (Exception ex)
@@ -55,7 +67,7 @@ namespace ShipManifest.Process
     }
 
     /// <summary>
-    /// This method is called by WindowTransfer.Xferbutton press.
+    ///   This method is called by WindowTransfer.Xferbutton press.
     /// </summary>
     /// <param name="xferPumps"></param>
     internal static void TransferResources(List<TransferPump> xferPumps)
@@ -69,7 +81,8 @@ namespace ShipManifest.Process
             pump.IsPumpOn = true;
           }
           // now lets start the pumping process...
-          Utilities.LogMessage("ProcessController.TransferResources - Starting Transfer...", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("ProcessController.TransferResources - Starting Transfer...", "Info",
+            SMSettings.VerboseLogging);
           SMAddon.SmVessel.TransferPumps.AddRange(xferPumps);
 
           // Start the process.  This flag is checked in SMAddon.Update()
@@ -86,7 +99,9 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in  ProcessController.TransferResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in  ProcessController.TransferResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -107,7 +122,8 @@ namespace ShipManifest.Process
           SMAddon.SmVessel.TransferPumps.AddRange(pumps);
 
           // now lets make some noise and simulate the pumping process...
-          Utilities.LogMessage("ProcessController.DumpResources: Starting Pump Operation...", "Info", SMSettings.VerboseLogging);
+          Utilities.LogMessage("ProcessController.DumpResources: Starting Pump Operation...", "Info",
+            SMSettings.VerboseLogging);
 
           // Start the process.  This flag is checked in SMAddon.Update()
           TransferPump.PumpProcessOn = true;
@@ -123,7 +139,9 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in  ProcessController.DumpResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in  ProcessController.DumpResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
   }

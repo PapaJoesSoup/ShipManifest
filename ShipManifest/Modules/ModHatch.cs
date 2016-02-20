@@ -4,6 +4,16 @@ namespace ShipManifest.Modules
 {
   internal class ModHatch
   {
+    internal ModHatch()
+    {
+    }
+
+    internal ModHatch(PartModule pModule, ICLSPart iPart)
+    {
+      HatchModule = pModule;
+      ClsPart = iPart;
+    }
+
     internal PartModule HatchModule { get; set; }
 
     internal ICLSPart ClsPart { get; set; }
@@ -44,14 +54,7 @@ namespace ShipManifest.Modules
     private IModuleDockingHatch Module
     {
       // ReSharper disable once SuspiciousTypeConversion.Global
-      get { return (IModuleDockingHatch)HatchModule; }
-    }
-
-    internal ModHatch() { }
-    internal ModHatch(PartModule pModule, ICLSPart iPart)
-    {
-      HatchModule = pModule;
-      ClsPart = iPart;
+      get { return (IModuleDockingHatch) HatchModule; }
     }
 
     internal void OpenHatch(bool fireEvent = false)
@@ -62,6 +65,7 @@ namespace ShipManifest.Modules
       if (fireEvent)
         SMAddon.FireEventTriggers();
     }
+
     internal void CloseHatch(bool fireEvent = false)
     {
       Module.HatchEvents["CloseHatch"].active = false;
@@ -70,7 +74,5 @@ namespace ShipManifest.Modules
       if (fireEvent)
         SMAddon.FireEventTriggers();
     }
-
   }
-
 }

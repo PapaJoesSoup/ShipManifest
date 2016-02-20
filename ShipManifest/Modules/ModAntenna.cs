@@ -2,18 +2,24 @@
 
 namespace ShipManifest.Modules
 {
-  class ModAntenna
+  internal class ModAntenna
   {
+    internal ModAntenna()
+    {
+    }
+
+    internal ModAntenna(PartModule xModule, PartModule pModule, Part iPart)
+    {
+      XmitterModule = xModule;
+      AnimateModule = pModule;
+      SPart = iPart;
+    }
+
     internal PartModule XmitterModule { get; set; }
 
     internal PartModule AnimateModule { get; set; }
 
-    private Part _spart;
-    internal Part SPart
-    {
-      get { return _spart; }
-      set { _spart = value; }
-    }
+    internal Part SPart { get; set; }
 
     internal bool IsRtModule
     {
@@ -21,8 +27,7 @@ namespace ShipManifest.Modules
       {
         if (XmitterModule.moduleName == "ModuleRTAntenna")
           return true;
-        else
-          return false;
+        return false;
       }
     }
 
@@ -32,8 +37,7 @@ namespace ShipManifest.Modules
       {
         if (IsRtModule)
           return XmitterModule.Events["EventClose"].active;
-        else
-          return Module.Events["Toggle"].guiName == "Retract";
+        return Module.Events["Toggle"].guiName == "Retract";
       }
     }
 
@@ -46,16 +50,11 @@ namespace ShipManifest.Modules
         {
           if (XmitterModule.Events["EventClose"].active)
             return "Activated";
-          else
-            return "Deactivated";
+          return "Deactivated";
         }
-        else
-        {
-          if (Module.Events["Toggle"].guiName == "Retract")
-            return "Extended";
-          else
-            return "Retracted";
-        }
+        if (Module.Events["Toggle"].guiName == "Retract")
+          return "Extended";
+        return "Retracted";
       }
     }
 
@@ -66,11 +65,11 @@ namespace ShipManifest.Modules
         string title;
         try
         {
-          title = _spart.partInfo.title + "\r\n on " + _spart.parent.partInfo.title;
+          title = SPart.partInfo.title + "\r\n on " + SPart.parent.partInfo.title;
         }
         catch
         {
-          title = _spart.partInfo.title;
+          title = SPart.partInfo.title;
         }
         return title;
       }
@@ -78,16 +77,7 @@ namespace ShipManifest.Modules
 
     private ModuleAnimateGeneric Module
     {
-      get { return (ModuleAnimateGeneric)AnimateModule; }
-    }
-
-    internal ModAntenna() { }
-
-    internal ModAntenna(PartModule xModule, PartModule pModule, Part iPart)
-    {
-      XmitterModule = xModule;
-      AnimateModule = pModule;
-      SPart = iPart;
+      get { return (ModuleAnimateGeneric) AnimateModule; }
     }
 
     internal void ExtendAntenna()
@@ -123,6 +113,5 @@ namespace ShipManifest.Modules
       else if (Module.Events["Toggle"].guiName == "Retract")
         Module.Toggle();
     }
-
   }
 }

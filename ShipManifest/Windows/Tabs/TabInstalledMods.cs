@@ -31,7 +31,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("Installed Mods  ", SMStyle.LabelTabHeader, GUILayout.Width(180));
       ShowAllAssemblies = GUILayout.Toggle(ShowAllAssemblies, "Show All Assemblies", SMStyle.ToggleStyleHeader);
       GUILayout.EndHorizontal();
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       if (ShowAllAssemblies)
         InstalledMods.DisplayAssemblyList();
       else

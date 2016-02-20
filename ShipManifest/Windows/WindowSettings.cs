@@ -17,13 +17,16 @@ namespace ShipManifest.Windows
     private static Tab _selectedTab = Tab.Realism;
 
     private static Vector2 _displayViewerPosition = Vector2.zero;
+
     internal static void Display(int windowId)
     {
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
       var rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", "Close Window.\r\nSettings will not be immediately saved,\r\n but will be remembered while in game.")))
+      if (GUI.Button(rect,
+        new GUIContent("",
+          "Close Window.\r\nSettings will not be immediately saved,\r\n but will be remembered while in game.")))
       {
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -41,7 +44,8 @@ namespace ShipManifest.Windows
 
       DisplayTabButtons();
 
-      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(300), GUILayout.Width(380));
+      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
+        GUILayout.Height(300), GUILayout.Width(380));
       GUILayout.BeginVertical();
 
       DisplaySelectedTab(_displayViewerPosition);
@@ -153,6 +157,7 @@ namespace ShipManifest.Windows
       Sounds,
       ToolTips
     }
+
     #endregion
   }
 }

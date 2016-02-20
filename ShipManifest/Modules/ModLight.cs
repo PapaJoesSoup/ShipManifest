@@ -1,7 +1,17 @@
 ﻿namespace ShipManifest.Modules
 {
-  class ModLight
+  internal class ModLight
   {
+    internal ModLight()
+    {
+    }
+
+    internal ModLight(PartModule pModule, Part iPart)
+    {
+      LightModule = pModule;
+      SPart = iPart;
+    }
+
     internal PartModule LightModule { get; set; }
 
     internal Part SPart { get; set; }
@@ -25,10 +35,7 @@
 
     internal bool IsOn
     {
-      get
-      {
-        return Module.isOn;
-      }
+      get { return Module.isOn; }
     }
 
     internal string Status
@@ -43,14 +50,7 @@
 
     private ModuleLight Module
     {
-      get { return (ModuleLight)LightModule; }
-    }
-
-    internal ModLight() { }
-    internal ModLight(PartModule pModule, Part iPart)
-    {
-      LightModule = pModule;
-      SPart = iPart;
+      get { return (ModuleLight) LightModule; }
     }
 
     internal void TurnOnLight()

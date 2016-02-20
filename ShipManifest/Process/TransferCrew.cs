@@ -4,7 +4,6 @@ namespace ShipManifest.Process
 {
   public class TransferCrew : ITransferCrew, ICrewTransfer
   {
-
     // Default sound license: CC-By-SA
     // http://www.freesound.org/people/adcbicycle/sounds/14214/
     internal static string Path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
@@ -18,14 +17,39 @@ namespace ShipManifest.Process
     internal static GameEvents.HostedFromToAction<ProtoCrewMember, Part> SourceAction;
     internal static GameEvents.HostedFromToAction<ProtoCrewMember, Part> TargetAction;
 
+    internal static XferState CrewXferState = XferState.Off;
+
     // crew xfer inerface properties
     private bool _crewXferActive;
+    private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
+
+    private double _seat2SeatXferDelaySec = 2;
+
+    public TransferCrew()
+    {
+      IvaPortraitDelay = 0;
+    }
+
+    // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
+    // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
+    public int IvaPortraitDelay { get; set; }
+
+    public static TransferCrew Instance
+    {
+      get { return SMAddon.SmVessel.TransferCrewObj; }
+    }
+
+    /// <summary>
+    ///   Deprecated. Use XferVesselId instead.  Returns the vessel Id
+    /// </summary>
+    public Guid XferVesselID
+    {
+      get { return SMAddon.SmVessel.Vessel.id; }
+    }
+
     public bool CrewXferActive
     {
-      get
-      {
-        return _crewXferActive;
-      }
+      get { return _crewXferActive; }
       set
       {
         if (!value && _crewXferActive && !IvaDelayActive)
@@ -38,62 +62,32 @@ namespace ShipManifest.Process
 
     public bool OverrideStockCrewXfer
     {
-      get
-      {
-        return SMSettings.OverrideStockCrewXfer;
-      }
+      get { return SMSettings.OverrideStockCrewXfer; }
     }
-    private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
+
     public double CrewXferDelaySec
     {
-      get
-      {
-        return _crewXferDelaysec;
-      }
-      set
-      {
-        _crewXferDelaysec = value;
-      }
+      get { return _crewXferDelaysec; }
+      set { _crewXferDelaysec = value; }
     }
 
     public bool IsSeat2SeatXfer { get; set; }
 
-    private double _seat2SeatXferDelaySec = 2;
     public double Seat2SeatXferDelaySec
     {
-      get
-      {
-        return _seat2SeatXferDelaySec;
-      }
-      set
-      {
-        _seat2SeatXferDelaySec = value;
-      }
+      get { return _seat2SeatXferDelaySec; }
+      set { _seat2SeatXferDelaySec = value; }
     }
-
-    internal static XferState CrewXferState = XferState.Off;
 
     public InternalSeat FromSeat { get; set; }
 
     public InternalSeat ToSeat { get; set; }
-
-    /// <summary>
-    /// Deprecated. Use XferVesselId instead.  Returns the vessel Id
-    /// </summary>
-    public Guid XferVesselID
-    {
-      get { return SMAddon.SmVessel.Vessel.id; }
-    }
 
 
     public Guid XferVesselId
     {
       get { return SMAddon.SmVessel.Vessel.id; }
     }
-
-    // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
-    // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
-    public int IvaPortraitDelay { get; set; }
 
     public bool IvaDelayActive { get; set; }
 
@@ -104,19 +98,6 @@ namespace ShipManifest.Process
     public ProtoCrewMember FromCrewMember { get; set; }
 
     public ProtoCrewMember ToCrewMember { get; set; }
-
-    public static TransferCrew Instance
-    {
-      get
-      {
-        return SMAddon.SmVessel.TransferCrewObj;
-      }
-    }
-
-    public TransferCrew()
-    {
-      IvaPortraitDelay = 0;
-    }
 
     public void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
     {
@@ -170,7 +151,8 @@ namespace ShipManifest.Process
             foreach (var seat in ToPart.internalModel.seats)
             {
               // This supports DeepFreeze frozen kerbals...
-              if (seat.kerbalRef != null && seat.kerbalRef.protoCrewMember.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+              if (seat.kerbalRef != null &&
+                  seat.kerbalRef.protoCrewMember.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
               {
                 ToSeat = seat;
                 break;
@@ -277,7 +259,9 @@ namespace ShipManifest.Process
               else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
               {
                 if (IsStockXfer)
-                  ScreenMessages.PostScreenMessage(string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name, ToPart.partInfo.title), 5f);
+                  ScreenMessages.PostScreenMessage(
+                    string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name,
+                      ToPart.partInfo.title), 5f);
 
                 ResetXferProcess();
               }
@@ -295,7 +279,9 @@ namespace ShipManifest.Process
         if (!SMAddon.FrameErrTripped)
         {
           Utilities.LogMessage("Transfer State:  " + CrewXferState + "...", "Error", true);
-          Utilities.LogMessage(string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
+              ex.StackTrace), "Error", true);
           SMAddon.FrameErrTripped = true;
           ResetXferProcess();
         }
@@ -396,7 +382,9 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message,
+            ex.StackTrace), "Error", true);
       }
     }
 
@@ -445,6 +433,5 @@ namespace ShipManifest.Process
       Stop,
       Portraits
     }
-
   }
 }

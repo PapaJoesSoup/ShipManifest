@@ -32,7 +32,8 @@ namespace ShipManifest.Windows.Tabs
       // Enable Tool Tips
       GUI.enabled = true;
       GUILayout.Label("ToolTips", SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________", SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       _label = "Enable Tool Tips";
       _toolTip = "Turns tooltips On or Off.";
@@ -41,7 +42,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUI.enabled = SMSettings.ShowToolTips;
 
@@ -56,7 +58,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // Manifest Window
       GUILayout.BeginHorizontal();
@@ -69,7 +72,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // Transfer Window
       GUILayout.BeginHorizontal();
@@ -82,7 +86,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // Setting Window
       GUILayout.BeginHorizontal();
@@ -95,7 +100,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUI.enabled = SMSettings.ShowToolTips && WindowSettings.ShowToolTips;
 
@@ -111,7 +117,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // SW - Highlighting Tab
       GUILayout.BeginHorizontal();
@@ -125,7 +132,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // SW - ToolTips Tab
       GUILayout.BeginHorizontal();
@@ -139,7 +147,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // SW - Sounds Tab
       GUILayout.BeginHorizontal();
@@ -153,7 +162,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // SW - Config Tab
       GUILayout.BeginHorizontal();
@@ -167,7 +177,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // SW - Installed Mods Tab
       GUILayout.BeginHorizontal();
@@ -181,7 +192,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUI.enabled = SMSettings.ShowToolTips;
 
@@ -196,7 +208,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // Control Window
       GUILayout.BeginHorizontal();
@@ -209,7 +222,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUI.enabled = SMSettings.ShowToolTips && WindowControl.ShowToolTips;
 
@@ -225,7 +239,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // CW - Solar Tab
       GUILayout.BeginHorizontal();
@@ -239,7 +254,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // CW - Antenna Tab
       GUILayout.BeginHorizontal();
@@ -253,7 +269,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       // CW - Light Tab
       GUILayout.BeginHorizontal();
@@ -267,7 +284,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX, scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
+          scrollY - displayViewerPosition.y);
 
       GUI.enabled = true;
     }

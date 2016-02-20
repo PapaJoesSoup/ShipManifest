@@ -13,12 +13,10 @@ namespace ShipManifest.Windows
     internal static string Title = string.Format("Ship Manifest {0} - ", SMSettings.CurVersion);
     internal static Rect Position = new Rect(0, 0, 0, 0);
     private static bool _showWindow;
+
     internal static bool ShowWindow
     {
-      get
-      {
-        return _showWindow;
-      }
+      get { return _showWindow; }
       set
       {
         if (!value && SMAddon.SmVessel != null)
@@ -26,6 +24,7 @@ namespace ShipManifest.Windows
         _showWindow = value;
       }
     }
+
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -34,6 +33,7 @@ namespace ShipManifest.Windows
     // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
     private static Vector2 _smScrollViewerPosition = Vector2.zero;
     private static Vector2 _resourceScrollViewerPosition = Vector2.zero;
+
     internal static void Display(int windowId)
     {
       Title = string.Format("SM {0} - {1}", SMSettings.CurVersion, SMAddon.SmVessel.Vessel.vesselName);
@@ -58,7 +58,8 @@ namespace ShipManifest.Windows
       try
       {
         GUILayout.BeginVertical();
-        _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+        _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle,
+          GUILayout.Height(100), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.IsRecoverable)
@@ -97,7 +98,9 @@ namespace ShipManifest.Windows
           }
           catch (Exception ex)
           {
-            Utilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            Utilities.LogMessage(
+              string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+              true);
           }
         }
 
@@ -119,7 +122,9 @@ namespace ShipManifest.Windows
           }
           catch (Exception ex)
           {
-            Utilities.LogMessage(string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            Utilities.LogMessage(
+              string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+              true);
           }
         }
 
@@ -132,7 +137,9 @@ namespace ShipManifest.Windows
           }
           catch (Exception ex)
           {
-            Utilities.LogMessage(string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            Utilities.LogMessage(
+              string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+              true);
           }
         }
         GUILayout.EndHorizontal();
@@ -142,7 +149,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 
@@ -165,7 +173,7 @@ namespace ShipManifest.Windows
           if (GUILayout.Button("Empty Crew", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
           {
             SMAddon.SmVessel.EmptyCrew();
-          }          
+          }
         }
         GUILayout.EndHorizontal();
 
@@ -178,12 +186,13 @@ namespace ShipManifest.Windows
         if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
         {
           SMAddon.SmVessel.DumpAllResources();
-       }
+        }
         GUILayout.EndHorizontal();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -204,7 +213,9 @@ namespace ShipManifest.Windows
 
           // Resource Button
           var displayAmounts = string.Format("{0}{1}", resourceName, Utilities.DisplayVesselResourceTotals(resourceName));
-          var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName) ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+          var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName)
+            ? SMStyle.ButtonToggledStyle
+            : SMStyle.ButtonStyle;
           if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
           {
             ResourceButtonToggled(resourceName);
@@ -213,8 +224,13 @@ namespace ShipManifest.Windows
           // Dump Button
           if (SMConditions.IsResourceTypeOther(resourceName) && SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
           {
-            var pumpId = TransferPump.GetPumpIdFromHash(resourceName, SMAddon.SmVessel.PartsByResource[resourceName].First(), SMAddon.SmVessel.PartsByResource[resourceName].Last(), TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest);
-            var dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? new GUIContent("Dump", "Dumps the selected resource in this vessel") : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+            var pumpId = TransferPump.GetPumpIdFromHash(resourceName,
+              SMAddon.SmVessel.PartsByResource[resourceName].First(),
+              SMAddon.SmVessel.PartsByResource[resourceName].Last(), TransferPump.TypePump.Dump,
+              TransferPump.TriggerButton.Manifest);
+            var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+              ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
+              : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
             GUI.enabled = SMConditions.CanResourceBeDumped(resourceName);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
@@ -223,10 +239,12 @@ namespace ShipManifest.Windows
           }
 
           // Fill Button
-          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName) && SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName) &&
+              SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(resourceName);
-            if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35), GUILayout.Height(20)))
+            if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35),
+              GUILayout.Height(20)))
             {
               SMAddon.SmVessel.FillResource(resourceName);
             }
@@ -237,7 +255,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 
@@ -246,7 +265,7 @@ namespace ShipManifest.Windows
       try
       {
         // TODO:  Do we still want this?   (Do we want to allow simultaneous Crew and resource transfers?)
-        if (SMConditions.IsTransferInProgress()) return; 
+        if (SMConditions.IsTransferInProgress()) return;
 
         // First, lets clear any highlighting...
         SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
@@ -292,7 +311,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
       }
     }
 
@@ -304,12 +325,17 @@ namespace ShipManifest.Windows
         {
           var newSources = new List<Part>();
           var newTargets = new List<Part>();
-          if (WindowTransfer.ShowSourceVessels && SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+          if (WindowTransfer.ShowSourceVessels &&
+              SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
           {
-            SMAddon.SmVessel.SelectedPartsSource = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
+            SMAddon.SmVessel.SelectedPartsSource =
+              SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
             if (!WindowTransfer.ShowTargetVessels)
             {
-              foreach (var part in SMAddon.SmVessel.SelectedPartsSource.Where(part => SMAddon.SmVessel.SelectedPartsTarget.Contains(part)))
+              foreach (
+                var part in
+                  SMAddon.SmVessel.SelectedPartsSource.Where(part => SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
+                )
               {
                 SMAddon.SmVessel.SelectedPartsTarget.Remove(part);
               }
@@ -328,7 +354,8 @@ namespace ShipManifest.Windows
               {
                 if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && part.CrewCapacity > 0)
                   newSources.Add(part);
-                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
+                         part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
                   newSources.Add(part);
                 else if (part.Resources.Contains(resourceNames[0]))
                   newSources.Add(part);
@@ -338,12 +365,17 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.SelectedPartsSource = newSources;
           }
 
-          if (WindowTransfer.ShowTargetVessels && SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+          if (WindowTransfer.ShowTargetVessels &&
+              SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
           {
-            SMAddon.SmVessel.SelectedPartsTarget = SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
+            SMAddon.SmVessel.SelectedPartsTarget =
+              SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
             if (!WindowTransfer.ShowSourceVessels)
             {
-              foreach (var part in SMAddon.SmVessel.SelectedPartsTarget.Where(part => SMAddon.SmVessel.SelectedPartsSource.Contains(part)))
+              foreach (
+                var part in
+                  SMAddon.SmVessel.SelectedPartsTarget.Where(part => SMAddon.SmVessel.SelectedPartsSource.Contains(part))
+                )
               {
                 SMAddon.SmVessel.SelectedPartsSource.Remove(part);
               }
@@ -362,7 +394,8 @@ namespace ShipManifest.Windows
               {
                 if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && part.CrewCapacity > 0)
                   newTargets.Add(part);
-                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() && part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
+                         part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
                   newTargets.Add(part);
                 else if (part.Resources.Contains(resourceNames[0]))
                   newTargets.Add(part);
@@ -377,7 +410,7 @@ namespace ShipManifest.Windows
             TransferPump.CreateDisplayPumps();
             return;
           }
-            
+
           SMAddon.SmVessel.SelectedVesselsSource.Clear();
           SMAddon.SmVessel.SelectedVesselsTarget.Clear();
         }
@@ -391,7 +424,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in WindowManifest.ReconcileSelectedXferParts.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        Utilities.LogMessage(
+          string.Format(" in WindowManifest.ReconcileSelectedXferParts.  Error:  {0} \r\n\r\n{1}", ex.Message,
+            ex.StackTrace), "Error", true);
       }
     }
 
@@ -399,7 +434,8 @@ namespace ShipManifest.Windows
     {
       try
       {
-        _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle, GUILayout.Height(100), GUILayout.Width(300));
+        _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
+          GUILayout.Height(100), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.SelectedResources.Count > 0)
@@ -409,15 +445,21 @@ namespace ShipManifest.Windows
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
               var noWrap = SMStyle.LabelStyleNoWrap;
-              GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265), GUILayout.Height(18));
+              GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
+                GUILayout.Height(18));
               var noPad = SMStyle.LabelStyleNoPad;
               foreach (var resource in SMAddon.SmVessel.SelectedResources)
-                GUILayout.Label(string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"), part.Resources[resource].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265), GUILayout.Height(16));
+                GUILayout.Label(
+                  string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"),
+                    part.Resources[resource].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
+                  GUILayout.Height(16));
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             {
               GUILayout.BeginHorizontal();
-              GUILayout.Label(string.Format("{0}, ({1}/{2})", part.partInfo.title, Utilities.GetPartCrewCount(part), part.CrewCapacity), GUILayout.Width(265), GUILayout.Height(20));
+              GUILayout.Label(
+                string.Format("{0}, ({1}/{2})", part.partInfo.title, Utilities.GetPartCrewCount(part), part.CrewCapacity),
+                GUILayout.Width(265), GUILayout.Height(20));
               GUILayout.EndHorizontal();
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
@@ -429,7 +471,7 @@ namespace ShipManifest.Windows
                 if (container != null)
                   scienceCount += container.GetScienceCount();
                 else if (pm is ModuleScienceExperiment)
-                  scienceCount += ((ModuleScienceExperiment)pm).GetScienceCount();
+                  scienceCount += ((ModuleScienceExperiment) pm).GetScienceCount();
               }
               GUILayout.BeginHorizontal();
               GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, scienceCount), GUILayout.Width(265));
@@ -442,7 +484,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage(string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          Utilities.LogMessage(
+            string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
+              ex.StackTrace), "Error", true);
           SMAddon.FrameErrTripped = true;
         }
       }

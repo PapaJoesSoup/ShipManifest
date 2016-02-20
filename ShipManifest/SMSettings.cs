@@ -1,9 +1,9 @@
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
-using UnityEngine;
 using ShipManifest.Windows;
 using ShipManifest.Windows.Tabs;
+using UnityEngine;
 
 namespace ShipManifest
 {
@@ -17,7 +17,10 @@ namespace ShipManifest
     internal static Dictionary<string, Color> Colors;
 
     internal static ConfigNode Settings;
-    private static readonly string SettingsPath = string.Format("{0}GameData/ShipManifest/Plugins/PluginData", KSPUtil.ApplicationRootPath);
+
+    private static readonly string SettingsPath = string.Format("{0}GameData/ShipManifest/Plugins/PluginData",
+      KSPUtil.ApplicationRootPath);
+
     private static readonly string SettingsFile = string.Format("{0}/SMSettings.dat", SettingsPath);
 
     // This value is assigned from AssemblyInfo.cs
@@ -379,7 +382,7 @@ namespace ShipManifest
           ? hiddenNode.GetValue("TargetPartCrewColor")
           : TargetPartCrewColor;
         MouseOverColor = hiddenNode.HasValue("MouseOverColor") ? hiddenNode.GetValue("MouseOverColor") : MouseOverColor;
-        
+
         //Hidden sound
         PumpSoundVol = hiddenNode.HasValue("PumpSoundVol")
           ? double.Parse(hiddenNode.GetValue("PumpSoundVol"))
@@ -387,7 +390,7 @@ namespace ShipManifest
         CrewSoundVol = hiddenNode.HasValue("CrewSoundVol")
           ? double.Parse(hiddenNode.GetValue("CrewSoundVol"))
           : CrewSoundVol;
-        
+
         // Hidden config
         CrewXferDelaySec = hiddenNode.HasValue("CrewXferDelaySec")
           ? double.Parse(hiddenNode.GetValue("CrewXferDelaySec"))
@@ -403,7 +406,7 @@ namespace ShipManifest
         Loaded = true;
         MemStoreTempSettings();
       }
-      
+
       // Force Styles to refresh/load.
       SMStyle.WindowStyle = null;
 
@@ -419,8 +422,12 @@ namespace ShipManifest
         if (Settings == null)
           Settings = LoadSettingsFile();
 
-        var windowsNode = Settings.HasNode("SM_Windows") ? Settings.GetNode("SM_Windows") : Settings.AddNode("SM_Windows");
-        var settingsNode = Settings.HasNode("SM_Settings") ? Settings.GetNode("SM_Settings") : Settings.AddNode("SM_Settings");
+        var windowsNode = Settings.HasNode("SM_Windows")
+          ? Settings.GetNode("SM_Windows")
+          : Settings.AddNode("SM_Windows");
+        var settingsNode = Settings.HasNode("SM_Settings")
+          ? Settings.GetNode("SM_Settings")
+          : Settings.AddNode("SM_Settings");
         var hiddenNode = Settings.HasNode("SM_Hidden") ? Settings.GetNode("SM_Hidden") : Settings.AddNode("SM_Hidden");
 
         // Write window positions
