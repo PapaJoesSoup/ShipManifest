@@ -75,12 +75,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APIClients\DFWrapper.cs" />
+    <Compile Include="InternalObjects\SMSounds.cs" />
     <Compile Include="SMInterface.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Process\ProcessController.cs" />
-    <Compile Include="SMConditions.cs" />
+    <Compile Include="InternalObjects\SMConditions.cs" />
     <Compile Include="SMPart.cs" />
-    <Compile Include="SMToolTips.cs" />
+    <Compile Include="InternalObjects\SMToolTips.cs" />
     <Compile Include="Process\TransferCrew.cs" />
     <Compile Include="APIClients\InstalledMods.cs" />
     <Compile Include="Modules\ModAntenna.cs" />
@@ -88,7 +89,7 @@
     <Compile Include="Modules\ModLight.cs" />
     <Compile Include="Modules\ModSolarPanel.cs" />
     <Compile Include="Process\TransferPump.cs" />
-    <Compile Include="SMHighlighter.cs" />
+    <Compile Include="InternalObjects\SMHighlighter.cs" />
     <Compile Include="APIClients\ToolbarWrapper.cs" />
     <Compile Include="Windows\Tabs\TabAntenna.cs" />
     <Compile Include="Windows\Tabs\TabConfig.cs" />

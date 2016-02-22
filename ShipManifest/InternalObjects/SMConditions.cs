@@ -4,7 +4,7 @@ using ShipManifest.APIClients;
 using ShipManifest.Process;
 using ShipManifest.Windows;
 
-namespace ShipManifest
+namespace ShipManifest.InternalObjects
 {
   /// <summary>
   ///   This class contains nothing but conditional logic methods and enums
@@ -141,7 +141,6 @@ namespace ShipManifest
           SMAddon.FrameErrTripped = true;
         }
       }
-      //Utilities.LogMessage("IsInCLS() - results = " + results.ToString() , "info", Settings.VerboseLogging);
       return results;
     }
 
@@ -303,14 +302,14 @@ namespace ShipManifest
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             SMAddon.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
+             WindowRoster.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool FrozenKerbalIsThawable(ProtoCrewMember kerbal)
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             SMAddon.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
+             WindowRoster.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool CanKerbalBeFrozen(ProtoCrewMember kerbal)

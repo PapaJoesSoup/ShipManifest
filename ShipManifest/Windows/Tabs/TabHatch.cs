@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ConnectedLivingSpace;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs

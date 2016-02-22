@@ -13,8 +13,8 @@ namespace ShipManifest.Process
 
         if (moduleScience != null && moduleScience.Length > 0)
         {
-          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", "Info",
-            SMSettings.VerboseLogging);
+          //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", "Info",
+          //  SMSettings.VerboseLogging);
 
           if ((IScienceDataContainer) target != null)
           {
@@ -23,41 +23,13 @@ namespace ShipManifest.Process
               ((ModuleScienceContainer) target).StoreData(
                 new List<IScienceDataContainer> {(IScienceDataContainer) source}, false))
             {
-              Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
-                "Info", SMSettings.VerboseLogging);
-              foreach (var data in moduleScience)
-                ((IScienceDataContainer) source).DumpData(data);
+              //Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
+              //  "Info", SMSettings.VerboseLogging);
+              foreach (var data in moduleScience) ((IScienceDataContainer) source).DumpData(data);
 
-              if (SMSettings.RealismMode)
-                Utilities.LogMessage(
-                  "ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data", "Info",
-                  SMSettings.VerboseLogging);
-              else
-              {
-                Utilities.LogMessage(
-                  "ProcessController.TransferScience:  ((Module ScienceExperiment xferred.  Dump Source data, reset Experiment",
-                  "Info", SMSettings.VerboseLogging);
-                ((ModuleScienceExperiment) source).ResetExperiment();
-              }
-            }
-            else
-            {
-              Utilities.LogMessage("ProcessController.TransferScience:  Science Data transfer failed...", "Info",
-                SMSettings.VerboseLogging);
+              if (!SMSettings.RealismMode) ((ModuleScienceExperiment) source).ResetExperiment();
             }
           }
-          else
-          {
-            Utilities.LogMessage("ProcessController.TransferScience:  ((IScienceDataContainer)target) is null", "Info",
-              SMSettings.VerboseLogging);
-          }
-          Utilities.LogMessage("ProcessController.TransferScience:  Transfer Complete.", "Info",
-            SMSettings.VerboseLogging);
-        }
-        else if (moduleScience == null)
-        {
-          Utilities.LogMessage("ProcessController.TransferScience:  moduleScience is null...", "Info",
-            SMSettings.VerboseLogging);
         }
       }
       catch (Exception ex)
@@ -81,8 +53,6 @@ namespace ShipManifest.Process
             pump.IsPumpOn = true;
           }
           // now lets start the pumping process...
-          Utilities.LogMessage("ProcessController.TransferResources - Starting Transfer...", "Info",
-            SMSettings.VerboseLogging);
           SMAddon.SmVessel.TransferPumps.AddRange(xferPumps);
 
           // Start the process.  This flag is checked in SMAddon.Update()
@@ -120,10 +90,6 @@ namespace ShipManifest.Process
           }
           // Add pumps to pump queue
           SMAddon.SmVessel.TransferPumps.AddRange(pumps);
-
-          // now lets make some noise and simulate the pumping process...
-          Utilities.LogMessage("ProcessController.DumpResources: Starting Pump Operation...", "Info",
-            SMSettings.VerboseLogging);
 
           // Start the process.  This flag is checked in SMAddon.Update()
           TransferPump.PumpProcessOn = true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using ShipManifest.InternalObjects;
 using ShipManifest.Windows;
 
 namespace ShipManifest.Process
@@ -11,12 +12,6 @@ namespace ShipManifest.Process
   /// </summary>
   internal class TransferPump : ITransferPump
   {
-    // Default sound license: CC-By-SA
-    // http://www.freesound.org/people/vibe_crc/sounds/59328/
-    internal static string Path1 = SMSettings.PumpSoundStart ?? "ShipManifest/Sounds/59328-1";
-    internal static string Path2 = SMSettings.PumpSoundRun ?? "ShipManifest/Sounds/59328-2";
-    internal static string Path3 = SMSettings.PumpSoundStop ?? "ShipManifest/Sounds/59328-3";
-
     public static List<TransferPump> Instance
     {
       get { return SMAddon.SmVessel.TransferPumps; }
@@ -27,21 +22,17 @@ namespace ShipManifest.Process
 
     internal static void ProcessActivePumps()
     {
-      var methodname = "TransferPump.ProcessActivePumps:  ";
       // This routine acts as a queue
       // WHen a pump is set to IsPumOn = true, it will be processed by this routine.
       var transferPumps = SMAddon.SmVessel.TransferPumps;
       // this task runs every Update when active.
       try
       {
-        Utilities.LogMessage(string.Format("{0}Entering Method.", methodname), "Info", SMSettings.VerboseLogging);
         foreach (var pump in transferPumps)
         {
           // Check Pump state:
           if (!pump.IsPumpOn)
           {
-            Utilities.LogMessage(string.Format("{0} Skipping this pump.{1}", methodname, pump.Info), "Info",
-              SMSettings.VerboseLogging);
             continue;
           }
           switch (pump.PumpStatus)
@@ -50,29 +41,19 @@ namespace ShipManifest.Process
               pump.TimeStamp = DateTime.Now;
               pump.Start();
               pump.PumpStatus = PumpState.Start;
-              Utilities.LogMessage(string.Format("{0}Entered State Off. {1}", methodname, pump.Info), "Info",
-                SMSettings.VerboseLogging);
               break;
             case PumpState.Start:
               // Calculate Elapsed.
               pump.Elapsed += (DateTime.Now - pump.TimeStamp).TotalSeconds;
-              if (pump.Elapsed >= SMAddon.AudioSourcePumpStart.clip.length - 0.25)
+              if (pump.Elapsed >= SMSound.SourcePumpStart.clip.length - 0.25)
               {
                 pump.Run();
                 pump.PumpStatus = PumpState.Run;
-                Utilities.LogMessage(string.Format("{0}Entered State Start. {1}", methodname, pump.Info), "Info",
-                  SMSettings.VerboseLogging);
               }
-              else
-                Utilities.LogMessage(
-                  string.Format("{0}Entered State Start.  Waiting for sound start to complete. {1}", methodname,
-                    pump.Info), "Info", SMSettings.VerboseLogging);
               break;
             case PumpState.Run:
               // 1.  Get Elapsed from last run
               var deltaT = (DateTime.Now - pump.TimeStamp).TotalSeconds;
-              Utilities.LogMessage(string.Format("{0}Entered State Run.  Step 1. DeltaT = {1}", methodname, deltaT),
-                "Info", SMSettings.VerboseLogging);
 
               // 2. Lets wait long enough to get a resource volume worth moving
               pump.TimeStamp = DateTime.Now;
@@ -81,28 +62,19 @@ namespace ShipManifest.Process
               {
                 pump.PumpStatus = PumpState.Stop;
               }
-              Utilities.LogMessage(string.Format("{0}Entered State Run.  Step 2. {1}", methodname, pump.Info), "Info",
-                SMSettings.VerboseLogging);
               break;
             case PumpState.Stop:
               pump.Stop();
               pump.PumpStatus = PumpState.Off;
-              Utilities.LogMessage(string.Format("{0}Entered State Stop.  {1}", methodname, pump.Info), "Info",
-                SMSettings.VerboseLogging);
               break;
           }
         }
         foreach (var pump in (from pump in transferPumps where pump.IsComplete select pump).ToList())
         {
-          Utilities.LogMessage(string.Format("{0}Post-loop.  removing pump:{1}", methodname, pump.Info), "Info",
-            SMSettings.VerboseLogging);
           transferPumps.Remove(pump);
         }
         PumpProcessOn = IsAnyPumpOn();
-        Utilities.LogMessage(string.Format("{0}Post-loop. IsAnyPumpOn = {1}", methodname, PumpProcessOn), "Info",
-          SMSettings.VerboseLogging);
         UpdateDisplayPumps();
-        Utilities.LogMessage(string.Format("{0}Exiting Method.", methodname), "Info", SMSettings.VerboseLogging);
       }
       catch (Exception ex)
       {
@@ -345,20 +317,17 @@ namespace ShipManifest.Process
       Elapsed = 0;
       DefaultFlowRate = SMSettings.FlowRate;
       AmtPumped = 0;
-      SMAddon.AudioSourcePumpStart.Play();
-      Utilities.LogMessage(string.Format("TransferPump.Start:  Resource:  {0}.  Play start sound...", Resource), "Info",
-        SMSettings.VerboseLogging);
+      SMSound.SourcePumpStart.Play();
     }
 
     private void Run()
     {
-      if (SMAddon.AudioSourcePumpStart.isPlaying) SMAddon.AudioSourcePumpStart.Stop();
+      if (SMSound.SourcePumpStart.isPlaying) SMSound.SourcePumpStart.Stop();
 
       // This is the run sound.  we need this only if it is not already playing..
-      if (!SMAddon.AudioSourcePumpRun.isPlaying)
+      if (!SMSound.SourcePumpRun.isPlaying)
       {
-        SMAddon.AudioSourcePumpRun.Play();
-        Utilities.LogMessage("TransferPump.PransferPump.Run:  Play Run sound...", "Info", SMSettings.VerboseLogging);
+        SMSound.SourcePumpRun.Play();
       }
       // reset timer for next step
       Elapsed = 0;
@@ -366,16 +335,13 @@ namespace ShipManifest.Process
 
     private void Running(double deltaT)
     {
-      var methodName = "TransferPump.Running:";
       // 1.  Calculate amount to move based on flow rate and time delta
       var deltaAmt = deltaT*FlowRate*PumpRatio;
-      Utilities.LogMessage(string.Format("{0}  1.  {1}", methodName, Info), "Info", SMSettings.VerboseLogging);
 
       // 2.  Determine if move amount exceeds remaining amount in tank(s)  
       deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt;
       if (PumpType != TypePump.Dump)
         deltaAmt = deltaAmt > ToCapacityRemaining ? ToCapacityRemaining : deltaAmt;
-      Utilities.LogMessage(string.Format("{0}  2.  {1}", methodName, Info), "Info", SMSettings.VerboseLogging);
 
       if (deltaAmt > SMSettings.Tolerance)
       {
@@ -383,9 +349,6 @@ namespace ShipManifest.Process
         // 3.  Drain Charge
         if (ConsumeCharge(deltaCharge))
         {
-          Utilities.LogMessage(
-            string.Format("{0}  3a. Sufficient Charge.  Perform Pump Cucle.  {1}", methodName, Info), "Info",
-            SMSettings.VerboseLogging);
           // 4.  Get list of From parts & Pump Resource
           RunCycle(deltaAmt);
         }
@@ -393,9 +356,6 @@ namespace ShipManifest.Process
         {
           // 5.  Report Lack of charge and turn off pump
           PumpStatus = PumpState.Stop;
-          Utilities.LogMessage(
-            string.Format("{0}  3b. Insufficient Charge.  Abort Pump Cycle.   {1}", methodName, Info), "Info",
-            SMSettings.VerboseLogging);
         }
       }
     }
@@ -407,12 +367,11 @@ namespace ShipManifest.Process
 
       // If no other pumps running, then turn off run sound.
       if (!(from pump in SMAddon.SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
-        SMAddon.AudioSourcePumpRun.Stop();
+        SMSound.SourcePumpRun.Stop();
 
       // play pump shutdown.
-      SMAddon.AudioSourcePumpStop.Play();
+      SMSound.SourcePumpStop.Play();
       Elapsed = 0;
-      Utilities.LogMessage("TransferPump.Stop:  Play stop sound...", "Info", SMSettings.VerboseLogging);
     }
 
     internal void RunCycle(double cycleAmount)

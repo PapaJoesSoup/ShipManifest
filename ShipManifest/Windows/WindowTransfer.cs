@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
-using Enumerable = System.Linq.Enumerable;
 
 namespace ShipManifest.Windows
 {
@@ -41,7 +41,7 @@ namespace ShipManifest.Windows
         if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return _scienceModulesSource;
         var modules = SMAddon.SmVessel.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
         if (modules.Length <= 0) return _scienceModulesSource;
-        foreach (var pm in Enumerable.Cast<PartModule>(modules))
+        foreach (var pm in modules.Cast<PartModule>())
         {
           _scienceModulesSource.Add(pm, false);
         }
@@ -160,14 +160,14 @@ namespace ShipManifest.Windows
           var prevValue = ShowSourceVessels;
           ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, "Vessels", GUILayout.Width(90));
           if (!prevValue && ShowSourceVessels)
-            WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
         }
         else
         {
           var prevValue = ShowSourceVessels;
           ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, "Vessels", GUILayout.Width(90));
           if (!prevValue && ShowSourceVessels)
-            WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
         }
       }
       GUILayout.EndHorizontal();
@@ -489,7 +489,7 @@ namespace ShipManifest.Windows
               ? SMStyle.ButtonSourceStyle
               : SMStyle.ButtonTargetStyle;
             var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
-              Enumerable.First(modDockedVessel.VesselParts), Enumerable.Last(modDockedVessel.VesselParts), pumpType,
+              modDockedVessel.VesselParts.First(), modDockedVessel.VesselParts.Last(), pumpType,
               TransferPump.TriggerButton.Transfer);
             var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
               ? new GUIContent("Dump", "Dumps the selected resource in this Part")
@@ -597,7 +597,6 @@ namespace ShipManifest.Windows
           var sourcepartFrzr = selectedPartsFrom[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
           if (sourcepartFrzr == null) return;
           if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
-          var frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
           foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
           {
             GUILayout.BeginHorizontal();
@@ -614,7 +613,7 @@ namespace ShipManifest.Windows
                 yOffset - scrollPosition.y);
             }
 
-            var trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
+            var trait = WindowRoster.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
             GUI.enabled = true;
             GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
               GUILayout.Width(190), GUILayout.Height(20));
@@ -647,7 +646,7 @@ namespace ShipManifest.Windows
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
       const float yOffset = 160;
-      var modules = Enumerable.ToArray(ScienceModulesSource.Keys);
+      var modules = ScienceModulesSource.Keys.ToArray();
       foreach (var pm in modules)
       {
         // experiments/Containers.
@@ -729,7 +728,7 @@ namespace ShipManifest.Windows
             var expId = item.subjectID.Split('@')[0];
             var expKey = item.subjectID.Split('@')[1];
             var se = ResearchAndDevelopment.GetExperiment(expId);
-            var key = (from k in se.Results.Keys where expKey.Contains((string) k) select k).FirstOrDefault();
+            var key = (from k in se.Results.Keys where expKey.Contains(k) select k).FirstOrDefault();
             key = key ?? "default";
             var results = se.Results[key];
 
@@ -1102,7 +1101,7 @@ namespace ShipManifest.Windows
             SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
               SMAddon.SmVessel.SelectedResources);
         }
-        WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+        WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
       }
       catch (Exception ex)
       {

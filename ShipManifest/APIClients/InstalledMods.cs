@@ -10,11 +10,10 @@ namespace ShipManifest.APIClients
   {
     // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
-    private static readonly bool? DfInstalled = null;
 
     internal static bool IsDfInstalled
     {
-      get { return DfInstalled ?? DFWrapper.InitDFWrapper(); }
+      get { return DFWrapper.APIReady; }
     }
 
     internal static bool IsRtInstalled

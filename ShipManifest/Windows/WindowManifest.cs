@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ShipManifest.InternalObjects;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ namespace ShipManifest.Windows
       var rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, label))
       {
-        SMAddon.OnSmButtonToggle();
+        SMAddon.OnSmButtonClicked();
         ToolTip = "";
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -62,6 +63,7 @@ namespace ShipManifest.Windows
           GUILayout.Height(100), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
+        // Prelaunch (landed) Gui
         if (SMAddon.SmVessel.IsRecoverable)
         {
           PreLaunchGui();
@@ -82,67 +84,10 @@ namespace ShipManifest.Windows
 
         // Resource Details List Viewer
         ResourceDetailsViewer();
-        GUILayout.BeginHorizontal();
 
-        var settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-        if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
-        {
-          try
-          {
-            WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
-            if (WindowSettings.ShowWindow)
-            {
-              // Store settings in case we cancel later...
-              SMSettings.MemStoreTempSettings();
-            }
-          }
-          catch (Exception ex)
-          {
-            Utilities.LogMessage(
-              string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
-              true);
-          }
-        }
+        // Window toggle Button List
+        WindowToggleButtons();
 
-        var rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-        if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
-        {
-          try
-          {
-            WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
-            if (!WindowRoster.ShowWindow)
-            {
-              WindowRoster.SelectedKerbal = null;
-              WindowRoster.ToolTip = "";
-            }
-            else
-            {
-              SMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-            }
-          }
-          catch (Exception ex)
-          {
-            Utilities.LogMessage(
-              string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
-              true);
-          }
-        }
-
-        var controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-        if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
-        {
-          try
-          {
-            WindowControl.ShowWindow = !WindowControl.ShowWindow;
-          }
-          catch (Exception ex)
-          {
-            Utilities.LogMessage(
-              string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
-              true);
-          }
-        }
-        GUILayout.EndHorizontal();
         GUILayout.EndVertical();
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         SMAddon.RepositionWindow(ref Position);
@@ -304,7 +249,7 @@ namespace ShipManifest.Windows
         SMAddon.SmVessel.GetSelectedResourcesParts();
 
         // now lets reconcile the selected parts based on the new list of resources...
-        ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+        ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
 
         // Now, based on the resourceselection, do we show the Transfer window?
         WindowTransfer.ShowWindow = SMAddon.SmVessel.SelectedResources.Count > 0;
@@ -317,7 +262,138 @@ namespace ShipManifest.Windows
       }
     }
 
-    internal static void ReconcileSelectedXferParts(List<string> resourceNames)
+    private static void ResourceDetailsViewer()
+    {
+      try
+      {
+        _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
+          GUILayout.Height(100), GUILayout.Width(300));
+        GUILayout.BeginVertical();
+
+        if (SMAddon.SmVessel.SelectedResources.Count > 0)
+        {
+          foreach (var part in SMAddon.SmVessel.SelectedResourcesParts)
+          {
+            if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+            {
+              var noWrap = SMStyle.LabelStyleNoWrap;
+              GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
+                GUILayout.Height(18));
+              var noPad = SMStyle.LabelStyleNoPad;
+              foreach (var resource in SMAddon.SmVessel.SelectedResources)
+                GUILayout.Label(
+                  string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"),
+                    part.Resources[resource].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
+                  GUILayout.Height(16));
+            }
+            else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+            {
+              GUILayout.BeginHorizontal();
+              GUILayout.Label(
+                string.Format("{0}, ({1}/{2})", part.partInfo.title, Utilities.GetPartCrewCount(part), part.CrewCapacity),
+                GUILayout.Width(265), GUILayout.Height(20));
+              GUILayout.EndHorizontal();
+            }
+            else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
+            {
+              var scienceCount = 0;
+              foreach (PartModule pm in part.Modules)
+              {
+                var container = pm as ModuleScienceContainer;
+                if (container != null)
+                  scienceCount += container.GetScienceCount();
+                else if (pm is ModuleScienceExperiment)
+                  scienceCount += ((ModuleScienceExperiment) pm).GetScienceCount();
+              }
+              GUILayout.BeginHorizontal();
+              GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, scienceCount), GUILayout.Width(265));
+              GUILayout.EndHorizontal();
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(
+            string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
+              ex.StackTrace), "Error", true);
+          SMAddon.FrameErrTripped = true;
+        }
+      }
+      GUILayout.EndVertical();
+      GUILayout.EndScrollView();
+    }
+
+    private static void WindowToggleButtons()
+    {
+      GUILayout.BeginHorizontal();
+
+      var settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
+      {
+        try
+        {
+          WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
+          if (WindowSettings.ShowWindow)
+          {
+            // Store settings in case we cancel later...
+            SMSettings.MemStoreTempSettings();
+          }
+        }
+        catch (Exception ex)
+        {
+          Utilities.LogMessage(
+            string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            true);
+        }
+      }
+
+      var rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
+      {
+        try
+        {
+          WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
+          if (WindowRoster.ShowWindow)
+          {
+            SMAddon.SmVessel.GetRosterList();
+          }
+          else
+          {
+            WindowRoster.SelectedKerbal = null;
+            WindowRoster.ToolTip = "";
+          }
+        }
+        catch (Exception ex)
+        {
+          Utilities.LogMessage(
+            string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            true);
+        }
+      }
+
+      var controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
+      {
+        try
+        {
+          WindowControl.ShowWindow = !WindowControl.ShowWindow;
+        }
+        catch (Exception ex)
+        {
+          Utilities.LogMessage(
+            string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            true);
+        }
+      }
+      GUILayout.EndHorizontal();
+    }
+
+    #endregion
+
+    internal static void ResolveResourcePartSelections(List<string> resourceNames)
     {
       try
       {
@@ -430,70 +506,5 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceDetailsViewer()
-    {
-      try
-      {
-        _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(100), GUILayout.Width(300));
-        GUILayout.BeginVertical();
-
-        if (SMAddon.SmVessel.SelectedResources.Count > 0)
-        {
-          foreach (var part in SMAddon.SmVessel.SelectedResourcesParts)
-          {
-            if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
-            {
-              var noWrap = SMStyle.LabelStyleNoWrap;
-              GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
-                GUILayout.Height(18));
-              var noPad = SMStyle.LabelStyleNoPad;
-              foreach (var resource in SMAddon.SmVessel.SelectedResources)
-                GUILayout.Label(
-                  string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"),
-                    part.Resources[resource].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
-                  GUILayout.Height(16));
-            }
-            else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-            {
-              GUILayout.BeginHorizontal();
-              GUILayout.Label(
-                string.Format("{0}, ({1}/{2})", part.partInfo.title, Utilities.GetPartCrewCount(part), part.CrewCapacity),
-                GUILayout.Width(265), GUILayout.Height(20));
-              GUILayout.EndHorizontal();
-            }
-            else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
-            {
-              var scienceCount = 0;
-              foreach (PartModule pm in part.Modules)
-              {
-                var container = pm as ModuleScienceContainer;
-                if (container != null)
-                  scienceCount += container.GetScienceCount();
-                else if (pm is ModuleScienceExperiment)
-                  scienceCount += ((ModuleScienceExperiment) pm).GetScienceCount();
-              }
-              GUILayout.BeginHorizontal();
-              GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, scienceCount), GUILayout.Width(265));
-              GUILayout.EndHorizontal();
-            }
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        if (!SMAddon.FrameErrTripped)
-        {
-          Utilities.LogMessage(
-            string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), "Error", true);
-          SMAddon.FrameErrTripped = true;
-        }
-      }
-      GUILayout.EndVertical();
-      GUILayout.EndScrollView();
-    }
-
-    #endregion
   }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using ShipManifest.InternalObjects;
+using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs

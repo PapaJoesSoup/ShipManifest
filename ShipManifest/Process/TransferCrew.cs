@@ -1,15 +1,10 @@
 ﻿using System;
+using ShipManifest.InternalObjects;
 
 namespace ShipManifest.Process
 {
   public class TransferCrew : ITransferCrew, ICrewTransfer
   {
-    // Default sound license: CC-By-SA
-    // http://www.freesound.org/people/adcbicycle/sounds/14214/
-    internal static string Path1 = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
-    internal static string Path2 = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
-    internal static string Path3 = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
-
     // OnCrewTransferred Event Handling Flags
     internal static DateTime Timestamp;
     internal static bool FireSourceXferEvent;
@@ -202,10 +197,9 @@ namespace ShipManifest.Process
               if (SMSettings.RealismMode)
               {
                 // Play run sound when start sound is nearly done. (repeats)
-                if (SMAddon.Elapsed >= SMAddon.AudioClipPumpStart.length - 0.25)
+                if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
                 {
-                  Utilities.LogMessage("SourceRun.play():  started.", "info", SMSettings.VerboseLogging);
-                  SMAddon.AudioSourcePumpRun.Play();
+                  SMSound.SourcePumpRun.Play();
                   SMAddon.Elapsed = 0;
                   CrewXferState = XferState.Transfer;
                 }
@@ -239,14 +233,13 @@ namespace ShipManifest.Process
               if (SMSettings.RealismMode)
               {
                 // play crew sit.
-                SMAddon.AudioSourcePumpRun.Stop();
-                SMAddon.AudioSourcePumpStop.Play();
+                SMSound.SourcePumpRun.Stop();
+                SMSound.SourcePumpStop.Play();
               }
               SMAddon.Elapsed = 0;
               CrewTransferAction();
               CrewXferState = XferState.Portraits;
               IvaDelayActive = true;
-              Utilities.LogMessage("CrewTransferProcess:  Updating Portraits...", "info", SMSettings.VerboseLogging);
               break;
 
             case XferState.Portraits:
@@ -267,11 +260,7 @@ namespace ShipManifest.Process
               }
               break;
           }
-          Utilities.LogMessage("Transfer State:  " + CrewXferState + "...", "Info", SMSettings.VerboseLogging);
-          if (CrewXferState != XferState.Off)
-            Timestamp = DateTime.Now;
-          else
-            Utilities.LogMessage("CrewTransferProcess:  Complete.", "info", SMSettings.VerboseLogging);
+          if (CrewXferState != XferState.Off) Timestamp = DateTime.Now;
         }
       }
       catch (Exception ex)
@@ -315,10 +304,8 @@ namespace ShipManifest.Process
     {
       try
       {
-        Utilities.LogMessage("CrewTransferAction:  Begin.", "info", SMSettings.VerboseLogging);
         if (FromPart.internalModel != null && ToPart.internalModel != null)
         {
-          Utilities.LogMessage("CrewTransferAction:  InternalModel exists.", "info", SMSettings.VerboseLogging);
           if (ToSeat.taken)
           {
             // Swap places.
@@ -341,7 +328,6 @@ namespace ShipManifest.Process
         else
         {
           // no portraits, so let's just move kerbals...
-          Utilities.LogMessage("CrewTransferAction:  No InternalModel.", "info", SMSettings.VerboseLogging);
           if (ToCrewMember != null)
           {
             RemoveCrewMember(FromCrewMember, FromPart);
@@ -392,8 +378,8 @@ namespace ShipManifest.Process
     {
       if (SMSettings.RealismMode)
       {
-        SMAddon.AudioSourcePumpRun.Stop();
-        SMAddon.AudioSourcePumpStop.Play();
+        SMSound.SourcePumpRun.Stop();
+        SMSound.SourcePumpStop.Play();
       }
       SMAddon.Elapsed = 0;
       SMAddon.SmVessel.TransferCrewObj.IvaDelayActive = false;

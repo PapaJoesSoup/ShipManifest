@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
@@ -20,6 +21,15 @@ namespace ShipManifest.Windows
     internal static bool ShowToolTips = true;
     internal static float XOffset = 30;
     internal static float YOffset = 90;
+
+    // RosterList must exist outside of the vessel.
+    internal static List<ProtoCrewMember> RosterList = new List<ProtoCrewMember>();
+
+    // DeepFreeze Frozen Crew interface
+
+    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals =
+      new Dictionary<string, DFWrapper.KerbalInfo>();
+
     internal static Professions KerbalProfession;
 
     // Gender var
@@ -27,8 +37,6 @@ namespace ShipManifest.Windows
     internal static KerbalFilters CurrentFilter = KerbalFilters.All;
 
     internal static bool OnCreate;
-
-    private static List<ProtoCrewMember> _rosterList;
 
     private static ModKerbal _selectedKerbal;
 
@@ -38,19 +46,7 @@ namespace ShipManifest.Windows
     {
       get
       {
-        if (!OnCreate && SelectedKerbal == null)
-          return true;
-        return false;
-      }
-    }
-
-    internal static List<ProtoCrewMember> RosterList
-    {
-      get
-      {
-        if (_rosterList == null)
-          GetRosterList();
-        return _rosterList;
+        return !OnCreate && SelectedKerbal == null;
       }
     }
 
@@ -62,7 +58,7 @@ namespace ShipManifest.Windows
         _selectedKerbal = value;
         if (_selectedKerbal == null)
         {
-          SMAddon.SaveMessage = string.Empty;
+          SMAddon.SaveMessage = String.Empty;
         }
       }
     }
@@ -79,7 +75,7 @@ namespace ShipManifest.Windows
         SelectedKerbal = null;
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmRosterToggle();
+          SMAddon.OnSmRosterClicked();
         else
           ShowWindow = false;
       }
@@ -129,7 +125,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(String.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           "Error", true);
       }
     }
@@ -144,30 +140,13 @@ namespace ShipManifest.Windows
       return new Dictionary<string, DFWrapper.KerbalInfo>();
     }
 
-    internal static void GetRosterList()
-    {
-      try
-      {
-        if (_rosterList != null)
-          _rosterList.Clear();
-        _rosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-        // Support for DeepFreeze
-        if (InstalledMods.IsDfInstalled)
-          _rosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), "Error", true);
-      }
-    }
-
     internal static void ThawKerbal(string kerbalName)
     {
       try
       {
         if (InstalledMods.IsDfInstalled)
         {
-          var iKerbal = SMAddon.FrozenKerbals[kerbalName];
+          var iKerbal = FrozenKerbals[kerbalName];
 
           var cryofreezers =
             (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
@@ -187,13 +166,13 @@ namespace ShipManifest.Windows
         }
         else
         {
-          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
+          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
             true);
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(String.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           "Error", true);
       }
     }
@@ -223,7 +202,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(String.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           "Error", true);
       }
     }
@@ -413,10 +392,10 @@ namespace ShipManifest.Windows
             string buttonText;
             string buttonToolTip;
             GUILayout.BeginHorizontal();
-            GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
-            GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
-            GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
-            GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
+            GUILayout.Label((string) kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
+            GUILayout.Label((string) kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
+            GUILayout.Label((string) kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
+            GUILayout.Label((string) kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
             GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
             SetupEditButton(kerbal, out buttonText, out buttonToolTip);
@@ -475,7 +454,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          String.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
     }
 
@@ -493,7 +472,7 @@ namespace ShipManifest.Windows
         GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Trait + ")", SMStyle.LabelStyleBold,
           GUILayout.MaxWidth(300));
 
-      if (!string.IsNullOrEmpty(SMAddon.SaveMessage))
+      if (!String.IsNullOrEmpty(SMAddon.SaveMessage))
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
@@ -534,7 +513,7 @@ namespace ShipManifest.Windows
         if (SelectedKerbal != null)
         {
           SMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
-          if (string.IsNullOrEmpty(SMAddon.SaveMessage))
+          if (String.IsNullOrEmpty(SMAddon.SaveMessage))
             SelectedKerbal = null;
         }
       }
@@ -547,8 +526,8 @@ namespace ShipManifest.Windows
     private static string GetFrozenKerbalDetials(ProtoCrewMember kerbal)
     {
       string rosterDetails;
-      if (GetFrozenKerbals().ContainsKey(kerbal.name))
-        rosterDetails = "Frozen - " + GetFrozenKerbals()[kerbal.name].vesselName.Replace("(unloaded)", "");
+      if (FrozenKerbals.ContainsKey(kerbal.name))
+        rosterDetails = "Frozen - " + FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "");
       else
         rosterDetails = "Frozen";
 
@@ -559,26 +538,29 @@ namespace ShipManifest.Windows
     {
       foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
       {
-        if (kerbal.name.Contains(char.ConvertFromUtf32(1)))
+        if (kerbal.name.Contains(Char.ConvertFromUtf32(1)))
         {
-          kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+          kerbal.name = kerbal.name.Replace(Char.ConvertFromUtf32(1), "");
         }
       }
     }
 
     private static void SetProfessionFlag()
     {
-      if (SelectedKerbal.Trait == "Pilot")
+      switch (SelectedKerbal.Trait)
       {
-        KerbalProfession = Professions.Pilot;
-      }
-      else if (SelectedKerbal.Trait == "Engineer")
-      {
-        KerbalProfession = Professions.Engineer;
-      }
-      else
-      {
-        KerbalProfession = Professions.Scientist;
+        case "Pilot":
+          KerbalProfession = Professions.Pilot;
+          break;
+        case "Engineer":
+          KerbalProfession = Professions.Engineer;
+          break;
+        case "Scientist":
+          KerbalProfession = Professions.Scientist;
+          break;
+        default:
+          KerbalProfession = Professions.Tourist;
+          break;
       }
     }
 

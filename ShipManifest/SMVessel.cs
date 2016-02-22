@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
+using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows;
@@ -72,8 +74,7 @@ namespace ShipManifest
     {
       get
       {
-        if (_partsByResource == null) UpdatePartsByResource();
-        return _partsByResource ?? new Dictionary<string, List<Part>>();
+        return _partsByResource ?? (_partsByResource = new Dictionary<string, List<Part>>());
       }
     }
 
@@ -88,8 +89,7 @@ namespace ShipManifest
     {
       get
       {
-        if (_dockedVessels == null) UpdateDockedVessels();
-        return _dockedVessels ?? new List<ModDockedVessel>();
+        return _dockedVessels ?? (_dockedVessels = new List<ModDockedVessel>());
       }
       set { _dockedVessels = value; }
     }
@@ -167,10 +167,10 @@ namespace ShipManifest
     internal void RefreshLists()
     {
       GetSelectedResourcesParts(true);
-      _dockedVessels = null;
+      UpdateDockedVessels();
 
       // now lets reconcile the selected parts based on the new list of resources...
-      WindowManifest.ReconcileSelectedXferParts(SMAddon.SmVessel.SelectedResources);
+      WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
 
       // Now lets update the Resource Xfer Objects...
       TransferPump.UpdateDisplayPumps();
@@ -185,13 +185,13 @@ namespace ShipManifest
         }
       }
 
-      SMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-
       GetAntennas();
       GetLights();
       GetSolarPanels();
-      WindowRoster.GetRosterList();
+      GetRosterList();
       DockedVessels = null;
+      WindowRoster.FrozenKerbals = WindowRoster.GetFrozenKerbals();
+
     }
 
     internal void UpdatePartsByResource()
@@ -249,29 +249,26 @@ namespace ShipManifest
             }
 
             // Now, let's get flight Resources.
-            if (SMSettings.EnableResources)
+            if (!SMSettings.EnableResources) continue;
             {
               foreach (PartResource resource in part.Resources)
               {
                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                if (!SMSettings.RealismMode ||
-                    (SMSettings.RealismMode && resource.info.resourceTransferMode != ResourceTransferMode.NONE))
+                if (SMSettings.RealismMode &&
+                    (!SMSettings.RealismMode || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
+                  continue;
+                var vResourceFound = false;
+                // is resource in the list yet?.
+                if (_partsByResource.Keys.Contains(resource.info.name))
                 {
-                  var vResourceFound = false;
-                  // is resource in the list yet?.
-                  if (_partsByResource.Keys.Contains(resource.info.name))
-                  {
-                    vResourceFound = true;
-                    var eParts = _partsByResource[resource.info.name];
-                    eParts.Add(part);
-                  }
-                  if (!vResourceFound)
-                  {
-                    // found a new resource.  lets add it to the list of resources.
-                    var nParts = new List<Part> {part};
-                    _partsByResource.Add(resource.info.name, nParts);
-                  }
+                  vResourceFound = true;
+                  var eParts = _partsByResource[resource.info.name];
+                  eParts.Add(part);
                 }
+                if (vResourceFound) continue;
+                // found a new resource.  lets add it to the list of resources.
+                var nParts = new List<Part> {part};
+                _partsByResource.Add(resource.info.name, nParts);
               }
             }
           }
@@ -329,6 +326,22 @@ namespace ShipManifest
             SelectedResourcesParts.Add(part);
           }
           break;
+      }
+    }
+
+    internal void GetRosterList()
+    {
+      try
+      {
+        WindowRoster.RosterList.Clear();
+        WindowRoster.RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+        // Support for DeepFreeze
+        if (InstalledMods.IsDfInstalled)
+          WindowRoster.RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), "Error", true);
       }
     }
 
@@ -487,15 +500,15 @@ namespace ShipManifest
       return vesselpartList;
     }
 
-    #endregion
-
-    #region Action Methods
-
     internal Part FindPartByKerbal(ProtoCrewMember pKerbal)
     {
       var kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
       return kPart;
     }
+
+    #endregion
+
+    #region Action Methods
 
     internal void RespawnCrew()
     {

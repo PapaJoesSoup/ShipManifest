@@ -1,4 +1,5 @@
 ﻿using System;
+using ShipManifest.InternalObjects;
 using ShipManifest.Windows.Tabs;
 using UnityEngine;
 
@@ -30,7 +31,7 @@ namespace ShipManifest.Windows
       {
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmSettingsToggle();
+          SMAddon.OnSmSettingsClicked();
         else
         {
           SMSettings.MemStoreTempSettings();
@@ -59,7 +60,7 @@ namespace ShipManifest.Windows
         SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
         SMSettings.SaveSettings();
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmSettingsToggle();
+          SMAddon.OnSmSettingsClicked();
         else
           ShowWindow = false;
       }
@@ -69,7 +70,7 @@ namespace ShipManifest.Windows
         SMSettings.MemRestoreTempSettings();
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmSettingsToggle();
+          SMAddon.OnSmSettingsClicked();
         else
         {
           SMSettings.MemStoreTempSettings();

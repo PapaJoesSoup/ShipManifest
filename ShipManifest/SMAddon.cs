@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using ShipManifest.Process;
 using ShipManifest.Windows;
 using UnityEngine;
@@ -26,28 +27,6 @@ namespace ShipManifest
 
     internal static string TextureFolder = "ShipManifest/Textures/";
     internal static string SaveMessage = string.Empty;
-
-    // DeepFreeze Frozen Crew interface
-    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals =
-      new Dictionary<string, DFWrapper.KerbalInfo>();
-
-    // Resource transfer vars
-    internal static AudioSource AudioSourcePumpStart;
-    internal static AudioSource AudioSourcePumpRun;
-    internal static AudioSource AudioSourcePumpStop;
-
-    internal static AudioClip AudioClipPumpStart;
-    internal static AudioClip AudioClipPumpRun;
-    internal static AudioClip AudioClipPumpStop;
-
-    // Crew transfer vars
-    internal static AudioSource AudioSourceCrewStart;
-    internal static AudioSource AudioSourceCrewRun;
-    internal static AudioSource AudioSourceCrewStop;
-
-    internal static AudioClip AudioClipCrewStart;
-    internal static AudioClip AudioClipCrewRun;
-    internal static AudioClip AudioClipCrewStop;
 
     [KSPField(isPersistant = true)] internal static double Elapsed;
 
@@ -111,7 +90,6 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
         DontDestroyOnLoad(this);
         SMSettings.LoadSettings();
-        Utilities.LogMessage("SmAddon.Awake Active...", "info", SMSettings.VerboseLogging);
 
         if (SMSettings.AutoSave)
           InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
@@ -119,17 +97,14 @@ namespace ShipManifest
         if (SMSettings.EnableBlizzyToolbar)
         {
           // Let't try to use Blizzy's toolbar
-          Utilities.LogMessage("SmAddon.Awake - Blizzy Toolbar Selected.", "Info", SMSettings.VerboseLogging);
           if (ActivateBlizzyToolBar()) return;
           // We failed to activate the toolbar, so revert to stock
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
-          Utilities.LogMessage("SmAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
         }
         else
         {
           // Use stock Toolbar
-          Utilities.LogMessage("SmAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
         }
@@ -142,7 +117,6 @@ namespace ShipManifest
 
     internal void Start()
     {
-      Utilities.LogMessage("SMAddon.Start.", "Info", SMSettings.VerboseLogging);
       try
       {
         // Reset frame error latch if set
@@ -194,19 +168,16 @@ namespace ShipManifest
         }
         else
         {
-          Utilities.LogMessage("SMAddon.Start - CLS is not installed.", "Info", SMSettings.VerboseLogging);
           SMSettings.EnableCls = false;
           SMSettings.ClsInstalled = false;
           SMSettings.SaveSettings();
         }
-        Utilities.LogMessage("SMAddon.Start - CLS Installed?  " + SMSettings.ClsInstalled, "Info",
-          SMSettings.VerboseLogging);
+
+        // Support for DeepFreeze
+        DFWrapper.InitDFWrapper();
 
         // Load sounds for transfers.
-        LoadSounds(SMConditions.ResourceType.Crew, TransferCrew.Path1, TransferCrew.Path2, TransferCrew.Path3,
-          SMSettings.CrewSoundVol);
-        LoadSounds(SMConditions.ResourceType.Pump, TransferPump.Path1, TransferPump.Path2, TransferPump.Path3,
-          SMSettings.PumpSoundVol);
+        SMSound.LoadSounds();
       }
       catch (Exception ex)
       {
@@ -289,14 +260,12 @@ namespace ShipManifest
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
-      //Debug.Log("[ShipManifest]:  SMAddon.OnGUI");
       try
       {
         GUI.skin = SMSettings.UseUnityStyle ? null : HighLogic.Skin;
 
         SMStyle.SetupGuiStyles();
         Display();
-
         SMToolTips.ShowToolTips();
       }
       catch (Exception ex)
@@ -311,49 +280,46 @@ namespace ShipManifest
       {
         CheckForToolbarTypeToggle();
 
-        if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+        if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
+        if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel == null) return;
+
+        //Instantiate the controller for the active vessel.
+        //SmVessel = SMVessel.GetInstance(FlightGlobals.ActiveVessel);
+        SMHighlighter.Update_Highlighter();
+
+        // Realism Mode Resource transfer operation (real time)
+        // PumpActive is flagged in the Resource Controller
+        if (TransferPump.PumpProcessOn)
         {
-          if (FlightGlobals.fetch != null && FlightGlobals.ActiveVessel != null)
+          if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
+            TransferPump.ProcessActivePumps();
+          else
           {
-            //Instantiate the controller for the active vessel.
-            //SmVessel = SMVessel.GetInstance(FlightGlobals.ActiveVessel);
-            SMHighlighter.Update_Highlighter();
-
-            // Realism Mode Resource transfer operation (real time)
-            // PumpActive is flagged in the Resource Controller
-            if (TransferPump.PumpProcessOn)
-            {
-              if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
-                TransferPump.ProcessActivePumps();
-              else
-              {
-                TransferPump.PumpProcessOn = false;
-                SmVessel.TransferPumps.Clear();
-              }
-            }
-
-            // Realism Mode Crew transfer operation (real time)
-            if (SmVessel.TransferCrewObj.CrewXferActive)
-              SmVessel.TransferCrewObj.CrewTransferProcess();
-            else if (SmVessel.TransferCrewObj.IsStockXfer)
-            {
-              TransferCrew.RevertCrewTransfer(SmVessel.TransferCrewObj.FromCrewMember, SmVessel.TransferCrewObj.FromPart,
-                SmVessel.TransferCrewObj.ToPart);
-              SmVessel.TransferCrewObj.CrewTransferBegin(SmVessel.TransferCrewObj.FromCrewMember,
-                SmVessel.TransferCrewObj.FromPart, SmVessel.TransferCrewObj.ToPart);
-            }
-
-            if (!SMSettings.EnableOnCrewTransferEvent || !TransferCrew.FireSourceXferEvent) return;
-            // Now let's deal with third party mod support...
-            TransferCrew.FireSourceXferEvent = false;
-            GameEvents.onCrewTransferred.Fire(TransferCrew.SourceAction);
-
-            //If a swap, we need to handle that too...
-            if (!TransferCrew.FireTargetXferEvent) return;
-            TransferCrew.FireTargetXferEvent = false;
-            GameEvents.onCrewTransferred.Fire(TransferCrew.TargetAction);
+            TransferPump.PumpProcessOn = false;
+            SmVessel.TransferPumps.Clear();
           }
         }
+
+        // Realism Mode Crew transfer operation (real time)
+        if (SmVessel.TransferCrewObj.CrewXferActive)
+          SmVessel.TransferCrewObj.CrewTransferProcess();
+        else if (SmVessel.TransferCrewObj.IsStockXfer)
+        {
+          TransferCrew.RevertCrewTransfer(SmVessel.TransferCrewObj.FromCrewMember, SmVessel.TransferCrewObj.FromPart,
+            SmVessel.TransferCrewObj.ToPart);
+          SmVessel.TransferCrewObj.CrewTransferBegin(SmVessel.TransferCrewObj.FromCrewMember,
+            SmVessel.TransferCrewObj.FromPart, SmVessel.TransferCrewObj.ToPart);
+        }
+
+        if (!SMSettings.EnableOnCrewTransferEvent || !TransferCrew.FireSourceXferEvent) return;
+        // Now let's deal with third party mod support...
+        TransferCrew.FireSourceXferEvent = false;
+        GameEvents.onCrewTransferred.Fire(TransferCrew.SourceAction);
+
+        //If a swap, we need to handle that too...
+        if (!TransferCrew.FireTargetXferEvent) return;
+        TransferCrew.FireTargetXferEvent = false;
+        GameEvents.onCrewTransferred.Fire(TransferCrew.TargetAction);
       }
       catch (Exception ex)
       {
@@ -437,7 +403,6 @@ namespace ShipManifest
     //Vessel state handlers
     internal void OnVesselWasModified(Vessel modVessel)
     {
-      Utilities.LogMessage("SmAddon.OnVesselWasModified.", "Info", SMSettings.VerboseLogging);
       try
       {
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -451,7 +416,6 @@ namespace ShipManifest
 
     internal void OnVesselChange(Vessel newVessel)
     {
-      Utilities.LogMessage("SMAddon.OnVesselChange active...", "Info", SMSettings.VerboseLogging);
       try
       {
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -467,7 +431,6 @@ namespace ShipManifest
 
     private void OnVesselLoaded(Vessel data)
     {
-      Utilities.LogMessage("SMAddon.OnVesselLoaded active...", "Info", SMSettings.VerboseLogging);
       try
       {
         if (data.Equals(FlightGlobals.ActiveVessel) && data != SmVessel.Vessel)
@@ -488,15 +451,12 @@ namespace ShipManifest
       if (SMSettings.EnableBlizzyToolbar && !SMSettings.PrevEnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
-        Utilities.LogMessage("SMAddon.CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info",
-          SMSettings.VerboseLogging);
         if (!ActivateBlizzyToolBar())
         {
           // We failed to activate the toolbar, so revert to stock
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
 
-          Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
           SMSettings.EnableBlizzyToolbar = SMSettings.PrevEnableBlizzyToolbar;
         }
         else
@@ -515,7 +475,6 @@ namespace ShipManifest
       else if (!SMSettings.EnableBlizzyToolbar && SMSettings.PrevEnableBlizzyToolbar)
       {
         // Use stock Toolbar
-        Utilities.LogMessage("SMAddon.Awake - Stock Toolbar Selected.", "Info", SMSettings.VerboseLogging);
         if (HighLogic.LoadedSceneIsFlight)
           _smButtonBlizzy.Visible = false;
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -533,7 +492,6 @@ namespace ShipManifest
     // Stock Toolbar Startup and cleanup
     private void OnGuiAppLauncherReady()
     {
-      Utilities.LogMessage("SMAddon.OnGUIAppLauncherReady active...", "Info", SMSettings.VerboseLogging);
       try
       {
         // Setup SM WIndow button
@@ -541,8 +499,8 @@ namespace ShipManifest
         {
           var iconfile = "IconOff_38";
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
-            OnSmButtonToggle,
-            OnSmButtonToggle,
+            OnSmButtonClicked,
+            OnSmButtonClicked,
             DummyHandler,
             DummyHandler,
             DummyHandler,
@@ -562,8 +520,8 @@ namespace ShipManifest
         {
           var iconfile = "IconS_Off_38";
           _smSettingsStock = ApplicationLauncher.Instance.AddModApplication(
-            OnSmSettingsToggle,
-            OnSmSettingsToggle,
+            OnSmSettingsClicked,
+            OnSmSettingsClicked,
             DummyHandler,
             DummyHandler,
             DummyHandler,
@@ -583,8 +541,8 @@ namespace ShipManifest
         {
           var iconfile = "IconR_Off_38";
           _smRosterStock = ApplicationLauncher.Instance.AddModApplication(
-            OnSmRosterToggle,
-            OnSmRosterToggle,
+            OnSmRosterClicked,
+            OnSmRosterClicked,
             DummyHandler,
             DummyHandler,
             DummyHandler,
@@ -630,7 +588,7 @@ namespace ShipManifest
     }
 
     //Toolbar button click handlers
-    internal static void OnSmButtonToggle()
+    internal static void OnSmButtonClicked()
     {
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle");
       try
@@ -671,7 +629,7 @@ namespace ShipManifest
       }
     }
 
-    internal static void OnSmRosterToggle()
+    internal static void OnSmRosterClicked()
     {
       Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle");
       try
@@ -688,7 +646,7 @@ namespace ShipManifest
               GameDatabase.Instance.GetTexture(
                 WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
 
-          FrozenKerbals = WindowRoster.GetFrozenKerbals();
+          WindowRoster.FrozenKerbals = WindowRoster.GetFrozenKerbals();
         }
       }
       catch (Exception ex)
@@ -697,7 +655,7 @@ namespace ShipManifest
       }
     }
 
-    internal static void OnSmSettingsToggle()
+    internal static void OnSmSettingsClicked()
     {
       Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
       try
@@ -849,12 +807,10 @@ namespace ShipManifest
         {
           if (newVessel.isEVA && !SmVessel.Vessel.isEVA)
           {
-            if (WindowManifest.ShowWindow) OnSmButtonToggle();
+            if (WindowManifest.ShowWindow) OnSmButtonClicked();
 
             // kill selected resource and its associated highlighting.
             SmVessel.SelectedResources.Clear();
-            Utilities.LogMessage("SMAddon.UpdateSMcontroller - New Vessel is a Kerbal on EVA.  ", "Info",
-              SMSettings.VerboseLogging);
           }
         }
 
@@ -886,13 +842,11 @@ namespace ShipManifest
               {
                 SmVessel.ClsPartSource = sPart;
                 SmVessel.ClsSpaceSource = sSpace;
-                Utilities.LogMessage("UpdateCLSSpaces - clsPartSource found;", "info", SMSettings.VerboseLogging);
               }
               if (SmVessel.SelectedPartsTarget.Contains(sPart.Part) && SmVessel.ClsPartTarget == null)
               {
                 SmVessel.ClsPartTarget = sPart;
                 SmVessel.ClsSpaceTarget = sSpace;
-                Utilities.LogMessage("UpdateCLSSpaces - clsPartTarget found;", "info", SMSettings.VerboseLogging);
               }
               if (SmVessel.ClsPartSource != null && SmVessel.ClsPartTarget != null)
                 break;
@@ -907,8 +861,6 @@ namespace ShipManifest
             string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
         }
       }
-      else
-        Utilities.LogMessage("UpdateCLSSpaces - clsVessel is null... done.", "info", SMSettings.VerboseLogging);
     }
 
     internal static bool GetClsAddon()
@@ -916,7 +868,6 @@ namespace ShipManifest
       ClsAddon = ClsClient.GetCls();
       if (ClsAddon == null)
       {
-        Utilities.LogMessage("SMAddon.GetClsAddon - ClsAddon is null.", "Info", SMSettings.VerboseLogging);
         return false;
       }
       return true;
@@ -926,13 +877,11 @@ namespace ShipManifest
     {
       try
       {
-        Utilities.LogMessage("SMAddon.GetCLSVessel - Active.", "Info", SMSettings.VerboseLogging);
 
         if (ClsAddon.Vessel != null)
         {
           return true;
         }
-        Utilities.LogMessage("SMAddon.GetCLSVessel - clsVessel is null.", "Info", SMSettings.VerboseLogging);
         return false;
       }
       catch (Exception ex)
@@ -960,7 +909,7 @@ namespace ShipManifest
               _smButtonBlizzy.ToolTip = "Ship Manifest";
               _smButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
               _smButtonBlizzy.Visible = true;
-              _smButtonBlizzy.OnClick += e => { OnSmButtonToggle(); };
+              _smButtonBlizzy.OnClick += e => { OnSmButtonClicked(); };
             }
 
             if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -972,7 +921,7 @@ namespace ShipManifest
               _smSettingsBlizzy.ToolTip = "Ship Manifest Settings Window";
               _smSettingsBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
               _smSettingsBlizzy.Visible = true;
-              _smSettingsBlizzy.OnClick += e => { OnSmSettingsToggle(); };
+              _smSettingsBlizzy.OnClick += e => { OnSmSettingsClicked(); };
 
               _smRosterBlizzy = ToolbarManager.Instance.add("ShipManifest", "Roster");
               _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
@@ -981,123 +930,26 @@ namespace ShipManifest
               _smRosterBlizzy.ToolTip = "Ship Manifest Roster Window";
               _smRosterBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
               _smRosterBlizzy.Visible = true;
-              _smRosterBlizzy.OnClick += e => { OnSmRosterToggle(); };
+              _smRosterBlizzy.OnClick += e => { OnSmRosterClicked(); };
             }
-            Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar available!", "Info",
-              SMSettings.VerboseLogging);
             return true;
           }
-          Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar not available!", "Info",
-            SMSettings.VerboseLogging);
           return false;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
           // Blizzy Toolbar instantiation error.
-          Utilities.LogMessage("Error in SMAddon.ActivateBlizzyToolBar... Error:  " + ex, "Error", true);
           return false;
         }
       }
       // No Blizzy Toolbar
-      Utilities.LogMessage("SMAddon.ActivateBlizzyToolBar - Blizzy Toolbar not Enabled...", "Info",
-        SMSettings.VerboseLogging);
       return false;
-    }
-
-    internal static void LoadSounds(SMConditions.ResourceType soundType, string path1, string path2, string path3,
-      double dblVol)
-    {
-      try
-      {
-        Utilities.LogMessage("SMAddon.LoadSounds - Loading " + soundType + " sounds...", "Info",
-          SMSettings.VerboseLogging);
-        var go = new GameObject("Audio");
-        switch (soundType)
-        {
-          case SMConditions.ResourceType.Crew:
-            AudioSourceCrewStart = go.AddComponent<AudioSource>();
-            AudioSourceCrewRun = go.AddComponent<AudioSource>();
-            AudioSourceCrewStop = go.AddComponent<AudioSource>();
-
-            if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) &&
-                GameDatabase.Instance.ExistsAudioClip(path3))
-            {
-              AudioClipCrewStart = GameDatabase.Instance.GetAudioClip(path1);
-              AudioClipCrewRun = GameDatabase.Instance.GetAudioClip(path2);
-              AudioClipCrewStop = GameDatabase.Instance.GetAudioClip(path3);
-              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sounds loaded...", "Info",
-                SMSettings.VerboseLogging);
-
-              // configure sources
-              AudioSourceCrewStart.clip = AudioClipPumpStart; // Start sound
-              AudioSourceCrewStart.volume = (float) dblVol;
-              AudioSourceCrewStart.pitch = 1f;
-
-              AudioSourceCrewRun.clip = AudioClipPumpRun; // Run sound
-              AudioSourceCrewRun.loop = true;
-              AudioSourceCrewRun.volume = (float) dblVol;
-              AudioSourceCrewRun.pitch = 1f;
-
-              AudioSourceCrewStop.clip = AudioClipPumpStop; // Stop Sound
-              AudioSourceCrewStop.volume = (float) dblVol;
-              AudioSourceCrewStop.pitch = 1f;
-            }
-            else
-            {
-              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sound failed to load...", "Info",
-                SMSettings.VerboseLogging);
-            }
-            break;
-          case SMConditions.ResourceType.Pump:
-            AudioSourcePumpStart = go.AddComponent<AudioSource>();
-            AudioSourcePumpRun = go.AddComponent<AudioSource>();
-            AudioSourcePumpStop = go.AddComponent<AudioSource>();
-
-            if (GameDatabase.Instance.ExistsAudioClip(path1) && GameDatabase.Instance.ExistsAudioClip(path2) &&
-                GameDatabase.Instance.ExistsAudioClip(path3))
-            {
-              AudioClipPumpStart = GameDatabase.Instance.GetAudioClip(path1);
-              AudioClipPumpRun = GameDatabase.Instance.GetAudioClip(path2);
-              AudioClipPumpStop = GameDatabase.Instance.GetAudioClip(path3);
-              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sounds loaded...", "Info",
-                SMSettings.VerboseLogging);
-
-              // configure sources
-              AudioSourcePumpStart.clip = AudioClipPumpStart; // Start sound
-              AudioSourcePumpStart.volume = (float) dblVol;
-              AudioSourcePumpStart.pitch = 1f;
-
-              AudioSourcePumpRun.clip = AudioClipPumpRun; // Run sound
-              AudioSourcePumpRun.loop = true;
-              AudioSourcePumpRun.volume = (float) dblVol;
-              AudioSourcePumpRun.pitch = 1f;
-
-              AudioSourcePumpStop.clip = AudioClipPumpStop; // Stop Sound
-              AudioSourcePumpStop.volume = (float) dblVol;
-              AudioSourcePumpStop.pitch = 1f;
-            }
-            else
-            {
-              Utilities.LogMessage("SMAddon.LoadSounds - " + soundType + " sound failed to load...", "Info",
-                SMSettings.VerboseLogging);
-            }
-            break;
-        }
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(
-          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
-        // ReSharper disable once PossibleIntendedRethrow
-        throw ex;
-      }
     }
 
     internal static void FireEventTriggers()
     {
       // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
       // and instructions for using CLS API by codepoet.
-      Utilities.LogMessage("SMAddon.FireEventTriggers:  Active.", "info", SMSettings.VerboseLogging);
       GameEvents.onVesselChange.Fire(SmVessel.Vessel);
     }
 
@@ -1140,9 +992,7 @@ namespace ShipManifest
     {
       try
       {
-        Utilities.LogMessage("SMAddon.RunSave in progress...", "info", SMSettings.VerboseLogging);
         SMSettings.SaveSettings();
-        Utilities.LogMessage("SMAddon.RunSave complete.", "info", SMSettings.VerboseLogging);
       }
       catch (Exception ex)
       {
