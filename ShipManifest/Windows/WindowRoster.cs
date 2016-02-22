@@ -11,6 +11,8 @@ namespace ShipManifest.Windows
 {
   internal static class WindowRoster
   {
+    #region Properties
+
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
     internal static string Title = "Ship Manifest Roster";
@@ -24,11 +26,6 @@ namespace ShipManifest.Windows
 
     // RosterList must exist outside of the vessel.
     internal static List<ProtoCrewMember> RosterList = new List<ProtoCrewMember>();
-
-    // DeepFreeze Frozen Crew interface
-
-    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals =
-      new Dictionary<string, DFWrapper.KerbalInfo>();
 
     internal static Professions KerbalProfession;
 
@@ -63,6 +60,9 @@ namespace ShipManifest.Windows
       }
     }
 
+    #endregion Properties
+
+    #region Gui Layout
     internal static void Display(int windowId)
     {
       // Reset Tooltip active flag...
@@ -79,6 +79,7 @@ namespace ShipManifest.Windows
         else
           ShowWindow = false;
       }
+
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
       try
@@ -105,17 +106,6 @@ namespace ShipManifest.Windows
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
-          //if (SMSettings.RenameWithProfession)
-          //{
-          //    string toolTip = "This action resets all renamed Kerbals to their KSP default professions.\r\nIt removes any non printing chars previously used to maintain a specific profession.\r\nUse this if you wish to clean up a game save after updating to KSP 1.0.5 or above.";
-          //    if (GUILayout.Button(new GUIContent("Reset Professions", toolTip), GUILayout.MaxWidth(120), GUILayout.Height(20)))
-          //    {
-          //        ResetKerbalNames();
-          //    }
-          //}
-          //rect = GUILayoutUtility.GetLastRect();
-          //if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-          //    ToolTip = SMToolTips.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 10, 0);
           GUILayout.EndHorizontal();
         }
 
@@ -128,92 +118,6 @@ namespace ShipManifest.Windows
         Utilities.LogMessage(String.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           "Error", true);
       }
-    }
-
-    internal static Dictionary<string, DFWrapper.KerbalInfo> GetFrozenKerbals()
-    {
-      if (InstalledMods.IsDfInstalled)
-      {
-        var freezer = DFWrapper.DeepFreezeAPI.FrozenKerbals;
-        return freezer;
-      }
-      return new Dictionary<string, DFWrapper.KerbalInfo>();
-    }
-
-    internal static void ThawKerbal(string kerbalName)
-    {
-      try
-      {
-        if (InstalledMods.IsDfInstalled)
-        {
-          var iKerbal = FrozenKerbals[kerbalName];
-
-          var cryofreezers =
-            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
-          foreach (var cryoFreezer in cryofreezers)
-          {
-            if (cryoFreezer.flightID == iKerbal.partID)
-            {
-              // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer =
-                (from PartModule pm in cryoFreezer.Modules
-                  where pm.moduleName == "DeepFreezer"
-                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
-              if (deepFreezer != null) deepFreezer.beginThawKerbal(kerbalName);
-              break;
-            }
-          }
-        }
-        else
-        {
-          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
-            true);
-        }
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(String.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
-      }
-    }
-
-    internal static void FreezeKerbal(ProtoCrewMember kerbal)
-    {
-      try
-      {
-        if (InstalledMods.IsDfInstalled)
-        {
-          var cryofreezers =
-            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
-          foreach (var cryoFreezer in cryofreezers)
-          {
-            if (cryoFreezer.protoModuleCrew.Contains(kerbal))
-            {
-              // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer =
-                (from PartModule pm in cryoFreezer.Modules
-                  where pm.moduleName == "DeepFreezer"
-                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
-              if (deepFreezer != null) deepFreezer.beginFreezeKerbal(kerbal);
-              break;
-            }
-          }
-        }
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(String.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
-      }
-    }
-
-    internal static void RespawnKerbal(ProtoCrewMember kerbal)
-    {
-      kerbal.SetTimeForRespawn(0);
-      // This call causes issues in KSC scene, and is not needed.
-      //kerbal.Spawn();
-      kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-      HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
     }
 
     private static bool CanDisplayKerbal(ProtoCrewMember kerbal)
@@ -392,10 +296,10 @@ namespace ShipManifest.Windows
             string buttonText;
             string buttonToolTip;
             GUILayout.BeginHorizontal();
-            GUILayout.Label((string) kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
-            GUILayout.Label((string) kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
-            GUILayout.Label((string) kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
-            GUILayout.Label((string) kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
+            GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
+            GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
+            GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
+            GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
             GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
             SetupEditButton(kerbal, out buttonText, out buttonToolTip);
@@ -523,44 +427,19 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    private static string GetFrozenKerbalDetials(ProtoCrewMember kerbal)
+    internal static void GetRosterList()
     {
-      string rosterDetails;
-      if (FrozenKerbals.ContainsKey(kerbal.name))
-        rosterDetails = "Frozen - " + FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "");
-      else
-        rosterDetails = "Frozen";
-
-      return rosterDetails;
-    }
-
-    public static void ResetKerbalNames()
-    {
-      foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+      try
       {
-        if (kerbal.name.Contains(Char.ConvertFromUtf32(1)))
-        {
-          kerbal.name = kerbal.name.Replace(Char.ConvertFromUtf32(1), "");
-        }
+        RosterList.Clear();
+        RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+        // Support for DeepFreeze
+        if (InstalledMods.IsDfInstalled)
+          RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
       }
-    }
-
-    private static void SetProfessionFlag()
-    {
-      switch (SelectedKerbal.Trait)
+      catch (Exception ex)
       {
-        case "Pilot":
-          KerbalProfession = Professions.Pilot;
-          break;
-        case "Engineer":
-          KerbalProfession = Professions.Engineer;
-          break;
-        case "Scientist":
-          KerbalProfession = Professions.Scientist;
-          break;
-        default:
-          KerbalProfession = Professions.Tourist;
-          break;
+        Utilities.LogMessage(String.Format("Error in GetRosterList().\r\nError:  {0}", ex), "Error", true);
       }
     }
 
@@ -649,6 +528,128 @@ namespace ShipManifest.Windows
         buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
       }
     }
+
+    #endregion Gui Layout
+
+    #region Methods
+    private static string GetFrozenKerbalDetials(ProtoCrewMember kerbal)
+    {
+      string rosterDetails;
+      if (DFWrapper.DeepFreezeAPI.FrozenKerbals.ContainsKey(kerbal.name))
+        rosterDetails = "Frozen - " + DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "");
+      else
+        rosterDetails = "Frozen";
+
+      return rosterDetails;
+    }
+
+    public static void ResetKerbalNames()
+    {
+      foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+      {
+        if (kerbal.name.Contains(Char.ConvertFromUtf32(1)))
+        {
+          kerbal.name = kerbal.name.Replace(Char.ConvertFromUtf32(1), "");
+        }
+      }
+    }
+
+    private static void SetProfessionFlag()
+    {
+      switch (SelectedKerbal.Trait)
+      {
+        case "Pilot":
+          KerbalProfession = Professions.Pilot;
+          break;
+        case "Engineer":
+          KerbalProfession = Professions.Engineer;
+          break;
+        case "Scientist":
+          KerbalProfession = Professions.Scientist;
+          break;
+        default:
+          KerbalProfession = Professions.Tourist;
+          break;
+      }
+    }
+
+    internal static void ThawKerbal(string kerbalName)
+    {
+      try
+      {
+        if (InstalledMods.IsDfApiReady)
+        {
+          var iKerbal = DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbalName];
+
+          var cryofreezers =
+            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+          foreach (var cryoFreezer in cryofreezers)
+          {
+            if (cryoFreezer.flightID == iKerbal.partID)
+            {
+              // ReSharper disable once SuspiciousTypeConversion.Global
+              var deepFreezer =
+                (from PartModule pm in cryoFreezer.Modules
+                  where pm.moduleName == "DeepFreezer"
+                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+              if (deepFreezer != null) deepFreezer.beginThawKerbal(kerbalName);
+              break;
+            }
+          }
+        }
+        else
+        {
+          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
+            true);
+        }
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(String.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
+      }
+    }
+
+    internal static void FreezeKerbal(ProtoCrewMember kerbal)
+    {
+      try
+      {
+        if (InstalledMods.IsDfApiReady)
+        {
+          var cryofreezers =
+            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+          foreach (var cryoFreezer in cryofreezers)
+          {
+            if (cryoFreezer.protoModuleCrew.Contains(kerbal))
+            {
+              // ReSharper disable once SuspiciousTypeConversion.Global
+              var deepFreezer =
+                (from PartModule pm in cryoFreezer.Modules
+                  where pm.moduleName == "DeepFreezer"
+                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+              if (deepFreezer != null) deepFreezer.beginFreezeKerbal(kerbal);
+              break;
+            }
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(String.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
+      }
+    }
+
+    internal static void RespawnKerbal(ProtoCrewMember kerbal)
+    {
+      kerbal.SetTimeForRespawn(0);
+      // This call causes issues in KSC scene, and is not needed.
+      //kerbal.Spawn();
+      kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+      HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
+    }
+
+    #endregion Methods
 
     //Profession vars
     internal enum Professions

@@ -11,9 +11,14 @@ namespace ShipManifest.APIClients
     // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-    internal static bool IsDfInstalled
+    internal static bool IsDfApiReady
     {
       get { return DFWrapper.APIReady; }
+    }
+
+    internal static bool IsDfInstalled
+    {
+      get { return IsModInstalled("DeepFreeze"); }
     }
 
     internal static bool IsRtInstalled

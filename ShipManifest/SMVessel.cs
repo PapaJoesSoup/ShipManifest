@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
-using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using ShipManifest.Process;
@@ -188,9 +187,8 @@ namespace ShipManifest
       GetAntennas();
       GetLights();
       GetSolarPanels();
-      GetRosterList();
+      WindowRoster.GetRosterList();
       DockedVessels = null;
-      WindowRoster.FrozenKerbals = WindowRoster.GetFrozenKerbals();
 
     }
 
@@ -326,22 +324,6 @@ namespace ShipManifest
             SelectedResourcesParts.Add(part);
           }
           break;
-      }
-    }
-
-    internal void GetRosterList()
-    {
-      try
-      {
-        WindowRoster.RosterList.Clear();
-        WindowRoster.RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-        // Support for DeepFreeze
-        if (InstalledMods.IsDfInstalled)
-          WindowRoster.RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), "Error", true);
       }
     }
 

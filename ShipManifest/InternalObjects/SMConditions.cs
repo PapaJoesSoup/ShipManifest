@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ShipManifest.APIClients;
 using ShipManifest.Process;
 using ShipManifest.Windows;
@@ -54,8 +55,15 @@ namespace ShipManifest.InternalObjects
         // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
         // If there is just one spare seat or seat taken by a Thawed Kerbal that is OK because SM will just transfer them into the empty
         // seat or swap them with a thawed Kerbal.
-        var sourcepartFrzr = selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
-        var targetpartFrzr = selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+        DFWrapper.DeepFreezer sourcepartFrzr = null; // selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+        DFWrapper.DeepFreezer targetpartFrzr = null; // selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+
+        PartModule sourcedeepFreezer = (from PartModule pm in selectedPartsSource[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        if (sourcedeepFreezer != null) sourcepartFrzr = new DFWrapper.DeepFreezer(sourcedeepFreezer);
+
+        PartModule targetdeepFreezer = (from PartModule pm in selectedPartsTarget[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        if (targetdeepFreezer != null) targetpartFrzr = new DFWrapper.DeepFreezer(targetdeepFreezer);
+
         if (sourcepartFrzr != null)
         {
           if (sourcepartFrzr.FreezerSpace == 0)
@@ -302,14 +310,14 @@ namespace ShipManifest.InternalObjects
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             WindowRoster.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
+             DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool FrozenKerbalIsThawable(ProtoCrewMember kerbal)
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             WindowRoster.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
+             DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool CanKerbalBeFrozen(ProtoCrewMember kerbal)
@@ -320,7 +328,13 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsKerbalReadyToFreeze(ProtoCrewMember kerbal)
     {
-      return kerbal.seat.part.Modules.Contains("DeepFreezer") && !SMPart.IsCrewFull(kerbal.seat.part);
+      //return kerbal.seat.part.Modules.Contains("DeepFreezer") && !SMPart.IsCrewFull(kerbal.seat.part);
+      var deepFreezer =
+                (from PartModule pm in kerbal.seat.part.Modules
+                  where pm.moduleName == "DeepFreezer"
+                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
+      if (deepFreezer != null) return deepFreezer.FreezerSpace > 0;
+      return false;
     }
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)

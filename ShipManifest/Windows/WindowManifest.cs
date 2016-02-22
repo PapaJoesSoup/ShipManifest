@@ -358,7 +358,7 @@ namespace ShipManifest.Windows
           WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
           if (WindowRoster.ShowWindow)
           {
-            SMAddon.SmVessel.GetRosterList();
+            WindowRoster.GetRosterList();
           }
           else
           {

@@ -106,7 +106,7 @@ namespace ShipManifest
     internal static int GetPartCrewCount(Part part)
     {
       var crewCount = 0;
-      if (!InstalledMods.IsDfInstalled) return crewCount + part.protoModuleCrew.Count;
+      if (!InstalledMods.IsDfApiReady) return crewCount + part.protoModuleCrew.Count;
       if (part.Modules.Contains("DeepFreezer"))
       {
         var freezerModule =

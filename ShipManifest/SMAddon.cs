@@ -21,6 +21,8 @@ namespace ShipManifest
     // Game object that keeps us running
     // internal static GameObject SmInstance;
 
+    internal static bool SceneChangeInitDfWrapper;
+    
     // current vessel's controller instance
     internal static SMVessel SmVessel;
     internal static ICLSAddon ClsAddon;
@@ -174,7 +176,8 @@ namespace ShipManifest
         }
 
         // Support for DeepFreeze
-        DFWrapper.InitDFWrapper();
+        //Trigger Update to check and initialize the DeepFreeze Wrapper API
+        SceneChangeInitDfWrapper = true;
 
         // Load sounds for transfers.
         SMSound.LoadSounds();
@@ -280,6 +283,12 @@ namespace ShipManifest
       {
         CheckForToolbarTypeToggle();
 
+        if (SceneChangeInitDfWrapper && Time.timeSinceLevelLoad > 3f && !InstalledMods.IsDfApiReady)
+        {
+          DFWrapper.InitDFWrapper();
+          SceneChangeInitDfWrapper = false;
+        }
+
         if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel == null) return;
 
@@ -336,20 +345,22 @@ namespace ShipManifest
     // save settings on scene changes
     private void OnGameSceneLoadRequested(GameScenes requestedScene)
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnGameSceneLoadRequested");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnGameSceneLoadRequested");
       SMSettings.SaveSettings();
+      if (InstalledMods.IsDfInstalled)
+        SceneChangeInitDfWrapper = true;
     }
 
     // SM UI toggle handlers
     private void OnShowUi()
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnShowUI");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnShowUI");
       ShowUi = true;
     }
 
     private void OnHideUi()
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnHideUI");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnHideUI");
       ShowUi = false;
     }
 
@@ -385,7 +396,7 @@ namespace ShipManifest
       else
       {
         //Check for DeepFreezer full. if full, abort handling Xfer.
-        if (InstalledMods.IsDfInstalled && action.to.Modules.Contains("DeepFreezer"))
+        if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && action.to.Modules.Contains("DeepFreezer"))
           if (new DFWrapper.DeepFreezer(action.to.Modules["DeepFreezer"]).FreezerSpace == 0) return;
 
         // If we are here, then we want to override the Stock Xfer...
@@ -631,7 +642,7 @@ namespace ShipManifest
 
     internal static void OnSmRosterClicked()
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle");
+      //Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle");
       try
       {
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -645,8 +656,7 @@ namespace ShipManifest
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
                 WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
-
-          WindowRoster.FrozenKerbals = WindowRoster.GetFrozenKerbals();
+          if (WindowRoster.ShowWindow) WindowRoster.GetRosterList();
         }
       }
       catch (Exception ex)
@@ -657,7 +667,7 @@ namespace ShipManifest
 
     internal static void OnSmSettingsClicked()
     {
-      Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
+      //Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
       try
       {
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)

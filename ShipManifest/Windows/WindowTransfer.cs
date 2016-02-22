@@ -340,10 +340,9 @@ namespace ShipManifest.Windows
 
           // set the conditions for a button style change.
           var btnWidth = 273; // Start with full witth button...
-          if (SMSettings.RealismMode && SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = 223;
-          else if (!SMSettings.RealismMode && !selectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
-            btnWidth = 193;
+          if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
+            btnWidth = SMSettings.RealismMode ? 223 : 193;
+
           // Set style based on viewer and toggled state.
           step = "Set style";
           var style = GetPartButtonStyle(pumpType, part);
@@ -590,13 +589,15 @@ namespace ShipManifest.Windows
         GUILayout.EndHorizontal();
       }
       // Cater for DeepFreeze Continued... parts - list frozen kerbals
-      if (!InstalledMods.IsDfInstalled) return;
+      if (!InstalledMods.IsDfApiReady) return;
       {
         try
         {
-          var sourcepartFrzr = selectedPartsFrom[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
-          if (sourcepartFrzr == null) return;
+          PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+          if (deepFreezer == null) return;
+          DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
           if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
+          var frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
           foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
           {
             GUILayout.BeginHorizontal();
@@ -613,7 +614,7 @@ namespace ShipManifest.Windows
                 yOffset - scrollPosition.y);
             }
 
-            var trait = WindowRoster.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
+            var trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
             GUI.enabled = true;
             GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
               GUILayout.Width(190), GUILayout.Height(20));
@@ -635,8 +636,11 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
-          Debug.Log(ex.Message);
+          Utilities.LogMessage(
+            string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
+              ex.Message, ex.StackTrace), "Error", true);
+          //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
+          //Debug.Log(ex.Message);
         }
       }
     }
@@ -1119,45 +1123,6 @@ namespace ShipManifest.Windows
 
     #region Utilities
 
-    private static bool CanShowVessels()
-    {
-      return SMAddon.SmVessel.DockedVessels.Count > 0 &&
-             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString());
-    }
-
-    private static int GetScienceCount(Part part)
-    {
-      try
-      {
-        return part.Modules.OfType<IScienceDataContainer>().Sum(pm => pm.GetScienceCount());
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
-        return 0;
-      }
-    }
-
-    private static bool IsPartSelectable(string selectedResource, TransferPump.TypePump pumpType, Part part)
-    {
-      if (selectedResource == SMConditions.ResourceType.Crew.ToString() ||
-          selectedResource == SMConditions.ResourceType.Science.ToString()) return true;
-      var isSelectable = true;
-      if (pumpType == TransferPump.TypePump.SourceToTarget)
-      {
-        if (SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
-          isSelectable = false;
-      }
-      else
-      {
-        if (SMAddon.SmVessel.SelectedPartsSource.Contains(part))
-          isSelectable = false;
-      }
-      return isSelectable;
-    }
-
     private static bool CanDumpPart(Part part)
     {
       bool isDumpable;
@@ -1168,6 +1133,13 @@ namespace ShipManifest.Windows
         isDumpable = part.Resources[SMAddon.SmVessel.SelectedResources[0]].amount > 0;
 
       return isDumpable;
+    }
+
+    private static bool CanShowVessels()
+    {
+      return SMAddon.SmVessel.DockedVessels.Count > 0 &&
+             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
+             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString());
     }
 
     private static bool CanSelectVessel(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
@@ -1204,24 +1176,6 @@ namespace ShipManifest.Windows
       return style;
     }
 
-    private static GUIStyle GetVesselButtonStyle(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
-    {
-      GUIStyle style;
-      if (pumpType == TransferPump.TypePump.SourceToTarget)
-      {
-        style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel)
-          ? SMStyle.ButtonToggledSourceStyle
-          : SMStyle.ButtonSourceStyle;
-      }
-      else
-      {
-        style = SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel)
-          ? SMStyle.ButtonToggledTargetStyle
-          : SMStyle.ButtonTargetStyle;
-      }
-      return style;
-    }
-
     private static string GetResourceDescription(IList<string> selectedResources, Part part)
     {
       string strDescription;
@@ -1250,6 +1204,38 @@ namespace ShipManifest.Windows
       return strDescription;
     }
 
+    private static int GetScienceCount(Part part)
+    {
+      try
+      {
+        return part.Modules.OfType<IScienceDataContainer>().Sum(pm => pm.GetScienceCount());
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          "Error", true);
+        return 0;
+      }
+    }
+
+    private static GUIStyle GetVesselButtonStyle(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
+    {
+      GUIStyle style;
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
+      {
+        style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel)
+          ? SMStyle.ButtonToggledSourceStyle
+          : SMStyle.ButtonSourceStyle;
+      }
+      else
+      {
+        style = SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel)
+          ? SMStyle.ButtonToggledTargetStyle
+          : SMStyle.ButtonTargetStyle;
+      }
+      return style;
+    }
+
     internal static string GetVesselResourceTotals(ModDockedVessel modDockedVessel, List<string> selectedResources)
     {
       double currAmount = 0;
@@ -1270,6 +1256,24 @@ namespace ShipManifest.Windows
       var displayAmount = string.Format("({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"));
 
       return displayAmount;
+    }
+
+    private static bool IsPartSelectable(string selectedResource, TransferPump.TypePump pumpType, Part part)
+    {
+      if (selectedResource == SMConditions.ResourceType.Crew.ToString() ||
+          selectedResource == SMConditions.ResourceType.Science.ToString()) return true;
+      var isSelectable = true;
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
+      {
+        if (SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
+          isSelectable = false;
+      }
+      else
+      {
+        if (SMAddon.SmVessel.SelectedPartsSource.Contains(part))
+          isSelectable = false;
+      }
+      return isSelectable;
     }
 
     #endregion
