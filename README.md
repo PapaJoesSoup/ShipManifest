@@ -1,5 +1,19 @@
 ShipManifest
 ============
+Version 5.0.0.0 - Release 22 Feb, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
+- New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
+        with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
+- New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
+        per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
+- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
+        A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
+- New:  Added build package automation and distribution.
+- New:  Removed need for DFInterface.dll.  Now using new reflection class method for soft dependency to DeepFreeze.
+- Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
+- Fixed:  Corrected nested control displays in settings.
+- Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
+- Fixed:  Corrected staging error where SM cannot be displayed during launch.  
+
 Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
 - New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  
         KSP 1.0.5 now supports native kerbal profession managment, so kerbal profession now saves to game save.  
