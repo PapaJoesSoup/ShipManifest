@@ -1,4 +1,4 @@
-﻿Version 5.0.0.0 - Release xx Jan, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
+﻿Version 5.0.0.0 - Release 22 Feb, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
         with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
 - New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.

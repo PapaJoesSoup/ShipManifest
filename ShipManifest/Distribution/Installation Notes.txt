@@ -1,13 +1,13 @@
 ----------------
 Ship Manifest
 ----------------
-Current Version 5.0.0.0 - Release xx Jan, 2015 - Refactoring Edition.  New!!  Fuel Depot Operations - multiple transfers & dumps at the same time!
+Current Version 5.0.0.0 - Release 22 Feb, 2015 - Refactoring Edition.  New!!  Fuel Depot Operations - multiple transfers & dumps at the same time!
 
 KSP Version supported:  1.0.5
 ----------------
 
 ----------------
-Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
+Download: SpaceDock - http://spacedock.info/mod/189/ShipManifest
           CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
 Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
