@@ -99,7 +99,7 @@ namespace ShipManifest.InternalObjects
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         // ReSharper disable once PossibleIntendedRethrow
         throw ex;
       }

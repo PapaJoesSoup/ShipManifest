@@ -116,7 +116,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(String.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -358,7 +358,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          String.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          String.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -439,7 +439,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format("Error in GetRosterList().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(String.Format("Error in GetRosterList().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -599,14 +599,14 @@ namespace ShipManifest.Windows
         }
         else
         {
-          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), "Info",
+          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), Utilities.LogType.Info,
             true);
         }
       }
       catch (Exception ex)
       {
         Utilities.LogMessage(String.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -636,7 +636,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(String.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 

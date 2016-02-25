@@ -13,7 +13,7 @@ namespace ShipManifest.Process
 
         if (moduleScience != null && moduleScience.Length > 0)
         {
-          //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", "Info",
+          //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", Utilities.LogType.Info,
           //  SMSettings.VerboseLogging);
 
           if ((IScienceDataContainer) target != null)
@@ -34,7 +34,7 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(" in ProcessController.TransferScience:  Error:  " + ex, "Info", SMSettings.VerboseLogging);
+        Utilities.LogMessage(" in ProcessController.TransferScience:  Error:  " + ex, Utilities.LogType.Info, SMSettings.VerboseLogging);
       }
     }
 
@@ -63,7 +63,7 @@ namespace ShipManifest.Process
           //Not in Realism mode, so just move the resource...
           foreach (var pump in xferPumps)
           {
-            pump.RunCycle(pump.PumpAmount);
+            pump.RunPumpCycle(pump.PumpAmount);
           }
         }
       }
@@ -71,7 +71,7 @@ namespace ShipManifest.Process
       {
         Utilities.LogMessage(
           string.Format(" in  ProcessController.TransferResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -98,7 +98,7 @@ namespace ShipManifest.Process
         {
           foreach (var pump in pumps)
           {
-            pump.RunCycle(pump.PumpAmount);
+            pump.RunPumpCycle(pump.PumpAmount);
           }
           SMAddon.SmVessel.TransferPumps.Clear();
         }
@@ -107,7 +107,7 @@ namespace ShipManifest.Process
       {
         Utilities.LogMessage(
           string.Format(" in  ProcessController.DumpResources.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
   }

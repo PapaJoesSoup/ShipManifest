@@ -267,10 +267,10 @@ namespace ShipManifest.Process
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage("Transfer State:  " + CrewXferState + "...", "Error", true);
+          Utilities.LogMessage("Transfer State:  " + CrewXferState + "...", Utilities.LogType.Error, true);
           Utilities.LogMessage(
             string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), "Error", true);
+              ex.StackTrace), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
           ResetXferProcess();
         }
@@ -370,7 +370,7 @@ namespace ShipManifest.Process
       {
         Utilities.LogMessage(
           string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), "Error", true);
+            ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 

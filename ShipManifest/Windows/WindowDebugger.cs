@@ -36,7 +36,7 @@ namespace ShipManifest.Windows
         GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
-      foreach (var error in Utilities.Errors)
+      foreach (var error in Utilities.LogItemList)
         GUILayout.TextArea(error, GUILayout.Width(460));
 
       GUILayout.EndVertical();
@@ -45,8 +45,8 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       if (GUILayout.Button("Clear log", GUILayout.Height(20)))
       {
-        Utilities.Errors.Clear();
-        Utilities.Errors.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " UTC.");
+        Utilities.LogItemList.Clear();
+        Utilities.LogItemList.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " UTC.");
       }
       if (GUILayout.Button("Save Log", GUILayout.Height(20)))
       {
@@ -87,28 +87,28 @@ namespace ShipManifest.Windows
           SMSettings.DebugLogPath += @"\";
 
         filename = path + SMSettings.DebugLogPath + filename;
-        Utilities.LogMessage("File Name = " + filename, "Info", true);
+        Utilities.LogMessage("File Name = " + filename, Utilities.LogType.Info, true);
 
         try
         {
           var sb = new StringBuilder();
-          foreach (var line in Utilities.Errors)
+          foreach (var line in Utilities.LogItemList)
           {
             sb.AppendLine(line);
           }
 
           File.WriteAllText(filename, sb.ToString());
 
-          Utilities.LogMessage("File written", "Info", true);
+          Utilities.LogMessage("File written", Utilities.LogType.Info, true);
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage("Error Writing File:  " + ex, "Error", true);
+          Utilities.LogMessage("Error Writing File:  " + ex, Utilities.LogType.Error, true);
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+        Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
           true);
       }
     }

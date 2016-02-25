@@ -95,7 +95,7 @@ namespace ShipManifest.InternalObjects
       catch (Exception ex)
       {
         Utilities.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
       if (WindowTransfer.XferToolTip == "")
         WindowTransfer.XferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
@@ -144,7 +144,7 @@ namespace ShipManifest.InternalObjects
         if (!SMAddon.FrameErrTripped)
         {
           Utilities.LogMessage(
-            string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
             true);
           SMAddon.FrameErrTripped = true;
         }
@@ -193,7 +193,7 @@ namespace ShipManifest.InternalObjects
 
           Utilities.LogMessage(
             string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
-              ex.Message, ex.StackTrace, values), "Error", true);
+              ex.Message, ex.StackTrace, values), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
         return false;

@@ -292,13 +292,13 @@ namespace ShipManifest.APIClients
         actualStoredCrewList = StoredCrewListMethod.Invoke(actualDeepFreezer, null);
 
         //Methods
-        LogFormatted("Getting beginFreezeKerbalMethod Method");
+        //LogFormatted("Getting beginFreezeKerbalMethod Method");
         beginFreezeKerbalMethod = DeepFreezerType.GetMethod("beginFreezeKerbal", BindingFlags.Public | BindingFlags.Instance);
-        LogFormatted_DebugOnly("Success: " + (beginFreezeKerbalMethod != null).ToString());
+        //LogFormatted_DebugOnly("Success: " + (beginFreezeKerbalMethod != null).ToString());
 
-        LogFormatted("Getting beginThawKerbalMethod Method");
+        //LogFormatted("Getting beginThawKerbalMethod Method");
         beginThawKerbalMethod = DeepFreezerType.GetMethod("beginThawKerbal", BindingFlags.Public | BindingFlags.Instance);
-        LogFormatted_DebugOnly("Success: " + (beginThawKerbalMethod != null).ToString());
+        //LogFormatted_DebugOnly("Success: " + (beginThawKerbalMethod != null).ToString());
       }
 
       private Object actualDeepFreezer;

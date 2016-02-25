@@ -27,11 +27,11 @@ namespace ShipManifest.Windows
     internal static bool ShowSourceVessels;
     internal static bool ShowTargetVessels;
 
-    // this list is for display use.  Transfers are executed against a separate list.  These objects may be used to derive objgectes to be added to the process queue.
+    // this list is for display use.  Transfers are executed against a separate list.  
+    // These objects may be used to derive objectes to be added to the transfer process queue.
     internal static List<TransferPump> DisplayPumps = new List<TransferPump>();
 
     private static Dictionary<PartModule, bool> _scienceModulesSource;
-
     internal static Dictionary<PartModule, bool> ScienceModulesSource
     {
       get
@@ -130,7 +130,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -201,7 +201,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in Ship Manifest Window - SourceTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), "Error", true);
+            ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -238,7 +238,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in WindowTransfer.SourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -278,7 +278,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in Ship Manifest Window - TargetTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), "Error", true);
+            ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -315,7 +315,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in WindowTransfer.TargetDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -422,7 +422,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             "Error in Windowtransfer.PartsTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
-            "Error", true);
+            Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -523,7 +523,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             "Error in Windowtransfer.VesselTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
-            "Error", true);
+            Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -638,7 +638,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
-              ex.Message, ex.StackTrace), "Error", true);
+              ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
           //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
           //Debug.Log(ex.Message);
         }
@@ -1011,7 +1011,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             string.Format(" in WindowTransfer.ResourceFlowButtons at step:  " + step + ".  Error:  {0} \r\n\r\n{1}",
-              ex.Message, ex.StackTrace), "Error", true);
+              ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -1073,7 +1073,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             "Error in WindowTransfer.PartButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
-            "Error", true);
+            Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -1113,7 +1113,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             "Error in WindowTransfer.VesselButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
-            "Error", true);
+            Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -1137,9 +1137,7 @@ namespace ShipManifest.Windows
 
     private static bool CanShowVessels()
     {
-      return SMAddon.SmVessel.DockedVessels.Count > 0 &&
-             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-             !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString());
+      return SMAddon.SmVessel.DockedVessels.Count > 0 && SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources);
     }
 
     private static bool CanSelectVessel(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
@@ -1213,7 +1211,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
         return 0;
       }
     }
@@ -1251,7 +1249,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in DisplayVesselResourceTotals().  Error:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format(" in DisplayVesselResourceTotals().  Error:  {0}", ex), Utilities.LogType.Error, true);
       }
       var displayAmount = string.Format("({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"));
 

@@ -526,10 +526,10 @@ namespace ShipManifest
       try
       {
         var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
-        thisRect.x = rectNode.HasValue("x") ? float.Parse(rectNode.GetValue("x")) : defaultvalue.x;
-        thisRect.y = rectNode.HasValue("y") ? float.Parse(rectNode.GetValue("y")) : defaultvalue.y;
-        thisRect.width = rectNode.HasValue("width") ? float.Parse(rectNode.GetValue("width")) : defaultvalue.width;
-        thisRect.height = rectNode.HasValue("height") ? float.Parse(rectNode.GetValue("height")) : defaultvalue.height;
+        thisRect.x = rectNode.HasValue("x") ? (float)int.Parse(rectNode.GetValue("x")) : defaultvalue.x;
+        thisRect.y = rectNode.HasValue("y") ? (float)int.Parse(rectNode.GetValue("y")) : defaultvalue.y;
+        thisRect.width = rectNode.HasValue("width") ? (float)int.Parse(rectNode.GetValue("width")) : defaultvalue.width;
+        thisRect.height = rectNode.HasValue("height") ? (float)int.Parse(rectNode.GetValue("height")) : defaultvalue.height;
       }
       catch
       {
@@ -543,10 +543,10 @@ namespace ShipManifest
     private static void WriteRectangle(ConfigNode windowsNode, string rectName, Rect rectValue)
     {
       var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
-      WriteValue(rectNode, "x", rectValue.x);
-      WriteValue(rectNode, "y", rectValue.y);
-      WriteValue(rectNode, "width", rectValue.width);
-      WriteValue(rectNode, "height", rectValue.height);
+      WriteValue(rectNode, "x", (int)rectValue.x);
+      WriteValue(rectNode, "y", (int)rectValue.y);
+      WriteValue(rectNode, "width", (int)rectValue.width);
+      WriteValue(rectNode, "height", (int)rectValue.height);
     }
 
     private static void WriteValue(ConfigNode configNode, string valueName, object value)

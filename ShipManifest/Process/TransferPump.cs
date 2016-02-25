@@ -82,7 +82,7 @@ namespace ShipManifest.Process
         {
           Utilities.LogMessage(
             string.Format(" in TransferPump.ProcessActivePumps (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), "Error", true);
+              ex.StackTrace), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
 
           // ReSharper disable once PossibleIntendedRethrow
@@ -350,7 +350,7 @@ namespace ShipManifest.Process
         if (ConsumeCharge(deltaCharge))
         {
           // 4.  Get list of From parts & Pump Resource
-          RunCycle(deltaAmt);
+          RunPumpCycle(deltaAmt);
         }
         else
         {
@@ -374,7 +374,7 @@ namespace ShipManifest.Process
       Elapsed = 0;
     }
 
-    internal void RunCycle(double cycleAmount)
+    internal void RunPumpCycle(double cycleAmount)
     {
       // This var keeps track of what we actually moved..
       var cycleBalance = cycleAmount;
@@ -415,24 +415,24 @@ namespace ShipManifest.Process
         // Calculate pump amounts for each From/Dump part and Decrement.
         foreach (var part in FromParts)
         {
-          var amtToMove = part.Resources[Resource].amount >= fromPartAmt ? fromPartAmt : part.Resources[Resource].amount;
-          part.Resources[Resource].amount -= amtToMove;
+          var amtToRemove = part.Resources[Resource].amount >= fromPartAmt ? fromPartAmt : part.Resources[Resource].amount;
+          part.Resources[Resource].amount -= amtToRemove;
           if (part.Resources[Resource].amount <= SMSettings.Tolerance) part.Resources[Resource].amount = 0;
 
           // Report ramaining balance after Transfer.
-          cycleBalance -= amtToMove;
-          AmtPumped += amtToMove;
+          cycleBalance -= amtToRemove;
+          AmtPumped += amtToRemove;
         }
         if (PumpType != TypePump.Dump)
         {
           // Calculate pump amounts for each To part and Increment.
           foreach (var part in ToParts)
           {
-            var amtToMove = part.Resources[Resource].maxAmount - part.Resources[Resource].amount >= toPartAmt
+            var amtToAdd = part.Resources[Resource].maxAmount - part.Resources[Resource].amount >= toPartAmt
               ? toPartAmt
               : part.Resources[Resource].amount;
 
-            part.Resources[Resource].amount += amtToMove;
+            part.Resources[Resource].amount += amtToAdd;
             if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
               part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
           }

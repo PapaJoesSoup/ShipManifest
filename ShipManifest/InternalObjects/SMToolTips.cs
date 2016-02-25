@@ -18,7 +18,7 @@ namespace ShipManifest.InternalObjects
     {
       if (!string.IsNullOrEmpty(ToolTip))
       {
-        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), "Info", Settings.VerboseLogging);
+        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), Utilities.LogType.Info, Settings.VerboseLogging);
         ShowToolTip(ToolTipPos, ToolTip);
       }
 

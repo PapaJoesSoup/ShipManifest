@@ -49,7 +49,7 @@ namespace ShipManifest.Windows.Tabs
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in Light Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), "Error",
+          string.Format(" in Light Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), Utilities.LogType.Error,
           true);
       }
       GUILayout.EndVertical();
