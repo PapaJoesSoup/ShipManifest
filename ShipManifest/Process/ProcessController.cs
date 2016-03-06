@@ -5,6 +5,58 @@ namespace ShipManifest.Process
 {
   internal static class ProcessController
   {
+	internal enum Selection
+		{
+			All,
+			OnlyProcessed,
+			OnlyUnprocessed,
+		};
+
+    internal static void TransferScienceLab(PartModule source, PartModule target, Selection sel)
+    {
+      try
+      {
+		// Create lookup list to avoid a slow linear search for each item
+		// Value is number of labs that have processed it
+		// (would allow to only move data not processed in all labs if there are multiple)
+		var processedScience = new Dictionary<string, int>();
+
+		foreach (var lab in SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>())
+		{
+			foreach (var data in lab.ExperimentData)
+			{
+				if (!processedScience.ContainsKey(data))
+					processedScience.Add(data, 1);
+				else
+					processedScience[data]++;
+			}
+		}
+
+		var moduleScience = (IScienceDataContainer) source != null ? ((IScienceDataContainer) source).GetData() : null;
+
+		if (moduleScience != null && moduleScience.Length > 0)
+		{
+			foreach (var data in moduleScience)
+			{
+				bool processed = processedScience.ContainsKey(data.subjectID);
+
+				if ( (sel == Selection.OnlyProcessed && processed) ||
+					 (sel == Selection.OnlyUnprocessed && !processed))
+				{
+					if (((ModuleScienceContainer) target).AddData(data))
+					{
+						((IScienceDataContainer) source).DumpData(data);
+					}
+				}
+			}
+		}
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(" in ProcessController.TransferScience:  Error:  " + ex, "Info", SMSettings.VerboseLogging);
+      }
+    }
+
     internal static void TransferScience(PartModule source, PartModule target)
     {
       try

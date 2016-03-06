@@ -711,6 +711,27 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.SelectedModuleTarget);
             SMAddon.SmVessel.SelectedModuleSource = null;
           }
+		  if (GUI.enabled && SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().Count > 0)
+		  {
+			if (GUILayout.Button(new GUIContent("Proc", "Transfer only science that was already processed"), SMStyle.ButtonStyle, GUILayout.Width(40),
+			                     GUILayout.Height(20)))
+			{
+				SMAddon.SmVessel.SelectedModuleSource = pm;
+				ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
+				                                     SMAddon.SmVessel.SelectedModuleTarget,
+							                         ProcessController.Selection.OnlyProcessed);
+				SMAddon.SmVessel.SelectedModuleSource = null;
+			}
+			if (GUILayout.Button(new GUIContent("Unproc", "Transfer only science that was not processed yet"), SMStyle.ButtonStyle, GUILayout.Width(50),
+			                     GUILayout.Height(20)))
+			{
+				SMAddon.SmVessel.SelectedModuleSource = pm;
+				ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
+				                                     SMAddon.SmVessel.SelectedModuleTarget,
+							                         ProcessController.Selection.OnlyUnprocessed);
+				SMAddon.SmVessel.SelectedModuleSource = null;
+			}
+		  }
           if (Event.current.type == EventType.Repaint && ShowToolTips)
           {
             var rect = GUILayoutUtility.GetLastRect();
