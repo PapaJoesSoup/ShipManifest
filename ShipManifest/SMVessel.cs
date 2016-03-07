@@ -112,7 +112,6 @@ namespace ShipManifest
 
     // Control Window parts
     private List<ModHatch> _hatches = new List<ModHatch>();
-
     internal List<ModHatch> Hatches
     {
       get { return _hatches ?? (_hatches = new List<ModHatch>()); }
@@ -124,7 +123,6 @@ namespace ShipManifest
     }
 
     private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
-
     internal List<ModSolarPanel> SolarPanels
     {
       get { return _solarPanels ?? (_solarPanels = new List<ModSolarPanel>()); }
@@ -136,7 +134,6 @@ namespace ShipManifest
     }
 
     private List<ModLight> _lights = new List<ModLight>();
-
     internal List<ModLight> Lights
     {
       get { return _lights ?? (_lights = new List<ModLight>()); }
@@ -148,7 +145,6 @@ namespace ShipManifest
     }
 
     private List<ModAntenna> _antennas = new List<ModAntenna>();
-
     internal List<ModAntenna> Antennas
     {
       get { return _antennas ?? (_antennas = new List<ModAntenna>()); }
@@ -255,7 +251,7 @@ namespace ShipManifest
               {
                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
                 if (SMSettings.RealismMode &&
-                    (!SMSettings.RealismMode || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
+                    (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
                   continue;
                 var vResourceFound = false;
                 // is resource in the list yet?.
@@ -545,7 +541,7 @@ namespace ShipManifest
         SMAddon.SmVessel.TransferPumps.AddRange(pumpList);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else TransferPump.AbortPumpProcess(pumpId);
+      else TransferPump.AbortAllPumpsInProcess(pumpId);
     }
 
     internal static void ToggleDumpResource(string resourceName, uint pumpId)
@@ -562,7 +558,7 @@ namespace ShipManifest
         SMAddon.SmVessel.TransferPumps.Add(pump);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else TransferPump.AbortPumpProcess(pumpId);
+      else TransferPump.AbortAllPumpsInProcess(pumpId);
     }
 
     internal void FillResources()

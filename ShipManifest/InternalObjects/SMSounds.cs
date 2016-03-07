@@ -47,7 +47,8 @@ namespace ShipManifest.InternalObjects
         SourceCrewRun = go.AddComponent<AudioSource>();
         SourceCrewStop = go.AddComponent<AudioSource>();
 
-        if (GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStart) && GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathRun) &&
+        if (GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStart) && 
+            GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathRun) &&
             GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStop))
         {
           ClipCrewStart = GameDatabase.Instance.GetAudioClip(AudioSourceCrewPathStart);
@@ -69,12 +70,13 @@ namespace ShipManifest.InternalObjects
           SourceCrewStop.pitch = 1f;
         }
 
-        // Now do Crew sounds
+        // Now do Pump sounds
         SourcePumpStart = go.AddComponent<AudioSource>();
         SourcePumpRun = go.AddComponent<AudioSource>();
         SourcePumpStop = go.AddComponent<AudioSource>();
 
-        if (GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStart) && GameDatabase.Instance.ExistsAudioClip(SourcePumpPathRun) &&
+        if (GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStart) && 
+            GameDatabase.Instance.ExistsAudioClip(SourcePumpPathRun) &&
             GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStop))
         {
           ClipPumpStart = GameDatabase.Instance.GetAudioClip(SourcePumpPathStart);

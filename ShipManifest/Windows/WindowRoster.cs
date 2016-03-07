@@ -81,7 +81,7 @@ namespace ShipManifest.Windows
       }
 
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       try
       {
         GUILayout.BeginVertical();
@@ -105,7 +105,7 @@ namespace ShipManifest.Windows
           }
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
           GUILayout.EndHorizontal();
         }
 
@@ -178,7 +178,7 @@ namespace ShipManifest.Windows
       }
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       guilabel = new GUIContent("Cancel", "Cancels current creation and exit editor.");
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
@@ -187,7 +187,7 @@ namespace ShipManifest.Windows
       }
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.EndHorizontal();
     }
 
@@ -319,8 +319,7 @@ namespace ShipManifest.Windows
             }
             var rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, XOffset,
-                YOffset - _scrollViewerPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
 
             // Setup buttons with gui state, button text and tooltip.
             SetupActionButton(kerbal, out buttonText, out buttonToolTip);
@@ -345,8 +344,7 @@ namespace ShipManifest.Windows
             }
             var rect2 = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect2, Position, GUI.tooltip, ref ToolTipActive, XOffset,
-                YOffset - _scrollViewerPosition.y);
+              ToolTip = SMToolTips.SetActiveToolTip(rect2, GUI.tooltip, ref ToolTipActive, XOffset);
             GUILayout.EndHorizontal();
             GUI.enabled = true;
           }
@@ -423,7 +421,7 @@ namespace ShipManifest.Windows
       }
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.EndHorizontal();
     }
 

@@ -300,13 +300,17 @@ namespace ShipManifest
         // PumpActive is flagged in the Resource Controller
         if (TransferPump.PumpProcessOn)
         {
-          if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
-            TransferPump.ProcessActivePumps();
-          else
+          if (TransferPump.PumpHalfCycleLatch)
           {
-            TransferPump.PumpProcessOn = false;
-            SmVessel.TransferPumps.Clear();
+            if ((from pump in SmVessel.TransferPumps where pump.IsPumpOn select pump).Any())
+              TransferPump.ProcessActivePumps();
+            else
+            {
+              TransferPump.PumpProcessOn = false;
+              SmVessel.TransferPumps.Clear();
+            }
           }
+          TransferPump.PumpHalfCycleLatch = !TransferPump.PumpHalfCycleLatch;
         }
 
         // Realism Mode Crew transfer operation (real time)
@@ -787,16 +791,27 @@ namespace ShipManifest
 
     internal static void RepositionWindow(ref Rect windowPosition)
     {
-      if (windowPosition.x < 0)
-        windowPosition.x = 0;
-      if (windowPosition.y < 0)
-        windowPosition.y = 0;
-      if (windowPosition.xMax > Screen.currentResolution.width)
-        windowPosition.x = Screen.currentResolution.width - windowPosition.width;
-      if (windowPosition.yMax > Screen.currentResolution.height)
-        windowPosition.y = Screen.currentResolution.height - windowPosition.height;
+      // This method uses Gui point system.
+      if (windowPosition.x < 0) windowPosition.x = 0;
+      if (windowPosition.y < 0) windowPosition.y = 0;
+
+      if (windowPosition.xMax > Screen.width)
+        windowPosition.x = Screen.width - windowPosition.width;
+      if (windowPosition.yMax > Screen.height)
+        windowPosition.y = Screen.height - windowPosition.height;
     }
 
+    internal static Rect GuiToScreenRect(Rect rect)
+    {
+      // Must run during OnGui to work...
+      var newRect = new Rect
+      {
+        position = GUIUtility.GUIToScreenPoint(rect.position),
+        width = rect.width,
+        height = rect.height
+      };
+      return newRect;
+    }
     #endregion
 
     #region Action Methods

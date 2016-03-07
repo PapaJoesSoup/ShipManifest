@@ -29,7 +29,7 @@ namespace ShipManifest.Windows
         ToolTip = "";
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
       Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, SMStyle.ScrollStyle,

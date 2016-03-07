@@ -87,9 +87,13 @@ namespace ShipManifest
     internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
     internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
     internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
+    internal static double PumpSoundVol = 1; // Range = 0...1
+
     internal static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
     internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
     internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
+    internal static double CrewSoundVol = 1; // Range = 0...1
+
 
     //Config Tab options
     internal static bool EnableBlizzyToolbar;
@@ -113,8 +117,6 @@ namespace ShipManifest
     internal static string MouseOverColor = "green";
     internal static double CrewXferDelaySec = 7;
     internal static int IvaUpdateFrameDelay = 20;
-    internal static double PumpSoundVol = 3;
-    internal static double CrewSoundVol = 3;
     internal static bool EnableOnCrewTransferEvent = true;
 
 
@@ -156,6 +158,9 @@ namespace ShipManifest
     internal static string PrevCrewSoundStart = "ShipManifest/Sounds/14214-1";
     internal static string PrevCrewSoundRun = "ShipManifest/Sounds/14214-2";
     internal static string PrevCrewSoundStop = "ShipManifest/Sounds/14214-3";
+    internal static double PrevPumpSoundVol = 1;
+    internal static double PrevCrewSoundVol = 1;
+
 
     // these values have no non prev counterpart.  Each window contains an EnableToolTip property 
     // that is directly assigned on load and directly retrieved on save
@@ -338,6 +343,13 @@ namespace ShipManifest
         CrewSoundRun = settingsNode.HasValue("CrewSoundRun") ? settingsNode.GetValue("CrewSoundRun") : CrewSoundRun;
         CrewSoundStop = settingsNode.HasValue("CrewSoundStop") ? settingsNode.GetValue("CrewSoundStop") : CrewSoundStop;
 
+        PumpSoundVol = settingsNode.HasValue("PumpSoundVol")
+          ? double.Parse(settingsNode.GetValue("PumpSoundVol"))
+          : PumpSoundVol;
+        CrewSoundVol = settingsNode.HasValue("CrewSoundVol")
+          ? double.Parse(settingsNode.GetValue("CrewSoundVol"))
+          : CrewSoundVol;
+
         // Config Settings
         EnableBlizzyToolbar = settingsNode.HasValue("EnableBlizzyToolbar")
           ? bool.Parse(settingsNode.GetValue("EnableBlizzyToolbar"))
@@ -382,14 +394,6 @@ namespace ShipManifest
           ? hiddenNode.GetValue("TargetPartCrewColor")
           : TargetPartCrewColor;
         MouseOverColor = hiddenNode.HasValue("MouseOverColor") ? hiddenNode.GetValue("MouseOverColor") : MouseOverColor;
-
-        //Hidden sound
-        PumpSoundVol = hiddenNode.HasValue("PumpSoundVol")
-          ? double.Parse(hiddenNode.GetValue("PumpSoundVol"))
-          : PumpSoundVol;
-        CrewSoundVol = hiddenNode.HasValue("CrewSoundVol")
-          ? double.Parse(hiddenNode.GetValue("CrewSoundVol"))
-          : CrewSoundVol;
 
         // Hidden config
         CrewXferDelaySec = hiddenNode.HasValue("CrewXferDelaySec")
@@ -487,6 +491,8 @@ namespace ShipManifest
         WriteValue(settingsNode, "CrewSoundStart", CrewSoundStart);
         WriteValue(settingsNode, "CrewSoundRun", CrewSoundRun);
         WriteValue(settingsNode, "CrewSoundStop", CrewSoundStop);
+        WriteValue(settingsNode, "PumpSoundVol", PumpSoundVol);
+        WriteValue(settingsNode, "CrewSoundVol", CrewSoundVol);
 
         // Config Settings
         WriteValue(settingsNode, "ShowDebugger", WindowDebugger.ShowWindow);
@@ -508,8 +514,6 @@ namespace ShipManifest
         WriteValue(hiddenNode, "TargetPartColor", TargetPartColor);
         WriteValue(hiddenNode, "TargetPartCrewColor", TargetPartCrewColor);
         WriteValue(hiddenNode, "MouseOverColor", MouseOverColor);
-        WriteValue(hiddenNode, "PumpSoundVol", PumpSoundVol);
-        WriteValue(hiddenNode, "CrewSoundVol", CrewSoundVol);
         WriteValue(hiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
         WriteValue(hiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
         WriteValue(hiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
@@ -526,10 +530,10 @@ namespace ShipManifest
       try
       {
         var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
-        thisRect.x = rectNode.HasValue("x") ? (float)int.Parse(rectNode.GetValue("x")) : defaultvalue.x;
-        thisRect.y = rectNode.HasValue("y") ? (float)int.Parse(rectNode.GetValue("y")) : defaultvalue.y;
-        thisRect.width = rectNode.HasValue("width") ? (float)int.Parse(rectNode.GetValue("width")) : defaultvalue.width;
-        thisRect.height = rectNode.HasValue("height") ? (float)int.Parse(rectNode.GetValue("height")) : defaultvalue.height;
+        thisRect.x = rectNode.HasValue("x") ? int.Parse(rectNode.GetValue("x")) : defaultvalue.x;
+        thisRect.y = rectNode.HasValue("y") ? int.Parse(rectNode.GetValue("y")) : defaultvalue.y;
+        thisRect.width = rectNode.HasValue("width") ? int.Parse(rectNode.GetValue("width")) : defaultvalue.width;
+        thisRect.height = rectNode.HasValue("height") ? int.Parse(rectNode.GetValue("height")) : defaultvalue.height;
       }
       catch
       {
@@ -593,6 +597,9 @@ namespace ShipManifest
       PrevCrewSoundStart = CrewSoundStart;
       PrevCrewSoundRun = CrewSoundRun;
       PrevCrewSoundStop = CrewSoundStop;
+      PrevCrewSoundVol = CrewSoundVol;
+      PrevPumpSoundVol = PumpSoundVol;
+
       PrevEnableScience = EnableScience;
       PrevEnableHighlighting = EnableHighlighting;
       PrevOnlySourceTarget = OnlySourceTarget;
@@ -649,6 +656,8 @@ namespace ShipManifest
       CrewSoundStart = PrevCrewSoundStart;
       CrewSoundRun = PrevCrewSoundRun;
       CrewSoundStop = PrevCrewSoundStop;
+      CrewSoundVol = PrevCrewSoundVol;
+      PumpSoundVol = PrevPumpSoundVol;
       EnableScience = PrevEnableScience;
       EnableHighlighting = PrevEnableHighlighting;
       OnlySourceTarget = PrevOnlySourceTarget;

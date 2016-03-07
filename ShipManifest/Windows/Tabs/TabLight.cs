@@ -10,6 +10,8 @@ namespace ShipManifest.Windows.Tabs
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
 
+    internal static bool ShowVessels;
+
     internal static void Display(Vector2 displayViewerPosition)
     {
       var scrollX = WindowControl.Position.x + 20;
