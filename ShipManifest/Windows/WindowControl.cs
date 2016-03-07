@@ -29,7 +29,7 @@ namespace ShipManifest.Windows
         ToolTip = "";
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // This is a scroll panel (we are using it to make button lists...)
       GUILayout.BeginVertical();
@@ -64,7 +64,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         }
       }
       GUI.enabled = true;
@@ -79,7 +79,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
             true);
         }
       }
@@ -94,7 +94,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         }
       }
       var lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -108,7 +108,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Lights Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+            string.Format(" opening Lights Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         }
       }
       GUILayout.EndHorizontal();

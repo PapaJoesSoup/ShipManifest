@@ -1,4 +1,5 @@
-﻿using ShipManifest.InternalObjects;
+﻿using System.Globalization;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -27,7 +28,6 @@ namespace ShipManifest.Windows.Tabs
 
       Position = WindowSettings.Position;
       var scrollX = 20;
-      var scrollY = 50;
 
       GUILayout.Label("Sounds", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
@@ -44,8 +44,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.PumpSoundStart = GUILayout.TextField(SMSettings.PumpSoundStart, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -58,8 +57,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.PumpSoundRun = GUILayout.TextField(SMSettings.PumpSoundRun, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -72,9 +70,30 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.PumpSoundStop = GUILayout.TextField(SMSettings.PumpSoundStop, GUILayout.Width(220));
+      GUILayout.EndHorizontal();
+
+      // Pump Sound Volume
+      GUILayout.BeginHorizontal();
+      _label = "Pump Volume: ";
+      _toolTip = "How loud do you want it?";
+      _toolTip += "\r\nMove slider to change volume.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      // Volume Slider Control
+      GUILayout.Label("Min", GUILayout.Width(40),GUILayout.Height(20));
+      SMSettings.PumpSoundVol = GUILayout.HorizontalSlider((float)SMSettings.PumpSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
+      _label = "Max";
+      _toolTip = "Slide control to change the volume above.";
+      GUILayout.Label(new GUIContent(_label, _toolTip), GUILayout.Width(40), GUILayout.Height(20));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
       GUILayout.Label(" ", GUILayout.Height(10));
@@ -88,8 +107,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.CrewSoundStart = GUILayout.TextField(SMSettings.CrewSoundStart, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -102,8 +120,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.CrewSoundRun = GUILayout.TextField(SMSettings.CrewSoundRun, GUILayout.Width(220));
       GUILayout.EndHorizontal();
 
@@ -116,9 +133,30 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, Position, GUI.tooltip, ref ToolTipActive, scrollX,
-          scrollY - displayViewerPosition.y);
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       SMSettings.CrewSoundStop = GUILayout.TextField(SMSettings.CrewSoundStop, GUILayout.Width(220));
+      GUILayout.EndHorizontal();
+
+      // Crew Sound Volume
+      GUILayout.BeginHorizontal();
+      _label = "Crew Volume: ";
+      _toolTip = "How loud do you want it?";
+      _toolTip += "\r\nMove slider to change volume.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      // Volume Slider Control
+      GUILayout.Label("Min", GUILayout.Width(40), GUILayout.Height(20));
+      SMSettings.CrewSoundVol = GUILayout.HorizontalSlider((float)SMSettings.CrewSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
+      _label = "Max";
+      _toolTip = "Slide control to change the volume above.";
+      GUILayout.Label(new GUIContent(_label, _toolTip), GUILayout.Width(40), GUILayout.Height(20));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
     }
   }

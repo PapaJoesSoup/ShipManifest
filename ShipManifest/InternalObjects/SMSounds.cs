@@ -47,7 +47,8 @@ namespace ShipManifest.InternalObjects
         SourceCrewRun = go.AddComponent<AudioSource>();
         SourceCrewStop = go.AddComponent<AudioSource>();
 
-        if (GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStart) && GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathRun) &&
+        if (GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStart) && 
+            GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathRun) &&
             GameDatabase.Instance.ExistsAudioClip(AudioSourceCrewPathStop))
         {
           ClipCrewStart = GameDatabase.Instance.GetAudioClip(AudioSourceCrewPathStart);
@@ -69,12 +70,13 @@ namespace ShipManifest.InternalObjects
           SourceCrewStop.pitch = 1f;
         }
 
-        // Now do Crew sounds
+        // Now do Pump sounds
         SourcePumpStart = go.AddComponent<AudioSource>();
         SourcePumpRun = go.AddComponent<AudioSource>();
         SourcePumpStop = go.AddComponent<AudioSource>();
 
-        if (GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStart) && GameDatabase.Instance.ExistsAudioClip(SourcePumpPathRun) &&
+        if (GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStart) && 
+            GameDatabase.Instance.ExistsAudioClip(SourcePumpPathRun) &&
             GameDatabase.Instance.ExistsAudioClip(SourcePumpPathStop))
         {
           ClipPumpStart = GameDatabase.Instance.GetAudioClip(SourcePumpPathStart);
@@ -99,7 +101,7 @@ namespace ShipManifest.InternalObjects
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         // ReSharper disable once PossibleIntendedRethrow
         throw ex;
       }

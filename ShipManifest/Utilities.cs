@@ -19,16 +19,16 @@ namespace ShipManifest
     internal static bool StrHasZero;
 
     // ReSharper disable once FieldCanBeMadeReadOnly.Local
-    private static List<string> _errors = new List<string>();
+    private static List<string> _logItemList = new List<string>();
 
-    internal static List<string> Errors
+    internal static List<string> LogItemList
     {
-      get { return _errors; }
+      get { return _logItemList; }
     }
 
     internal static void LoadTexture(ref Texture2D tex, string fileName)
     {
-      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info",
+      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), LogType.Info,
         SMSettings.VerboseLogging);
       var img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
       img1.LoadImageIntoTexture(tex);
@@ -97,7 +97,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        LogMessage(string.Format(" in DisplayResourceTotals().  Error:  {0}", ex), "Error", true);
+        LogMessage(string.Format(" in DisplayResourceTotals().  Error:  {0}", ex), LogType.Error, true);
       }
 
       return displayAmount;
@@ -118,21 +118,21 @@ namespace ShipManifest
       return crewCount + part.protoModuleCrew.Count;
     }
 
-    internal static void LogMessage(string error, string type, bool verbose)
+    internal static void LogMessage(string msg, LogType type, bool verbose)
     {
       try
       {
-        // Add rolling error list. This limits growth.  Configure with ErrorListLength
-        if (_errors.Count > int.Parse(SMSettings.ErrorLogLength) && int.Parse(SMSettings.ErrorLogLength) > 0)
-          _errors.RemoveRange(0, _errors.Count - int.Parse(SMSettings.ErrorLogLength));
+        // Added rolling error list. This limits growth.  Configure with ErrorListLength
+        if (_logItemList.Count > int.Parse(SMSettings.ErrorLogLength) && int.Parse(SMSettings.ErrorLogLength) > 0)
+          _logItemList.RemoveRange(0, _logItemList.Count - int.Parse(SMSettings.ErrorLogLength));
         if (verbose)
-          _errors.Add(type + ": " + error);
-        if (type == "Error" && SMSettings.AutoDebug)
+          _logItemList.Add(type + ": " + msg);
+        if (type == LogType.Error && SMSettings.AutoDebug)
           WindowDebugger.ShowWindow = true;
       }
       catch (Exception ex)
       {
-        _errors.Add("Error: " + ex);
+        _logItemList.Add("Error: " + ex);
         WindowDebugger.ShowWindow = true;
       }
     }
@@ -165,6 +165,12 @@ namespace ShipManifest
         StrHasDecimal = true;
       else
         StrHasDecimal = false;
+    }
+
+    internal enum LogType
+    {
+      Info,
+      Error
     }
   }
 }

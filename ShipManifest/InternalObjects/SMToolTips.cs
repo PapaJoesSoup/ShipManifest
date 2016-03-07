@@ -18,7 +18,7 @@ namespace ShipManifest.InternalObjects
     {
       if (!string.IsNullOrEmpty(ToolTip))
       {
-        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), "Info", Settings.VerboseLogging);
+        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), Utilities.LogType.Info, Settings.VerboseLogging);
         ShowToolTip(ToolTipPos, ToolTip);
       }
 
@@ -38,26 +38,31 @@ namespace ShipManifest.InternalObjects
       }
     }
 
-    internal static string SetActiveToolTip(Rect controlPosition, Rect windowPosition, string toolTip,
-      ref bool toolTipActive, float xOffset, float yOffset)
+    internal static string SetActiveToolTip(Rect control, string toolTip, ref bool toolTipActive, float xOffset)
     {
-      if (!toolTipActive && controlPosition.Contains(Event.current.mousePosition))
+      // Note:  all values are screen point based.  (0,0 in lower left).  this removes confusion with the gui point of elements (o,o in upper left).
+      if (!toolTipActive && control.Contains(Event.current.mousePosition))
       {
         toolTipActive = true;
-        // Since we are using GUILayout, the curent mouse position returns a position with reference to the parent. 
+        // Note at this time controlPosition is in Gui Point system and is local position.  convert to screenpoint.
+        var newControl = new Rect
+        {
+          position = GUIUtility.GUIToScreenPoint(control.position),
+          width = control.width,
+          height = control.height
+        };
+
+        // Event.current.mousePosition returns sceen mouseposition.  GuI elements return a value in gui position.. 
         // Add the height of parent GUI elements already drawn to y offset to get the correct screen position
-        if (controlPosition.Contains(Event.current.mousePosition))
+        if (control.Contains(Event.current.mousePosition))
         {
           // Let's use the rectangle as a solid anchor and a stable tooltip, forgiving of mouse movement within bounding box...
-          ToolTipPos = new Vector2(controlPosition.xMax, controlPosition.y);
+          ToolTipPos = new Vector2(newControl.xMax + xOffset, newControl.y - 10);
 
-          ToolTipPos.x = ToolTipPos.x + windowPosition.x + xOffset;
-          ToolTipPos.y = ToolTipPos.y + windowPosition.y + yOffset;
-
-          ControlRect = controlPosition;
+          ControlRect = newControl;
           XOffset = xOffset;
-          ControlRect.x += windowPosition.x + xOffset;
-          ControlRect.y += windowPosition.y + yOffset;
+          ControlRect.x += xOffset;
+          ControlRect.y -= 10;
         }
         else
           toolTip = "";
@@ -102,10 +107,10 @@ namespace ShipManifest.InternalObjects
 
     private static void RepositionToolTip()
     {
-      if (Position.xMax > Screen.currentResolution.width)
+      if (Position.xMax > Screen.width)
         Position.x = ControlRect.x - Position.width - (XOffset > 30 ? 30 : XOffset);
-      if (Position.yMax > Screen.currentResolution.height)
-        Position.y = Screen.currentResolution.height - Position.height;
+      if (Position.yMax > Screen.height)
+        Position.y = Screen.height - Position.height;
     }
 
     private static void EmptyWindow(int windowId)

@@ -112,7 +112,6 @@ namespace ShipManifest
 
     // Control Window parts
     private List<ModHatch> _hatches = new List<ModHatch>();
-
     internal List<ModHatch> Hatches
     {
       get { return _hatches ?? (_hatches = new List<ModHatch>()); }
@@ -124,7 +123,6 @@ namespace ShipManifest
     }
 
     private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
-
     internal List<ModSolarPanel> SolarPanels
     {
       get { return _solarPanels ?? (_solarPanels = new List<ModSolarPanel>()); }
@@ -136,7 +134,6 @@ namespace ShipManifest
     }
 
     private List<ModLight> _lights = new List<ModLight>();
-
     internal List<ModLight> Lights
     {
       get { return _lights ?? (_lights = new List<ModLight>()); }
@@ -148,7 +145,6 @@ namespace ShipManifest
     }
 
     private List<ModAntenna> _antennas = new List<ModAntenna>();
-
     internal List<ModAntenna> Antennas
     {
       get { return _antennas ?? (_antennas = new List<ModAntenna>()); }
@@ -165,7 +161,9 @@ namespace ShipManifest
 
     internal void RefreshLists()
     {
-      GetSelectedResourcesParts(true);
+      Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      UpdatePartsByResource();
+      GetSelectedResourcesParts();
       UpdateDockedVessels();
 
       // now lets reconcile the selected parts based on the new list of resources...
@@ -188,7 +186,7 @@ namespace ShipManifest
       GetLights();
       GetSolarPanels();
       WindowRoster.GetRosterList();
-      DockedVessels = null;
+      Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
 
     }
 
@@ -253,7 +251,7 @@ namespace ShipManifest
               {
                 // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
                 if (SMSettings.RealismMode &&
-                    (!SMSettings.RealismMode || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
+                    (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
                   continue;
                 var vResourceFound = false;
                 // is resource in the list yet?.
@@ -275,7 +273,7 @@ namespace ShipManifest
       catch (Exception ex)
       {
         Utilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
         _partsByResource = null;
       }
 
@@ -287,6 +285,7 @@ namespace ShipManifest
 
     private void UpdateDockedVessels()
     {
+      Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
       _dockedVessels = new List<ModDockedVessel>();
       var dockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList();
       foreach (var dPart in dockingParts)
@@ -304,11 +303,11 @@ namespace ShipManifest
           }
         }
       }
+      Utilities.LogMessage("Exiting:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 
-    internal void GetSelectedResourcesParts(bool refresh = false)
+    internal void GetSelectedResourcesParts()
     {
-      if (refresh) UpdatePartsByResource();
       switch (SelectedResources.Count)
       {
         case 1:
@@ -346,7 +345,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -371,7 +370,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -402,7 +401,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetAntennas().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetAntennas().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -429,7 +428,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -453,7 +452,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
         resourcePartList = new List<Part>();
       }
       return resourcePartList;
@@ -476,7 +475,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), "Error", true);
+        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
         vesselpartList = new List<Part>();
       }
       return vesselpartList;
@@ -542,7 +541,7 @@ namespace ShipManifest
         SMAddon.SmVessel.TransferPumps.AddRange(pumpList);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else TransferPump.AbortPumpProcess(pumpId);
+      else TransferPump.AbortAllPumpsInProcess(pumpId);
     }
 
     internal static void ToggleDumpResource(string resourceName, uint pumpId)
@@ -559,7 +558,7 @@ namespace ShipManifest
         SMAddon.SmVessel.TransferPumps.Add(pump);
         ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
       }
-      else TransferPump.AbortPumpProcess(pumpId);
+      else TransferPump.AbortAllPumpsInProcess(pumpId);
     }
 
     internal void FillResources()

@@ -59,7 +59,7 @@ namespace ShipManifest.Windows.Tabs
       {
         Utilities.LogMessage(
           string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

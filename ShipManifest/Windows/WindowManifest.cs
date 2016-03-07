@@ -54,7 +54,7 @@ namespace ShipManifest.Windows
         ToolTip = "";
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, Position, GUI.tooltip, ref ToolTipActive, 10, 0);
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUI.enabled = true;
       try
       {
@@ -95,7 +95,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -137,7 +137,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -201,7 +201,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         Utilities.LogMessage(
-          string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 
@@ -258,7 +258,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          "Error", true);
+          Utilities.LogType.Error, true);
       }
     }
 
@@ -318,7 +318,7 @@ namespace ShipManifest.Windows
         {
           Utilities.LogMessage(
             string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), "Error", true);
+              ex.StackTrace), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -345,7 +345,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
             true);
         }
       }
@@ -369,7 +369,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
             true);
         }
       }
@@ -384,7 +384,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           Utilities.LogMessage(
-            string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error",
+            string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
             true);
         }
       }
@@ -502,7 +502,7 @@ namespace ShipManifest.Windows
       {
         Utilities.LogMessage(
           string.Format(" in WindowManifest.ReconcileSelectedXferParts.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), "Error", true);
+            ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
 

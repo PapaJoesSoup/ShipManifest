@@ -1,13 +1,11 @@
 ----------------
 Ship Manifest
 ----------------
-Current Version 5.0.0.0 - Release 22 Feb, 2015 - Refactoring Edition.  New!!  Fuel Depot Operations - multiple transfers & dumps at the same time!
-
 KSP Version supported:  1.0.5
 ----------------
 
 ----------------
-Download: SpaceDock - http://spacedock.info/mod/189/ShipManifest
+Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
           CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
 Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
@@ -23,18 +21,7 @@ License:  CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/.
 ----------------
 What's New:
 ----------------
-- New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
-        with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
-- New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
-        per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
-- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
-        A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
-- New:  Added build automation and distribution.
-- New:  Removed need for DFInterface.dll.  Now using new reflection class method for soft dependency to DeepFreeze.
-- Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
-- Fixed:  Corrected nested control displays in settings.
-- Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
-- Fixed:  Corrected staging error where SM cannot be displayed during launch.  
+- See ChangeLog.txt for details.
 ----------------
 
 
@@ -64,9 +51,9 @@ Installation steps:
 ------------	
 Videos:
 ------------	
- - Kottabos did a fine review here:  www.youtube.com/watch?v=I_TNxjnW234 (Feb 28th). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
+ - Kottabos did a fine review here:  www.youtube.com/watch?v=I_TNxjnW234 (Feb 28th 2014). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
 
 ------------	
 Acknoledgments:
 ------------	
- - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with 0.22.  
+ - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with KSP v0.22.  

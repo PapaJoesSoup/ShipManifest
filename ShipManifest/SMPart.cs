@@ -70,7 +70,7 @@ namespace ShipManifest
             }).ToList();
       if (!TransferPump.PumpsInProgress(pumpId).Any())
         ProcessController.DumpResources(pumpList);
-      else TransferPump.AbortPumpProcess(pumpId);
+      else TransferPump.AbortAllPumpsInProcess(pumpId);
     }
 
     internal static void FillResource(Part part, string resourceName)
