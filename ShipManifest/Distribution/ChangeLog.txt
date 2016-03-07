@@ -4,12 +4,12 @@
 - Fixed:  Windows disappear on settings save.
 - Fixed:  Windows disappear on window resolution changes.
 - Fixed:  Vessel Transfers were not visible.
-- Fixed:  Vessel Transfers were not behaving properly.
+- Fixed:  Transfers were not behaving properly.
 - Fixed:  Transfer souncds continue playing afer transfer complete.
 - Fixed:  Science Tooltips (and others) scrolling off screen on long lists.  Git Issue #18
 
 
-Version 5.0.0.0 - Release 22 Jan, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
+Version 5.0.0.0 - Release 22 Feb, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
         with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
 - New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps be stopped.
