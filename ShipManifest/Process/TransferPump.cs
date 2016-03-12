@@ -10,7 +10,7 @@ namespace ShipManifest.Process
   /// <summary>
   ///   This class supports the transfer/dump/fill of a desired resource of ResourceType.Other
   /// </summary>
-  internal class TransferPump : ITransferPump
+  internal class TransferPump
   {
     #region Properties
 

@@ -52,7 +52,7 @@ namespace ShipManifest
 
     public static ICrewTransfer GetCrewTransfer()
     {
-      var smAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest.TransferCrew");
+      var smAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest..Process.TransferCrew");
       if (smAddonType == null) return null;
       var crewTransferObj = smAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
       return (ICrewTransfer)crewTransferObj;

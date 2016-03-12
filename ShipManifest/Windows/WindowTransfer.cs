@@ -641,7 +641,6 @@ namespace ShipManifest.Windows
     {
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
-      const float yOffset = 160;
       var modules = ScienceModulesSource.Keys.ToArray();
       foreach (var pm in modules)
       {

@@ -12,7 +12,7 @@ namespace ShipManifest
 {
   [KSPAddon(KSPAddon.Startup.EveryScene, false)]
   // ReSharper disable once InconsistentNaming
-  internal class SMAddon : MonoBehaviour, ITransferProcess
+  internal class SMAddon : MonoBehaviour
   {
     // Object Scope:  Current Unity/KSP Scene.  Object will be destroyed and recreated when scene changes!
 
@@ -51,7 +51,7 @@ namespace ShipManifest
     internal static bool ShowUi = true;
 
     // SMInterface.ITransferProcess properties
-    public ITransferProcess Instance
+    public SMAddon Instance
     {
       get { return this; }
     }
@@ -66,14 +66,14 @@ namespace ShipManifest
       get { return SmVessel.TransferCrewObj.CrewXferActive; }
     }
 
-    public ITransferCrew CrewTransferProcess
+    public TransferCrew CrewTransferProcess
     {
       get { return SmVessel.TransferCrewObj; }
     }
 
-    public List<ITransferPump> PumpsInProgress
+    public List<TransferPump> PumpsInProgress
     {
-      get { return (from pump in SmVessel.TransferPumps select (ITransferPump) pump).ToList(); }
+      get { return (from pump in SmVessel.TransferPumps select (TransferPump) pump).ToList(); }
     }
 
     #endregion

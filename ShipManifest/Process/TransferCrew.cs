@@ -3,7 +3,7 @@ using ShipManifest.InternalObjects;
 
 namespace ShipManifest.Process
 {
-  public class TransferCrew : ITransferCrew, ICrewTransfer
+  public class TransferCrew
   {
     // OnCrewTransferred Event Handling Flags
     internal static DateTime Timestamp;
@@ -94,7 +94,7 @@ namespace ShipManifest.Process
 
     public ProtoCrewMember ToCrewMember { get; set; }
 
-    public void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
+    internal void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
     {
       FromPart = fromPart;
       ToPart = toPart;
@@ -300,7 +300,7 @@ namespace ShipManifest.Process
       SMAddon.SmVessel.RespawnCrew();
     }
 
-    public void CrewTransferAction()
+    internal void CrewTransferAction()
     {
       try
       {
@@ -411,7 +411,7 @@ namespace ShipManifest.Process
       SMAddon.FireEventTriggers();
     }
 
-    internal enum XferState
+    public enum XferState
     {
       Off,
       Start,
