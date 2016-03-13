@@ -46,9 +46,10 @@ namespace ShipManifest.Process
       get { return _crewXferActive; }
       set
       {
-        if (!value && _crewXferActive && !IvaDelayActive)
+        if (value) return;
+        if (_crewXferActive && !IvaDelayActive)
           CrewTransferAbort();
-        _crewXferActive = value;
+        _crewXferActive = false;
       }
     }
 
@@ -170,7 +171,7 @@ namespace ShipManifest.Process
         IsSeat2SeatXfer = FromPart == ToPart;
       }
       FlightEVA.fetch.DisableInterface();
-      CrewXferActive = true;
+      _crewXferActive = true;
     }
 
     internal void CrewTransferProcess()
@@ -289,7 +290,7 @@ namespace ShipManifest.Process
       FlightEVA.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
       CrewXferState = XferState.Off;
-      CrewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
+      _crewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
     }
 
     internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)

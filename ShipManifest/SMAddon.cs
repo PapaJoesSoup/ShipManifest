@@ -57,7 +57,6 @@ namespace ShipManifest
 
     #region Public Instance Properties
 
-
     public bool PumpProcessOn
     {
       get { return TransferPump.PumpProcessOn; }
