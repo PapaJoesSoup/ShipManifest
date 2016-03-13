@@ -10,7 +10,7 @@ namespace ShipManifest.Process
   /// <summary>
   ///   This class supports the transfer/dump/fill of a desired resource of ResourceType.Other
   /// </summary>
-  internal class TransferPump
+  public class TransferPump
   {
     #region Properties
 
@@ -230,6 +230,7 @@ namespace ShipManifest.Process
 
     internal TransferPump()
     {
+
     }
 
     internal TransferPump(string resourceName, TypePump pumpType, TriggerButton trigger, double pumpAmount)

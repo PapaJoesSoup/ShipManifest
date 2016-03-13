@@ -1,4 +1,9 @@
 ﻿Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
+- New:  Removed SMInterface.dll.   moving to reflection based interface class that a developer can add to their project.
+- New:  Added Reflection based class source for developer use in distribution and to Wiki.
+- Fixed:  Windows disappear on settings save.
+
+Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added Volume controls in the sound tab of the Settings Window.   They had long been in the settings file, but not in the UI. I don't know why...
 - New:  Science Transfers:  Added ability to process unprocessed in science labs. Git Issue #14
 - Fixed:  Windows disappear on settings save.

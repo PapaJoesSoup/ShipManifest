@@ -228,7 +228,7 @@ namespace ShipManifest.Windows
         else
         {
           // Other resources are left....
-          ResourceDetailsViewer(TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.SourceToTarget);
         }
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
@@ -303,7 +303,7 @@ namespace ShipManifest.Windows
         }
         else
         {
-          ResourceDetailsViewer(TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.TargetToSource);
         }
         // --------------------------------------------------------------------------
         GUILayout.EndVertical();
@@ -839,7 +839,7 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceDetailsViewer(TransferPump.TypePump pumpType, Vector2 scrollPosition)
+    private static void ResourceDetailsViewer(TransferPump.TypePump pumpType)
     {
       // Let's get the pump objects we may use...
       var selectedResources = SMAddon.SmVessel.SelectedResources;
@@ -874,7 +874,7 @@ namespace ShipManifest.Windows
       if (TransferPump.PumpProcessOn)
       {
         // We want to show this during transfer if the direction is correct...
-        if (SMAddon.ActivePumpType == pumpType)
+        if (activePump.PumpType == pumpType)
         {
           GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
           GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"));
