@@ -5,6 +5,8 @@ namespace ShipManifest.Process
 {
   public class TransferCrew
   {
+    public static TransferCrew Instance;
+
     #region Internal Properties
 
     // OnCrewTransferred Event Handling Flags
@@ -29,17 +31,17 @@ namespace ShipManifest.Process
     public TransferCrew()
     {
       IvaPortraitDelay = 0;
-      SMAddon.SmVessel.TransferCrewObj = this;
+      Instance = this;
     }
 
     // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
     // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
     public int IvaPortraitDelay { get; internal set; }
 
-    public static TransferCrew Instance
-    {
-      get { return SMAddon.SmVessel.TransferCrewObj; }
-    }
+    //public static TransferCrew Instance
+    //{
+    //  get { return SMAddon.SmVessel.TransferCrewObj; }
+    //}
 
     public bool CrewXferActive
     {
