@@ -540,7 +540,7 @@ namespace ShipManifest.Windows
         GUILayout.BeginHorizontal();
         if (crewMember.seat != null)
         {
-          if (SMConditions.IsTransferInProgress())
+          if (SMConditions.IsTransferInProgress()) 
             GUI.enabled = false;
 
           if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
@@ -584,55 +584,53 @@ namespace ShipManifest.Windows
       }
       // Cater for DeepFreeze Continued... parts - list frozen kerbals
       if (!InstalledMods.IsDfApiReady) return;
+      try
       {
-        try
+        PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        if (deepFreezer == null) return;
+        DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
+        if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
+        foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
         {
-          var deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
-          if (deepFreezer == null) return;
-          var sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
-          if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
-          foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
+          GUILayout.BeginHorizontal();
+          GUI.enabled = false;
+          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+            GUILayout.Width(15), GUILayout.Height(20)))
           {
-            GUILayout.BeginHorizontal();
-            GUI.enabled = false;
-            if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
-              GUILayout.Width(15), GUILayout.Height(20)))
-            {
-              ToolTip = "";
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-            {
-              var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-            }
-
-            var trait = DFWrapper.DeepFreezeAPI.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
-            GUI.enabled = true;
-            GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
-              GUILayout.Width(190), GUILayout.Height(20));
-
-            if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"),
-              SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-            {
-              WindowRoster.ThawKerbal(frzncrew.CrewName);
-              ToolTip = "";
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-            {
-              var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-            }
-            GUILayout.EndHorizontal();
+            ToolTip = "";
           }
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+          {
+            var rect = GUILayoutUtility.GetLastRect();
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+          }
+
+          string trait = DFWrapper.DeepFreezeAPI.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
+          GUI.enabled = true;
+          GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
+            GUILayout.Width(190), GUILayout.Height(20));
+
+          if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"),
+            SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+          {
+            WindowRoster.ThawKerbal(frzncrew.CrewName);
+            ToolTip = "";
+          }
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+          {
+            var rect = GUILayoutUtility.GetLastRect();
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+          }
+          GUILayout.EndHorizontal();
         }
-        catch (Exception ex)
-        {
-          Utilities.LogMessage(
-            string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
-              ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
-          //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
-          //Debug.Log(ex.Message);
-        }
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(
+          string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
+            ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
+        //Debug.Log(ex.Message);
       }
     }
 

@@ -1,8 +1,9 @@
-﻿Version 5.0.1.0 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
-- New:  Added Reflection based Wrapper class source code for developer use in distribution and to Wiki.
-- New:  Removed SMInterface.dll.   Replaced by SMWrapper.
-- Fixed:  Windows disappear on settings save.
-- Fixed:  KIS integration when swaping kerbals.  Inventories are not swapping.
+﻿Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and API
+- New:  Removed DFInterface.dll.  Added Reflection based Wrapper class source code for integration with DeepFreeze.
+- New:  Removed SMInterface.dll.   Replaced by SMWrapper, which is also a reflection based wrapper for developer use with SM.
+- Fixed:  Crew movement issues with DeepFreeze.
+- Fixed:  Roster Window does not display correctly with DeepFreeze installed.
+- Note:  The latest version of DeepFreeze (DF) is required if you use it with SM. 
 
 Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added Volume controls in the sound tab of the Settings Window.   They had long been in the settings file, but not in the UI. I don't know why...

@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +15,11 @@ namespace ShipManifest.APIClients
   /// </summary>
   public class DFWrapper
   {
-    protected static System.Type DFType;
-    protected static System.Type KerbalInfoType;
-    protected static System.Type DeepFreezerType;
-    protected static System.Type FrznCrewMbrType;
-    protected static Object actualDF = null;
+    internal static System.Type DFType;
+    internal static System.Type KerbalInfoType;
+    internal static System.Type DeepFreezerType;
+    internal static System.Type FrznCrewMbrType;
+    internal static Object actualDF = null;
 
     /// <summary>
     /// This is the DeepFreeze object
@@ -68,6 +68,10 @@ namespace ShipManifest.APIClients
         _DFWrapped = false;
         actualDF = null;
         DeepFreezeAPI = null;
+        DFType = null;
+        KerbalInfoType = null;
+        DeepFreezerType = null;
+        FrznCrewMbrType = null;
         LogFormatted("Attempting to Grab DeepFreeze Types...");
 
         //find the base type
@@ -202,7 +206,7 @@ namespace ShipManifest.APIClients
 
       #region Frozenkerbals
 
-      private Object actualFrozenKerbals;
+      private object actualFrozenKerbals;
       private MethodInfo FrozenKerbalsMethod;
 
       /// <summary>
@@ -215,13 +219,19 @@ namespace ShipManifest.APIClients
       {
         get
         {
-          if (FrozenKerbalsMethod == null)
-            return null;
-          //Object tstfrozenkerbals = DFType.GetField("FrozenKerbals", BindingFlags.Public | BindingFlags.Static).GetValue(null);
-          FieldInfo gamesettingsfield = DFType.GetField("DFgameSettings", BindingFlags.Instance | BindingFlags.NonPublic);
-          Object gamesettings = gamesettingsfield.GetValue(actualDFAPI);
-          actualFrozenKerbals = FrozenKerbalsMethod.Invoke(actualDFAPI, null);
           Dictionary<string, KerbalInfo> returnvalue = new Dictionary<string, KerbalInfo>();
+          if (FrozenKerbalsMethod == null)
+          {
+            LogFormatted("Error getting FrozenKerbals - Reflection Method is Null");
+            return returnvalue;
+          }
+          object actualDFtest = DFType.GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
+          FieldInfo gamesettingsfield = DFType.GetField("DFgameSettings", BindingFlags.Instance | BindingFlags.NonPublic);
+          object gamesettings;
+          if (gamesettingsfield != null)
+            gamesettings = gamesettingsfield.GetValue(actualDFAPI);
+          actualFrozenKerbals = null;
+          actualFrozenKerbals = FrozenKerbalsMethod.Invoke(actualDFAPI, null);
           returnvalue = ExtractFrozenKerbalDict(actualFrozenKerbals);
           return returnvalue;
         }
@@ -231,7 +241,9 @@ namespace ShipManifest.APIClients
       /// This converts the actualFrozenKerbals actual object to a new dictionary for consumption
       /// </summary>
       /// <param name="actualFrozenKerbals"></param>
-      /// <returns>Dictionary <string, KerbalInfo> of Frozen Kerbals</returns>
+      /// <returns>
+      /// Dictionary <string, KerbalInfo> of Frozen Kerbals
+      /// </returns>
       private Dictionary<string, KerbalInfo> ExtractFrozenKerbalDict(Object actualFrozenKerbals)
       {
         Dictionary<string, KerbalInfo> DictToReturn = new Dictionary<string, KerbalInfo>();
