@@ -38,11 +38,6 @@ namespace ShipManifest.Process
     // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
     public int IvaPortraitDelay { get; internal set; }
 
-    //public static TransferCrew Instance
-    //{
-    //  get { return SMAddon.SmVessel.TransferCrewObj; }
-    //}
-
     public bool CrewXferActive
     {
       get { return _crewXferActive; }

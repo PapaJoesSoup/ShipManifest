@@ -75,6 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APIClients\DFWrapper.cs" />
+    <Compile Include="Distribution\SMWrapper.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Process\ProcessController.cs" />
@@ -119,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
+    <Content Include="Distribution\Developer Notes.txt" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />

@@ -1,0 +1,56 @@
+﻿Ship Manifest Developer Notes
+-------------------------------------------------
+KSP Version supported:  1.0.5
+-------------------------------------------------
+
+
+Important Links:
+-------------------------------------------------
+Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
+          CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
+          Github - https://github.com/PapaJoesSoup/ShipManifest/releases
+Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
+WIKI:     Github - http://github.com/PapaJoesSoup/ShipManifest/wiki
+-------------------------------------------------
+
+
+License:
+-------------------------------------------------
+CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/.  
+Original license on Crew Manifest was do as you want.  I felt the original and contributing authors deserve due attribution, 
+since this is a derivative work.
+-------------------------------------------------
+
+
+ShipManifest API
+-------------------------------------------------
+Ship Manifest supports other Mods via exposing certain elements of the mod as public to the outside world.  
+Developers can use the enclosed SMWrapper.cs class in their projects to easily integrate with SM.
+SMWrapper uses reflection to derive the needed objects, properties, & methods for accessing SM's Crew Transfer Features.
+
+Thanks go out to JPLRepo for writing SMWrapper.cs, and helping with testing and refactoring.
+-------------------------------------------------
+
+
+Using SMWrapper.cs
+-------------------------------------------------
+Add SMWrapper.cs to your solution and change the namespace at the top of the file to your own.
+
+Add calls to obtain an SMAddon instance in the Start or Awake event handlers of your mod.
+Use the exposed objects as needed.
+
+DeepFreeze, by JPLRepo implements SMWrapper, so you may examine his Git Repository for details on advanced implementation.
+-------------------------------------------------
+
+
+Under the hood
+-------------------------------------------------
+SM uses an SMAddon Instance for basic API connectivity and instantiation.  
+It is available at all times and contains a flag to notify you of transfers in progress. 
+Inside this instance is an instance of the TransferCrew class that encapsulates all info needed for in progress Crew Transfers.  
+TransferCrew objects are only available in Flight.
+
+This section will expand as I have time to add.
+----------------------------------------------------------------------------------------------------------------------------------------
+
+Thanks for considering integrating with SM!

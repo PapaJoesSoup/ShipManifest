@@ -587,11 +587,10 @@ namespace ShipManifest.Windows
       {
         try
         {
-          PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+          var deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
           if (deepFreezer == null) return;
-          DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
+          var sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
           if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
-          var frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
           foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
           {
             GUILayout.BeginHorizontal();
@@ -607,7 +606,7 @@ namespace ShipManifest.Windows
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
             }
 
-            var trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
+            var trait = DFWrapper.DeepFreezeAPI.FrozenKerbals[frzncrew.CrewName].experienceTraitName;
             GUI.enabled = true;
             GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
               GUILayout.Width(190), GUILayout.Height(20));
