@@ -6,6 +6,7 @@ Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and APIs
 - Fixed:  Crew movement issues with DeepFreeze.
 - Fixed:  Roster Window does not display correctly with DeepFreeze installed.
 - Note:  The latest version of DeepFreeze (DF) is required if you use it with SM. 
+- Note:  EVA kerbals causing a null ref bug and duplicating kerbals.  This fix also requires the latest version of Deepfreeze (V0.20.4.0)    
 
 Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added Volume controls in the sound tab of the Settings Window.   They had long been in the settings file, but not in the UI. I don't know why...

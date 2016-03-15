@@ -590,7 +590,7 @@ namespace ShipManifest.Windows
         if (deepFreezer == null) return;
         DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
         if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
-        Dictionary<string, DFWrapper.KerbalInfo> frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
+        //Dictionary<string, DFWrapper.KerbalInfo> frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
         foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
         {
           GUILayout.BeginHorizontal();
@@ -605,9 +605,10 @@ namespace ShipManifest.Windows
             var rect = GUILayoutUtility.GetLastRect();
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
           }
-
-          string trait = "";
-          if (frozenKerbals.ContainsKey(frzncrew.CrewName)) trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
+          var trait = "";
+          var frozenKerbal = HighLogic.CurrentGame.CrewRoster.Unowned.FirstOrDefault(a => a.name == frzncrew.CrewName);
+          //var frozenKerbal = (from a in HighLogic.CurrentGame.CrewRoster.Unowned where a.name == frzncrew.CrewName select a).FirstOrDefault();
+          if (frozenKerbal != null) trait = frozenKerbal.trait;
           GUI.enabled = true;
           GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
             GUILayout.Width(190), GUILayout.Height(20));
