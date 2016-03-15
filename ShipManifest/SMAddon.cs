@@ -55,6 +55,11 @@ namespace ShipManifest
     // Makes instance available via reflection
     public static SMAddon Instance;
 
+    public SMAddon()
+    {
+      Instance = this;
+    }
+
     #region Public Instance Properties
 
     public bool PumpProcessOn

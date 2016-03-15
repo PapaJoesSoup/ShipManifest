@@ -1,4 +1,4 @@
-﻿Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and API
+﻿Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and APIs
 - New:  Removed DFInterface.dll.  Added Reflection based Wrapper class source code for integration with DeepFreeze.
 - New:  Removed SMInterface.dll.   Replaced by SMWrapper, which is also a reflection based wrapper for developer use with SM.
 - Fixed:  Crew movement issues with DeepFreeze.
@@ -12,9 +12,8 @@ Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Reali
 - Fixed:  Windows disappear on window resolution changes.
 - Fixed:  Vessel Transfers were not visible.
 - Fixed:  Vessel Transfers were not behaving properly.
-- Fixed:  Transfer souncds continue playing afer transfer complete.
+- Fixed:  Transfer sounds continue playing after transfer complete.
 - Fixed:  Science Tooltips (and others) scrolling off screen on long lists.  Git Issue #18
-
 
 Version 5.0.0.0 - Release 22 Jan, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
