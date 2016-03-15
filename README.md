@@ -1,5 +1,13 @@
 ShipManifest
 ============
+Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and APIs
+- New:  Removed DFInterface.dll.  Added Reflection based Wrapper class source code for integration with DeepFreeze.
+- New:  Removed SMInterface.dll.   Replaced by SMWrapper, which is also a reflection based wrapper for developer use with SM.
+- Fixed:  Crew movement issues with DeepFreeze.
+- Fixed:  Roster Window does not display correctly with DeepFreeze installed.
+- Note:  The latest version of DeepFreeze (DF) is required if you use it with SM. 
+- Note:  EVA kerbals causing a null ref bug and duplicating kerbals.  This fix also requires the latest version of Deepfreeze (V0.20.4.0)    
+
 Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
 - New:  Added Volume controls in the sound tab of the Settings Window.   They had long been in the settings file, but not in the UI. I don't know why...
 - New:  Science Transfers:  Added ability to process unprocessed in science labs. Git Issue #14
@@ -7,22 +15,8 @@ Version 5.0.0.1 - Release 07 Mar, 2016 - Massive Refactoring Edition. NEW! Reali
 - Fixed:  Windows disappear on window resolution changes.
 - Fixed:  Vessel Transfers were not visible.
 - Fixed:  Vessel Transfers were not behaving properly.
-- Fixed:  Transfer souncds continue playing afer transfer complete.
+- Fixed:  Transfer sounds continue playing after transfer complete.
 - Fixed:  Science Tooltips (and others) scrolling off screen on long lists.  Git Issue #18
-
-Version 5.0.0.0 - Release 22 Feb, 2016 - Massive Refactoring Edition. NEW! Realism Mode - Multiple simultaneous transfers & dumps.
-- New:  Added ability queue transfers in realism mode.  you may now start and stop multiple transfers and or dumps simultaneously, 
-        with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
-- New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps cannot be stopped/reversed.
-        per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
-- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
-        A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
-- New:  Added build package automation and distribution.
-- New:  Removed need for DFInterface.dll.  Now using new reflection class method for soft dependency to DeepFreeze.
-- Fixed:  In realism Mode, during Preflight, Fill and dump kerbals vessel wide was enabled.   Now disabled when Realism is on.
-- Fixed:  Corrected nested control displays in settings.
-- Fixed:  Corrected Errors with tooltip displays and tooltip settings.  Tooltips would show on certain windows when disabled in settings.
-- Fixed:  Corrected staging error where SM cannot be displayed during launch.  
 
 Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
 - New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  

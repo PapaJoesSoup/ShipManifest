@@ -47,7 +47,6 @@ namespace ShipManifest
 
     #region Instance Properties
 
-    // variables used for tracking xfer sliders for resources.
     internal Vessel Vessel
     {
       get { return _controllers.Single(p => p.Value == this).Key.Target; }
@@ -60,15 +59,14 @@ namespace ShipManifest
 
     #endregion
 
+    // dataSources for Resource manifest and ResourceTransfer windows
     #region Instance DataSource properties
 
-    // dataSources for Resource manifest and ResourceTransfer windows
-
-
-    // Provides a list of resources and the parts that contain that resource.
+    // Provides a list of resources
     internal List<string> ResourceList = new List<string>();
-    private Dictionary<string, List<Part>> _partsByResource;
 
+    // This is the main part Dictionary.  Provides a list of resources and the parts that contain that resource.
+    private Dictionary<string, List<Part>> _partsByResource;
     internal Dictionary<string, List<Part>> PartsByResource
     {
       get
@@ -77,7 +75,7 @@ namespace ShipManifest
       }
     }
 
-    // dataSource for Resource manifest and ResourceTransfer windows
+    // dataSources for Resource manifest and ResourceTransfer windows
     // Holds the Resource.info.name selected in the Resource Manifest Window.
     internal List<string> SelectedResources = new List<string>();
     internal List<TransferPump> TransferPumps = new List<TransferPump>();

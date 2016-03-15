@@ -3,8 +3,12 @@ using ShipManifest.InternalObjects;
 
 namespace ShipManifest.Process
 {
-  public class TransferCrew : ITransferCrew, ICrewTransfer
+  public class TransferCrew
   {
+    public static TransferCrew Instance;
+
+    #region Internal Properties
+
     // OnCrewTransferred Event Handling Flags
     internal static DateTime Timestamp;
     internal static bool FireSourceXferEvent;
@@ -20,40 +24,33 @@ namespace ShipManifest.Process
 
     private double _seat2SeatXferDelaySec = 2;
 
+    #endregion
+
+    #region Public Methods
+
     public TransferCrew()
     {
       IvaPortraitDelay = 0;
+      Instance = this;
     }
 
     // These vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
     // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
-    public int IvaPortraitDelay { get; set; }
-
-    public static TransferCrew Instance
-    {
-      get { return SMAddon.SmVessel.TransferCrewObj; }
-    }
-
-    /// <summary>
-    ///   Deprecated. Use XferVesselId instead.  Returns the vessel Id
-    /// </summary>
-    public Guid XferVesselID
-    {
-      get { return SMAddon.SmVessel.Vessel.id; }
-    }
+    public int IvaPortraitDelay { get; internal set; }
 
     public bool CrewXferActive
     {
       get { return _crewXferActive; }
       set
       {
-        if (!value && _crewXferActive && !IvaDelayActive)
+        if (value) return;
+        if (_crewXferActive && !IvaDelayActive)
           CrewTransferAbort();
-        _crewXferActive = value;
+        _crewXferActive = false;
       }
     }
 
-    public bool IsStockXfer { get; set; }
+    public bool IsStockXfer { get; internal set; }
 
     public bool OverrideStockCrewXfer
     {
@@ -63,20 +60,20 @@ namespace ShipManifest.Process
     public double CrewXferDelaySec
     {
       get { return _crewXferDelaysec; }
-      set { _crewXferDelaysec = value; }
+      internal set { _crewXferDelaysec = value; }
     }
 
-    public bool IsSeat2SeatXfer { get; set; }
+    public bool IsSeat2SeatXfer { get; internal set; }
 
     public double Seat2SeatXferDelaySec
     {
       get { return _seat2SeatXferDelaySec; }
-      set { _seat2SeatXferDelaySec = value; }
+      internal set { _seat2SeatXferDelaySec = value; }
     }
 
-    public InternalSeat FromSeat { get; set; }
+    public InternalSeat FromSeat { get; internal set; }
 
-    public InternalSeat ToSeat { get; set; }
+    public InternalSeat ToSeat { get; internal set; }
 
 
     public Guid XferVesselId
@@ -84,17 +81,21 @@ namespace ShipManifest.Process
       get { return SMAddon.SmVessel.Vessel.id; }
     }
 
-    public bool IvaDelayActive { get; set; }
+    public bool IvaDelayActive { get; internal set; }
 
-    public Part FromPart { get; set; }
+    public Part FromPart { get; internal set; }
 
-    public Part ToPart { get; set; }
+    public Part ToPart { get; internal set; }
 
-    public ProtoCrewMember FromCrewMember { get; set; }
+    public ProtoCrewMember FromCrewMember { get; internal set; }
 
-    public ProtoCrewMember ToCrewMember { get; set; }
+    public ProtoCrewMember ToCrewMember { get; internal set; }
 
-    public void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
+    #endregion
+
+    #region Internal Methods
+
+    internal void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
     {
       FromPart = fromPart;
       ToPart = toPart;
@@ -167,7 +168,7 @@ namespace ShipManifest.Process
         IsSeat2SeatXfer = FromPart == ToPart;
       }
       FlightEVA.fetch.DisableInterface();
-      CrewXferActive = true;
+      _crewXferActive = true;
     }
 
     internal void CrewTransferProcess()
@@ -286,7 +287,7 @@ namespace ShipManifest.Process
       FlightEVA.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
       CrewXferState = XferState.Off;
-      CrewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
+      _crewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
     }
 
     internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
@@ -300,7 +301,7 @@ namespace ShipManifest.Process
       SMAddon.SmVessel.RespawnCrew();
     }
 
-    public void CrewTransferAction()
+    internal void CrewTransferAction()
     {
       try
       {
@@ -410,8 +411,10 @@ namespace ShipManifest.Process
       pKerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
       SMAddon.FireEventTriggers();
     }
+    
+    #endregion
 
-    internal enum XferState
+    public enum XferState
     {
       Off,
       Start,

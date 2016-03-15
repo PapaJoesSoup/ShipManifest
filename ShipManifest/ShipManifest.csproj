@@ -75,8 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APIClients\DFWrapper.cs" />
+    <Compile Include="Distribution\SMWrapper.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
-    <Compile Include="SMInterface.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Process\ProcessController.cs" />
     <Compile Include="InternalObjects\SMConditions.cs" />
@@ -120,10 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Distribution\ChangeLog.txt" />
+    <Content Include="Distribution\Developer Notes.txt" />
     <Content Include="Distribution\Installation Notes.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Plugins\ShipManifest.dll" />
-    <Content Include="Distribution\GameData\ShipManifest\Plugins\SMInterface.dll" />
     <Content Include="Distribution\GameData\ShipManifest\Sounds\Sounds.txt" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconOff_24.png" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconOff_38.png" />
@@ -151,12 +151,6 @@
     <None Include="Distribution\GameData\ShipManifest\Sounds\59328-1.ogg" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\59328-2.ogg" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\59328-3.ogg" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SMInterface\SMInterface.csproj">
-      <Project>{fe8e6894-3a15-472c-b229-e0be7a827ca1}</Project>
-      <Name>SMInterface</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Distribution\GameData\ShipManifest\Plugins\PluginData\" />
@@ -189,7 +183,6 @@ call "%25ZA_DIR%25\7za.exe" a -tzip -r  "%25DIST_DIR%25\$(Targetname).@(VersionN
 echo Deploy $(Targetname) Distribution files to test env...
 xcopy /E /Y "$(SolutionDir)$(ProjectName)\Distribution\GameData" "%25KSP_DIR%25\GameData"
 copy /Y "$(TargetDir)$(Targetname).pdb" "%25KSP_DIR%25\GameData\$(Targetname)\Plugins\"
-copy /Y "$(TargetDir)SMInterface.pdb" "%25KSP_DIR%25\GameData\$(Targetname)\Plugins\"
 
 echo Build/deploy complete!</PostBuildEvent>
   </PropertyGroup>

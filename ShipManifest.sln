@@ -1,10 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipManifest", "ShipManifest\ShipManifest.csproj", "{C6304C33-CCE5-496C-B11B-49F454CC2F79}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMInterface", "SMInterface\SMInterface.csproj", "{FE8E6894-3A15-472C-B229-E0BE7A827CA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,12 +20,6 @@ Global
 		{C6304C33-CCE5-496C-B11B-49F454CC2F79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C6304C33-CCE5-496C-B11B-49F454CC2F79}.Release|x86.ActiveCfg = Release|x86
 		{C6304C33-CCE5-496C-B11B-49F454CC2F79}.Release|x86.Build.0 = Release|x86
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FE8E6894-3A15-472C-B229-E0BE7A827CA1}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

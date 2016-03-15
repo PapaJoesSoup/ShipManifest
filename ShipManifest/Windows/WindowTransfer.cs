@@ -228,7 +228,7 @@ namespace ShipManifest.Windows
         else
         {
           // Other resources are left....
-          ResourceDetailsViewer(TransferPump.TypePump.SourceToTarget, _sourceDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.SourceToTarget);
         }
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
@@ -303,7 +303,7 @@ namespace ShipManifest.Windows
         }
         else
         {
-          ResourceDetailsViewer(TransferPump.TypePump.TargetToSource, _targetDetailsViewerScrollPosition);
+          ResourceDetailsViewer(TransferPump.TypePump.TargetToSource);
         }
         // --------------------------------------------------------------------------
         GUILayout.EndVertical();
@@ -540,7 +540,7 @@ namespace ShipManifest.Windows
         GUILayout.BeginHorizontal();
         if (crewMember.seat != null)
         {
-          if (SMConditions.IsTransferInProgress())
+          if (SMConditions.IsTransferInProgress()) 
             GUI.enabled = false;
 
           if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
@@ -584,56 +584,56 @@ namespace ShipManifest.Windows
       }
       // Cater for DeepFreeze Continued... parts - list frozen kerbals
       if (!InstalledMods.IsDfApiReady) return;
+      try
       {
-        try
+        PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        if (deepFreezer == null) return;
+        DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
+        if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
+        //Dictionary<string, DFWrapper.KerbalInfo> frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
+        foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
         {
-          PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
-          if (deepFreezer == null) return;
-          DFWrapper.DeepFreezer sourcepartFrzr = new DFWrapper.DeepFreezer(deepFreezer);
-          if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
-          var frozenKerbals = DFWrapper.DeepFreezeAPI.FrozenKerbals;
-          foreach (var frzncrew in sourcepartFrzr.StoredCrewList)
+          GUILayout.BeginHorizontal();
+          GUI.enabled = false;
+          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+            GUILayout.Width(15), GUILayout.Height(20)))
           {
-            GUILayout.BeginHorizontal();
-            GUI.enabled = false;
-            if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
-              GUILayout.Width(15), GUILayout.Height(20)))
-            {
-              ToolTip = "";
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-            {
-              var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-            }
-
-            var trait = frozenKerbals[frzncrew.CrewName].experienceTraitName;
-            GUI.enabled = true;
-            GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
-              GUILayout.Width(190), GUILayout.Height(20));
-
-            if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"),
-              SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
-            {
-              WindowRoster.ThawKerbal(frzncrew.CrewName);
-              ToolTip = "";
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-            {
-              var rect = GUILayoutUtility.GetLastRect();
-              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-            }
-            GUILayout.EndHorizontal();
+            ToolTip = "";
           }
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+          {
+            var rect = GUILayoutUtility.GetLastRect();
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+          }
+          var trait = "";
+          var frozenKerbal = HighLogic.CurrentGame.CrewRoster.Unowned.FirstOrDefault(a => a.name == frzncrew.CrewName);
+          //var frozenKerbal = (from a in HighLogic.CurrentGame.CrewRoster.Unowned where a.name == frzncrew.CrewName select a).FirstOrDefault();
+          if (frozenKerbal != null) trait = frozenKerbal.trait;
+          GUI.enabled = true;
+          GUILayout.Label(string.Format("  {0}", frzncrew.CrewName + " (" + trait + ")"), SMStyle.LabelStyleCyan,
+            GUILayout.Width(190), GUILayout.Height(20));
+
+          if (GUILayout.Button(new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal"),
+            SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+          {
+            WindowRoster.ThawKerbal(frzncrew.CrewName);
+            ToolTip = "";
+          }
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+          {
+            var rect = GUILayoutUtility.GetLastRect();
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+          }
+          GUILayout.EndHorizontal();
         }
-        catch (Exception ex)
-        {
-          Utilities.LogMessage(
-            string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
-              ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
-          //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
-          //Debug.Log(ex.Message);
-        }
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(
+          string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
+            ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
+        //Debug.Log(ex.Message);
       }
     }
 
@@ -641,7 +641,6 @@ namespace ShipManifest.Windows
     {
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
-      const float yOffset = 160;
       var modules = ScienceModulesSource.Keys.ToArray();
       foreach (var pm in modules)
       {
@@ -840,7 +839,7 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceDetailsViewer(TransferPump.TypePump pumpType, Vector2 scrollPosition)
+    private static void ResourceDetailsViewer(TransferPump.TypePump pumpType)
     {
       // Let's get the pump objects we may use...
       var selectedResources = SMAddon.SmVessel.SelectedResources;
@@ -875,7 +874,7 @@ namespace ShipManifest.Windows
       if (TransferPump.PumpProcessOn)
       {
         // We want to show this during transfer if the direction is correct...
-        if (SMAddon.ActivePumpType == pumpType)
+        if (activePump.PumpType == pumpType)
         {
           GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
           GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"));
