@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
+using KSP.UI.Screens;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Process;
@@ -994,14 +995,14 @@ namespace ShipManifest
       if (smessages != null)
       {
         var smessagesToRemove =
-          smessages.activeMessages.Where(
+          smessages..activeMessages.Where(
             x =>
               Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
               x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
         foreach (var m in smessagesToRemove)
           ScreenMessages.RemoveMessage(m);
-        var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
-        ScreenMessages.PostScreenMessage(strMessage, failmessage, true);
+        var failmessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
+        ScreenMessages.PostScreenMessage(failmessage);
       }
     }
 

@@ -130,6 +130,9 @@ namespace ShipManifest.Windows
         case Tab.Light:
           TabLight.Display(displayViewerPosition);
           break;
+        case Tab.Lab:
+          TabScienceLab.Display(displayViewerPosition);
+          break;
         case Tab.None:
           break;
         default:
@@ -166,6 +169,12 @@ namespace ShipManifest.Windows
           if (GUILayout.Button("Turn On All Lights", GUILayout.Height(20)))
             TabLight.TurnOnAllLights();
           break;
+        case Tab.Lab:
+          if (GUILayout.Button("Turn Off All Labs", GUILayout.Height(20)))
+            TabLight.TurnOffAllLights();
+          if (GUILayout.Button("Turn On All Labs", GUILayout.Height(20)))
+            TabLight.TurnOnAllLights();
+          break;
         case Tab.None:
           break;
         default:
@@ -180,7 +189,8 @@ namespace ShipManifest.Windows
       Hatch,
       Panel,
       Antenna,
-      Light
+      Light,
+      Lab
     }
   }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using KSP.UI.Dialogs;
 using ShipManifest.APIClients;
 using ShipManifest.Process;
 using ShipManifest.Windows;

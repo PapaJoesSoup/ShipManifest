@@ -142,6 +142,17 @@ namespace ShipManifest
       }
     }
 
+    private List<ModuleScienceLab> _labs = new List<ModuleScienceLab>();
+    internal List<ModuleScienceLab> Labs
+    {
+      get { return _labs ?? (_labs = new List<ModuleScienceLab>()); }
+      set
+      {
+        _labs.Clear();
+        _labs = value;
+      }
+    }
+
     private List<ModAntenna> _antennas = new List<ModAntenna>();
     internal List<ModAntenna> Antennas
     {
@@ -183,6 +194,7 @@ namespace ShipManifest
       GetAntennas();
       GetLights();
       GetSolarPanels();
+      GetLabs();
       WindowRoster.GetRosterList();
       Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
 
@@ -427,6 +439,29 @@ namespace ShipManifest
       catch (Exception ex)
       {
         Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+      }
+    }
+
+    internal void GetLabs()
+    {
+      _labs.Clear();
+      try
+      {
+        foreach (var pPart in Vessel.Parts)
+        {
+          var part = pPart;
+          foreach (var pLab in from PartModule pModule in pPart.Modules
+                               where pModule.moduleName == "ModuleScienceLab"
+                               select (ModuleScienceLab)pModule)
+          {
+            _labs.Add(pLab);
+            break;
+          }
+        }
+      }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage(string.Format("Error in GetLabs().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 

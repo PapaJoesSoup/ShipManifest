@@ -167,7 +167,8 @@ namespace ShipManifest.Process
         // if moving within a part, set the seat2seat flag
         IsSeat2SeatXfer = FromPart == ToPart;
       }
-      FlightEVA.fetch.DisableInterface();
+      //FlightEVA.fetch.DisableInterface();
+      CrewHatchController.fetch.DisableInterface();
       _crewXferActive = true;
     }
 
@@ -284,7 +285,8 @@ namespace ShipManifest.Process
       IvaPortraitDelay = 0;
       FromCrewMember = ToCrewMember = null;
       SMAddon.SmVessel.RespawnCrew();
-      FlightEVA.fetch.EnableInterface();
+      //FlightEVA.fetch.EnableInterface();
+      CrewHatchController.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
       CrewXferState = XferState.Off;
       _crewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
@@ -356,8 +358,7 @@ namespace ShipManifest.Process
           }
         }
 
-        FromPart.SpawnCrew();
-        ToPart.SpawnCrew();
+        FromPart.vessel.SpawnCrew();
 
         // not sure if these help.   We have been experiencing issues with "ghost" kerbals & EVAs/docking/undocking after Crew Moves.   
         // trying this to see if it "cleans up" any internal tracking inside of KSP...
@@ -388,7 +389,8 @@ namespace ShipManifest.Process
       SMAddon.SmVessel.TransferCrewObj.FromCrewMember = SMAddon.SmVessel.TransferCrewObj.ToCrewMember = null;
       CrewXferState = XferState.Off;
       _crewXferActive = IsSeat2SeatXfer = false;
-      FlightEVA.fetch.EnableInterface();
+      //FlightEVA.fetch.EnableInterface();
+      CrewHatchController.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
       IsStockXfer = false;
     }

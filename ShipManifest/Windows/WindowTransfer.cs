@@ -717,6 +717,11 @@ namespace ShipManifest.Windows
                                              ProcessController.Selection.OnlyProcessed);
               SMAddon.SmVessel.SelectedModuleSource = null;
             }
+            if (Event.current.type == EventType.Repaint && ShowToolTips)
+            {
+              var rect = GUILayoutUtility.GetLastRect();
+              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+            }
             if (GUILayout.Button(new GUIContent("Unproc", "Transfer only science that was not processed yet"), SMStyle.ButtonStyle, GUILayout.Width(50),
                                  GUILayout.Height(20)))
             {
@@ -725,6 +730,11 @@ namespace ShipManifest.Windows
                                                    SMAddon.SmVessel.SelectedModuleTarget,
                                              ProcessController.Selection.OnlyUnprocessed);
               SMAddon.SmVessel.SelectedModuleSource = null;
+            }
+            if (Event.current.type == EventType.Repaint && ShowToolTips)
+            {
+              var rect = GUILayoutUtility.GetLastRect();
+              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
             }
           }
         }
