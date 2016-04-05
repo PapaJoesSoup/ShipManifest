@@ -990,36 +990,38 @@ namespace ShipManifest
 
     internal static void DisplayScreenMsg(string strMessage)
     {
-      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-      var smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
-      {
-        var smessagesToRemove =
-          smessages..activeMessages.Where(
-            x =>
-              Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
-        var failmessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
-        ScreenMessages.PostScreenMessage(failmessage);
-      }
+      // TODO:  Still searching for a solution to removed existing screenMessages.
+      //var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
+      //var smessages = ScreenMessages.Instance;
+      //if (smessages != null)
+      //{
+      //  var smessagesToRemove =
+      //    smessages.activeMessages.Where(
+      //      x =>
+      //        Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
+      //        x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+      //  foreach (var m in smessagesToRemove)
+      //    ScreenMessages.RemoveMessage(m);
+      //}
+      var failmessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
+      ScreenMessages.PostScreenMessage(failmessage);
     }
 
     internal static void RemoveScreenMsg()
     {
       var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
       var smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
-      {
-        var smessagesToRemove =
-          smessages.activeMessages.Where(
-            x =>
-              Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
-      }
+      // TODO:  Still searching for a solution to located existing messages.
+      //if (smessages != null)
+      //{
+      //  var smessagesToRemove =
+      //    smessages.activeMessages.Where(
+      //      x =>
+      //        Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
+      //        x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
+      //  foreach (var m in smessagesToRemove)
+      //    ScreenMessages.RemoveMessage(m);
+      //}
     }
 
     // This method is used for autosave...
