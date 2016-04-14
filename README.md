@@ -1,6 +1,9 @@
 ShipManifest
 ============
 Version 5.0.9.0 - Release 05 Apr, 2016 - KSP 1.1 Compatability Update ** PreRelease **
+- New:  Modified screen message displays to account for channges to the object model.  Should now properly remove stock messages when Overriding Stock Crew Transfers.  wip.
+
+Version 5.0.9.0 - Release 05 Apr, 2016 - KSP 1.1 Compatability Update ** PreRelease **
 - New:  Updated code to run on KSP 1.1
 - New:  Modified screen message displays to account for channges to the object model.  SM screen messages are wip.
 
