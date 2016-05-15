@@ -990,7 +990,6 @@ namespace ShipManifest
 
     internal static void DisplayScreenMsg(string strMessage)
     {
-      //TODO: Still searching for a solution to removed existing screenMessages.
       var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
       var smessages = ScreenMessages.Instance;
       if (smessages != null)
@@ -1011,7 +1010,6 @@ namespace ShipManifest
     {
       var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
       var smessages = FindObjectOfType<ScreenMessages>();
-      // TODO:  Still searching for a solution to located existing messages.
       if (smessages != null)
       {
         var smessagesToRemove =
