@@ -20,15 +20,16 @@ namespace ShipManifest.Process
         // Value is number of labs that have processed it
         // (would allow to only move data not processed in all labs if there are multiple)
         var processedScience = new Dictionary<string, int>();
-
-        foreach (var lab in SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>())
+        var labs = SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().GetEnumerator();
+        while (labs.MoveNext())
         {
-          foreach (var data in lab.ExperimentData)
+          var dataitems = labs.Current.ExperimentData.GetEnumerator();
+          while (dataitems.MoveNext())
           {
-            if (!processedScience.ContainsKey(data))
-              processedScience.Add(data, 1);
+            if (!processedScience.ContainsKey(dataitems.Current))
+              processedScience.Add(dataitems.Current, 1);
             else
-              processedScience[data]++;
+              processedScience[dataitems.Current]++;
           }
         }
 

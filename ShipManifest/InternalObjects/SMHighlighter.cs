@@ -25,8 +25,11 @@ namespace ShipManifest.InternalObjects
     {
       if (parts != null)
       {
-        foreach (var part in parts)
-          ClearPartHighlight(part);
+        var list = parts.GetEnumerator();
+        while (list.MoveNext())
+        {
+          ClearPartHighlight(list.Current);          
+        }
       }
     }
 
@@ -38,11 +41,11 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        if (part != null)
+        if (part != null && part.highlighter.highlighted)
         {
-          part.SetHighlight(false, false);
+          //part.SetHighlight(false, false);
           part.SetHighlightDefault();
-          part.highlightType = Part.HighlightType.OnMouseOver;
+          //part.highlightType = Part.HighlightType.OnMouseOver;
         }
       }
       catch (Exception ex)
@@ -60,9 +63,10 @@ namespace ShipManifest.InternalObjects
     {
       if (resourceParts != null)
       {
-        foreach (var part in resourceParts)
+        var list = resourceParts.GetEnumerator();
+        while (list.MoveNext())
         {
-          ClearPartHighlight(part);
+          ClearPartHighlight(list.Current);
         }
         if (SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.GetClsVessel())
         {
@@ -76,9 +80,11 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        foreach (var part in parts)
+        var list = parts.GetEnumerator();
+        while (list.MoveNext())
         {
-          SetPartHighlight(part, color);
+          if (!list.Current.highlighter.highlighted)
+          SetPartHighlight(list.Current, color);
         }
       }
       catch (Exception ex)
@@ -94,9 +100,10 @@ namespace ShipManifest.InternalObjects
       {
         if (part != null)
         {
-          part.SetHighlightColor(color);
-          part.SetHighlight(true, false);
+          if (!part.HighlightActive)
+            part.SetHighlight(true, false);
           part.highlightType = Part.HighlightType.AlwaysOn;
+          part.SetHighlightColor(color);
         }
       }
       catch (Exception ex)
@@ -162,20 +169,20 @@ namespace ShipManifest.InternalObjects
     {
       if (SMSettings.EnableEdgeHighlighting)
       {
-        foreach (var part in parts)
+        var list = parts.GetEnumerator();
+        while (list.MoveNext())
         {
-          var highlighter = part.highlighter;
           if (enable)
           {
             if (string.IsNullOrEmpty(color))
               color = SMSettings.MouseOverColor;
-            highlighter.SeeThroughOn();
-            highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
+            list.Current.highlighter.SeeThroughOn();
+            list.Current.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
           }
           else
           {
-            highlighter.SeeThroughOff();
-            highlighter.ConstantOffImmediate();
+            list.Current.highlighter.SeeThroughOff();
+            list.Current.highlighter.ConstantOffImmediate();
           }
         }
       }
@@ -185,17 +192,17 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        //SmAddon.UpdateCLSSpaces();
         if (SMAddon.ClsAddon.Vessel == null)
           SMAddon.UpdateClsSpaces();
-        if (SMAddon.ClsAddon.Vessel != null)
+        if (SMAddon.ClsAddon.Vessel == null) return;
+        var spaces = SMAddon.ClsAddon.Vessel.Spaces.GetEnumerator();
+        while (spaces.MoveNext())
         {
-          foreach (var space in SMAddon.ClsAddon.Vessel.Spaces)
+          if (spaces.Current == null) continue;
+          var parts = spaces.Current.Parts.GetEnumerator();
+          while (parts.MoveNext())
           {
-            foreach (var part in space.Parts)
-            {
-              part.Highlight(enabled, force);
-            }
+            parts.Current?.Highlight(enabled, force);
           }
         }
       }
@@ -211,81 +218,78 @@ namespace ShipManifest.InternalObjects
       }
     }
 
+    // This method is expensive.  Refactor to consume less CPU.
     internal static void Update_Highlighter()
     {
       var step = "";
       try
       {
         // Do we even want to highlight?
-        if (SMSettings.EnableHighlighting)
+        if (!SMSettings.EnableHighlighting) return;
+        step = "Showhipmanifest = true";
+        if (!SMConditions.CanShowShipManifest()) return;
+        //step = "Clear old highlighting";
+        //// Clear Highlighting on everything, start fresh
+        //EdgeHighight(SMAddon.SmVessel.Vessel.parts, false);
+        //ClearPartsHighlight(SMAddon.SmVessel.Vessel.parts);
+
+        step = "Mouseover highlighting, if any";
+        // Supports Transfer Window vessel/part Highlighting....
+        if (IsMouseOver)
         {
-          step = "Showhipmanifest = true";
-          if (SMConditions.CanShowShipManifest())
+          if (MouseOverRect.Contains(Event.current.mousePosition))
           {
-            step = "Clear old highlighting";
-            // Clear Highlighting on everything, start fresh
-            EdgeHighight(SMAddon.SmVessel.Vessel.parts, false);
-            ClearPartsHighlight(SMAddon.SmVessel.Vessel.parts);
-
-            step = "Mouseover highlighting, if any";
-            // Supports Transfer Window vessel/part Highlighting....
-            if (IsMouseOver)
-            {
-              if (MouseOverRect.Contains(Event.current.mousePosition))
-              {
-                if (MouseOverpart == null && MouseOverparts != null)
-                  MouseOverHighlight(MouseOverparts);
-                else if (MouseOverpart != null)
-                  MouseOverHighlight(MouseOverpart);
-              }
-              else
-              {
-                IsMouseOver = false;
-                MouseOverpart = null;
-                MouseOverparts = null;
-              }
-            }
-
-            if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
-            {
-              // If Crew and cls, perform cls Highlighting
-              if (SMConditions.IsClsHighlightingEnabled())
-              {
-                step = "Highlight CLS vessel";
-                HighlightClsVessel(true, true);
-
-                // Turn off the source and target cls highlighting.  We are going to replace it.
-                if (SMAddon.SmVessel.ClsPartSource != null)
-                  SMAddon.SmVessel.ClsPartSource.Highlight(false, true);
-                if (SMAddon.SmVessel.ClsPartTarget != null)
-                  SMAddon.SmVessel.ClsPartTarget.Highlight(false, true);
-              }
-
-              // Default is yellow
-              step = "Set non selected resource part color";
-              var partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
-
-              // match color used by CLS if active
-              if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-                  SMSettings.EnableCls)
-                partColor = Color.green;
-
-              step = "Set Resource Part Colors";
-              if (!SMSettings.OnlySourceTarget)
-              {
-                SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, partColor);
-              }
-
-              step = "Set Selected Part Colors";
-              SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
-              if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-                  SMSettings.EnableCls)
-                SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget,
-                  SMSettings.Colors[SMSettings.TargetPartCrewColor]);
-              else
-                SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);
-            }
+            if (MouseOverpart == null && MouseOverparts != null)
+              MouseOverHighlight(MouseOverparts);
+            else if (MouseOverpart != null)
+              MouseOverHighlight(MouseOverpart);
           }
+          else
+          {
+            IsMouseOver = false;
+            MouseOverpart = null;
+            MouseOverparts = null;
+          }
+        }
+
+        if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
+        {
+          // If Crew and cls, perform cls Highlighting
+          if (SMConditions.IsClsHighlightingEnabled())
+          {
+            step = "Highlight CLS vessel";
+            HighlightClsVessel(true, true);
+
+            // Turn off the source and target cls highlighting.  We are going to replace it.
+            if (SMAddon.SmVessel.ClsPartSource != null)
+              SMAddon.SmVessel.ClsPartSource.Highlight(false, true);
+            if (SMAddon.SmVessel.ClsPartTarget != null)
+              SMAddon.SmVessel.ClsPartTarget.Highlight(false, true);
+          }
+
+          // Default is yellow
+          step = "Set non selected resource part color";
+          var partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
+
+          // match color used by CLS if active
+          if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
+              SMSettings.EnableCls)
+            partColor = Color.green;
+
+          step = "Set Resource Part Colors";
+          if (!SMSettings.OnlySourceTarget)
+          {
+            SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, partColor);
+          }
+
+          step = "Set Selected Part Colors";
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
+          if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
+              SMSettings.EnableCls)
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget,
+              SMSettings.Colors[SMSettings.TargetPartCrewColor]);
+          else
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);
         }
       }
       catch (Exception ex)

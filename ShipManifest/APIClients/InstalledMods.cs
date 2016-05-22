@@ -45,24 +45,31 @@ namespace ShipManifest.APIClients
     internal static void DisplayAssemblyList()
     {
       var sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
-      foreach (var assembly in sortedAssemblies)
+      if (sortedAssemblies.Count == 0) return;
+      var list = sortedAssemblies.GetEnumerator();
+      while (list.MoveNext())
       {
-        var fullName = assembly.FullName.Split(',');
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(190));
-        GUILayout.Label(fullName[1]);
-        GUILayout.EndHorizontal();
+        if (list.Current != null)
+        {
+          var fullName = list.Current.FullName.Split(',');
+          GUILayout.BeginHorizontal();
+          GUILayout.Label(fullName[0], GUILayout.Width(190));
+          GUILayout.Label(fullName[1]);
+          GUILayout.EndHorizontal();
+        }
       }
     }
 
     internal static void DisplayModList()
     {
       var sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
-      foreach (var assembly in sortedAssemblies)
+      if (sortedAssemblies.Count == 0) return;
+      var list = sortedAssemblies.GetEnumerator();
+      while (list.MoveNext())
       {
-        if (!IsKspAssembly(assembly.FullName))
+        if (list.Current != null)
         {
-          var fullName = assembly.FullName.Split(',');
+          var fullName = list.Current.FullName.Split(',');
           GUILayout.BeginHorizontal();
           GUILayout.Label(fullName[0], GUILayout.Width(190));
           GUILayout.Label(fullName[1]);

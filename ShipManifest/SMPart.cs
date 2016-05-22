@@ -81,9 +81,10 @@ namespace ShipManifest
 
     internal static void FillResource(List<Part> partList, string resourceName)
     {
-      foreach (var part in partList.Where(part => part.Resources.Contains(resourceName)))
+      var list = partList.Where(part => part.Resources.Contains(resourceName)).GetEnumerator();
+      while (list.MoveNext())
       {
-        part.Resources[resourceName].amount = part.Resources[resourceName].maxAmount;
+        list.Current.Resources[resourceName].amount = list.Current.Resources[resourceName].maxAmount;
       }
     }
   }
