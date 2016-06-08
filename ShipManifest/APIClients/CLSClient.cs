@@ -1,32 +1,31 @@
+using System;
 using System.Linq;
 using System.Reflection;
 
 namespace ShipManifest.APIClients
 {
-  internal class ClsClient
+  static class CLSClient
   {
-    private static ConnectedLivingSpace.ICLSAddon _cls;
-    private static bool? _clsAvailable;
+    static PropertyInfo cls;
 
-    public static ConnectedLivingSpace.ICLSAddon GetCls()
+    static CLSClient()
     {
-      var clsAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ConnectedLivingSpace.CLSAddon");
-      if (clsAddonType == null) return _cls;
-      var realClsAddon = clsAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
-      _cls = (ConnectedLivingSpace.ICLSAddon)realClsAddon;
-      return _cls;
+      Type cls_type = AssemblyLoader
+        .loadedAssemblies
+        .SelectMany(a => a.assembly.GetExportedTypes())
+        .SingleOrDefault(t => t.FullName == "ConnectedLivingSpace.CLSAddon");
+
+      if (cls_type != null) cls = cls_type.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
     }
 
-    public static bool ClsInstalled
+    public static bool CLSInstalled()
     {
-      get
-      {
-        if (_clsAvailable == null)
-        {
-          _clsAvailable = GetCls() != null;
-        }
-        return (bool)_clsAvailable;
-      }
+      return cls != null;
+    }
+
+    public static ConnectedLivingSpace.ICLSAddon GetCLS()
+    {
+      return (ConnectedLivingSpace.ICLSAddon) cls?.GetValue(null, null);
     }
   }
 }

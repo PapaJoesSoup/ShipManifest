@@ -129,6 +129,7 @@ namespace ShipManifest
           _logItemList.Add(type + ": " + msg);
         if (type == LogType.Error && SMSettings.AutoDebug)
           WindowDebugger.ShowWindow = true;
+        Debug.Log(string.Format("[ShipManifest] - {0}:  {1}", type,msg));
       }
       catch (Exception ex)
       {

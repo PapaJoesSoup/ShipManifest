@@ -1,4 +1,8 @@
-﻿Version 5.1.0.0 - Release 14 May, 2016 - KSP 1.1.2 Compatability Update
+﻿Version 5.1.0.1 - Release xx Jun, 2016 - Bug fixes.
+- Fixed:  NulRef errror with DeepFreeze installed and a frozen kerbal in RosterListViewer.
+- New:  Added logging to output.log.  this will make the output.log more useful for troubleshooting.  Captures all log entries, verbose or not.
+
+Version 5.1.0.0 - Release 14 May, 2016 - KSP 1.1.2 Compatability Update
 - New:  Updated mod to support KSP 1.1.2.
 - New:  Updated screen maeeages to use new object model.  
 

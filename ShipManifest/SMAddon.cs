@@ -683,19 +683,17 @@ namespace ShipManifest
       //Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
       try
       {
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-        {
-          WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
-          SMSettings.MemStoreTempSettings();
-          if (SMSettings.EnableBlizzyToolbar)
-            _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
-              ? TextureFolder + "IconS_On_24"
-              : TextureFolder + "IconS_Off_24";
-          else
-            _smSettingsStock.SetTexture(
-              GameDatabase.Instance.GetTexture(
-                WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
-        }
+        if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
+        WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
+        SMSettings.MemStoreTempSettings();
+        if (SMSettings.EnableBlizzyToolbar)
+          _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
+            ? TextureFolder + "IconS_On_24"
+            : TextureFolder + "IconS_Off_24";
+        else
+          _smSettingsStock.SetTexture(
+            GameDatabase.Instance.GetTexture(
+              WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
       }
       catch (Exception ex)
       {
@@ -901,7 +899,7 @@ namespace ShipManifest
 
     internal static bool GetClsAddon()
     {
-      ClsAddon = ClsClient.GetCls();
+      ClsAddon = CLSClient.GetCLS();
       return ClsAddon != null;
     }
 

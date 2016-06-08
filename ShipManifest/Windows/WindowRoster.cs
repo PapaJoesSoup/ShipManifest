@@ -152,7 +152,7 @@ namespace ShipManifest.Windows
         case KerbalFilters.Vessel:
           if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) ||
               (InstalledMods.IsDfInstalled &&
-               GetFrozenKerbalDetials(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
+               GetFrozenKerbalDetails(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
             return true;
           break;
       }
@@ -282,10 +282,10 @@ namespace ShipManifest.Windows
                 }
               }
             }
-            else if (InstalledMods.IsDfInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+            else if (InstalledMods.IsDfInstalled && DFWrapper.APIReady && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
             {
               // This kerbal could be frozen.  Lets find out...
-              rosterDetails = GetFrozenKerbalDetials(kerbal);
+              rosterDetails = GetFrozenKerbalDetails(kerbal);
               labelStyle = SMStyle.LabelStyleCyan;
             }
             else
@@ -355,8 +355,10 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          String.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        }
       }
     }
 
@@ -432,7 +434,7 @@ namespace ShipManifest.Windows
         RosterList.Clear();
         RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
         // Support for DeepFreeze
-        if (InstalledMods.IsDfInstalled)
+        if (InstalledMods.IsDfInstalled && DFWrapper.APIReady)
           RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
       }
       catch (Exception ex)
@@ -530,15 +532,30 @@ namespace ShipManifest.Windows
     #endregion Gui Layout
 
     #region Methods
-    private static string GetFrozenKerbalDetials(ProtoCrewMember kerbal)
+    private static string GetFrozenKerbalDetails(ProtoCrewMember kerbal)
     {
-      string rosterDetails;
-      if (DFWrapper.DeepFreezeAPI.FrozenKerbals.ContainsKey(kerbal.name))
-        rosterDetails = "Frozen - " + DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "");
-      else
-        rosterDetails = "Frozen";
-
-      return rosterDetails;
+      try
+      {
+        string rosterDetails = "";
+        if (!DFWrapper.APIReady) DFWrapper.InitDFWrapper();
+        if (DFWrapper.APIReady)
+        {
+          if (DFWrapper.DeepFreezeAPI.FrozenKerbals.ContainsKey(kerbal.name))
+            rosterDetails = string.Format("Frozen - {0}", DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", ""));
+          else
+            rosterDetails = "Frozen";
+        }
+        return rosterDetails;
+      }
+      catch (Exception ex)
+      {
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), Utilities.LogType.Error,
+            true);
+        }
+        return "Display Error:";
+      }
     }
 
     public static void ResetKerbalNames()
