@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using ShipManifest.InternalObjects;
 using ShipManifest.Windows;
 using ShipManifest.Windows.Tabs;
 using UnityEngine;
@@ -31,6 +33,7 @@ namespace ShipManifest
     // Realism Tab Feature Options
     internal static bool RealismMode = true;
     internal static bool EnableCrew = true;
+    internal static bool EnableStockCrewXfer = true;
     internal static bool OverrideStockCrewXfer = true;
     internal static bool EnableCls = true;
     internal static bool EnableScience = true;
@@ -117,7 +120,6 @@ namespace ShipManifest
     internal static string MouseOverColor = "green";
     internal static double CrewXferDelaySec = 7;
     internal static int IvaUpdateFrameDelay = 20;
-    internal static bool EnableOnCrewTransferEvent = true;
 
 
     // End Persisted Properties
@@ -147,7 +149,8 @@ namespace ShipManifest
     internal static bool PrevEnableEdgeHighlighting = true;
     internal static bool PrevEnableScience = true;
     internal static bool PrevEnableCrew = true;
-    internal static bool PrevOverrideStockCrewTransfer = true;
+    internal static bool PrevEnableStockCrewXfer = true;
+    internal static bool PrevOverrideStockCrewXfer = true;
     internal static bool PrevEnablePfResources = true;
     internal static bool PrevEnableCls = true;
     internal static bool PrevEnableBlizzyToolbar;
@@ -230,6 +233,10 @@ namespace ShipManifest
           ? bool.Parse(settingsNode.GetValue("RealismMode"))
           : RealismMode;
         EnableCrew = settingsNode.HasValue("EnableCrew") ? bool.Parse(settingsNode.GetValue("EnableCrew")) : EnableCrew;
+        EnableStockCrewXfer = settingsNode.HasValue("EnableStockCrewTransfer")
+          ? bool.Parse(settingsNode.GetValue("EnableStockCrewTransfer"))
+          : EnableStockCrewXfer;
+
         EnableScience = settingsNode.HasValue("EnableScience")
           ? bool.Parse(settingsNode.GetValue("EnableScience"))
           : EnableScience;
@@ -402,10 +409,6 @@ namespace ShipManifest
         IvaUpdateFrameDelay = hiddenNode.HasValue("IvaUpdateFrameDelay")
           ? int.Parse(hiddenNode.GetValue("IvaUpdateFrameDelay"))
           : IvaUpdateFrameDelay;
-        EnableOnCrewTransferEvent = hiddenNode.HasValue("EnableOnCrewTransferEvent")
-          ? bool.Parse(hiddenNode.GetValue("EnableOnCrewTransferEvent"))
-          : EnableOnCrewTransferEvent;
-
         // Okay, set the Settings loaded flag
         Loaded = true;
         MemStoreTempSettings();
@@ -422,6 +425,22 @@ namespace ShipManifest
     {
       if (Loaded && (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER))
       {
+        if (EnableStockCrewXfer != PrevEnableStockCrewXfer)
+        {
+          // wrap in a try, as save can be executed outside of the flight scene and we don't care if it fails...
+          try
+          {
+            foreach (var part in SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()])
+            {
+              part.crewTransferAvailable = EnableStockCrewXfer;
+            }
+          }
+          catch (Exception)
+          {
+            // Do nothing.   We don't care if it fails when outside of the Flight Scene.
+          }
+        }
+
         MemStoreTempSettings();
         if (Settings == null)
           Settings = LoadSettingsFile();
@@ -446,6 +465,7 @@ namespace ShipManifest
         // Realism Settings
         WriteValue(settingsNode, "RealismMode", RealismMode);
         WriteValue(settingsNode, "EnableCrew", EnableCrew);
+        WriteValue(settingsNode, "EnableStockCrewTransfer", EnableStockCrewXfer);
         WriteValue(settingsNode, "EnableScience", EnableScience);
         WriteValue(settingsNode, "EnableResources", EnableResources);
         WriteValue(settingsNode, "EnablePFResources", EnablePfResources);
@@ -516,7 +536,6 @@ namespace ShipManifest
         WriteValue(hiddenNode, "MouseOverColor", MouseOverColor);
         WriteValue(hiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
         WriteValue(hiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
-        WriteValue(hiddenNode, "EnableOnCrewTransferEvent", EnableOnCrewTransferEvent);
 
         if (!Directory.Exists(SettingsPath))
           Directory.CreateDirectory(SettingsPath);
@@ -607,7 +626,8 @@ namespace ShipManifest
       PrevEnableCrew = EnableCrew;
       PrevEnablePfResources = EnablePfResources;
       PrevEnableCls = EnableCls;
-      PrevOverrideStockCrewTransfer = OverrideStockCrewXfer;
+      PrevEnableStockCrewXfer = EnableStockCrewXfer;
+      PrevOverrideStockCrewXfer = OverrideStockCrewXfer;
       PrevEnableKerbalRename = EnableKerbalRename;
       PrevRenameWithProfession = RenameWithProfession;
       PrevUseUnityStyle = UseUnityStyle;
@@ -665,7 +685,8 @@ namespace ShipManifest
       EnableCrew = PrevEnableCrew;
       EnablePfResources = PrevEnablePfResources;
       EnableCls = PrevEnableCls;
-      OverrideStockCrewXfer = PrevOverrideStockCrewTransfer;
+      EnableStockCrewXfer = PrevEnableStockCrewXfer;
+      OverrideStockCrewXfer = PrevOverrideStockCrewXfer;
       EnableKerbalRename = PrevEnableKerbalRename;
       RenameWithProfession = PrevRenameWithProfession;
       UseUnityStyle = PrevUseUnityStyle;

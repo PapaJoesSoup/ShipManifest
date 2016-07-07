@@ -159,12 +159,12 @@ namespace ShipManifest
 
         if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         // Instantiate Event handlers
+        GameEvents.onCrewTransferSelected.Add(OnCrewTransferSelected);
         GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
         GameEvents.onVesselChange.Add(OnVesselChange);
         GameEvents.onVesselWasModified.Add(OnVesselWasModified);
         GameEvents.onVesselChange.Add(OnVesselChange);
         GameEvents.onVesselLoaded.Add(OnVesselLoaded);
-        GameEvents.onCrewTransferred.Add(OnCrewTransferred);
         GameEvents.onShowUI.Add(OnShowUi);
         GameEvents.onHideUI.Add(OnHideUi);
 
@@ -213,13 +213,13 @@ namespace ShipManifest
         if (SMSettings.Loaded)
           SMSettings.SaveSettings();
 
+        GameEvents.onCrewTransferSelected.Remove(OnCrewTransferSelected);
         GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
         GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
         GameEvents.onVesselChange.Remove(OnVesselChange);
         GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
         GameEvents.onVesselChange.Remove(OnVesselChange);
         GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
-        GameEvents.onCrewTransferred.Remove(OnCrewTransferred);
         GameEvents.onHideUI.Remove(OnHideUi);
         GameEvents.onShowUI.Remove(OnShowUi);
 
@@ -302,7 +302,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel == null) return;
 
-        SMHighlighter.Update_Highlighter();
+        if (SmVessel.SelectedResources.Count > 0) SMHighlighter.Update_Highlighter();
 
         // Realism Mode Resource transfer operation (real time)
         // PumpActive is flagged in the Resource Controller
@@ -326,13 +326,11 @@ namespace ShipManifest
           SmVessel.TransferCrewObj.CrewTransferProcess();
         else if (SmVessel.TransferCrewObj.IsStockXfer)
         {
-          TransferCrew.RevertCrewTransfer(SmVessel.TransferCrewObj.FromCrewMember, SmVessel.TransferCrewObj.FromPart,
-            SmVessel.TransferCrewObj.ToPart);
           SmVessel.TransferCrewObj.CrewTransferBegin(SmVessel.TransferCrewObj.FromCrewMember,
             SmVessel.TransferCrewObj.FromPart, SmVessel.TransferCrewObj.ToPart);
         }
 
-        if (!SMSettings.EnableOnCrewTransferEvent || !TransferCrew.FireSourceXferEvent) return;
+        if (!SMSettings.EnableStockCrewXfer || !TransferCrew.FireSourceXferEvent) return;
         // Now let's deal with third party mod support...
         TransferCrew.FireSourceXferEvent = false;
         GameEvents.onCrewTransferred.Fire(TransferCrew.SourceAction);
@@ -377,54 +375,58 @@ namespace ShipManifest
     }
 
     // Crew Event handlers
-    internal void OnCrewTransferred(GameEvents.HostedFromToAction<ProtoCrewMember, Part> action)
+    /// <summary>
+    /// OnCrewTransferSelected (GameEvent Handler)
+    /// This method captures a Stock Crew Transfer event just prior to the actual crew move.
+    /// </summary>
+    /// <param name="crewTransferData"></param>
+    internal void OnCrewTransferSelected(CrewTransfer.CrewTransferData crewTransferData)
     {
-      // If the transfer window is not open, then no SM transfer is occuring.  ignore event.
-      if (!WindowTransfer.ShowWindow) return;
+      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM  Crew Transfers are active
+      if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
-      // We are performing a mod notification. Ignore the event.
-      if ((action.host == TransferCrew.SourceAction.host && action.from == TransferCrew.SourceAction.from &&
-           action.to == TransferCrew.SourceAction.to)
-          ||
-          action.host == TransferCrew.TargetAction.host && action.from == TransferCrew.TargetAction.from &&
-          action.to == TransferCrew.TargetAction.to) return;
-
-      // no SM crew Xfers in progress, so Non-override stock Xfers and EVAs require no action
-      if (!SmVessel.TransferCrewObj.CrewXferActive && (!SMSettings.OverrideStockCrewXfer 
-          ||
-          action.to.Modules.Cast<PartModule>().Any(x => x is KerbalEVA) ||
-          action.from.Modules.Cast<PartModule>().Any(x => x is KerbalEVA))) return;
-
-      if (SmVessel.TransferCrewObj.CrewXferActive)
+      // Disable the stock Transfer action if SM dictates.
+      if (!SMSettings.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
       {
-        // Remove the transfer message that stock displayed. 
-        RemoveScreenMsg();
-
-        var failMessage =
-          string.Format("<color=orange>{0} is unable to xfer to {1}.  An SM Crew Xfer is in progress</color>",
-            action.host.name, action.to.partInfo.title);
-        DisplayScreenMsg(failMessage);
-        TransferCrew.RevertCrewTransfer(action.host, action.from, action.to);
+        if (!SMSettings.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
+        if (TransferCrew.CrewXferState != TransferCrew.XferState.Off) DisplayScreenMsg("Stock Crew Transfer Disabled.  SM Crew Transfer in Progress.");
+        crewTransferData.canTransfer = false;
+        return;
       }
-      else
+
+      // If override is off, then ignore.
+      if (!SMSettings.OverrideStockCrewXfer) return;
+
+      //Check for DeepFreezer full. if full, abort handling Xfer.
+      if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && crewTransferData.destPart.Modules.Contains("DeepFreezer"))
       {
-        //Check for DeepFreezer full. if full, abort handling Xfer.
-        if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && action.to.Modules.Contains("DeepFreezer"))
-          if (new DFWrapper.DeepFreezer(action.to.Modules["DeepFreezer"]).FreezerSpace == 0) return;
-
-        // If we are here, then we want to override the Stock Xfer...
-        RemoveScreenMsg();
-
-        // store data from event.
-        SmVessel.TransferCrewObj.FromPart = action.from;
-        SmVessel.TransferCrewObj.ToPart = action.to;
-        SmVessel.TransferCrewObj.FromCrewMember = action.host;
-        if (SmVessel.TransferCrewObj.FromPart != null && SmVessel.TransferCrewObj.ToPart != null)
-          SmVessel.TransferCrewObj.IsStockXfer = true;
+        if (new DFWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
+        {
+          DisplayScreenMsg("Destination part is a Freezer and it is full. Aborting Transfer.");
+          crewTransferData.canTransfer = false;
+          return;
+        }
       }
+
+      // CLS is enabled and parts are not in same space.  Abort Transfer.
+      if (!SMConditions.IsClsInSameSpace(crewTransferData.sourcePart, crewTransferData.destPart))
+      {
+         DisplayScreenMsg("CLS is Enabled in SM. Parts are not in Same Space. Aborting Transfer.");
+        crewTransferData.canTransfer = false;
+        return;
+      };
+
+      if (!SMSettings.RealismMode) return;
+      // OK, ealism and override are on lets manage the Crew transfer
+      // store data from event.
+      DisplayScreenMsg("SM is overriding Stock Transfers.  SM based Crew Transfer initiating...");
+      SmVessel.TransferCrewObj.FromPart = crewTransferData.sourcePart;
+      SmVessel.TransferCrewObj.ToPart = crewTransferData.destPart;
+      SmVessel.TransferCrewObj.FromCrewMember = crewTransferData.crewMember;
+      SmVessel.TransferCrewObj.IsStockXfer = true;
+      crewTransferData.canTransfer = false;
     }
 
-    //Vessel state handlers
     internal void OnVesselWasModified(Vessel modVessel)
     {
       try
@@ -972,18 +974,6 @@ namespace ShipManifest
 
     internal static void DisplayScreenMsg(string strMessage)
     {
-      var failmessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.LOWER_CENTER);
-      var smessages = ScreenMessages.Instance;
-      if (smessages != null)
-      {
-        var smessagesToRemove =
-          smessages.ActiveMessages.Where(
-            x =>
-              Math.Abs(x.startTime - failmessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.LOWER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
-      }
       var smessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
       ScreenMessages.PostScreenMessage(smessage);
     }

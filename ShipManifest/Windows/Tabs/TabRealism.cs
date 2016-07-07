@@ -78,6 +78,23 @@ namespace ShipManifest.Windows.Tabs
         }
       }
 
+      // Enable stock Crew Xfers
+      GUI.enabled = isEnabled;
+      GUILayout.BeginHorizontal();
+      _label = "Enable Stock Crew Xfers";
+      _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
+      _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will be Allowed.";
+      _toolTip += "\r\nWhen Off (requires Realism Mode On), Stock Crew transfers are disabled (the Transfer options will still appear, but are blocked.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUILayout.Space(20);
+      SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
+        GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.EndHorizontal();
+
       // Enable stock Crew Xfer Override
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ConnectedLivingSpace;
 using KSP.UI.Dialogs;
 using ShipManifest.APIClients;
 using ShipManifest.Process;
@@ -31,6 +32,15 @@ namespace ShipManifest.InternalObjects
              (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
     }
 
+    internal static bool CanKerbalsBeXferred(Part sourcePart, Part targetPart)
+    {
+      var sourceParts = new List<Part>();
+      sourceParts.Add(sourcePart);
+      var targetParts = new List<Part>();
+      targetParts.Add(targetPart);
+
+      return CanKerbalsBeXferred(sourceParts, targetParts);
+    }
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
     {
       var results = false;
@@ -103,6 +113,34 @@ namespace ShipManifest.InternalObjects
       return results;
     }
 
+    internal static bool IsClsInSameSpace(Part source, Part target)
+    {
+      var results = false;
+      if (SMSettings.EnableCls && SMSettings.RealismMode)
+      {
+        if (SMAddon.ClsAddon.Vessel != null)
+        {
+          ICLSSpace sourceSpace = null;
+          ICLSSpace targetSpace = null;
+          foreach (ICLSPart ipart in SMAddon.ClsAddon.Vessel.Parts)
+          {
+            if (ipart.Part == source) sourceSpace = ipart.Space;
+            if (ipart.Part == target) targetSpace = ipart.Space;
+            if (sourceSpace != null && targetSpace != null) break;
+          }
+
+          if (sourceSpace != null && targetSpace != null && sourceSpace == targetSpace)
+          {
+            results = true;
+          }
+        }
+      }
+      else
+      {
+        results = true;
+      }
+      return results;
+    }
     internal static bool IsClsInSameSpace()
     {
       var results = false;
@@ -167,9 +205,9 @@ namespace ShipManifest.InternalObjects
             && FlightGlobals.ActiveVessel != null
             && !FlightGlobals.ActiveVessel.isEVA
             && FlightGlobals.ActiveVessel.vesselType != VesselType.Flag
-            && FlightGlobals.ActiveVessel.vesselType != VesselType.Debris
-            && FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
-            && CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
+            //&& FlightGlobals.ActiveVessel.vesselType != VesselType.Debris
+            //&& FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
+            //&& CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
           )
           canShow = ignoreShowSm || WindowManifest.ShowWindow;
         return canShow;

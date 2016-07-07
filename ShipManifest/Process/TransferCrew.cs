@@ -292,16 +292,22 @@ namespace ShipManifest.Process
       _crewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
     }
 
-    internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
-    {
-      // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
-      toPart.RemoveCrewmember(fromCrew);
-      fromPart.AddCrewmember(fromCrew);
-      if (fromCrew.seat != null)
-        fromCrew.seat.SpawnCrew();
+    /// <summary>
+    /// This method is obsolete.
+    /// </summary>
+    /// <param name="fromCrew"></param>
+    /// <param name="fromPart"></param>
+    /// <param name="toPart"></param>
+    //internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
+    //{
+    //  // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
+    //  toPart.RemoveCrewmember(fromCrew);
+    //  fromPart.AddCrewmember(fromCrew);
+    //  if (fromCrew.seat != null)
+    //    fromCrew.seat.SpawnCrew();
 
-      SMAddon.SmVessel.RespawnCrew();
-    }
+    //  SMAddon.SmVessel.RespawnCrew();
+    //}
 
     internal void CrewTransferAction()
     {
@@ -344,7 +350,7 @@ namespace ShipManifest.Process
             AddCrewMember(FromCrewMember, ToPart);
           }
         }
-        if (SMSettings.EnableOnCrewTransferEvent)
+        if (SMSettings.EnableStockCrewXfer)
         {
           // Now let's deal with third party mod support...
           SourceAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);

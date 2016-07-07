@@ -39,20 +39,8 @@ namespace ShipManifest.InternalObjects
     /// <param name="part">Part to remove highlighting from.</param>
     internal static void ClearPartHighlight(Part part)
     {
-      try
-      {
-        if (part != null && part.highlighter.highlighted)
-        {
-          //part.SetHighlight(false, false);
-          part.SetHighlightDefault();
-          //part.highlightType = Part.HighlightType.OnMouseOver;
-        }
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(
-          string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
-      }
+      if (part == null) return;
+      if (part.HighlightActive) part.SetHighlightDefault();
     }
 
     /// <summary>
@@ -76,14 +64,15 @@ namespace ShipManifest.InternalObjects
       }
     }
 
-    internal static void SetPartsHighlight(List<Part> parts, Color color)
+    internal static void SetPartsHighlight(List<Part> parts, Color color, bool force = false)
     {
       try
       {
         var list = parts.GetEnumerator();
         while (list.MoveNext())
         {
-          if (!list.Current.highlighter.highlighted)
+          if (list.Current == null) continue;
+          if (!list.Current.HighlightActive || force)
           SetPartHighlight(list.Current, color);
         }
       }
@@ -96,15 +85,13 @@ namespace ShipManifest.InternalObjects
 
     internal static void SetPartHighlight(Part part, Color color)
     {
+      if (part == null) return;
       try
       {
-        if (part != null)
-        {
-          if (!part.HighlightActive)
-            part.SetHighlight(true, false);
-          part.highlightType = Part.HighlightType.AlwaysOn;
-          part.SetHighlightColor(color);
-        }
+        if (!part.HighlightActive)
+          part.SetHighlight(true, false);
+        part.highlightType = Part.HighlightType.AlwaysOn;
+        part.SetHighlightColor(color);
       }
       catch (Exception ex)
       {
@@ -172,6 +159,7 @@ namespace ShipManifest.InternalObjects
         var list = parts.GetEnumerator();
         while (list.MoveNext())
         {
+          if (list.Current == null) continue;
           if (enable)
           {
             if (string.IsNullOrEmpty(color))
@@ -229,9 +217,9 @@ namespace ShipManifest.InternalObjects
         step = "Showhipmanifest = true";
         if (!SMConditions.CanShowShipManifest()) return;
         //step = "Clear old highlighting";
-        //// Clear Highlighting on everything, start fresh
-        //EdgeHighight(SMAddon.SmVessel.Vessel.parts, false);
-        //ClearPartsHighlight(SMAddon.SmVessel.Vessel.parts);
+        // Clear Highlighting on everything, start fresh
+        EdgeHighight(SMAddon.SmVessel.Vessel.parts, false);
+        ClearPartsHighlight(SMAddon.SmVessel.Vessel.parts);
 
         step = "Mouseover highlighting, if any";
         // Supports Transfer Window vessel/part Highlighting....
@@ -283,13 +271,13 @@ namespace ShipManifest.InternalObjects
           }
 
           step = "Set Selected Part Colors";
-          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor]);
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor], true);
           if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
               SMSettings.EnableCls)
             SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget,
-              SMSettings.Colors[SMSettings.TargetPartCrewColor]);
+              SMSettings.Colors[SMSettings.TargetPartCrewColor], true);
           else
-            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor]);
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);
         }
       }
       catch (Exception ex)

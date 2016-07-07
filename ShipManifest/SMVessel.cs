@@ -170,7 +170,7 @@ namespace ShipManifest
 
     internal void RefreshLists()
     {
-      Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
       UpdatePartsByResource();
       GetSelectedResourcesParts();
       UpdateDockedVessels();
@@ -196,7 +196,7 @@ namespace ShipManifest
       GetSolarPanels();
       GetLabs();
       WindowRoster.GetRosterList();
-      Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Exiting:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
 
     }
 
@@ -224,6 +224,7 @@ namespace ShipManifest
                 // found resource.  lets add part to its list.
                 vResourceFound = true;
                 var eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
+                part.crewTransferAvailable = SMSettings.EnableStockCrewXfer;
                 eParts.Add(part);
               }
               if (!vResourceFound)
@@ -295,7 +296,7 @@ namespace ShipManifest
 
     private void UpdateDockedVessels()
     {
-      Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
       _dockedVessels = new List<ModDockedVessel>();
       var dockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList();
       foreach (var dPart in dockingParts)
@@ -313,7 +314,7 @@ namespace ShipManifest
           }
         }
       }
-      Utilities.LogMessage("Exiting:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Exiting:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 
     internal void GetSelectedResourcesParts()

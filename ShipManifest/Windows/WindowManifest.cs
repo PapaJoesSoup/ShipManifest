@@ -94,8 +94,13 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(
+            string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            Utilities.LogType.Error, true);
+          SMAddon.FrameErrTripped = true;
+        }
       }
     }
 
@@ -136,8 +141,12 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            Utilities.LogType.Error, true);
+          SMAddon.FrameErrTripped = true;
+        }
       }
     }
 
@@ -200,8 +209,13 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        if (!SMAddon.FrameErrTripped)
+        {
+          Utilities.LogMessage(
+            string.Format(" in ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            Utilities.LogType.Error, true);
+          SMAddon.FrameErrTripped = true;
+        }
       }
     }
 
@@ -209,7 +223,6 @@ namespace ShipManifest.Windows
     {
       try
       {
-        // TODO:  Do we still want this?   (Do we want to allow simultaneous Crew and resource transfers?)
         if (SMConditions.IsTransferInProgress()) return;
 
         // First, lets clear any highlighting...

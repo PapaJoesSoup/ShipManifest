@@ -247,27 +247,31 @@ namespace ShipManifest.Process
 
     internal static void ProcessActivePumps()
     {
-      Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // This routine acts as a queue
       // WHen a pump is set to IsPumOn = true, it will be processed by this routine.
       var transferPumps = SMAddon.SmVessel.TransferPumps;
       // this task runs every Update when active.
+
+      // set an active pump so we know what was running if an error occurs.
+      var activePump = transferPumps[0];
       try
       {
         foreach (var pump in transferPumps)
         {
           // Check Pump state:
           if (!pump.IsPumpOn) continue;
+          activePump = pump;
           switch (pump.PumpStatus)
           {
             case PumpState.Off:
-              Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Off", Utilities.LogType.Info, SMSettings.VerboseLogging);
+              //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Off", Utilities.LogType.Info, SMSettings.VerboseLogging);
               pump.TimeStamp = DateTime.Now;
               pump.Start();
               pump.PumpStatus = PumpState.Start;
               break;
             case PumpState.Start:
-              Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Start", Utilities.LogType.Info, SMSettings.VerboseLogging);
+              //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Start", Utilities.LogType.Info, SMSettings.VerboseLogging);
               // Calculate Elapsed.
               pump.Elapsed += (DateTime.Now - pump.TimeStamp).TotalSeconds;
               if (pump.Elapsed >= SMSound.SourcePumpStart.clip.length - 0.25)
@@ -277,7 +281,7 @@ namespace ShipManifest.Process
               }
               break;
             case PumpState.Run:
-              Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Run", Utilities.LogType.Info, SMSettings.VerboseLogging);
+              //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Run", Utilities.LogType.Info, SMSettings.VerboseLogging);
               // 1.  Get Elapsed from last run
               var deltaT = (DateTime.Now - pump.TimeStamp).TotalSeconds;
 
@@ -286,34 +290,35 @@ namespace ShipManifest.Process
               pump.Running(deltaT);
               break;
             case PumpState.Stop:
-              Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Stop", Utilities.LogType.Info, SMSettings.VerboseLogging);
+              //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Stop", Utilities.LogType.Info, SMSettings.VerboseLogging);
               pump.Stop();
               pump.PumpStatus = PumpState.Off;
               transferPumps.Remove(pump);
               break;
           }
         }
-        PumpProcessOn = IsAnyPumpOn();
-        UpdateDisplayPumps();
       }
       catch (Exception ex)
       {
-        if (!SMAddon.FrameErrTripped)
+        // Electric charge can continue to regenerate, so we can ignore the error if Electric Charge has been selected.
+        if (!SMAddon.FrameErrTripped && activePump.Resource != "ElectricCharge")
         {
           Utilities.LogMessage(
             string.Format(" in TransferPump.ProcessActivePumps (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
               ex.StackTrace), Utilities.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
-
-          // ReSharper disable once PossibleIntendedRethrow
-          throw ex;
         }
+      }
+      finally
+      {
+        PumpProcessOn = IsAnyPumpOn();
+        UpdateDisplayPumps();
       }
     }
 
     private void Start()
     {
-      Utilities.LogMessage("Entering:  TransferPump.Start", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.Start", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // reset counters
       Elapsed = 0;
       DefaultFlowRate = SMSettings.FlowRate;
@@ -323,7 +328,7 @@ namespace ShipManifest.Process
 
     private void Run()
     {
-      Utilities.LogMessage("Entering:  TransferPump.Run", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.Run", Utilities.LogType.Info, SMSettings.VerboseLogging);
       if (SMSound.SourcePumpStart.isPlaying) SMSound.SourcePumpStart.Stop();
 
       // This is the run sound.  we need this only if it is not already playing..
@@ -337,7 +342,7 @@ namespace ShipManifest.Process
 
     private void Running(double deltaT)
     {
-      Utilities.LogMessage("Entering:  TransferPump.Running", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.Running", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // 1.  Calculate amount to move based on flow rate and time delta
       var deltaAmt = deltaT*FlowRate*PumpRatio;
 
@@ -365,7 +370,7 @@ namespace ShipManifest.Process
 
     private void Stop()
     {
-      Utilities.LogMessage("Entering:  TransferPump.Stop", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.Stop", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // Reset transfer related pump vars.
       IsPumpOn = false;
 
@@ -384,7 +389,7 @@ namespace ShipManifest.Process
     /// <param name="cycleAmount"></param>
     internal void RunPumpCycle(double cycleAmount)
     {
-      Utilities.LogMessage("Entering:  TransferPump.RunPumpCycle", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.RunPumpCycle", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // If a Transfer, lets validate From pump amount can be pumped. (and To if needed)
       if (PumpType != TypePump.Dump)
       {
@@ -403,7 +408,7 @@ namespace ShipManifest.Process
       // -------------------------------------------------------------------
       if (IsComplete)
         PumpStatus = PumpState.Stop;
-      Utilities.LogMessage(string.Format("Exiting:  TransferPump.RunPumpCycle.  PumpStatus = {0}", PumpStatus), Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage(string.Format("Exiting:  TransferPump.RunPumpCycle.  PumpStatus = {0}", PumpStatus), Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 
     /// <summary>
@@ -413,7 +418,7 @@ namespace ShipManifest.Process
     /// <param name="cycleAmount"></param>
     internal void FillParts(double cycleAmount)
     {
-      Utilities.LogMessage("Entering:  TransferPump.FillParts", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.FillParts", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // To parts.  Used only by Transfers
       if (cycleAmount < SMSettings.Tolerance) return;
 
@@ -436,7 +441,7 @@ namespace ShipManifest.Process
           minAmt[0] = thisAmount;
         }
 
-        Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
+        //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Calculate pump amounts for each To part and Increment.
         foreach (var part in toPartsRemaining)
         {
@@ -447,14 +452,14 @@ namespace ShipManifest.Process
           if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
             part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
         }
-        Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
+        //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         if (toPartsRemaining.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
       }
     }
 
     internal void DrainParts(double cycleAmount)
     {
-      Utilities.LogMessage("Entering:  TransferPump.DrainParts.", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.DrainParts.", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // Lets account for any empty/full containers
       // now split up the xfer amount evenly across the number of tanks that can send/receive resources
       var fromPartsRemaining =
@@ -472,7 +477,7 @@ namespace ShipManifest.Process
           if (thisAmt < minAmt && thisAmt > SMSettings.Tolerance) minAmt = thisAmt;
         }
 
-        Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
+        //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Decrement.
         if (fromPartsRemaining.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
         foreach (var part in fromPartsRemaining)
@@ -484,13 +489,13 @@ namespace ShipManifest.Process
           cycleBalance -= minAmt;
           AmtPumped += minAmt;
         }
-        Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
+        //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
       }
     }
 
     internal static bool ConsumeCharge(double deltaCharge)
     {
-      Utilities.LogMessage("Entering:  TransferPump.ConsumeCharge", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      //Utilities.LogMessage("Entering:  TransferPump.ConsumeCharge", Utilities.LogType.Info, SMSettings.VerboseLogging);
       if (SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge") || !SMSettings.EnableXferCost) return true;
       foreach (var iPart in SMAddon.SmVessel.PartsByResource["ElectricCharge"])
       {
