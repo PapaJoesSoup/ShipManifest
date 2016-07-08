@@ -1,4 +1,7 @@
-﻿Version 5.1.1.0 - Release 07 Jul, 2016 - KSP 1.1.3 Compatibility Edition.
+﻿Version 5.1.1.1 - Release 08 Jul, 2016 - KSP 1.1.3 Compatibility Edition.
+- New:  Implemented Diabling of Stock Crew Transfer system using Realism setting "Enable Stock Crew Transfer". When set to off, Stock Crew transfer buttons no longer appear.
+
+Version 5.1.1.0 - Release 07 Jul, 2016 - KSP 1.1.3 Compatibility Edition.
 - Fixed:  NulRef errror with DeepFreeze installed and a frozen kerbal in RosterListViewer.
 - Fixed:  (maybe) Window display issues during launch and stage separation, explosion of ship.
 - New:  SM window can now be displayed in IVA and in Map mode.
@@ -6,16 +9,16 @@
 - New:  Refactored Highlighting to clean up FPS issue. Now causes significantly less impact to frame rate.
 - New:  Refactored Stock Crew Transfer Beahavior.  When override is on, changes to KSP 1.1.3 now allow capturing transfer before it occurs.
 
-Version 5.1.0.0 - Release 14 May, 2016 - KSP 1.1.2 Compatability Update
+Version 5.1.0.0 - Release 14 May, 2016 - KSP 1.1.2 Compatibility Update
 - New:  Updated mod to support KSP 1.1.2.
 - New:  Updated screen maeeages to use new object model.  
 
-Version 5.0.9.1 - Release 14 Apr, 2016 - KSP 1.1 Compatability Update ** PreRelease **
+Version 5.0.9.1 - Release 14 Apr, 2016 - KSP 1.1 Compatibility Update ** PreRelease **
 - New:  Modified screen message displays to account for channges to the object model.  Stock screen messages should now be removed when SM Overrides a Stock crew transfer.  wip.
 
-Version 5.0.9.0 - Release 05 Apr, 2016 - KSP 1.1 Compatability Update ** PreRelease **
+Version 5.0.9.0 - Release 05 Apr, 2016 - KSP 1.1 Compatibility Update ** PreRelease **
 - New:  Updated code to run on KSP 1.1
-- New:  Modified screen message displays to account for channges to the object model.  SM screen messages are wip.
+- New:  Modified screen message displays to account for changes to the object model.  SM screen messages are wip.
 
 Version 5.0.1.0 - Release 14 Mar, 2016 - Bug fixes and APIs
 - New:  Removed DFInterface.dll.  Added Reflection based Wrapper class source code for integration with DeepFreeze.
@@ -40,7 +43,7 @@ Version 5.0.0.0 - Release 22 Jan, 2016 - Massive Refactoring Edition. NEW! Reali
         with the Vessel, Docked Vessels, individual parts or a selected group of parts.  Fuel Depot anyone?
 - New:  Added ability to dump resources in flight in realism mode.  Dump process follows flow rate rules.  Dumps be stopped.
         per forum discussions, this process is assumed to impart a zero thrust component upon the vessel.
-- New:  Massive refactor and reorgainization of code (nothing was left untouched). 
+- New:  Massive refactor and reorganization of code (nothing was left untouched). 
         A tremendous amount of work for very little visible effect except maybe performance :). Sets the foundation for easier to manage/enhance code.
 - New:  Added build package automation and distribution.
 - New:  Removed need for DFInterface.dll.  Now using new reflection class method for soft dependency to DeepFreeze.
@@ -51,7 +54,7 @@ Version 5.0.0.0 - Release 22 Jan, 2016 - Massive Refactoring Edition. NEW! Reali
 
 Version 4.4.2.0 - Release 12 Nov, 2015 - KSP 1.0.5 Edition.
 - New:  Native Kerbal Renaming and Profession Management!  The old hash hack is gone!  
-        KSP 1.0.5 now supports native kerbal profession managment, so kerbal profession now saves to game save.  
+        KSP 1.0.5 now supports native kerbal profession management, so kerbal profession now saves to game save.  
         Updated SM to use new trait attribute of the kerbal object.  Also supports old game saves.  
         Cleans up old game save automatically, if profession management is ON in settings (now the default)
 - New:  Added Crew Dump/Fill at part level in Transfer Window, when vessel is in a recoverable state and realism is off.
@@ -67,10 +70,10 @@ Version 4.4.1.0 - Release 05 July, 2015 - Tooltips & Science Xfer Improvements.
 - New:  Refactored and expanded Tooltips.  Changed background, positioning, anchor points, font styles & colors for better readability.  Added more tooltips to various windows and tabs.
 - New:  Added Control Window Tooltip control to settings.  If control window Tooltips is off, all tab tooltip settings are disabled.
 - New:  Added linkage of Control Window Tab Tooltip settings to the Control Window ToolTip control.  They now act as children.  
-- New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behavior and layout.
+- New:  Added Detail support to Experiments.  Added greater detail to science tooltips.  Cleaned up horizontal scroll behaviour and layout.
 - New:  Added labels to button headers in Roster Window.
 - New:  Added 2 additional Roster List Filters.  "Assigned" and "Frozen".
-- New:  Added active window screen edge managment.  No more positioning windows beyond the screen edge when moving.
+- New:  Added active window screen edge management.  No more positioning windows beyond the screen edge when moving.
 - Fixed:  Control window close button (upper right) did not display tooltip.
 - Fixed:  Some Roster window action buttons have incorrect text when in Space Center.
 
@@ -102,7 +105,7 @@ Version 4.3.1.0 - Release 15 June, 2015 - GUI Skins, DeepFreeze & Bugs Edition.
 - New:  Updated Roster display to improve general layout and readability.
 - New:  Added Mods Tab to Settings Window.  Displayes Installed Mods/Assemblies.
 - Fixed:  Bug in settings.  When cancelling or saving changes in Space Center, Settings Icon does not revert on toolbar.
-- Fixed:  Bug with KIS compatability.  When transferring Kerbals with inventory, a race condition occurs with OnCrewTransferred Event handler and causes errors.
+- Fixed:  Bug with KIS compatibility.  When transferring Kerbals with inventory, a race condition occurs with OnCrewTransferred Event handler and causes errors.
           Added switch in SMSetting.dat to allow disabling onCrewTransferred Event call if KIS still is causing issues.
 - Fixed:  Bug in Multi Part transfers.  Transfers sometimes still hang.  Added check for maxAmount to Transfer, and a flag for transfer in progress to allow Stop button to remain visible until completion...
 
@@ -140,7 +143,7 @@ Version 4.2.1.0 - Release 13 May, 2015 - Highlighting Updates Edition.
 - New:  Added mouseover part highlighting on Transfer Window part Selection buttons.
 - New:  Revised mousover highlighting to use new edge highlighting methods introduced in KSP 0.90.  Improves visibility of highlighted parts.
 - New:  Added configuration switch to enable/disable mouseover edge highlighting, if performance is affected or behavior is not desired.
-- Fixed:  When using Mod Admin, SM generates and error, and SMSettings file is not created, as PluginData folder is deleted (compatability issue).
+- Fixed:  When using Mod Admin, SM generates and error, and SMSettings file is not created, as PluginData folder is deleted (compatibility issue).
 - Fixed:  When in Preflight or Flight and Realism Off, Selecting a single fluid/gaseous resource causes Transfer Window display issues (Found during Wiki creation).  Bug introduced in 4.2.0.0
 - Fixed:  When performing a Crew Transfer in SM with Realism on, it is possible to perform a stock transfer during the Crew transfer process if Override is off, and potentially create a ghost kerbal.
 - Fixed:  When removing/adding crew to a vessel in pre-flight, vessel "remembers" professions available when scene loads.  A scene change causes correct professions to be initialized. Possible exploit.
@@ -171,7 +174,7 @@ Version 4.1.4.4 - Release 10 Apr, 2015 - Bug fixes.
 - Fixed:  SM windows do not hide when the F2 key is toggled to hide UI.
 - Fixed:  SM window positions are not automatically saved between scenes.
 - Fixed:  Roster windows position incorrectly saving to settings window position.
-- Changed:  Altered Window Reposition behavior to be more intuitive.  
+- Changed:  Altered Window Reposition behaviour to be more intuitive.  
 - - - - - - Was:  Reset window to 0.0 when position exceeds the edge of the screen.  
 - - - - - - Now:  reposition window to edge of screen when position exceeds the edge of screen.
 

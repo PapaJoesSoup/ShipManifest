@@ -198,7 +198,6 @@ namespace ShipManifest.InternalObjects
         var canShow = false;
         if (SMAddon.ShowUi
             && HighLogic.LoadedScene == GameScenes.FLIGHT
-          //&& !MapView.MapIsEnabled
             && !IsPauseMenuOpen()
             && !IsFlightDialogDisplaying()
             && FlightGlobals.fetch != null

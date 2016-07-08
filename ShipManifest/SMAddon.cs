@@ -446,6 +446,7 @@ namespace ShipManifest
       {
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
         UpdateSMcontroller(newVessel);
+        SMSettings.SetStockCrewTransferState();
       }
       catch (Exception ex)
       {

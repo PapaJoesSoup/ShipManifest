@@ -414,6 +414,9 @@ namespace ShipManifest
         MemStoreTempSettings();
       }
 
+      // Enable/Disable crewed parts CrewTransferDialog 
+      SetStockCrewTransferState();
+
       // Force Styles to refresh/load.
       SMStyle.WindowStyle = null;
 
@@ -427,18 +430,7 @@ namespace ShipManifest
       {
         if (EnableStockCrewXfer != PrevEnableStockCrewXfer)
         {
-          // wrap in a try, as save can be executed outside of the flight scene and we don't care if it fails...
-          try
-          {
-            foreach (var part in SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()])
-            {
-              part.crewTransferAvailable = EnableStockCrewXfer;
-            }
-          }
-          catch (Exception)
-          {
-            // Do nothing.   We don't care if it fails when outside of the Flight Scene.
-          }
+          SetStockCrewTransferState();
         }
 
         MemStoreTempSettings();
@@ -540,6 +532,33 @@ namespace ShipManifest
         if (!Directory.Exists(SettingsPath))
           Directory.CreateDirectory(SettingsPath);
         Settings.Save(SettingsFile);
+      }
+    }
+
+    internal static void SetStockCrewTransferState()
+    {
+      // wrap in a try, as save can be executed outside of the flight scene and we don't care if it fails...
+      try
+      {
+        foreach (var part in SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()])
+        {
+          part.crewTransferAvailable = EnableStockCrewXfer;
+          TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
+          if (EnableStockCrewXfer)
+          {
+            if (Tds != null) continue;
+            part.AddModule("TransferDialogSpawner");
+            MonoUtilities.RefreshContextWindows(part);
+          }
+          else
+          {
+            if (Tds != null) part.RemoveModule(Tds);
+          }
+        }
+      }
+      catch (Exception)
+      {
+        // Do nothing.   We don't care if it fails when outside of the Flight Scene.
       }
     }
 
