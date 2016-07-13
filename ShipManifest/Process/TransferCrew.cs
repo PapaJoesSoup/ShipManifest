@@ -285,7 +285,6 @@ namespace ShipManifest.Process
       IvaPortraitDelay = 0;
       FromCrewMember = ToCrewMember = null;
       SMAddon.SmVessel.RespawnCrew();
-      //FlightEVA.fetch.EnableInterface();
       CrewHatchController.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
       CrewXferState = XferState.Off;

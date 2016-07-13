@@ -847,6 +847,7 @@ namespace ShipManifest
             // kill selected resource and its associated highlighting.
             SmVessel.SelectedResources.Clear();
           }
+
         }
 
         // Now let's update the current vessel view...

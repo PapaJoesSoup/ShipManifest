@@ -171,6 +171,7 @@ namespace ShipManifest
     internal void RefreshLists()
     {
       //Utilities.LogMessage("Entered:  SMVessel.RefreshLists", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      if (Vessel == null) return;
       UpdatePartsByResource();
       GetSelectedResourcesParts();
       UpdateDockedVessels();
@@ -202,101 +203,86 @@ namespace ShipManifest
 
     internal void UpdatePartsByResource()
     {
-      try
+      if (_partsByResource == null)
+        _partsByResource = new Dictionary<string, List<Part>>();
+      else
+        _partsByResource.Clear();
+
+      // Let's update...
+      if (FlightGlobals.ActiveVessel == null) return;
+      foreach (var part in Vessel.Parts)
       {
-        if (_partsByResource == null)
-          _partsByResource = new Dictionary<string, List<Part>>();
-        else
-          _partsByResource.Clear();
-
-        // Let's update...
-        if (FlightGlobals.ActiveVessel != null)
+        // First let's Get any Crew, if desired...
+        if (SMSettings.EnableCrew && part.CrewCapacity > 0 && part.partInfo.name != "kerbalEVA")
         {
-          foreach (var part in Vessel.Parts)
+          var vResourceFound = false;
+          // is resource in the list yet?.
+          if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
-            // First let's Get any Crew, if desired...
-            if (SMSettings.EnableCrew && part.CrewCapacity > 0 && part.partInfo.name != "kerbalEVA")
+            // found resource.  lets add part to its list.
+            vResourceFound = true;
+            var eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
+            part.crewTransferAvailable = SMSettings.EnableStockCrewXfer;
+            eParts.Add(part);
+          }
+          if (!vResourceFound)
+          {
+            // found a new resource.  lets add it to the list of resources.
+            var nParts = new List<Part> { part };
+            _partsByResource.Add(SMConditions.ResourceType.Crew.ToString(), nParts);
+          }
+        }
+        // Let's Get any Science...
+        if (SMSettings.EnableScience)
+        {
+          var sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
+          if (sciModules.Length > 0)
+          {
+            // is resource in the list yet?.
+            // We only need the first match on the part so stop.
+            if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Science.ToString()))
             {
-              var vResourceFound = false;
-              // is resource in the list yet?.
-              if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Crew.ToString()))
-              {
-                // found resource.  lets add part to its list.
-                vResourceFound = true;
-                var eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
-                part.crewTransferAvailable = SMSettings.EnableStockCrewXfer;
-                eParts.Add(part);
-              }
-              if (!vResourceFound)
-              {
-                // found a new resource.  lets add it to the list of resources.
-                var nParts = new List<Part> {part};
-                _partsByResource.Add(SMConditions.ResourceType.Crew.ToString(), nParts);
-              }
+              _partsByResource[SMConditions.ResourceType.Science.ToString()].Add(part);
             }
-            // Let's Get any Science...
-            if (SMSettings.EnableScience)
+            else
             {
-              var sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
-              if (sciModules.Length > 0)
-              {
-                // is resource in the list yet?.
-                // We only need the first match on the part so stop.
-                if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Science.ToString()))
-                {
-                  _partsByResource[SMConditions.ResourceType.Science.ToString()].Add(part);
-                }
-                else
-                {
-                  // found a new resource.  lets add it to the list of resources.
-                  var nParts = new List<Part> {part};
-                  _partsByResource.Add(SMConditions.ResourceType.Science.ToString(), nParts);
-                }
-              }
-            }
-
-            // Now, let's get flight Resources.
-            if (!SMSettings.EnableResources) continue;
-            {
-              foreach (PartResource resource in part.Resources)
-              {
-                // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-                if (SMSettings.RealismMode &&
-                    (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
-                  continue;
-                var vResourceFound = false;
-                // is resource in the list yet?.
-                if (_partsByResource.Keys.Contains(resource.info.name))
-                {
-                  vResourceFound = true;
-                  var eParts = _partsByResource[resource.info.name];
-                  eParts.Add(part);
-                }
-                if (vResourceFound) continue;
-                // found a new resource.  lets add it to the list of resources.
-                var nParts = new List<Part> {part};
-                _partsByResource.Add(resource.info.name, nParts);
-              }
+              // found a new resource.  lets add it to the list of resources.
+              var nParts = new List<Part> { part };
+              _partsByResource.Add(SMConditions.ResourceType.Science.ToString(), nParts);
             }
           }
         }
-      }
-      catch (Exception ex)
-      {
-        Utilities.LogMessage(string.Format(" getting partsbyresource.  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
-        _partsByResource = null;
-      }
 
-      if (PartsByResource != null)
-        ResourceList = new List<string>(PartsByResource.Keys);
-      else
-        ResourceList.Clear();
+        // Now, let's get flight Resources.
+        if (!SMSettings.EnableResources) continue;
+        {
+          foreach (PartResource resource in part.Resources)
+          {
+            // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
+            if (SMSettings.RealismMode &&
+                (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
+              continue;
+            var vResourceFound = false;
+            // is resource in the list yet?.
+            if (_partsByResource.Keys.Contains(resource.info.name))
+            {
+              vResourceFound = true;
+              var eParts = _partsByResource[resource.info.name];
+              eParts.Add(part);
+            }
+            if (vResourceFound) continue;
+            // found a new resource.  lets add it to the list of resources.
+            var nParts = new List<Part> { part };
+            _partsByResource.Add(resource.info.name, nParts);
+          }
+        }
+      }
     }
 
     private void UpdateDockedVessels()
     {
       //Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
+      if (FlightGlobals.ActiveVessel == null) return;
       _dockedVessels = new List<ModDockedVessel>();
       var dockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList();
       foreach (var dPart in dockingParts)
@@ -555,8 +541,8 @@ namespace ShipManifest
     internal void DumpAllResources()
     {
       var otherResourcesList =
-        (from s in SMAddon.SmVessel.ResourceList
-          where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump
+        (from s in SMAddon.SmVessel.PartsByResource.Keys
+         where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump
           select s).ToList();
       var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()),
         SMAddon.SmVessel.Vessel.parts.First(), SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump,

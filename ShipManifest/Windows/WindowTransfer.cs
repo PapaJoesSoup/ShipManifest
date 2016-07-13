@@ -22,6 +22,7 @@ namespace ShipManifest.Windows
 
     internal static string ToolTip = "";
     internal static string XferToolTip = "";
+    internal static string EvaToolTip = "";
 
     // Switches for List Viewers
     internal static bool ShowSourceVessels;
@@ -529,7 +530,7 @@ namespace ShipManifest.Windows
 
     private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo)
     {
-      // Since only one Crew Part can be selected, all lists will use an index of [0].
+      // Since only one Crew Part can currently be selected, all lists will use an index of [0].
       float xOffset = 30;
 
       if (selectedPartsFrom.Count <= 0) return;
@@ -540,10 +541,9 @@ namespace ShipManifest.Windows
         GUILayout.BeginHorizontal();
         if (crewMember.seat != null)
         {
-          if (SMConditions.IsTransferInProgress()) 
-            GUI.enabled = false;
+          if (SMConditions.IsTransferInProgress()) GUI.enabled = false;
 
-          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+          if (GUILayout.Button(new GUIContent("»", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
             GUILayout.Width(15), GUILayout.Height(20)))
           {
             ToolTip = "";
@@ -564,6 +564,21 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = true;
           GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
+        }
+        else if (!SMConditions.IsClsInSameSpace())
+        {
+          GUI.enabled = true;
+          if (GUILayout.Button(new GUIContent("EVA", EvaToolTip), SMStyle.ButtonStyle, GUILayout.Width(50),
+            GUILayout.Height(20)))
+          {
+            ToolTip = "";
+            FlightEVA.SpawnEVA(crewMember.KerbalRef); 
+          }
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+          {
+            var rect = GUILayoutUtility.GetLastRect();
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+          }
         }
         else
         {
@@ -595,7 +610,7 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           GUI.enabled = false;
-          if (GUILayout.Button(new GUIContent(">>", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
+          if (GUILayout.Button(new GUIContent("»", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
             GUILayout.Width(15), GUILayout.Height(20)))
           {
             ToolTip = "";

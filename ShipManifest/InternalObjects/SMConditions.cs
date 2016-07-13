@@ -102,6 +102,8 @@ namespace ShipManifest.InternalObjects
         }
         // now if realism mode, are the parts connected to each other in the same living space?
         results = IsClsInSameSpace();
+        if (!results)
+          WindowTransfer.EvaToolTip = "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
       }
       catch (Exception ex)
       {
