@@ -424,27 +424,25 @@ namespace ShipManifest.Windows
       var style2 = pumpType == TransferPump.TypePump.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
-      // Fills should only be in Non Realism mode...
-      if (!SMSettings.RealismMode)
+      // Fills should only be in Non Realism mode or if Preflight Resources are seleced...
+      if (SMSettings.RealismMode && !SMSettings.EnablePfResources) return;
+      if (selectedResources.Count > 1)
+        GUI.enabled = part.Resources[selectedResources[0]].amount <
+                      part.Resources[selectedResources[0]].maxAmount ||
+                      part.Resources[selectedResources[1]].amount <
+                      part.Resources[selectedResources[1]].maxAmount;
+      else
+        GUI.enabled = part.Resources[selectedResources[0]].amount <
+                      part.Resources[selectedResources[0]].maxAmount;
+      if (GUILayout.Button("Fill", style2, GUILayout.Width(30), GUILayout.Height(20)))
       {
+        SMPart.FillResource(part, selectedResources[0]);
         if (selectedResources.Count > 1)
-          GUI.enabled = part.Resources[selectedResources[0]].amount <
-                        part.Resources[selectedResources[0]].maxAmount ||
-                        part.Resources[selectedResources[1]].amount <
-                        part.Resources[selectedResources[1]].maxAmount;
-        else
-          GUI.enabled = part.Resources[selectedResources[0]].amount <
-                        part.Resources[selectedResources[0]].maxAmount;
-        if (GUILayout.Button("Fill", style2, GUILayout.Width(30), GUILayout.Height(20)))
-        {
-          SMPart.FillResource(part, selectedResources[0]);
-          if (selectedResources.Count > 1)
-            SMPart.FillResource(part, selectedResources[1]);
-        }
-        rect = GUILayoutUtility.GetLastRect();
-        if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+          SMPart.FillResource(part, selectedResources[1]);
       }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
 
     private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
@@ -956,7 +954,7 @@ namespace ShipManifest.Windows
       // let's determine how much of a resource we can move to the target.
       var thisXferAmount = double.Parse(activePump.EditSliderAmount);
       var maxPumpAmount = TransferPump.CalcMaxPumpAmt(pumps[0].FromParts, pumps[0].ToParts, selectedResources);
-      if (!(maxPumpAmount > 0) && !TransferPump.PumpProcessOn) return;
+      if (maxPumpAmount <= 0 && !TransferPump.PumpProcessOn) return;
       GUILayout.BeginHorizontal();
       string label;
       Rect rect;

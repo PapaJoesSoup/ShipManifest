@@ -752,14 +752,15 @@ namespace ShipManifest.Process
           maxFromAmount += fromParts.Current.Resources[selectedResources[resIdx]].amount;
         }
         var toParts = partsTo.GetEnumerator();
+        double maxToAmount = 0;
         while (toParts.MoveNext())
         {
           if (toParts.Current == null) continue;
           if (!toParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
-          maxFromAmount += PartRemainingCapacity(toParts.Current, selectedResources[resIdx]);
+          maxToAmount += PartRemainingCapacity(toParts.Current, selectedResources[resIdx]);
         }
 
-        maxPumpAmount = maxPumpAmount > maxFromAmount ? maxFromAmount : maxPumpAmount;
+        maxPumpAmount = maxToAmount > maxFromAmount ? maxFromAmount : maxToAmount;
         maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
       }
       return maxPumpAmount;
