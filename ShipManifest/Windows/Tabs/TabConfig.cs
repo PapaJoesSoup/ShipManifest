@@ -117,7 +117,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
 
       _label = "Enable Kerbal Renaming";
-      _toolTip = "Allows renaming a Kerbal.  The Profession may change when the kerbal is renamed.";
+      _toolTip = "Allows renaming a Kerbal.";
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -127,13 +127,11 @@ namespace ShipManifest.Windows.Tabs
       if (!SMSettings.EnableKerbalRename)
         GUI.enabled = false;
       GUILayout.BeginHorizontal();
-      _label = "Rename and Keep Profession (Experimental)";
-      _toolTip = "When On, SM will remember the selected profesison when Kerbal is Renamed.";
-      _toolTip += "\r\nAdds non printing chars to Kerbal name in your game save.";
-      _toolTip += "\r\n(Should be no issue, but use at your own risk.)";
+      _label = "Enable Profession management";
+      _toolTip = "When On, SM allows you to change a Kerbal's profession.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
-      SMSettings.RenameWithProfession = GUILayout.Toggle(SMSettings.RenameWithProfession, _guiLabel,
+      SMSettings.EnableChangeProfession = GUILayout.Toggle(SMSettings.EnableChangeProfession, _guiLabel,
         GUILayout.Width(300));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();

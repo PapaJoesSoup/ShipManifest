@@ -61,7 +61,7 @@ namespace ShipManifest.Modules
       Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
 
       // New trait management is easy!
-      if (SMSettings.EnableKerbalRename && SMSettings.RenameWithProfession)
+      if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
         KerbalRoster.SetExperienceTrait(Kerbal, Trait);
       Kerbal.gender = Gender;
       Kerbal.stupidity = Stupidity;

@@ -150,7 +150,7 @@ namespace ShipManifest
             SMSettings.ClsInstalled = false;
           }
           // reset any hacked kerbal names in game save from old version of SM/KSP
-          if (SMSettings.RenameWithProfession)
+          if (SMSettings.EnableChangeProfession)
             WindowRoster.ResetKerbalNames();
 
           SMSettings.SaveSettings();
@@ -990,9 +990,12 @@ namespace ShipManifest
           smessages.ActiveMessages.Where(
             x =>
               Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.UPPER_CENTER).ToList();
-        foreach (var m in smessagesToRemove)
-          ScreenMessages.RemoveMessage(m);
+              x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
+        while (smessagesToRemove.MoveNext())
+        {
+          if (smessagesToRemove.Current == null) continue;
+          ScreenMessages.RemoveMessage(smessagesToRemove.Current);
+        }
       }
     }
 

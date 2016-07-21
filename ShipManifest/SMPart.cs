@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects;
 using ShipManifest.Process;
 
 namespace ShipManifest
@@ -10,12 +11,13 @@ namespace ShipManifest
   {
     internal static void FillCrew(Part part)
     {
-      if (!part.vessel.IsRecoverable || IsCrewFull(part)) return;
+      //Utilities.LogMessage(string.Format("Entering Fill Crew with part {0}", part.partInfo.name), Utilities.LogType.Info, true);
+      if (IsCrewFull(part)) return;
       while (part.CrewCapacity > Utilities.GetPartCrewCount(part))
       {
         var kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
         part.AddCrewmember(kerbal);
-
+        //Utilities.LogMessage(string.Format("Filling crew in part {0}", part.partInfo.name), Utilities.LogType.Info, true);
         if (kerbal.seat != null)
           kerbal.seat.SpawnCrew();
       }
@@ -41,11 +43,9 @@ namespace ShipManifest
     internal static bool IsCrewFull(Part part)
     {
       if (!InstalledMods.IsDfInstalled || !part.Modules.Contains("DeepFreezer"))
-        return part.protoModuleCrew.Count < part.CrewCapacity;
-      var deepFreezer =
-        (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select new DFWrapper.DeepFreezer(pm))
-          .SingleOrDefault();
-      return deepFreezer != null && deepFreezer.PartFull;
+        return part.protoModuleCrew.Count == part.CrewCapacity;
+      var deepFreezer = SMConditions.GetFreezerModule(part);
+      return deepFreezer != null && new DFWrapper.DeepFreezer(deepFreezer).PartFull;
     }
 
     internal static void ToggleDumpResource(Part part, List<string> resourceNames, uint pumpId)

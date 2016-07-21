@@ -256,98 +256,100 @@ namespace ShipManifest.Windows
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
           GUILayout.Height(230), GUILayout.Width(680));
-        foreach (var kerbal in RosterList)
+        var kerbals = RosterList.GetEnumerator();
+        while (kerbals.MoveNext())
         {
-          if (CanDisplayKerbal(kerbal))
+          if (kerbals.Current == null) continue;
+          if (!CanDisplayKerbal(kerbals.Current)) continue;
+          GUIStyle labelStyle;
+          if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
+              kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+            labelStyle = SMStyle.LabelStyleRed;
+          else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+            labelStyle = SMStyle.LabelStyleYellow;
+          else
+            labelStyle = SMStyle.LabelStyle;
+
+          // What vessel is this Kerbal Assigned to?
+          var rosterDetails = "";
+          if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
           {
-            GUIStyle labelStyle;
-            if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
-                kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
-              labelStyle = SMStyle.LabelStyleRed;
-            else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
-              labelStyle = SMStyle.LabelStyleYellow;
-            else
-              labelStyle = SMStyle.LabelStyle;
-
-            // What vessel is this Kerbal Assigned to?
-            var rosterDetails = "";
-            if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+            var theseVessels = FlightGlobals.Vessels.GetEnumerator();
+            while (theseVessels.MoveNext())
             {
-              foreach (var thisVessel in FlightGlobals.Vessels)
+              if (theseVessels.Current == null) continue;
+              var crew = theseVessels.Current.GetVesselCrew();
+              if (crew.Any(crewMember => crewMember == kerbals.Current))
               {
-                var crew = thisVessel.GetVesselCrew();
-                if (crew.Any(crewMember => crewMember == kerbal))
-                {
-                  rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
-                }
+                rosterDetails = "Assigned - " + theseVessels.Current.GetName().Replace("(unloaded)", "");
               }
             }
-            else if (InstalledMods.IsDfInstalled && DFWrapper.APIReady && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
-            {
-              // This kerbal could be frozen.  Lets find out...
-              rosterDetails = GetFrozenKerbalDetails(kerbal);
-              labelStyle = SMStyle.LabelStyleCyan;
-            }
-            else
-            {
-              // Since the kerbal has no vessel assignment, lets show what their status...
-              rosterDetails = kerbal.rosterStatus.ToString();
-            }
-            string buttonText;
-            string buttonToolTip;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(kerbal.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
-            GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
-            GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(70));
-            GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
-            GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
-
-            SetupEditButton(kerbal, out buttonText, out buttonToolTip);
-
-            if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
-              GUILayout.Height(20)))
-            {
-              if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
-              {
-                SelectedKerbal = new ModKerbal(kerbal, false);
-                SetProfessionFlag();
-              }
-              else
-              {
-                SelectedKerbal = null;
-              }
-            }
-            var rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
-
-            // Setup buttons with gui state, button text and tooltip.
-            SetupActionButton(kerbal, out buttonText, out buttonToolTip);
-
-            if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
-            {
-              if (buttonText == "Add")
-                TransferCrew.AddCrewMember(kerbal, SMAddon.SmVessel.SelectedPartsSource[0]);
-              else if (buttonText == "Respawn")
-                RespawnKerbal(kerbal);
-              else if (buttonText == "Thaw")
-                ThawKerbal(kerbal.name);
-              else if (buttonText == "Freeze")
-                FreezeKerbal(kerbal);
-              else if (buttonText == "Remove")
-              {
-                // get part...
-                var part = SMAddon.SmVessel.FindPartByKerbal(kerbal);
-                if (part != null)
-                  TransferCrew.RemoveCrewMember(kerbal, part);
-              }
-            }
-            var rect2 = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips)
-              ToolTip = SMToolTips.SetActiveToolTip(rect2, GUI.tooltip, ref ToolTipActive, XOffset);
-            GUILayout.EndHorizontal();
-            GUI.enabled = true;
           }
+          else if (InstalledMods.IsDfInstalled && DFWrapper.APIReady && kerbals.Current.type == ProtoCrewMember.KerbalType.Unowned)
+          {
+            // This kerbal could be frozen.  Lets find out...
+            rosterDetails = GetFrozenKerbalDetails(kerbals.Current);
+            labelStyle = SMStyle.LabelStyleCyan;
+          }
+          else
+          {
+            // Since the kerbal has no vessel assignment, lets show what their status...
+            rosterDetails = kerbals.Current.rosterStatus.ToString();
+          }
+          string buttonText;
+          string buttonToolTip;
+          GUILayout.BeginHorizontal();
+          GUILayout.Label(kerbals.Current.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
+          GUILayout.Label(kerbals.Current.gender.ToString(), labelStyle, GUILayout.Width(50));
+          GUILayout.Label(kerbals.Current.experienceTrait.Title, labelStyle, GUILayout.Width(70));
+          GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
+          GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
+
+          SetupEditButton(kerbals.Current, out buttonText, out buttonToolTip);
+
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
+            GUILayout.Height(20)))
+          {
+            if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbals.Current)
+            {
+              SelectedKerbal = new ModKerbal(kerbals.Current, false);
+              SetProfessionFlag();
+            }
+            else
+            {
+              SelectedKerbal = null;
+            }
+          }
+          var rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
+
+          // Setup buttons with gui state, button text and tooltip.
+          SetupActionButton(kerbals.Current, out buttonText, out buttonToolTip);
+
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
+          {
+            if (buttonText == "Add")
+              TransferCrew.AddCrewMember(kerbals.Current, SMAddon.SmVessel.SelectedPartsSource[0]);
+            else if (buttonText == "Respawn")
+              RespawnKerbal(kerbals.Current);
+            else if (buttonText == "Thaw")
+              ThawKerbal(kerbals.Current.name);
+            else if (buttonText == "Freeze")
+              FreezeKerbal(kerbals.Current);
+            else if (buttonText == "Remove")
+            {
+              // get part...
+              var part = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
+              if (part != null)
+                TransferCrew.RemoveCrewMember(kerbals.Current, part);
+            }
+          }
+          var rect2 = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect2, GUI.tooltip, ref ToolTipActive, XOffset);
+          GUILayout.EndHorizontal();
+          GUI.enabled = true;
         }
 
         GUILayout.EndVertical();
@@ -380,7 +382,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
-      if (SMSettings.EnableKerbalRename && SMSettings.RenameWithProfession)
+      if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
       {
         DisplaySelectProfession();
       }
@@ -410,7 +412,7 @@ namespace ShipManifest.Windows
         "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
       if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
       {
-        if (SMSettings.EnableKerbalRename && SMSettings.RenameWithProfession)
+        if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
         {
           if (SelectedKerbal != null) SelectedKerbal.Trait = KerbalProfession.ToString();
         }
@@ -560,12 +562,12 @@ namespace ShipManifest.Windows
 
     public static void ResetKerbalNames()
     {
-      foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
+      var kerbals = HighLogic.CurrentGame.CrewRoster.Crew.GetEnumerator();
+      while (kerbals.MoveNext())
       {
-        if (kerbal.name.Contains(Char.ConvertFromUtf32(1)))
-        {
-          kerbal.name = kerbal.name.Replace(Char.ConvertFromUtf32(1), "");
-        }
+        if (kerbals.Current == null) continue;
+        if (!kerbals.Current.name.Contains(Char.ConvertFromUtf32(1))) continue;
+        kerbals.Current.name = kerbals.Current.name.Replace(Char.ConvertFromUtf32(1), "");
       }
     }
 
@@ -596,31 +598,28 @@ namespace ShipManifest.Windows
         {
           var iKerbal = DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbalName];
 
-          var cryofreezers =
-            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
-          foreach (var cryoFreezer in cryofreezers)
+          var cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
+          while (cryofreezers.MoveNext())
           {
-            if (cryoFreezer.flightID == iKerbal.partID)
+            if (cryofreezers.Current == null) continue;
+            if (cryofreezers.Current.flightID == iKerbal.partID)
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer =
-                (from PartModule pm in cryoFreezer.Modules
-                  where pm.moduleName == "DeepFreezer"
-                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
-              if (deepFreezer != null) deepFreezer.beginThawKerbal(kerbalName);
+              var deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
+              if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginThawKerbal(kerbalName);
               break;
             }
           }
         }
         else
         {
-          Utilities.LogMessage(String.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), Utilities.LogType.Info,
+          Utilities.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), Utilities.LogType.Info,
             true);
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           Utilities.LogType.Error, true);
       }
     }
@@ -629,28 +628,21 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (InstalledMods.IsDfApiReady)
+        if (!InstalledMods.IsDfApiReady) return;
+        var cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
+        while (cryofreezers.MoveNext())
         {
-          var cryofreezers =
-            (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
-          foreach (var cryoFreezer in cryofreezers)
-          {
-            if (cryoFreezer.protoModuleCrew.Contains(kerbal))
-            {
-              // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer =
-                (from PartModule pm in cryoFreezer.Modules
-                  where pm.moduleName == "DeepFreezer"
-                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
-              if (deepFreezer != null) deepFreezer.beginFreezeKerbal(kerbal);
-              break;
-            }
-          }
+          if (cryofreezers.Current == null) continue;
+          if (!cryofreezers.Current.protoModuleCrew.Contains(kerbal)) continue;
+          // ReSharper disable once SuspiciousTypeConversion.Global
+          var deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
+          if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginFreezeKerbal(kerbal);
+          break;
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(string.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           Utilities.LogType.Error, true);
       }
     }

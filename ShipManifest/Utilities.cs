@@ -43,10 +43,12 @@ namespace ShipManifest
       {
         if (SMConditions.IsResourceTypeOther(selectedResource))
         {
-          foreach (var part in SMAddon.SmVessel.PartsByResource[selectedResource])
+          var parts = SMAddon.SmVessel.PartsByResource[selectedResource].GetEnumerator();
+          while (parts.MoveNext())
           {
-            currAmount += part.Resources[selectedResource].amount;
-            totAmount += part.Resources[selectedResource].maxAmount;
+            if (parts.Current == null) continue;
+            currAmount += parts.Current.Resources[selectedResource].amount;
+            totAmount += parts.Current.Resources[selectedResource].maxAmount;
           }
         }
         switch (SMConditions.TypeOfResource(selectedResource))
@@ -58,16 +60,13 @@ namespace ShipManifest
             // if DF installed, get total frozen and add to count.
             if (InstalledMods.IsDfInstalled)
             {
-              var cryofreezers =
-                (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+              var cryofreezers = GetFreezerParts().GetEnumerator();
               // ReSharper disable once SuspiciousTypeConversion.Global
-              currAmount =
-                cryofreezers.Select(
-                  cryoFreezer =>
-                    (from PartModule pm in cryoFreezer.Modules where pm.moduleName == "DeepFreezer" select pm)
-                      .SingleOrDefault())
-                  .Aggregate(currAmount,
-                    (current, deepFreezer) => current + new DFWrapper.DeepFreezer(deepFreezer).TotalFrozen);
+              while (cryofreezers.MoveNext())
+              {
+                if (cryofreezers.Current == null) continue;
+                currAmount += new DFWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
+              }
             }
 
             // Now check for occupied external seats
@@ -103,18 +102,20 @@ namespace ShipManifest
       return displayAmount;
     }
 
+    internal static List<Part> GetFreezerParts()
+    {
+      return (from p in SMAddon.SmVessel.Vessel.parts where p.Modules.Contains("DeepFreezer") select p).ToList();
+    }
+
     internal static int GetPartCrewCount(Part part)
     {
       var crewCount = 0;
       if (!InstalledMods.IsDfApiReady) return crewCount + part.protoModuleCrew.Count;
-      if (part.Modules.Contains("DeepFreezer"))
-      {
-        var freezerModule =
-          (from PartModule pm in part.Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
-        // ReSharper disable once SuspiciousTypeConversion.Global
-        var freezer = new DFWrapper.DeepFreezer(freezerModule);
-        crewCount += freezer.TotalFrozen;
-      }
+      if (!part.Modules.Contains("DeepFreezer")) return crewCount + part.protoModuleCrew.Count;
+      var freezerModule = SMConditions.GetFreezerModule(part);
+      // ReSharper disable once SuspiciousTypeConversion.Global
+      var freezer = new DFWrapper.DeepFreezer(freezerModule);
+      crewCount += freezer.TotalFrozen;
       return crewCount + part.protoModuleCrew.Count;
     }
 

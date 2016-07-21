@@ -28,13 +28,15 @@ namespace ShipManifest.Windows.Tabs
       try
       {
         // Display all Labs
-        foreach (var iLab in SMAddon.SmVessel.Labs)
+        var iLabs = SMAddon.SmVessel.Labs.GetEnumerator();
+        while (iLabs.MoveNext())
         {
+          if (iLabs.Current == null) continue;
           var isEnabled = true;
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          var label = iLab.name + " - (" + (iLab.IsOperational() ? "Operational" : "InOp") + ")";
+          var label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? "Operational" : "InOp") + ")";
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
         }
       }
@@ -45,32 +47,6 @@ namespace ShipManifest.Windows.Tabs
           Utilities.LogType.Error, true);
       }
       GUILayout.EndVertical();
-    }
-
-    internal static void ExtendAllPanels()
-    {
-      // TODO: for realism, add a closing/opening sound
-      foreach (var iPanel in SMAddon.SmVessel.SolarPanels)
-      {
-        var iModule = (ModuleDeployableSolarPanel) iPanel.PanelModule;
-        if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.RETRACTED)
-        {
-          iModule.Extend();
-        }
-      }
-    }
-
-    internal static void RetractAllPanels()
-    {
-      // TODO: for realism, add a closing/opening sound
-      foreach (var iPanel in SMAddon.SmVessel.SolarPanels)
-      {
-        var iModule = (ModuleDeployableSolarPanel) iPanel.PanelModule;
-        if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.EXTENDED)
-        {
-          iModule.Retract();
-        }
-      }
     }
   }
 }

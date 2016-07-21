@@ -78,14 +78,14 @@ namespace ShipManifest.Windows.Tabs
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      foreach (
-        var iModule in
-          SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
-            .Where(iModule => iModule.IsDocked))
+      var iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
+        .Where(iModule => iModule.IsDocked).GetEnumerator();
+      while (iModules.MoveNext())
       {
-        iModule.HatchEvents["CloseHatch"].active = true;
-        iModule.HatchEvents["OpenHatch"].active = false;
-        iModule.HatchOpen = true;
+        if (iModules.Current == null) continue;;
+        iModules.Current.HatchEvents["CloseHatch"].active = true;
+        iModules.Current.HatchEvents["OpenHatch"].active = false;
+        iModules.Current.HatchOpen = true;
       }
       SMAddon.FireEventTriggers();
     }
@@ -94,14 +94,14 @@ namespace ShipManifest.Windows.Tabs
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      foreach (
-        var iModule in
-          SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
-            .Where(iModule => iModule.IsDocked))
+      var iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch)iHatch.HatchModule)
+        .Where(iModule => iModule.IsDocked).GetEnumerator();
+      while (iModules.MoveNext())
       {
-        iModule.HatchEvents["CloseHatch"].active = false;
-        iModule.HatchEvents["OpenHatch"].active = true;
-        iModule.HatchOpen = false;
+        if (iModules.Current == null) continue; ;
+        iModules.Current.HatchEvents["CloseHatch"].active = false;
+        iModules.Current.HatchEvents["OpenHatch"].active = true;
+        iModules.Current.HatchOpen = false;
       }
       SMAddon.FireEventTriggers();
     }

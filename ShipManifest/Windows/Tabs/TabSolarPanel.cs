@@ -27,39 +27,41 @@ namespace ShipManifest.Windows.Tabs
       try
       {
         // Display all hatches
-        foreach (var iPanel in SMAddon.SmVessel.SolarPanels)
+        var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+        while (iPanels.MoveNext())
         {
+          if (iPanels.Current == null) continue;
           var isEnabled = true;
-          var label = iPanel.PanelStatus + " - " + iPanel.Title;
-          if (iPanel.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN)
+          var label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
+          if (iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN)
           {
             isEnabled = false;
-            label = iPanel.PanelStatus + " - (Broken) - " + iPanel.Title;
+            label = iPanels.Current.PanelStatus + " - (Broken) - " + iPanels.Current.Title;
           }
           var open =
-            !(iPanel.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTED ||
-              iPanel.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTING ||
-              iPanel.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN);
+            !(iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTED ||
+              iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTING ||
+              iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN);
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          if (!iPanel.CanBeRetracted)
+          if (!iPanels.Current.CanBeRetracted)
           {
-            label = iPanel.PanelStatus + " - (Locked) - " + iPanel.Title;
+            label = iPanels.Current.PanelStatus + " - (Locked) - " + iPanels.Current.Title;
           }
           var newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
-            iPanel.ExtendPanel();
+            iPanels.Current.ExtendPanel();
           else if (open && !newOpen)
-            iPanel.RetractPanel();
+            iPanels.Current.RetractPanel();
 
           var rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
             SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = iPanel.SPart;
+            SMHighlighter.MouseOverpart = iPanels.Current.SPart;
             SMHighlighter.MouseOverparts = null;
           }
         }
@@ -76,26 +78,24 @@ namespace ShipManifest.Windows.Tabs
     internal static void ExtendAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      foreach (var iPanel in SMAddon.SmVessel.SolarPanels)
+      var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+      while (iPanels.MoveNext())
       {
-        var iModule = (ModuleDeployableSolarPanel) iPanel.PanelModule;
-        if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.RETRACTED)
-        {
-          iModule.Extend();
-        }
+        if (iPanels.Current == null) continue;
+        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).panelState != ModuleDeployableSolarPanel.panelStates.RETRACTED) continue;
+        ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Extend();
       }
     }
 
     internal static void RetractAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      foreach (var iPanel in SMAddon.SmVessel.SolarPanels)
+      var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+      while (iPanels.MoveNext())
       {
-        var iModule = (ModuleDeployableSolarPanel) iPanel.PanelModule;
-        if (iModule.panelState == ModuleDeployableSolarPanel.panelStates.EXTENDED)
-        {
-          iModule.Retract();
-        }
+        if (iPanels.Current == null) continue;
+        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).panelState != ModuleDeployableSolarPanel.panelStates.EXTENDED) continue;
+        ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Retract();
       }
     }
   }

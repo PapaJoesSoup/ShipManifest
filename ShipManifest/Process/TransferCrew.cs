@@ -111,16 +111,17 @@ namespace ShipManifest.Process
         {
           // Must be a move...
           //Get the first available valid seat
-          foreach (var seat in FromPart.internalModel.seats)
+          var fromSeats = FromPart.internalModel.seats.GetEnumerator();
+          while  (fromSeats.MoveNext())
           {
+            var seat = fromSeats.Current;
+            if (seat == null) continue;
             if (seat.taken)
             {
               // This supports DeepFreeze frozen kerbals...
-              if (seat.kerbalRef != null && seat.crew != FromCrewMember)
-              {
-                ToSeat = seat;
-                break;
-              }
+              if (seat.kerbalRef == null || seat.crew == FromCrewMember) continue;
+              ToSeat = seat;
+              break;
             }
             else
             {
@@ -133,26 +134,28 @@ namespace ShipManifest.Process
         {
           // Xfer to another part
           // get target seat from target part's inernal model
-          foreach (var seat in ToPart.internalModel.seats)
+          var toSeats = ToPart.internalModel.seats.GetEnumerator();
+          while (toSeats.MoveNext())
           {
-            if (!seat.taken)
-            {
-              ToSeat = seat;
-              break;
-            }
+            var seat = toSeats.Current;
+            if (seat == null) continue;
+            if (seat.taken) continue;
+            ToSeat = seat;
+            break;
           }
           // All seats full?
           if (ToSeat == null)
           {
-            foreach (var seat in ToPart.internalModel.seats)
+            var moreSeats = FromPart.internalModel.seats.GetEnumerator();
+            while (moreSeats.MoveNext())
             {
+              var seat = moreSeats.Current;
+              if (seat == null) continue;
               // This supports DeepFreeze frozen kerbals...
-              if (seat.kerbalRef != null &&
-                  seat.kerbalRef.protoCrewMember.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
-              {
-                ToSeat = seat;
-                break;
-              }
+              if (seat.kerbalRef == null ||
+                  seat.kerbalRef.protoCrewMember.rosterStatus == ProtoCrewMember.RosterStatus.Dead) continue;
+              ToSeat = seat;
+              break;
             }
           }
         }
@@ -176,94 +179,92 @@ namespace ShipManifest.Process
     {
       try
       {
-        if (CrewXferActive)
+        if (!CrewXferActive) return;
+        if (CameraManager.Instance.currentCameraMode == CameraManager.CameraMode.IVA)
         {
-          if (CameraManager.Instance.currentCameraMode == CameraManager.CameraMode.IVA)
-          {
-            ScreenMessages.PostScreenMessage("<color=orange>Cannot go IVA.  An SM Crew Xfer is in progress</color>", 4f);
-            CameraManager.Instance.SetCameraMode(CameraManager.CameraMode.Flight);
-          }
+          ScreenMessages.PostScreenMessage("<color=orange>Cannot go IVA.  An SM Crew Xfer is in progress</color>", 4f);
+          CameraManager.Instance.SetCameraMode(CameraManager.CameraMode.Flight);
+        }
 
-          switch (CrewXferState)
-          {
-            case XferState.Off:
-              // We're just starting loop, so set some evnironment stuff.
-              Timestamp = DateTime.Now;
-              CrewXferState = XferState.Start;
-              break;
+        switch (CrewXferState)
+        {
+          case XferState.Off:
+            // We're just starting loop, so set some evnironment stuff.
+            Timestamp = DateTime.Now;
+            CrewXferState = XferState.Start;
+            break;
 
-            case XferState.Start:
+          case XferState.Start:
 
-              SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
+            SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-              if (SMSettings.RealismMode)
+            if (SMSettings.RealismMode)
+            {
+              // Play run sound when start sound is nearly done. (repeats)
+              if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
               {
-                // Play run sound when start sound is nearly done. (repeats)
-                if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
-                {
-                  SMSound.SourcePumpRun.Play();
-                  SMAddon.Elapsed = 0;
-                  CrewXferState = XferState.Transfer;
-                }
-              }
-              else
-              {
+                SMSound.SourcePumpRun.Play();
+                SMAddon.Elapsed = 0;
                 CrewXferState = XferState.Transfer;
               }
-              break;
+            }
+            else
+            {
+              CrewXferState = XferState.Transfer;
+            }
+            break;
 
-            case XferState.Transfer:
+          case XferState.Transfer:
 
-              SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
+            SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-              if (SMSettings.RealismMode)
-              {
-                // wait for movement to end...
-                if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
-                  CrewXferState = XferState.Stop;
-              }
-              else
-              {
-                if (SMAddon.Elapsed > 1)
-                  CrewXferState = XferState.Stop;
-              }
-              break;
+            if (SMSettings.RealismMode)
+            {
+              // wait for movement to end...
+              if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
+                CrewXferState = XferState.Stop;
+            }
+            else
+            {
+              if (SMAddon.Elapsed > 1)
+                CrewXferState = XferState.Stop;
+            }
+            break;
 
-            case XferState.Stop:
+          case XferState.Stop:
 
-              // Spawn crew in parts and in vessel.
-              if (SMSettings.RealismMode)
-              {
-                // play crew sit.
-                SMSound.SourcePumpRun.Stop();
-                SMSound.SourcePumpStop.Play();
-              }
-              SMAddon.Elapsed = 0;
-              CrewTransferAction();
-              CrewXferState = XferState.Portraits;
-              IvaDelayActive = true;
-              break;
+            // Spawn crew in parts and in vessel.
+            if (SMSettings.RealismMode)
+            {
+              // play crew sit.
+              SMSound.SourcePumpRun.Stop();
+              SMSound.SourcePumpStop.Play();
+            }
+            SMAddon.Elapsed = 0;
+            CrewTransferAction();
+            CrewXferState = XferState.Portraits;
+            IvaDelayActive = true;
+            break;
 
-            case XferState.Portraits:
+          case XferState.Portraits:
 
-              // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
-              if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
-              {
-                IvaPortraitDelay += 1;
-              }
-              else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
-              {
-                if (IsStockXfer)
-                  ScreenMessages.PostScreenMessage(
-                    string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name,
-                      ToPart.partInfo.title), 5f);
+            // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
+            if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
+            {
+              IvaPortraitDelay += 1;
+            }
+            else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
+            {
+              if (IsStockXfer)
+                ScreenMessages.PostScreenMessage(
+                  string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name,
+                    ToPart.partInfo.title), 5f);
 
-                ResetXferProcess();
-              }
-              break;
-          }
-          if (CrewXferState != XferState.Off) Timestamp = DateTime.Now;
+              ResetXferProcess();
+            }
+            break;
         }
+        if (CrewXferState != XferState.Off) Timestamp = DateTime.Now;
       }
       catch (Exception ex)
       {

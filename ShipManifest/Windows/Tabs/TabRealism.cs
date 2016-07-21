@@ -84,7 +84,7 @@ namespace ShipManifest.Windows.Tabs
       _label = "Enable Stock Crew Xfers";
       _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
       _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will be Allowed.";
-      _toolTip += "\r\nWhen Off (requires Realism Mode On), Stock Crew transfers are disabled (the Transfer options will still appear, but are blocked.";
+      _toolTip += "\r\nWhen OFF (requires Realism Mode On), Stock Crew transfers are disabled.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
       SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
@@ -93,6 +93,23 @@ namespace ShipManifest.Windows.Tabs
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
+      GUILayout.EndHorizontal();
+
+      // Set Gui.enabled for child settings to resources...
+      GUI.enabled = SMSettings.EnableCrew && isEnabled;
+
+      // EnablePFResources Mode
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      _label = "Enable Crew Fill and Empty Ops in Pre-Flight";
+      _toolTip = "Turns on/off Fill and Empty Crew when in preflight.";
+      _toolTip += "\r\nWhen ON, Fill & Empty Crew vessel wide are possible (shows in the Resource list).";
+      _toolTip += "\r\nWhen Off, Fill and Empty Crew vessel wide will not appear in the resource list.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.EnablePfCrews = GUILayout.Toggle(SMSettings.EnablePfCrews, _guiLabel, GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
       // Enable stock Crew Xfer Override

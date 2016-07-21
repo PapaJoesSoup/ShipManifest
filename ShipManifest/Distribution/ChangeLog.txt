@@ -1,4 +1,11 @@
-﻿Version 5.1.1.2 - Release 12 Jul, 2016 - KSP 1.1.3 Compatibility Edition.
+﻿Version 5.1.2.0 - Release 21 Jul, 2016 - KSP 1.1.3 Optimization Edition.
+- New:  Added Pre-Flight option to enable Crew Fills and Dumps Vessel Wide.  Off by default.  Works the same as Resource fill and dump.
+- New:  Refactored Part level Crew Fill and Dumps.  Now shows up in the Transfer Window in Preflight when CrewPreflight setting is on, or anytime when Realism is off
+- New:  Significant refactoring to improve overall performance.
+- Fixed:  Revised erroneous tooltip messages for Renaming kerbals and enabling Profession changes.  These are now enabled by default and supported by the stock game.
+- Fixed:  Now SM properly detects and notes changes to USI inflatable crewable modules
+
+Version 5.1.1.2 - Release 12 Jul, 2016 - KSP 1.1.3 Compatibility Edition.
 - New:  Added ability to initiate EVA from Crew Transfer Window in Realism mode when CLS prevents an internal Transfer.
 - Fixed: Occasional nullref exceptions when loading a vessel in method UpdateDockedVessels.
 

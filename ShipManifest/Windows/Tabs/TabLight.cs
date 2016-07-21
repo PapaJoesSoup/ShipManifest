@@ -26,22 +26,24 @@ namespace ShipManifest.Windows.Tabs
       try
       {
         // Display all Lights
-        foreach (var iLight in SMAddon.SmVessel.Lights)
+        var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+        while (iLights.MoveNext())
         {
-          var label = iLight.Status + " - " + iLight.Title;
-          var onState = iLight.IsOn;
+          if (iLights.Current == null) continue;
+          var label = iLights.Current.Status + " - " + iLights.Current.Title;
+          var onState = iLights.Current.IsOn;
           var newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!onState && newOnState)
-            iLight.TurnOnLight();
+            iLights.Current.TurnOnLight();
           else if (onState && !newOnState)
-            iLight.TurnOffLight();
+            iLights.Current.TurnOffLight();
           var rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
             SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = iLight.SPart;
+            SMHighlighter.MouseOverpart = iLights.Current.SPart;
             SMHighlighter.MouseOverparts = null;
           }
         }
@@ -58,18 +60,22 @@ namespace ShipManifest.Windows.Tabs
     internal static void TurnOnAllLights()
     {
       // iterate thru the hatch parts and open hatches
-      foreach (var iLight in SMAddon.SmVessel.Lights)
+      var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+      while (iLights.MoveNext())
       {
-        iLight.TurnOnLight();
+        if (iLights.Current == null) continue;
+        iLights.Current.TurnOnLight();
       }
     }
 
     internal static void TurnOffAllLights()
     {
       // iterate thru the hatch parts and open hatches
-      foreach (var iLight in SMAddon.SmVessel.Lights)
+      var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+      while (iLights.MoveNext())
       {
-        iLight.TurnOffLight();
+        if (iLights.Current == null) continue;
+        iLights.Current.TurnOffLight();
       }
     }
   }

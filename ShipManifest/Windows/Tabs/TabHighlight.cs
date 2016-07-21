@@ -137,8 +137,12 @@ namespace ShipManifest.Windows.Tabs
         {
           if (SMAddon.SmVessel.SelectedResources.Count > 0)
           {
-            foreach (var part in SMAddon.SmVessel.SelectedResourcesParts)
-              SMHighlighter.EdgeHighight(part, false);
+            var parts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
+            while (parts.MoveNext())
+            {
+              if (parts.Current == null) continue;
+              SMHighlighter.EdgeHighight(parts.Current, false);
+            }
           }
         }
       }

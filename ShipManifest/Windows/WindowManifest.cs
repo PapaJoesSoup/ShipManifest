@@ -112,9 +112,9 @@ namespace ShipManifest.Windows
     {
       try
       {
-        GUILayout.BeginHorizontal();
-        if (!SMSettings.RealismMode)
+        if (SMSettings.EnablePfCrews)
         {
+          GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
           if (GUILayout.Button("Fill Crew", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
           {
@@ -124,8 +124,8 @@ namespace ShipManifest.Windows
           {
             SMAddon.SmVessel.EmptyCrew();
           }
+          GUILayout.EndHorizontal();
         }
-        GUILayout.EndHorizontal();
 
         if (!SMSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
@@ -155,52 +155,53 @@ namespace ShipManifest.Windows
       try
       {
         // List required here to prevent foreach sync errors with live source.
-        var keys = SMAddon.SmVessel.PartsByResource.Keys.ToList();
-        foreach (var resourceName in keys)
+        var keys = SMAddon.SmVessel.PartsByResource.Keys.GetEnumerator();
+        while (keys.MoveNext())
         {
+          if (keys.Current == null) continue;
           GUILayout.BeginHorizontal();
 
           // Button Widths
           var width = 273;
-          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName)) width = 185;
-          else if (SMConditions.IsResourceTypeOther(resourceName)) width = 223;
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
+          else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
-          var displayAmounts = string.Format("{0}{1}", resourceName, Utilities.DisplayVesselResourceTotals(resourceName));
-          var style = SMAddon.SmVessel.SelectedResources.Contains(resourceName)
+          var displayAmounts = string.Format("{0}{1}", keys.Current, Utilities.DisplayVesselResourceTotals(keys.Current));
+          var style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
           if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
           {
-            ResourceButtonToggled(resourceName);
+            ResourceButtonToggled(keys.Current);
           }
 
           // Dump Button
-          if (SMConditions.IsResourceTypeOther(resourceName) && SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
+          if (SMConditions.IsResourceTypeOther(keys.Current) && SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
-            var pumpId = TransferPump.GetPumpIdFromHash(resourceName,
-              SMAddon.SmVessel.PartsByResource[resourceName].First(),
-              SMAddon.SmVessel.PartsByResource[resourceName].Last(), TransferPump.TypePump.Dump,
+            var pumpId = TransferPump.GetPumpIdFromHash(keys.Current,
+              SMAddon.SmVessel.PartsByResource[keys.Current].First(),
+              SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypePump.Dump,
               TransferPump.TriggerButton.Manifest);
             var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
               ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
               : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
-            GUI.enabled = SMConditions.CanResourceBeDumped(resourceName);
+            GUI.enabled = SMConditions.CanResourceBeDumped(keys.Current);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
-              SMVessel.ToggleDumpResource(resourceName, pumpId);
+              SMVessel.ToggleDumpResource(keys.Current, pumpId);
             }
           }
 
           // Fill Button
-          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(resourceName) &&
-              SMAddon.SmVessel.PartsByResource[resourceName].Count > 0)
+          if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(keys.Current) &&
+              SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
-            GUI.enabled = SMConditions.CanResourceBeFilled(resourceName);
+            GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
             if (GUILayout.Button(string.Format("{0}", "Fill"), SMStyle.ButtonStyle, GUILayout.Width(35),
               GUILayout.Height(20)))
             {
-              SMAddon.SmVessel.FillResource(resourceName);
+              SMAddon.SmVessel.FillResource(keys.Current);
             }
           }
           GUI.enabled = true;
@@ -285,19 +286,26 @@ namespace ShipManifest.Windows
 
         if (SMAddon.SmVessel.SelectedResources.Count > 0)
         {
-          foreach (var part in SMAddon.SmVessel.SelectedResourcesParts)
+          var pParts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
+          while (pParts.MoveNext())
           {
+            if (pParts.Current == null) continue;
+            var part = pParts.Current;
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
               var noWrap = SMStyle.LabelStyleNoWrap;
               GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
                 GUILayout.Height(18));
               var noPad = SMStyle.LabelStyleNoPad;
-              foreach (var resource in SMAddon.SmVessel.SelectedResources)
+              var sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
+              while (sResources.MoveNext())
+              {
+                if (sResources.Current == null) continue;
                 GUILayout.Label(
-                  string.Format(" - {0}:  ({1}/{2})", resource, part.Resources[resource].amount.ToString("######0.####"),
-                    part.Resources[resource].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
+                  string.Format(" - {0}:  ({1}/{2})", sResources.Current, part.Resources[sResources.Current].amount.ToString("######0.####"),
+                    part.Resources[sResources.Current].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
                   GUILayout.Height(16));
+              }
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             {
@@ -310,8 +318,11 @@ namespace ShipManifest.Windows
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
             {
               var scienceCount = 0;
-              foreach (PartModule pm in part.Modules)
+              var pModules = part.Modules.GetEnumerator();
+              while (pModules.MoveNext())
               {
+                if (pModules.Current == null) continue;
+                var pm = (PartModule)pModules.Current;
                 var container = pm as ModuleScienceContainer;
                 if (container != null)
                   scienceCount += container.GetScienceCount();
@@ -421,33 +432,35 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
             if (!WindowTransfer.ShowTargetVessels)
             {
-              foreach (
-                var part in
-                  SMAddon.SmVessel.SelectedPartsSource.Where(part => SMAddon.SmVessel.SelectedPartsTarget.Contains(part))
-                )
+              var srcParts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+              while (srcParts.MoveNext())
               {
-                SMAddon.SmVessel.SelectedPartsTarget.Remove(part);
+                if (srcParts.Current == null) continue;
+                if (!SMAddon.SmVessel.SelectedPartsTarget.Contains(srcParts.Current)) continue;
+                SMAddon.SmVessel.SelectedPartsTarget.Remove(srcParts.Current);
               }
             }
           }
           else
           {
-            foreach (var part in SMAddon.SmVessel.SelectedPartsSource)
+            var parts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+            while (parts.MoveNext())
             {
+              if (parts.Current == null) continue;
               if (resourceNames.Count > 1)
               {
-                if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                  newSources.Add(part);
+                if (parts.Current.Resources.Contains(resourceNames[0]) && parts.Current.Resources.Contains(resourceNames[1]))
+                  newSources.Add(parts.Current);
               }
               else
               {
-                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && part.CrewCapacity > 0)
-                  newSources.Add(part);
+                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && parts.Current.CrewCapacity > 0)
+                  newSources.Add(parts.Current);
                 else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
-                         part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                  newSources.Add(part);
-                else if (part.Resources.Contains(resourceNames[0]))
-                  newSources.Add(part);
+                         parts.Current.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                  newSources.Add(parts.Current);
+                else if (parts.Current.Resources.Contains(resourceNames[0]))
+                  newSources.Add(parts.Current);
               }
             }
             SMAddon.SmVessel.SelectedPartsSource.Clear();
@@ -461,33 +474,35 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
             if (!WindowTransfer.ShowSourceVessels)
             {
-              foreach (
-                var part in
-                  SMAddon.SmVessel.SelectedPartsTarget.Where(part => SMAddon.SmVessel.SelectedPartsSource.Contains(part))
-                )
+              var tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
+              while (tgtParts.MoveNext())
               {
-                SMAddon.SmVessel.SelectedPartsSource.Remove(part);
+                if (tgtParts.Current == null) continue;
+                if (!SMAddon.SmVessel.SelectedPartsSource.Contains(tgtParts.Current)) continue;
+                SMAddon.SmVessel.SelectedPartsSource.Remove(tgtParts.Current);
               }
             }
           }
           else
           {
-            foreach (var part in SMAddon.SmVessel.SelectedPartsTarget)
+            var tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
+            while (tgtParts.MoveNext())
             {
+              if (tgtParts.Current == null) continue;
               if (resourceNames.Count > 1)
               {
-                if (part.Resources.Contains(resourceNames[0]) && part.Resources.Contains(resourceNames[1]))
-                  newTargets.Add(part);
+                if (tgtParts.Current.Resources.Contains(resourceNames[0]) && tgtParts.Current.Resources.Contains(resourceNames[1]))
+                  newTargets.Add(tgtParts.Current);
               }
               else
               {
-                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && part.CrewCapacity > 0)
-                  newTargets.Add(part);
+                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && tgtParts.Current.CrewCapacity > 0)
+                  newTargets.Add(tgtParts.Current);
                 else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
-                         part.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                  newTargets.Add(part);
-                else if (part.Resources.Contains(resourceNames[0]))
-                  newTargets.Add(part);
+                         tgtParts.Current.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                  newTargets.Add(tgtParts.Current);
+                else if (tgtParts.Current.Resources.Contains(resourceNames[0]))
+                  newTargets.Add(tgtParts.Current);
               }
             }
             SMAddon.SmVessel.SelectedPartsTarget.Clear();

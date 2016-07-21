@@ -250,18 +250,18 @@ namespace ShipManifest.Process
       //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // This routine acts as a queue
       // WHen a pump is set to IsPumOn = true, it will be processed by this routine.
-      var transferPumps = SMAddon.SmVessel.TransferPumps;
+      var pumpsToRemove = new List<TransferPump>();
       // this task runs every Update when active.
 
-      // set an active pump so we know what was running if an error occurs.
-      var activePump = transferPumps[0];
       try
       {
-        foreach (var pump in transferPumps)
+        var tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
+        while (tPumps.MoveNext())
         {
+          if (tPumps.Current == null) continue;
           // Check Pump state:
-          if (!pump.IsPumpOn) continue;
-          activePump = pump;
+          if (!tPumps.Current.IsPumpOn) continue;
+          var pump = tPumps.Current;
           switch (pump.PumpStatus)
           {
             case PumpState.Off:
@@ -293,15 +293,22 @@ namespace ShipManifest.Process
               //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Stop", Utilities.LogType.Info, SMSettings.VerboseLogging);
               pump.Stop();
               pump.PumpStatus = PumpState.Off;
-              transferPumps.Remove(pump);
+              pumpsToRemove.Add(pump);
               break;
           }
         }
+        if (pumpsToRemove.Count <= 0) return;
+        var rpumps = pumpsToRemove.GetEnumerator();
+        while (rpumps.MoveNext())
+        {
+          if (rpumps.Current == null) continue;
+          SMAddon.SmVessel.TransferPumps.Remove(rpumps.Current);
+        }
+        pumpsToRemove.Clear();
       }
       catch (Exception ex)
       {
-        // Electric charge can continue to regenerate, so we can ignore the error if Electric Charge has been selected.
-        if (!SMAddon.FrameErrTripped && activePump.Resource != "ElectricCharge")
+        if (!SMAddon.FrameErrTripped)
         {
           Utilities.LogMessage(
             string.Format(" in TransferPump.ProcessActivePumps (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
@@ -425,35 +432,47 @@ namespace ShipManifest.Process
       var cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
-        var toPartsRemaining =
-          (from part in ToParts where part.Resources[Resource].maxAmount - part.Resources[Resource].amount > SMSettings.Tolerance select part).ToList();
-
-        // Lets account for any empty/full containers
-        var toPartCount = toPartsRemaining.Count;
-
-        // calc average of parts that have room.
-        var toPartAmt = cycleAmount/toPartCount;
+        // calc average of parts in list.
+        var toPartAvgAmt = cycleAmount/ToParts.Count;
 
         // reduce to the smallest container.
-        double[] minAmt = {toPartAmt};
-        foreach (var thisAmount in toPartsRemaining.Select(thisPart => thisPart.Resources[Resource].maxAmount - thisPart.Resources[Resource].amount).Where(thisPartCap => thisPartCap < minAmt[0] && thisPartCap > SMSettings.Tolerance))
+        var minAmt = toPartAvgAmt;
+        var remainingPartsCount = 0;
+        var theseParts = ToParts.GetEnumerator();
+        while (theseParts.MoveNext())
         {
-          minAmt[0] = thisAmount;
+          if (theseParts.Current == null) continue;
+          var thisPartCap = PartRemainingCapacity(theseParts.Current, Resource);
+          if (thisPartCap <= SMSettings.Tolerance) continue;
+          if (thisPartCap >= minAmt)
+          {
+            remainingPartsCount++;
+            continue;
+          }
+          minAmt = thisPartCap;
+          remainingPartsCount++;
         }
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Calculate pump amounts for each To part and Increment.
-        foreach (var part in toPartsRemaining)
+        if (remainingPartsCount > 0)
         {
-          part.Resources[Resource].amount += minAmt[0];
-          cycleBalance -= minAmt[0];
+          var toParts = ToParts.GetEnumerator();
+          while (toParts.MoveNext())
+          {
+            if (toParts.Current == null) continue;
+            if (PartRemainingCapacity(toParts.Current, Resource) <= SMSettings.Tolerance) continue;
+            var part = toParts.Current;
+            part.Resources[Resource].amount += minAmt;
+            cycleBalance -= minAmt;
 
-          // Ensure part is capped and does not contain more than allowed.
-          if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
-            part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
+            // Ensure part is capped and does not contain more than allowed.
+            if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
+              part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
+          }
         }
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
-        if (toPartsRemaining.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
+        if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
       }
     }
 
@@ -462,33 +481,50 @@ namespace ShipManifest.Process
       //Utilities.LogMessage("Entering:  TransferPump.DrainParts.", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // Lets account for any empty/full containers
       // now split up the xfer amount evenly across the number of tanks that can send/receive resources
-      var fromPartsRemaining =
-        (from part in FromParts where part.Resources[Resource].amount > SMSettings.Tolerance select part).ToList();
-      var fromPartCount = fromPartsRemaining.Count;
-      var fromPartAmt = cycleAmount/fromPartCount;
+      if (cycleAmount < SMSettings.Tolerance) return;
 
       var cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
+        // calc average of parts in list.
+        var fromPartAvgAmt = cycleAmount / FromParts.Count;
+
         // reduce to the smallest container.
-        var minAmt = fromPartAmt;
-        foreach (var thisAmt in fromPartsRemaining.Select(part => part.Resources[Resource].amount))
+        var minAmt = fromPartAvgAmt;
+        var remainingPartsCount = 0;
+        var theseParts = FromParts.GetEnumerator();
+        while (theseParts.MoveNext())
         {
-          if (thisAmt < minAmt && thisAmt > SMSettings.Tolerance) minAmt = thisAmt;
+          if (theseParts.Current == null) continue;
+          if (theseParts.Current.Resources[Resource].amount <= SMSettings.Tolerance) continue;
+          if (theseParts.Current.Resources[Resource].amount >= minAmt)
+          {
+            remainingPartsCount++;
+            continue;
+          }
+          minAmt = theseParts.Current.Resources[Resource].amount;
+          remainingPartsCount++;
         }
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Decrement.
-        if (fromPartsRemaining.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
-        foreach (var part in fromPartsRemaining)
+        if (remainingPartsCount > 0)
         {
-          part.Resources[Resource].amount -= minAmt;
-          if (part.Resources[Resource].amount <= SMSettings.Tolerance) part.Resources[Resource].amount = 0;
+          var fromParts = FromParts.GetEnumerator();
+          while (fromParts.MoveNext())
+          {
+            if (fromParts.Current == null) continue;
+            if (fromParts.Current.Resources[Resource].amount <= SMSettings.Tolerance) continue;
+            var part = fromParts.Current;
+            part.Resources[Resource].amount -= minAmt;
+            cycleBalance -= minAmt;
+            AmtPumped += minAmt;
 
-          // Report ramaining balance after Transfer.
-          cycleBalance -= minAmt;
-          AmtPumped += minAmt;
+            // Ensure part is empty and does not contain less than 0.
+            if (part.Resources[Resource].amount <= SMSettings.Tolerance) part.Resources[Resource].amount = 0;
+          }
         }
+        if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
       }
     }
@@ -497,8 +533,11 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.ConsumeCharge", Utilities.LogType.Info, SMSettings.VerboseLogging);
       if (SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge") || !SMSettings.EnableXferCost) return true;
-      foreach (var iPart in SMAddon.SmVessel.PartsByResource["ElectricCharge"])
+      var iParts = SMAddon.SmVessel.PartsByResource["ElectricCharge"].GetEnumerator();
+      while (iParts.MoveNext())
       {
+        if (iParts.Current == null) continue;
+        var iPart = iParts.Current;
         if (iPart.Resources["ElectricCharge"].amount >= deltaCharge)
         {
           iPart.Resources["ElectricCharge"].amount -= deltaCharge;
@@ -508,9 +547,7 @@ namespace ShipManifest.Process
         deltaCharge -= iPart.Resources["ElectricCharge"].amount;
         iPart.Resources["ElectricCharge"].amount = 0;
       }
-      if (deltaCharge > 0)
-        return false;
-      return true;
+      return !(deltaCharge > 0);
     }
 
     public void Abort()
@@ -521,12 +558,11 @@ namespace ShipManifest.Process
     public static void AbortAllPumpsInProcess(uint pumpId)
     {
       // set a state vars and wait for the next update to pick it up.
-      foreach (
-        var pump in
-          (from pump in SMAddon.SmVessel.TransferPumps where pump.IsPumpOn && pump.PumpId == pumpId select pump).ToList()
-        )
+      var tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
+      while (tPumps.MoveNext())
       {
-        pump.PumpStatus = PumpState.Stop;
+        if (tPumps.Current == null) continue;
+        if (tPumps.Current.PumpId == pumpId && tPumps.Current.IsPumpOn) tPumps.Current.PumpStatus = PumpState.Stop;
       }
     }
 
@@ -624,45 +660,70 @@ namespace ShipManifest.Process
     internal static double CalcRemainingResource(List<Part> parts, string selectedResource)
     {
       double amount = 0;
-      if (parts != null)
-        amount +=
-          parts.Where(part => part.Resources.Contains(selectedResource))
-            .Sum(part => part.Resources[selectedResource].amount);
+      if (parts == null || selectedResource == null || selectedResource == "") return amount;
+      var list = parts.GetEnumerator();
+      while (list.MoveNext())
+      {
+        if (list.Current == null) continue;
+        if (!list.Current.Resources.Contains(selectedResource)) continue;
+        amount += list.Current.Resources[selectedResource].amount;
+      }
       return amount;
     }
 
     internal static double CalcResourceCapacity(List<Part> parts, string selectedResource)
     {
       double amount = 0;
-      if (parts != null)
-        amount +=
-          parts.Where(part => part.Resources.Contains(selectedResource))
-            .Sum(part => part.Resources[selectedResource].maxAmount);
+      if (parts == null || selectedResource == null || selectedResource == "") return amount;
+      var list = parts.GetEnumerator();
+      while (list.MoveNext())
+      {
+        if (list.Current == null) continue;
+        if (!list.Current.Resources.Contains(selectedResource)) continue;
+        amount += list.Current.Resources[selectedResource].maxAmount;
+      }
       return amount;
     }
 
     internal static double CalcRemainingCapacity(List<Part> parts, string selectedResource)
     {
       double amount = 0;
-      if (parts != null)
-        amount +=
-          parts.Where(part => part.Resources.Contains(selectedResource))
-            .Sum(part => part.Resources[selectedResource].maxAmount - part.Resources[selectedResource].amount);
+      if (parts == null || selectedResource == null || selectedResource == "") return amount;
+      var list = parts.GetEnumerator();
+      while (list.MoveNext())
+      {
+        if (list.Current == null) continue;
+        if (!list.Current.Resources.Contains(selectedResource)) continue;
+        amount += PartRemainingCapacity(list.Current, selectedResource);
+      }
       return amount;
+    }
+    internal static double PartRemainingCapacity(Part part, string selectedResource)
+    {
+      return part.Resources[selectedResource].maxAmount - part.Resources[selectedResource].amount;
     }
 
     internal double MaxPumpAmt()
     {
       double maxPumpAmount = 0;
-      if (FromParts == null || ToParts == null || FromParts.Count == 0 || ToParts.Count == 0)
-        maxPumpAmount = 0;
-      else
+      if (FromParts == null || ToParts == null || FromParts.Count == 0 || ToParts.Count == 0) return maxPumpAmount;
+      var toList = ToParts.GetEnumerator();
+      var fromList = FromParts.GetEnumerator();
+      double fromAmount = 0;
+      double toCapacityRemaining = 0;
+      while (fromList.MoveNext())
       {
-        var maxFromAmount = FromParts.Sum(partFrom => partFrom.Resources[Resource].amount);
-        maxPumpAmount += ToParts.Sum(partTo => partTo.Resources[Resource].maxAmount - partTo.Resources[Resource].amount);
-        maxPumpAmount = maxPumpAmount > maxFromAmount ? maxFromAmount : maxPumpAmount;
-        maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
+        if (fromList.Current == null) continue;
+        fromAmount += fromList.Current.Resources[Resource].amount;
       }
+      while (toList.MoveNext())
+      {
+        if (toList.Current == null) continue;
+        toCapacityRemaining += PartRemainingCapacity(toList.Current, Resource);
+      }
+      maxPumpAmount = toCapacityRemaining - fromAmount;
+      maxPumpAmount = maxPumpAmount > fromAmount ? fromAmount : maxPumpAmount;
+      maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
       return maxPumpAmount;
     }
 
@@ -682,11 +743,21 @@ namespace ShipManifest.Process
             resIdx = 1;
         }
         // now lets get the amount to move.  we will use this higher portion to calc lower volume ratio during move.
-        var maxFromAmount = partsFrom.Sum(partFrom => partFrom.Resources[selectedResources[resIdx]].amount);
-        maxPumpAmount +=
-          partsTo.Sum(
-            partTo =>
-              partTo.Resources[selectedResources[resIdx]].maxAmount - partTo.Resources[selectedResources[resIdx]].amount);
+        double maxFromAmount = 0;
+        var fromParts = partsFrom.GetEnumerator();
+        while (fromParts.MoveNext())
+        {
+          if (fromParts.Current == null) continue;
+          if (!fromParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
+          maxFromAmount += fromParts.Current.Resources[selectedResources[resIdx]].amount;
+        }
+        var toParts = partsTo.GetEnumerator();
+        while (toParts.MoveNext())
+        {
+          if (toParts.Current == null) continue;
+          if (!toParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
+          maxFromAmount += PartRemainingCapacity(toParts.Current, selectedResources[resIdx]);
+        }
 
         maxPumpAmount = maxPumpAmount > maxFromAmount ? maxFromAmount : maxPumpAmount;
         maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
@@ -712,46 +783,45 @@ namespace ShipManifest.Process
     {
       // Now lets update the Resource Xfer pumps for display use...
       WindowTransfer.DisplayPumps.Clear();
-      if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+      if (!SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources)) return;
+      // Lets create a pump Object for managing pump options and data.
+      var displaySourceParts = WindowTransfer.ShowSourceVessels
+        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
+          SMAddon.SmVessel.SelectedResources)
+        : SMAddon.SmVessel.SelectedPartsSource;
+      var displayTargetParts = WindowTransfer.ShowTargetVessels
+        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
+          SMAddon.SmVessel.SelectedResources)
+        : SMAddon.SmVessel.SelectedPartsTarget;
+
+      var resources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
+      while (resources.MoveNext())
       {
-        // Lets create a pump Object for managing pump options and data.
-        var displaySourceParts = WindowTransfer.ShowSourceVessels
-          ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
-            SMAddon.SmVessel.SelectedResources)
-          : SMAddon.SmVessel.SelectedPartsSource;
-        var displayTargetParts = WindowTransfer.ShowTargetVessels
-          ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
-            SMAddon.SmVessel.SelectedResources)
-          : SMAddon.SmVessel.SelectedPartsTarget;
-
-        foreach (var resource in SMAddon.SmVessel.SelectedResources)
+        var pump1 = new TransferPump
         {
-          var pump1 = new TransferPump
-          {
-            Resource = resource,
-            PumpType = TypePump.SourceToTarget,
-            PumpAmount = CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources),
-            EditSliderAmount =
-              CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources)
-                .ToString(CultureInfo.InvariantCulture),
-            FromParts = displaySourceParts,
-            ToParts = displayTargetParts
-          };
-          WindowTransfer.DisplayPumps.Add(pump1);
+          Resource = resources.Current,
+          PumpType = TypePump.SourceToTarget,
+          PumpAmount = CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources),
+          EditSliderAmount =
+            CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources)
+              .ToString(CultureInfo.InvariantCulture),
+          FromParts = displaySourceParts,
+          ToParts = displayTargetParts
+        };
+        WindowTransfer.DisplayPumps.Add(pump1);
 
-          var pump2 = new TransferPump
-          {
-            Resource = resource,
-            PumpType = TypePump.TargetToSource,
-            PumpAmount = CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources),
-            EditSliderAmount =
-              CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources)
-                .ToString(CultureInfo.InvariantCulture),
-            FromParts = displayTargetParts,
-            ToParts = displaySourceParts
-          };
-          WindowTransfer.DisplayPumps.Add(pump2);
-        }
+        var pump2 = new TransferPump
+        {
+          Resource = resources.Current,
+          PumpType = TypePump.TargetToSource,
+          PumpAmount = CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources),
+          EditSliderAmount =
+            CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources)
+              .ToString(CultureInfo.InvariantCulture),
+          FromParts = displayTargetParts,
+          ToParts = displaySourceParts
+        };
+        WindowTransfer.DisplayPumps.Add(pump2);
       }
     }
 
@@ -771,9 +841,12 @@ namespace ShipManifest.Process
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsTarget;
 
-      foreach (var pump in WindowTransfer.DisplayPumps)
+      var dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
+      while (dPumps.MoveNext())
       {
+        if (dPumps.Current == null) continue;
         // Lets update pump data (it persists).
+        var pump = dPumps.Current;
         switch (pump.PumpType)
         {
           case TypePump.Dump:
@@ -794,7 +867,14 @@ namespace ShipManifest.Process
 
     internal static List<TransferPump> GetDisplayPumpsByType(TypePump pumpType)
     {
-      return (from pump in WindowTransfer.DisplayPumps where pump.PumpType == pumpType select pump).ToList();
+      var dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
+      var results = new List<TransferPump>();
+      while (dPumps.MoveNext())
+      {
+        if (dPumps.Current == null) continue;
+        if (dPumps.Current.PumpType == pumpType) results.Add(dPumps.Current);
+      }
+      return results;
     }
 
     /// <summary>

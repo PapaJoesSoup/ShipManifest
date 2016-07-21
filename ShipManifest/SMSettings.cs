@@ -38,6 +38,7 @@ namespace ShipManifest
     internal static bool EnableCls = true;
     internal static bool EnableScience = true;
     internal static bool EnableResources = true;
+    internal static bool EnablePfCrews;
     internal static bool EnablePfResources = true;
     internal static bool EnableXferCost = true;
     internal static double FlowCost = 0.0015;
@@ -104,8 +105,8 @@ namespace ShipManifest
     internal static bool AutoDebug;
     internal static bool SaveLogOnExit;
     internal static string ErrorLogLength = "1000";
-    internal static bool EnableKerbalRename;
-    internal static bool RenameWithProfession;
+    internal static bool EnableKerbalRename = true;
+    internal static bool EnableChangeProfession = true;
     internal static bool AutoSave;
     internal static int SaveIntervalSec = 60;
     internal static bool UseUnityStyle = true;
@@ -149,6 +150,7 @@ namespace ShipManifest
     internal static bool PrevEnableEdgeHighlighting = true;
     internal static bool PrevEnableScience = true;
     internal static bool PrevEnableCrew = true;
+    internal static bool PrevEnablePfCrews;
     internal static bool PrevEnableStockCrewXfer = true;
     internal static bool PrevOverrideStockCrewXfer = true;
     internal static bool PrevEnablePfResources = true;
@@ -186,7 +188,7 @@ namespace ShipManifest
     internal static bool PrevDebuggerToolTips = true;
 
     internal static bool PrevEnableKerbalRename = true;
-    internal static bool PrevRenameWithProfession = true;
+    internal static bool PrevEnableChangeProfession = true;
 
     // Internal properties for plugin management.  Not persisted, not user managed.
 
@@ -233,6 +235,7 @@ namespace ShipManifest
           ? bool.Parse(settingsNode.GetValue("RealismMode"))
           : RealismMode;
         EnableCrew = settingsNode.HasValue("EnableCrew") ? bool.Parse(settingsNode.GetValue("EnableCrew")) : EnableCrew;
+        EnablePfCrews = settingsNode.HasValue("EnablePfCrews") ? bool.Parse(settingsNode.GetValue("EnablePfCrews")) : EnablePfCrews;
         EnableStockCrewXfer = settingsNode.HasValue("EnableStockCrewTransfer")
           ? bool.Parse(settingsNode.GetValue("EnableStockCrewTransfer"))
           : EnableStockCrewXfer;
@@ -382,9 +385,9 @@ namespace ShipManifest
         EnableKerbalRename = settingsNode.HasValue("EnableKerbalRename")
           ? bool.Parse(settingsNode.GetValue("EnableKerbalRename"))
           : EnableKerbalRename;
-        RenameWithProfession = settingsNode.HasValue("RenameWithProfession")
-          ? bool.Parse(settingsNode.GetValue("RenameWithProfession"))
-          : RenameWithProfession;
+        EnableChangeProfession = settingsNode.HasValue("EnableChangeProfession")
+          ? bool.Parse(settingsNode.GetValue("EnableChangeProfession"))
+          : EnableChangeProfession;
         UseUnityStyle = settingsNode.HasValue("UseUnityStyle")
           ? bool.Parse(settingsNode.GetValue("UseUnityStyle"))
           : UseUnityStyle;
@@ -457,6 +460,7 @@ namespace ShipManifest
         // Realism Settings
         WriteValue(settingsNode, "RealismMode", RealismMode);
         WriteValue(settingsNode, "EnableCrew", EnableCrew);
+        WriteValue(settingsNode, "EnablePfCrews", EnablePfCrews);
         WriteValue(settingsNode, "EnableStockCrewTransfer", EnableStockCrewXfer);
         WriteValue(settingsNode, "EnableScience", EnableScience);
         WriteValue(settingsNode, "EnableResources", EnableResources);
@@ -517,7 +521,7 @@ namespace ShipManifest
         WriteValue(settingsNode, "ErrorLogLength", ErrorLogLength);
         WriteValue(settingsNode, "SaveLogOnExit", SaveLogOnExit);
         WriteValue(settingsNode, "EnableKerbalRename", EnableKerbalRename);
-        WriteValue(settingsNode, "RenameWithProfession", RenameWithProfession);
+        WriteValue(settingsNode, "EnableChangeProfession", EnableChangeProfession);
         WriteValue(settingsNode, "UseUnityStyle", UseUnityStyle);
 
         // Hidden Settings
@@ -540,8 +544,11 @@ namespace ShipManifest
       // wrap in a try, as save can be executed outside of the flight scene and we don't care if it fails...
       try
       {
-        foreach (var part in SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()])
+        var parts = SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
+        while (parts.MoveNext())
         {
+          if (parts.Current == null) continue;
+          var part = parts.Current;
           part.crewTransferAvailable = EnableStockCrewXfer;
           TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
           if (EnableStockCrewXfer)
@@ -643,12 +650,13 @@ namespace ShipManifest
       PrevOnlySourceTarget = OnlySourceTarget;
       PrevEnableClsHighlighting = EnableClsHighlighting;
       PrevEnableCrew = EnableCrew;
+      PrevEnablePfCrews = EnablePfCrews;
       PrevEnablePfResources = EnablePfResources;
       PrevEnableCls = EnableCls;
       PrevEnableStockCrewXfer = EnableStockCrewXfer;
       PrevOverrideStockCrewXfer = OverrideStockCrewXfer;
       PrevEnableKerbalRename = EnableKerbalRename;
-      PrevRenameWithProfession = RenameWithProfession;
+      PrevEnableChangeProfession = EnableChangeProfession;
       PrevUseUnityStyle = UseUnityStyle;
       PrevLockSettings = LockSettings;
       PrevEnableBlizzyToolbar = EnableBlizzyToolbar;
@@ -702,12 +710,13 @@ namespace ShipManifest
       OnlySourceTarget = PrevOnlySourceTarget;
       EnableClsHighlighting = PrevEnableClsHighlighting;
       EnableCrew = PrevEnableCrew;
+      EnablePfCrews = PrevEnablePfCrews;
       EnablePfResources = PrevEnablePfResources;
       EnableCls = PrevEnableCls;
       EnableStockCrewXfer = PrevEnableStockCrewXfer;
       OverrideStockCrewXfer = PrevOverrideStockCrewXfer;
       EnableKerbalRename = PrevEnableKerbalRename;
-      RenameWithProfession = PrevRenameWithProfession;
+      EnableChangeProfession = PrevEnableChangeProfession;
       UseUnityStyle = PrevUseUnityStyle;
       LockSettings = PrevLockSettings;
       EnableBlizzyToolbar = PrevEnableBlizzyToolbar;

@@ -69,10 +69,10 @@ namespace ShipManifest.InternalObjects
         DFWrapper.DeepFreezer sourcepartFrzr = null; // selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
         DFWrapper.DeepFreezer targetpartFrzr = null; // selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
 
-        PartModule sourcedeepFreezer = (from PartModule pm in selectedPartsSource[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        PartModule sourcedeepFreezer = GetFreezerModule(selectedPartsSource[0]);
         if (sourcedeepFreezer != null) sourcepartFrzr = new DFWrapper.DeepFreezer(sourcedeepFreezer);
 
-        PartModule targetdeepFreezer = (from PartModule pm in selectedPartsTarget[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        PartModule targetdeepFreezer = GetFreezerModule(selectedPartsTarget[0]);
         if (targetdeepFreezer != null) targetpartFrzr = new DFWrapper.DeepFreezer(targetdeepFreezer);
 
         if (sourcepartFrzr != null)
@@ -115,6 +115,11 @@ namespace ShipManifest.InternalObjects
       return results;
     }
 
+    internal static PartModule GetFreezerModule(Part selectedPartSource)
+    {
+      return !selectedPartSource.Modules.Contains("DeepFreezer") ? null : selectedPartSource.Modules["DeepFreezer"];
+    }
+
     internal static bool IsClsInSameSpace(Part source, Part target)
     {
       var results = false;
@@ -124,8 +129,11 @@ namespace ShipManifest.InternalObjects
         {
           ICLSSpace sourceSpace = null;
           ICLSSpace targetSpace = null;
-          foreach (ICLSPart ipart in SMAddon.ClsAddon.Vessel.Parts)
+          var parts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
+          while (parts.MoveNext())
           {
+            var ipart = parts.Current;
+            if (ipart == null) continue;
             if (ipart.Part == source) sourceSpace = ipart.Space;
             if (ipart.Part == target) targetSpace = ipart.Space;
             if (sourceSpace != null && targetSpace != null) break;
@@ -334,6 +342,17 @@ namespace ShipManifest.InternalObjects
              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing;
     }
 
+    internal static bool CanShowCrewFillDumpButtons()
+    {
+      return !SMSettings.RealismMode ||
+             (SMAddon.SmVessel.IsRecoverable && SMSettings.EnablePfCrews);
+    }
+    internal static bool IsUsiInflatable(Part part)
+    {
+      if (!part.Modules.Contains("USIAnimation")) return false;
+      return part.Modules["USIAnimation"].Fields["CrewCapacity"] != null;
+    }
+
     #endregion
 
     #region Roster Window methods
@@ -369,11 +388,8 @@ namespace ShipManifest.InternalObjects
     internal static bool IsKerbalReadyToFreeze(ProtoCrewMember kerbal)
     {
       //return kerbal.seat.part.Modules.Contains("DeepFreezer") && !SMPart.IsCrewFull(kerbal.seat.part);
-      var deepFreezer =
-                (from PartModule pm in kerbal.seat.part.Modules
-                  where pm.moduleName == "DeepFreezer"
-                  select new DFWrapper.DeepFreezer(pm)).SingleOrDefault();
-      if (deepFreezer != null) return deepFreezer.FreezerSpace > 0;
+      var deepFreezer = GetFreezerModule(kerbal.seat.part);
+      if (deepFreezer != null) return new DFWrapper.DeepFreezer(deepFreezer).FreezerSpace > 0;
       return false;
     }
 

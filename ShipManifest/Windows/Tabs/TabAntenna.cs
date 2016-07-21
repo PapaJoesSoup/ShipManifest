@@ -31,26 +31,27 @@ namespace ShipManifest.Windows.Tabs
       try
       {
         // Display all antennas
-        foreach (var iAntenna in SMAddon.SmVessel.Antennas)
+        var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+        while (iAntennas.MoveNext())
         {
-          if (!IsRtAntennas && iAntenna.IsRtModule)
-            IsRtAntennas = true;
+          if (iAntennas.Current == null) continue;
+          if (!IsRtAntennas && iAntennas.Current.IsRtModule) IsRtAntennas = true;
           step = "get Antenna label";
-          var label = iAntenna.AntennaStatus + " - " + iAntenna.Title;
-          var open = iAntenna.Extended;
+          var label = iAntennas.Current.AntennaStatus + " - " + iAntennas.Current.Title;
+          var open = iAntennas.Current.Extended;
           var newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
-            iAntenna.ExtendAntenna();
+            iAntennas.Current.ExtendAntenna();
           else if (open && !newOpen)
-            iAntenna.RetractAntenna();
+            iAntennas.Current.RetractAntenna();
 
           var rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
             SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = iAntenna.SPart;
+            SMHighlighter.MouseOverpart = iAntennas.Current.SPart;
             SMHighlighter.MouseOverparts = null;
           }
         }
@@ -67,18 +68,22 @@ namespace ShipManifest.Windows.Tabs
     internal static void ExtendAllAntennas()
     {
       // TODO: for realism, add a closing/opening sound
-      foreach (var iAntenna in SMAddon.SmVessel.Antennas)
+      var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+      while (iAntennas.MoveNext())
       {
-        iAntenna.ExtendAntenna();
+        if (iAntennas.Current == null) continue;
+        iAntennas.Current.ExtendAntenna();
       }
     }
 
     internal static void RetractAllAntennas()
     {
       // TODO: for realism, add a closing/opening sound
-      foreach (var iAntenna in SMAddon.SmVessel.Antennas)
+      var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+      while (iAntennas.MoveNext())
       {
-        iAntenna.RetractAntenna();
+        if (iAntennas.Current == null) continue;
+        iAntennas.Current.RetractAntenna();
       }
     }
   }

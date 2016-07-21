@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Runtime.Remoting;
 using System.Text;
 using ShipManifest.InternalObjects;
 using UnityEngine;
@@ -36,8 +37,13 @@ namespace ShipManifest.Windows
         GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
-      foreach (var error in Utilities.LogItemList)
-        GUILayout.TextArea(error, GUILayout.Width(460));
+      var errors = Utilities.LogItemList.GetEnumerator();
+      while (errors.MoveNext())
+      {
+        if (errors.Current == null) continue;
+        GUILayout.TextArea(errors.Current, GUILayout.Width(460));
+        
+      }
 
       GUILayout.EndVertical();
       GUILayout.EndScrollView();
@@ -92,9 +98,11 @@ namespace ShipManifest.Windows
         try
         {
           var sb = new StringBuilder();
-          foreach (var line in Utilities.LogItemList)
+          var lines = Utilities.LogItemList.GetEnumerator();
+          while (lines.MoveNext())
           {
-            sb.AppendLine(line);
+            if (lines.Current == null) continue;
+            sb.AppendLine(lines.Current);
           }
 
           File.WriteAllText(filename, sb.ToString());

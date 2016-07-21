@@ -35,19 +35,20 @@ namespace ShipManifest.Process
 
         var moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
 
-        if (moduleScience != null && moduleScience.Length > 0)
+        if (moduleScience == null || moduleScience.Length <= 0) return;
+        var dataItems = moduleScience.GetEnumerator();
+        while (dataItems.MoveNext())
         {
-          foreach (var data in moduleScience)
-          {
-            bool processed = processedScience.ContainsKey(data.subjectID);
+          if (dataItems.Current == null) continue;
+          var data = (ScienceData)dataItems.Current;
+          bool processed = processedScience.ContainsKey(data.subjectID);
 
-            if ((sel == Selection.OnlyProcessed && processed) ||
-               (sel == Selection.OnlyUnprocessed && !processed))
+          if ((sel == Selection.OnlyProcessed && processed) ||
+              (sel == Selection.OnlyUnprocessed && !processed))
+          {
+            if (((ModuleScienceContainer)target).AddData(data))
             {
-              if (((ModuleScienceContainer)target).AddData(data))
-              {
-                ((IScienceDataContainer)source).DumpData(data);
-              }
+              ((IScienceDataContainer)source).DumpData(data);
             }
           }
         }
@@ -64,26 +65,26 @@ namespace ShipManifest.Process
       {
         var moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
 
-        if (moduleScience != null && moduleScience.Length > 0)
+        if (moduleScience == null || moduleScience.Length <= 0) return;
+        //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", Utilities.LogType.Info,
+        //  SMSettings.VerboseLogging);
+
+        if ((IScienceDataContainer) target == null) return;
+        // Lets store the data from the source.
+        if (!((ModuleScienceContainer) target).StoreData(
+          new List<IScienceDataContainer> {(IScienceDataContainer) source}, false)) return;
+
+        //Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
+        //  "Info", SMSettings.VerboseLogging);
+        var dataItems = moduleScience.GetEnumerator();
+        while (dataItems.MoveNext())
         {
-          //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", Utilities.LogType.Info,
-          //  SMSettings.VerboseLogging);
-
-          if ((IScienceDataContainer)target != null)
-          {
-            // Lets store the data from the source.
-            if (
-              ((ModuleScienceContainer)target).StoreData(
-                new List<IScienceDataContainer> { (IScienceDataContainer)source }, false))
-            {
-              //Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
-              //  "Info", SMSettings.VerboseLogging);
-              foreach (var data in moduleScience) ((IScienceDataContainer)source).DumpData(data);
-
-              if (!SMSettings.RealismMode) ((ModuleScienceExperiment)source).ResetExperiment();
-            }
-          }
+          if (dataItems.Current == null) continue;
+          var data = (ScienceData) dataItems.Current;
+          ((IScienceDataContainer) source).DumpData(data);
         }
+
+        if (!SMSettings.RealismMode) ((ModuleScienceExperiment)source).ResetExperiment();
       }
       catch (Exception ex)
       {
@@ -101,8 +102,11 @@ namespace ShipManifest.Process
       {
         if (SMSettings.RealismMode)
         {
-          foreach (var pump in xferPumps)
+          var pumps = xferPumps.GetEnumerator();
+          while (pumps.MoveNext())
           {
+            if (pumps.Current == null) continue;
+            var pump = pumps.Current;
             pump.IsPumpOn = true;
           }
           // now lets start the pumping process...
@@ -114,8 +118,11 @@ namespace ShipManifest.Process
         else
         {
           //Not in Realism mode, so just move the resource...
-          foreach (var pump in xferPumps)
+          var pumps = xferPumps.GetEnumerator();
+          while (pumps.MoveNext())
           {
+            if (pumps.Current == null) continue;
+            var pump = pumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
         }
@@ -136,8 +143,11 @@ namespace ShipManifest.Process
         if (SMSettings.RealismMode)
         {
           // Turn on Pumps for timed process...
-          foreach (var pump in pumps)
+          var epumps = pumps.GetEnumerator();
+          while (epumps.MoveNext())
           {
+            if (epumps.Current == null) continue;
+            var pump = epumps.Current;
             pump.PumpRatio = 1;
             pump.IsPumpOn = true;
           }
@@ -149,8 +159,11 @@ namespace ShipManifest.Process
         }
         else
         {
-          foreach (var pump in pumps)
+          var epumps = pumps.GetEnumerator();
+          while (epumps.MoveNext())
           {
+            if (epumps.Current == null) continue;
+            var pump = epumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
           SMAddon.SmVessel.TransferPumps.Clear();
