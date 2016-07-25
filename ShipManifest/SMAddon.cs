@@ -132,7 +132,7 @@ namespace ShipManifest
       try
       {
         // Reset frame error latch if set
-        if (FrameErrTripped)
+        if (FrameErrTripped) 
           FrameErrTripped = false;
 
         if (WindowRoster.ResetRosterSize)

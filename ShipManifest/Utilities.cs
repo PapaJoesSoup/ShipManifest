@@ -39,6 +39,7 @@ namespace ShipManifest
       var displayAmount = "";
       double currAmount = 0;
       double totAmount = 0;
+      if (selectedResource == null) return string.Format(" - ({0})", currAmount.ToString("#######0"));
       try
       {
         if (SMConditions.IsResourceTypeOther(selectedResource))

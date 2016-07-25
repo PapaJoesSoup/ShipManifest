@@ -343,11 +343,11 @@ namespace ShipManifest.Windows
           var strDescription = GetResourceDescription(selectedResources, parts.Current);
 
           // set the conditions for a button style change.
-          var btnWidth = 273; // Start with full witth button...
+          var btnWidth = 273; // Start with full width button...
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = SMSettings.RealismMode ? 223 : 193;
+            btnWidth = !SMSettings.RealismMode || SMSettings.EnablePfResources ? 173 : 223;
           else if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMConditions.CanShowCrewFillDumpButtons())
-            btnWidth = 193;
+            btnWidth = 173;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -588,7 +588,7 @@ namespace ShipManifest.Windows
           if (SMConditions.IsTransferInProgress()) GUI.enabled = false;
 
           if (GUILayout.Button(new GUIContent("»", "Move Kerbal to another seat within Part"), SMStyle.ButtonStyle,
-            GUILayout.Width(15), GUILayout.Height(20)))
+            GUILayout.Width(25), GUILayout.Height(20)))
           {
             ToolTip = "";
             SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsFrom[0]);

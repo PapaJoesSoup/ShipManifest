@@ -116,11 +116,11 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
-          if (GUILayout.Button("Fill Crew", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+          if (GUILayout.Button("Fill Crew", SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20)))
           {
             SMAddon.SmVessel.FillCrew();
           }
-          if (GUILayout.Button("Empty Crew", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+          if (GUILayout.Button("Empty Crew", SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20)))
           {
             SMAddon.SmVessel.EmptyCrew();
           }
@@ -129,11 +129,11 @@ namespace ShipManifest.Windows
 
         if (!SMSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button("Fill Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+        if (GUILayout.Button("Fill Resources", SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20)))
         {
           SMAddon.SmVessel.FillResources();
         }
-        if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(130), GUILayout.Height(20)))
+        if (GUILayout.Button("Empty Resources", SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20)))
         {
           SMAddon.SmVessel.DumpAllResources();
         }
@@ -158,7 +158,7 @@ namespace ShipManifest.Windows
         var keys = SMAddon.SmVessel.PartsByResource.Keys.GetEnumerator();
         while (keys.MoveNext())
         {
-          if (keys.Current == null) continue;
+          if (string.IsNullOrEmpty(keys.Current)) continue;
           GUILayout.BeginHorizontal();
 
           // Button Widths

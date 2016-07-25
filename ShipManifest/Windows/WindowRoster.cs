@@ -256,6 +256,13 @@ namespace ShipManifest.Windows
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
           GUILayout.Height(230), GUILayout.Width(680));
+
+        // vars for acton to occurs after button press
+        var isAction = false;
+        Part actionPart = null;
+        string actionText = "";
+        ProtoCrewMember actionKerbal = null;
+
         var kerbals = RosterList.GetEnumerator();
         while (kerbals.MoveNext())
         {
@@ -306,7 +313,6 @@ namespace ShipManifest.Windows
           GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
           SetupEditButton(kerbals.Current, out buttonText, out buttonToolTip);
-
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
             GUILayout.Height(20)))
           {
@@ -329,21 +335,10 @@ namespace ShipManifest.Windows
 
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
           {
-            if (buttonText == "Add")
-              TransferCrew.AddCrewMember(kerbals.Current, SMAddon.SmVessel.SelectedPartsSource[0]);
-            else if (buttonText == "Respawn")
-              RespawnKerbal(kerbals.Current);
-            else if (buttonText == "Thaw")
-              ThawKerbal(kerbals.Current.name);
-            else if (buttonText == "Freeze")
-              FreezeKerbal(kerbals.Current);
-            else if (buttonText == "Remove")
-            {
-              // get part...
-              var part = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
-              if (part != null)
-                TransferCrew.RemoveCrewMember(kerbals.Current, part);
-            }
+            actionPart = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
+            actionKerbal = kerbals.Current;
+            actionText = buttonText;
+            isAction = true;
           }
           var rect2 = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -351,9 +346,21 @@ namespace ShipManifest.Windows
           GUILayout.EndHorizontal();
           GUI.enabled = true;
         }
-
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
+
+        // perform action from button press.
+        if (!isAction) return;
+        if (actionText == "Add")
+          TransferCrew.AddCrewMember(actionKerbal, SMAddon.SmVessel.SelectedPartsSource[0]);
+        else if (actionText == "Respawn")
+          RespawnKerbal(actionKerbal);
+        else if (actionText == "Thaw")
+          ThawKerbal(actionKerbal.name);
+        else if (actionText == "Freeze")
+          FreezeKerbal(actionKerbal);
+        else if (actionText == "Remove")
+          TransferCrew.RemoveCrewMember(actionKerbal, actionPart);
       }
       catch (Exception ex)
       {

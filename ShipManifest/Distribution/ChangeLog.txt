@@ -1,5 +1,9 @@
-﻿Version 5.1.2.0 - Release 21 Jul, 2016 - KSP 1.1.3 Optimization Edition.
-- New:  Added option to enable Crew Fills and Dumps Vessel Wideduring Pre-Flight .  Off by default.  Works the same as Resource fill and dump.
+﻿Version 5.1.2.1 - Release 24 Jul, 2016 - KSP 1.1.3 Optimization Edition.
+- Fixed: Enumeration error on kerbal action in Roster Window.  Moved action to outside enumerator, so change to list does not throw error.
+- Fixed: Button widths were incorrect in Manifes and Transfer window part selectors under certain realism and configuration settings.
+
+Version 5.1.2.0 - Release 21 Jul, 2016 - KSP 1.1.3 Optimization Edition.
+- New:  Added option to enable Crew Fills and Dumps Vessel Wide during Pre-Flight .  Off by default.  Works the same as Resource fill and dump.
 - New:  Refactored Part level Crew Fill and Dumps.  Now shows up in the Transfer Window in Preflight when CrewPreflight setting is on, or anytime when Realism is off
 - New:  Significant refactoring to improve overall performance.
 - Fixed:  Revised erroneous tooltip messages for Renaming kerbals and enabling Profession changes.  These are now enabled by default and supported by the stock game.
