@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.InternalObjects;
@@ -41,13 +42,13 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var label = new GUIContent("", "Close Window");
+      GUIContent label = new GUIContent("", "Close Window");
       if (SMConditions.IsTransferInProgress())
       {
         label = new GUIContent("", "Action in progress.  Cannot close window");
         GUI.enabled = false;
       }
-      var rect = new Rect(Position.width - 20, 4, 16, 16);
+      Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, label))
       {
         SMAddon.OnSmButtonClicked();
@@ -75,7 +76,7 @@ namespace ShipManifest.Windows
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
 
-        var resLabel = "No Resource Selected";
+        string resLabel = "No Resource Selected";
         if (SMAddon.SmVessel.SelectedResources.Count == 1)
           resLabel = SMAddon.SmVessel.SelectedResources[0];
         else if (SMAddon.SmVessel.SelectedResources.Count == 2)
@@ -154,21 +155,21 @@ namespace ShipManifest.Windows
     {
       try
       {
-        // List required here to prevent foreach sync errors with live source.
-        var keys = SMAddon.SmVessel.PartsByResource.Keys.GetEnumerator();
+        // List required here to prevent loop sync errors with live source.
+        Dictionary<string, List<Part>>.KeyCollection.Enumerator keys = SMAddon.SmVessel.PartsByResource.Keys.GetEnumerator();
         while (keys.MoveNext())
         {
           if (string.IsNullOrEmpty(keys.Current)) continue;
           GUILayout.BeginHorizontal();
 
           // Button Widths
-          var width = 273;
+          int width = 273;
           if (!SMSettings.RealismMode && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
-          var displayAmounts = string.Format("{0}{1}", keys.Current, Utilities.DisplayVesselResourceTotals(keys.Current));
-          var style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
+          string displayAmounts = string.Format("{0}{1}", keys.Current, Utilities.DisplayVesselResourceTotals(keys.Current));
+          GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
           if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
@@ -179,11 +180,11 @@ namespace ShipManifest.Windows
           // Dump Button
           if (SMConditions.IsResourceTypeOther(keys.Current) && SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
-            var pumpId = TransferPump.GetPumpIdFromHash(keys.Current,
+            uint pumpId = TransferPump.GetPumpIdFromHash(keys.Current,
               SMAddon.SmVessel.PartsByResource[keys.Current].First(),
               SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypePump.Dump,
               TransferPump.TriggerButton.Manifest);
-            var dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+            GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
               ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
               : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
             GUI.enabled = SMConditions.CanResourceBeDumped(keys.Current);
@@ -286,18 +287,18 @@ namespace ShipManifest.Windows
 
         if (SMAddon.SmVessel.SelectedResources.Count > 0)
         {
-          var pParts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
+          List<Part>.Enumerator pParts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
           while (pParts.MoveNext())
           {
             if (pParts.Current == null) continue;
-            var part = pParts.Current;
+            Part part = pParts.Current;
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
-              var noWrap = SMStyle.LabelStyleNoWrap;
+              GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
               GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
                 GUILayout.Height(18));
-              var noPad = SMStyle.LabelStyleNoPad;
-              var sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
+              GUIStyle noPad = SMStyle.LabelStyleNoPad;
+              List<string>.Enumerator sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
               while (sResources.MoveNext())
               {
                 if (sResources.Current == null) continue;
@@ -317,13 +318,13 @@ namespace ShipManifest.Windows
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
             {
-              var scienceCount = 0;
-              var pModules = part.Modules.GetEnumerator();
+              int scienceCount = 0;
+              IEnumerator pModules = part.Modules.GetEnumerator();
               while (pModules.MoveNext())
               {
                 if (pModules.Current == null) continue;
-                var pm = (PartModule)pModules.Current;
-                var container = pm as ModuleScienceContainer;
+                PartModule pm = (PartModule)pModules.Current;
+                ModuleScienceContainer container = pm as ModuleScienceContainer;
                 if (container != null)
                   scienceCount += container.GetScienceCount();
                 else if (pm is ModuleScienceExperiment)
@@ -354,7 +355,7 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
 
-      var settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Settings", settingsStyle, GUILayout.Height(20)))
       {
         try
@@ -374,7 +375,7 @@ namespace ShipManifest.Windows
         }
       }
 
-      var rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Roster", rosterStyle, GUILayout.Height(20)))
       {
         try
@@ -398,7 +399,7 @@ namespace ShipManifest.Windows
         }
       }
 
-      var controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Control", controlStyle, GUILayout.Height(20)))
       {
         try
@@ -423,8 +424,8 @@ namespace ShipManifest.Windows
       {
         if (resourceNames.Count > 0)
         {
-          var newSources = new List<Part>();
-          var newTargets = new List<Part>();
+          List<Part> newSources = new List<Part>();
+          List<Part> newTargets = new List<Part>();
           if (WindowTransfer.ShowSourceVessels &&
               SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
           {
@@ -432,7 +433,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
             if (!WindowTransfer.ShowTargetVessels)
             {
-              var srcParts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+              List<Part>.Enumerator srcParts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
               while (srcParts.MoveNext())
               {
                 if (srcParts.Current == null) continue;
@@ -443,7 +444,7 @@ namespace ShipManifest.Windows
           }
           else
           {
-            var parts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+            List<Part>.Enumerator parts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
             while (parts.MoveNext())
             {
               if (parts.Current == null) continue;
@@ -474,7 +475,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
             if (!WindowTransfer.ShowSourceVessels)
             {
-              var tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
+              List<Part>.Enumerator tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
               while (tgtParts.MoveNext())
               {
                 if (tgtParts.Current == null) continue;
@@ -485,7 +486,7 @@ namespace ShipManifest.Windows
           }
           else
           {
-            var tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
+            List<Part>.Enumerator tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
             while (tgtParts.MoveNext())
             {
               if (tgtParts.Current == null) continue;

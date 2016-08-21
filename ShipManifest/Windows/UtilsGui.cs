@@ -6,7 +6,7 @@ namespace ShipManifest.Windows
   {
     internal static string ColorSelector(out string toolTip)
     {
-      var thisColor = "";
+      string thisColor = "";
       toolTip = "";
 
       if (GUILayout.Button(new GUIContent("", "Blue"), SMStyle.ButtonStyle, GUILayout.Width(20), GUILayout.Height(20)))

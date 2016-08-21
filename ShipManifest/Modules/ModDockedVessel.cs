@@ -42,7 +42,7 @@ namespace ShipManifest.Modules
     {
       get
       {
-        var title = VesselInfo.name;
+        string title = VesselInfo.name;
         return title;
       }
     }

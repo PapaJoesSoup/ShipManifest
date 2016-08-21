@@ -38,7 +38,7 @@ namespace ShipManifest.Modules
       if (IsNew)
       {
         // Add to roster.
-        var dynMethod = HighLogic.CurrentGame.CrewRoster.GetType()
+        MethodInfo dynMethod = HighLogic.CurrentGame.CrewRoster.GetType()
           .GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
         Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
         dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] {Kerbal});
@@ -49,7 +49,7 @@ namespace ShipManifest.Modules
 
     public static ModKerbal CreateKerbal()
     {
-      var kerbal = CrewGenerator.RandomCrewMemberPrototype();
+      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
       return new ModKerbal(kerbal, true);
     }
 

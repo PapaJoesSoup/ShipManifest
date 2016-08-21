@@ -42,7 +42,7 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        var go = new GameObject("Audio");
+        GameObject go = new GameObject("Audio");
         SourceCrewStart = go.AddComponent<AudioSource>();
         SourceCrewRun = go.AddComponent<AudioSource>();
         SourceCrewStop = go.AddComponent<AudioSource>();
@@ -56,16 +56,16 @@ namespace ShipManifest.InternalObjects
           ClipCrewStop = GameDatabase.Instance.GetAudioClip(AudioSourceCrewPathStop);
 
           // configure sources
-          SourceCrewStart.clip = ClipPumpStart; // Start sound
+          SourceCrewStart.clip = ClipCrewStart; // Start sound
           SourceCrewStart.volume = (float)SMSettings.CrewSoundVol;
           SourceCrewStart.pitch = 1f;
 
-          SourceCrewRun.clip = ClipPumpRun; // Run sound
+          SourceCrewRun.clip = ClipCrewRun; // Run sound
           SourceCrewRun.loop = true;
           SourceCrewRun.volume = (float)SMSettings.CrewSoundVol;
           SourceCrewRun.pitch = 1f;
 
-          SourceCrewStop.clip = ClipPumpStop; // Stop Sound
+          SourceCrewStop.clip = ClipCrewStop; // Stop Sound
           SourceCrewStop.volume = (float)SMSettings.CrewSoundVol;
           SourceCrewStop.pitch = 1f;
         }

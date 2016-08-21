@@ -27,7 +27,7 @@ namespace ShipManifest.Windows.Tabs
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
-      var scrollX = 20;
+      int scrollX = 20;
 
       // Enable Tool Tips
       GUI.enabled = true;

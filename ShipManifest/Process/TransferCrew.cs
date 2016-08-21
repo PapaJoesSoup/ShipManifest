@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipManifest.InternalObjects;
 
 namespace ShipManifest.Process
@@ -111,10 +112,10 @@ namespace ShipManifest.Process
         {
           // Must be a move...
           //Get the first available valid seat
-          var fromSeats = FromPart.internalModel.seats.GetEnumerator();
+          List<InternalSeat>.Enumerator fromSeats = FromPart.internalModel.seats.GetEnumerator();
           while  (fromSeats.MoveNext())
           {
-            var seat = fromSeats.Current;
+            InternalSeat seat = fromSeats.Current;
             if (seat == null) continue;
             if (seat.taken)
             {
@@ -134,10 +135,10 @@ namespace ShipManifest.Process
         {
           // Xfer to another part
           // get target seat from target part's inernal model
-          var toSeats = ToPart.internalModel.seats.GetEnumerator();
+          List<InternalSeat>.Enumerator toSeats = ToPart.internalModel.seats.GetEnumerator();
           while (toSeats.MoveNext())
           {
-            var seat = toSeats.Current;
+            InternalSeat seat = toSeats.Current;
             if (seat == null) continue;
             if (seat.taken) continue;
             ToSeat = seat;
@@ -146,10 +147,10 @@ namespace ShipManifest.Process
           // All seats full?
           if (ToSeat == null)
           {
-            var moreSeats = FromPart.internalModel.seats.GetEnumerator();
+            List<InternalSeat>.Enumerator moreSeats = FromPart.internalModel.seats.GetEnumerator();
             while (moreSeats.MoveNext())
             {
-              var seat = moreSeats.Current;
+              InternalSeat seat = moreSeats.Current;
               if (seat == null) continue;
               // This supports DeepFreeze frozen kerbals...
               if (seat.kerbalRef == null ||
@@ -191,6 +192,7 @@ namespace ShipManifest.Process
           case XferState.Off:
             // We're just starting loop, so set some evnironment stuff.
             Timestamp = DateTime.Now;
+            SMSound.SourceCrewStart.Play();
             CrewXferState = XferState.Start;
             break;
 
@@ -203,7 +205,8 @@ namespace ShipManifest.Process
               // Play run sound when start sound is nearly done. (repeats)
               if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
               {
-                SMSound.SourcePumpRun.Play();
+                SMSound.SourceCrewStart.Stop();
+                SMSound.SourceCrewRun.Play();
                 SMAddon.Elapsed = 0;
                 CrewXferState = XferState.Transfer;
               }
@@ -237,8 +240,8 @@ namespace ShipManifest.Process
             if (SMSettings.RealismMode)
             {
               // play crew sit.
-              SMSound.SourcePumpRun.Stop();
-              SMSound.SourcePumpStop.Play();
+              SMSound.SourceCrewRun.Stop();
+              SMSound.SourceCrewStop.Play();
             }
             SMAddon.Elapsed = 0;
             CrewTransferAction();
@@ -292,23 +295,6 @@ namespace ShipManifest.Process
       _crewXferActive = IsSeat2SeatXfer = IsStockXfer = false;
     }
 
-    /// <summary>
-    /// This method is obsolete.
-    /// </summary>
-    /// <param name="fromCrew"></param>
-    /// <param name="fromPart"></param>
-    /// <param name="toPart"></param>
-    //internal static void RevertCrewTransfer(ProtoCrewMember fromCrew, Part fromPart, Part toPart)
-    //{
-    //  // If a Stock crew Transfer occurred, let's revert the crew and activate the SM transfer mechanism...
-    //  toPart.RemoveCrewmember(fromCrew);
-    //  fromPart.AddCrewmember(fromCrew);
-    //  if (fromCrew.seat != null)
-    //    fromCrew.seat.SpawnCrew();
-
-    //  SMAddon.SmVessel.RespawnCrew();
-    //}
-
     internal void CrewTransferAction()
     {
       try
@@ -317,15 +303,24 @@ namespace ShipManifest.Process
         {
           if (ToSeat.taken)
           {
-            // Swap places.
 
             // Remove the crew members from the part(s)...
             RemoveCrewMember(FromCrewMember, FromPart);
-            RemoveCrewMember(ToCrewMember, ToPart);
 
-            // Add the crew members back into the part(s) at their new seats.
-            FromPart.AddCrewmemberAt(ToCrewMember, FromPart.internalModel.seats.IndexOf(FromSeat));
-            ToPart.AddCrewmemberAt(FromCrewMember, ToPart.internalModel.seats.IndexOf(ToSeat));
+            // Swap places if there is no standing room available
+            if (ToPart.CrewCapacity == ToPart.protoModuleCrew.Count)
+            {
+              RemoveCrewMember(ToCrewMember, ToPart);
+              FromPart.AddCrewmemberAt(ToCrewMember, FromPart.internalModel.seats.IndexOf(FromSeat));
+              // Add the crew members back into the part(s) at their new seats.
+              ToPart.AddCrewmemberAt(FromCrewMember, ToPart.internalModel.seats.IndexOf(ToSeat));             
+            }
+            else
+            {
+              // Just move.
+              RemoveCrewMember(FromCrewMember, FromPart);
+              AddCrewMember(FromCrewMember, ToPart);
+            }
           }
           else
           {
@@ -386,8 +381,8 @@ namespace ShipManifest.Process
     {
       if (SMSettings.RealismMode)
       {
-        SMSound.SourcePumpRun.Stop();
-        SMSound.SourcePumpStop.Play();
+        SMSound.SourceCrewRun.Stop();
+        SMSound.SourceCrewStop.Play();
       }
       SMAddon.Elapsed = 0;
       SMAddon.SmVessel.TransferCrewObj.IvaDelayActive = false;

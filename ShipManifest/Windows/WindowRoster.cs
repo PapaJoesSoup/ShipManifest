@@ -68,7 +68,7 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var rect = new Rect(Position.width - 20, 4, 16, 16);
+      Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, new GUIContent("", "Close Window")))
       {
         OnCreate = false;
@@ -98,7 +98,7 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
-          var guilabel = new GUIContent("Create Kerbal", "Opens the Kerbal creation editor.");
+          GUIContent guilabel = new GUIContent("Create Kerbal", "Opens the Kerbal creation editor.");
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
             OnCreate = true;
@@ -163,11 +163,11 @@ namespace ShipManifest.Windows
     {
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
-      var guilabel = new GUIContent("Create",
+      GUIContent guilabel = new GUIContent("Create",
         "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster.");
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
-        var kerbalFound = false;
+        bool kerbalFound = false;
         while (!kerbalFound)
         {
           SelectedKerbal = ModKerbal.CreateKerbal();
@@ -176,7 +176,7 @@ namespace ShipManifest.Windows
         }
         OnCreate = false;
       }
-      var rect = GUILayoutUtility.GetLastRect();
+      Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       guilabel = new GUIContent("Cancel", "Cancels current creation and exit editor.");
@@ -195,13 +195,13 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       GUILayout.Label("Profession:", GUILayout.Width(85));
-      var isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, "Pilot", GUILayout.Width(90));
+      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, "Pilot", GUILayout.Width(90));
       if (isPilot) KerbalProfession = Professions.Pilot;
 
-      var isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, "Engineer", GUILayout.Width(90));
+      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, "Engineer", GUILayout.Width(90));
       if (isEngineer) KerbalProfession = Professions.Engineer;
 
-      var isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, "Scientist", GUILayout.Width(90));
+      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, "Scientist", GUILayout.Width(90));
       if (isScientist) KerbalProfession = Professions.Scientist;
       GUILayout.EndHorizontal();
     }
@@ -211,27 +211,27 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       GUILayout.Label("Filter:", GUILayout.Width(40));
 
-      var isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, "All", GUILayout.Width(60));
+      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, "All", GUILayout.Width(60));
       if (isAll) CurrentFilter = KerbalFilters.All;
 
-      var isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, "Assigned", GUILayout.Width(95));
+      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, "Assigned", GUILayout.Width(95));
       if (isAssign) CurrentFilter = KerbalFilters.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        var isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, "Vessel", GUILayout.Width(80));
+        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, "Vessel", GUILayout.Width(80));
         if (isVessel) CurrentFilter = KerbalFilters.Vessel;
       }
 
-      var isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, "Available", GUILayout.Width(95));
+      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, "Available", GUILayout.Width(95));
       if (isAvail) CurrentFilter = KerbalFilters.Available;
 
-      var isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, "Dead/Missing", GUILayout.Width(130));
+      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, "Dead/Missing", GUILayout.Width(130));
       if (isDead) CurrentFilter = KerbalFilters.Dead;
 
       if (InstalledMods.IsDfInstalled)
       {
-        var isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, "Frozen", GUILayout.Width(80));
+        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, "Frozen", GUILayout.Width(80));
         if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
       }
       GUILayout.EndHorizontal();
@@ -258,12 +258,12 @@ namespace ShipManifest.Windows
           GUILayout.Height(230), GUILayout.Width(680));
 
         // vars for acton to occurs after button press
-        var isAction = false;
+        bool isAction = false;
         Part actionPart = null;
         string actionText = "";
         ProtoCrewMember actionKerbal = null;
 
-        var kerbals = RosterList.GetEnumerator();
+        List<ProtoCrewMember>.Enumerator kerbals = RosterList.GetEnumerator();
         while (kerbals.MoveNext())
         {
           if (kerbals.Current == null) continue;
@@ -278,14 +278,14 @@ namespace ShipManifest.Windows
             labelStyle = SMStyle.LabelStyle;
 
           // What vessel is this Kerbal Assigned to?
-          var rosterDetails = "";
+          string rosterDetails = "";
           if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
           {
-            var theseVessels = FlightGlobals.Vessels.GetEnumerator();
+            List<Vessel>.Enumerator theseVessels = FlightGlobals.Vessels.GetEnumerator();
             while (theseVessels.MoveNext())
             {
               if (theseVessels.Current == null) continue;
-              var crew = theseVessels.Current.GetVesselCrew();
+              List<ProtoCrewMember> crew = theseVessels.Current.GetVesselCrew();
               if (crew.Any(crewMember => crewMember == kerbals.Current))
               {
                 rosterDetails = "Assigned - " + theseVessels.Current.GetName().Replace("(unloaded)", "");
@@ -326,7 +326,7 @@ namespace ShipManifest.Windows
               SelectedKerbal = null;
             }
           }
-          var rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
 
@@ -340,7 +340,7 @@ namespace ShipManifest.Windows
             actionText = buttonText;
             isAction = true;
           }
-          var rect2 = GUILayoutUtility.GetLastRect();
+          Rect rect2 = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect2, GUI.tooltip, ref ToolTipActive, XOffset);
           GUILayout.EndHorizontal();
@@ -393,7 +393,7 @@ namespace ShipManifest.Windows
       {
         DisplaySelectProfession();
       }
-      var isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
+      bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
       GUILayout.Label("Gender");
       isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
@@ -414,8 +414,8 @@ namespace ShipManifest.Windows
       {
         SelectedKerbal = null;
       }
-      var label = "Apply";
-      var toolTip =
+      string label = "Apply";
+      string toolTip =
         "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
       if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
       {
@@ -430,7 +430,7 @@ namespace ShipManifest.Windows
             SelectedKerbal = null;
         }
       }
-      var rect = GUILayoutUtility.GetLastRect();
+      Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.EndHorizontal();
@@ -569,7 +569,7 @@ namespace ShipManifest.Windows
 
     public static void ResetKerbalNames()
     {
-      var kerbals = HighLogic.CurrentGame.CrewRoster.Crew.GetEnumerator();
+      IEnumerator<ProtoCrewMember> kerbals = HighLogic.CurrentGame.CrewRoster.Crew.GetEnumerator();
       while (kerbals.MoveNext())
       {
         if (kerbals.Current == null) continue;
@@ -603,16 +603,16 @@ namespace ShipManifest.Windows
       {
         if (InstalledMods.IsDfApiReady)
         {
-          var iKerbal = DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbalName];
+          DFWrapper.KerbalInfo iKerbal = DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbalName];
 
-          var cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
+          List<Part>.Enumerator cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
           while (cryofreezers.MoveNext())
           {
             if (cryofreezers.Current == null) continue;
             if (cryofreezers.Current.flightID == iKerbal.partID)
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
-              var deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
+              PartModule deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
               if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginThawKerbal(kerbalName);
               break;
             }
@@ -636,13 +636,13 @@ namespace ShipManifest.Windows
       try
       {
         if (!InstalledMods.IsDfApiReady) return;
-        var cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
+        List<Part>.Enumerator cryofreezers = Utilities.GetFreezerParts().GetEnumerator();
         while (cryofreezers.MoveNext())
         {
           if (cryofreezers.Current == null) continue;
           if (!cryofreezers.Current.protoModuleCrew.Contains(kerbal)) continue;
           // ReSharper disable once SuspiciousTypeConversion.Global
-          var deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
+          PartModule deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
           if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginFreezeKerbal(kerbal);
           break;
         }

@@ -34,16 +34,16 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalsBeXferred(Part sourcePart, Part targetPart)
     {
-      var sourceParts = new List<Part>();
+      List<Part> sourceParts = new List<Part>();
       sourceParts.Add(sourcePart);
-      var targetParts = new List<Part>();
+      List<Part> targetParts = new List<Part>();
       targetParts.Add(targetPart);
 
       return CanKerbalsBeXferred(sourceParts, targetParts);
     }
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
     {
-      var results = false;
+      bool results = false;
       try
       {
         if (IsTransferInProgress())
@@ -122,17 +122,17 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsClsInSameSpace(Part source, Part target)
     {
-      var results = false;
+      bool results = false;
       if (SMSettings.EnableCls && SMSettings.RealismMode)
       {
         if (SMAddon.ClsAddon.Vessel != null)
         {
           ICLSSpace sourceSpace = null;
           ICLSSpace targetSpace = null;
-          var parts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
+          List<ICLSPart>.Enumerator parts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
           while (parts.MoveNext())
           {
-            var ipart = parts.Current;
+            ICLSPart ipart = parts.Current;
             if (ipart == null) continue;
             if (ipart.Part == source) sourceSpace = ipart.Space;
             if (ipart.Part == target) targetSpace = ipart.Space;
@@ -153,7 +153,7 @@ namespace ShipManifest.InternalObjects
     }
     internal static bool IsClsInSameSpace()
     {
-      var results = false;
+      bool results = false;
       try
       {
         if (SMSettings.EnableCls && SMSettings.RealismMode)
@@ -205,7 +205,7 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        var canShow = false;
+        bool canShow = false;
         if (SMAddon.ShowUi
             && HighLogic.LoadedScene == GameScenes.FLIGHT
             && !IsPauseMenuOpen()
@@ -225,7 +225,7 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          var values = "SmAddon.ShowUI = " + SMAddon.ShowUi + "\r\n";
+          string values = "SmAddon.ShowUI = " + SMAddon.ShowUi + "\r\n";
           values += "HighLogic.LoadedScene = " + HighLogic.LoadedScene + "\r\n";
           //values += "!MapView.MapIsEnabled = " +MapView.MapIsEnabled.ToString() + "\r\n";
           values += "PauseMenu.isOpen = " + IsPauseMenuOpen() + "\r\n";
@@ -388,7 +388,7 @@ namespace ShipManifest.InternalObjects
     internal static bool IsKerbalReadyToFreeze(ProtoCrewMember kerbal)
     {
       //return kerbal.seat.part.Modules.Contains("DeepFreezer") && !SMPart.IsCrewFull(kerbal.seat.part);
-      var deepFreezer = GetFreezerModule(kerbal.seat.part);
+      PartModule deepFreezer = GetFreezerModule(kerbal.seat.part);
       if (deepFreezer != null) return new DFWrapper.DeepFreezer(deepFreezer).FreezerSpace > 0;
       return false;
     }

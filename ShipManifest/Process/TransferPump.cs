@@ -250,18 +250,18 @@ namespace ShipManifest.Process
       //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // This routine acts as a queue
       // WHen a pump is set to IsPumOn = true, it will be processed by this routine.
-      var pumpsToRemove = new List<TransferPump>();
+      List<TransferPump> pumpsToRemove = new List<TransferPump>();
       // this task runs every Update when active.
 
       try
       {
-        var tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
+        List<TransferPump>.Enumerator tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
         while (tPumps.MoveNext())
         {
           if (tPumps.Current == null) continue;
           // Check Pump state:
           if (!tPumps.Current.IsPumpOn) continue;
-          var pump = tPumps.Current;
+          TransferPump pump = tPumps.Current;
           switch (pump.PumpStatus)
           {
             case PumpState.Off:
@@ -283,7 +283,7 @@ namespace ShipManifest.Process
             case PumpState.Run:
               //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps - Run", Utilities.LogType.Info, SMSettings.VerboseLogging);
               // 1.  Get Elapsed from last run
-              var deltaT = (DateTime.Now - pump.TimeStamp).TotalSeconds;
+              double deltaT = (DateTime.Now - pump.TimeStamp).TotalSeconds;
 
               // 2. Lets wait long enough to get a resource volume worth moving
               pump.TimeStamp = DateTime.Now;
@@ -298,7 +298,7 @@ namespace ShipManifest.Process
           }
         }
         if (pumpsToRemove.Count <= 0) return;
-        var rpumps = pumpsToRemove.GetEnumerator();
+        List<TransferPump>.Enumerator rpumps = pumpsToRemove.GetEnumerator();
         while (rpumps.MoveNext())
         {
           if (rpumps.Current == null) continue;
@@ -351,7 +351,7 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.Running", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // 1.  Calculate amount to move based on flow rate and time delta
-      var deltaAmt = deltaT*FlowRate*PumpRatio;
+      double deltaAmt = deltaT*FlowRate*PumpRatio;
 
       // 2.  Determine if move amount exceeds remaining amount in tank(s)  
       deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt;
@@ -360,7 +360,7 @@ namespace ShipManifest.Process
 
       if (deltaAmt > SMSettings.Tolerance)
       {
-        var deltaCharge = deltaAmt*SMSettings.FlowCost;
+        double deltaCharge = deltaAmt*SMSettings.FlowCost;
         // 3.  Drain Charge
         if (ConsumeCharge(deltaCharge))
         {
@@ -400,7 +400,7 @@ namespace ShipManifest.Process
       // If a Transfer, lets validate From pump amount can be pumped. (and To if needed)
       if (PumpType != TypePump.Dump)
       {
-        var maxAmount = CalcMaxPumpAmt(FromParts, ToParts, new List<string> {Resource});
+        double maxAmount = CalcMaxPumpAmt(FromParts, ToParts, new List<string> {Resource});
         if (cycleAmount > maxAmount) cycleAmount = maxAmount;
       }
 
@@ -429,20 +429,20 @@ namespace ShipManifest.Process
       // To parts.  Used only by Transfers
       if (cycleAmount < SMSettings.Tolerance) return;
 
-      var cycleBalance = cycleAmount;
+      double cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
         // calc average of parts in list.
-        var toPartAvgAmt = cycleAmount/ToParts.Count;
+        double toPartAvgAmt = cycleAmount/ToParts.Count;
 
         // reduce to the smallest container.
-        var minAmt = toPartAvgAmt;
-        var remainingPartsCount = 0;
-        var theseParts = ToParts.GetEnumerator();
+        double minAmt = toPartAvgAmt;
+        int remainingPartsCount = 0;
+        List<Part>.Enumerator theseParts = ToParts.GetEnumerator();
         while (theseParts.MoveNext())
         {
           if (theseParts.Current == null) continue;
-          var thisPartCap = PartRemainingCapacity(theseParts.Current, Resource);
+          double thisPartCap = PartRemainingCapacity(theseParts.Current, Resource);
           if (thisPartCap <= SMSettings.Tolerance) continue;
           if (thisPartCap >= minAmt)
           {
@@ -457,12 +457,12 @@ namespace ShipManifest.Process
         // Calculate pump amounts for each To part and Increment.
         if (remainingPartsCount > 0)
         {
-          var toParts = ToParts.GetEnumerator();
+          List<Part>.Enumerator toParts = ToParts.GetEnumerator();
           while (toParts.MoveNext())
           {
             if (toParts.Current == null) continue;
             if (PartRemainingCapacity(toParts.Current, Resource) <= SMSettings.Tolerance) continue;
-            var part = toParts.Current;
+            Part part = toParts.Current;
             part.Resources[Resource].amount += minAmt;
             cycleBalance -= minAmt;
 
@@ -483,16 +483,16 @@ namespace ShipManifest.Process
       // now split up the xfer amount evenly across the number of tanks that can send/receive resources
       if (cycleAmount < SMSettings.Tolerance) return;
 
-      var cycleBalance = cycleAmount;
+      double cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
         // calc average of parts in list.
-        var fromPartAvgAmt = cycleAmount / FromParts.Count;
+        double fromPartAvgAmt = cycleAmount / FromParts.Count;
 
         // reduce to the smallest container.
-        var minAmt = fromPartAvgAmt;
-        var remainingPartsCount = 0;
-        var theseParts = FromParts.GetEnumerator();
+        double minAmt = fromPartAvgAmt;
+        int remainingPartsCount = 0;
+        List<Part>.Enumerator theseParts = FromParts.GetEnumerator();
         while (theseParts.MoveNext())
         {
           if (theseParts.Current == null) continue;
@@ -510,12 +510,12 @@ namespace ShipManifest.Process
         // Decrement.
         if (remainingPartsCount > 0)
         {
-          var fromParts = FromParts.GetEnumerator();
+          List<Part>.Enumerator fromParts = FromParts.GetEnumerator();
           while (fromParts.MoveNext())
           {
             if (fromParts.Current == null) continue;
             if (fromParts.Current.Resources[Resource].amount <= SMSettings.Tolerance) continue;
-            var part = fromParts.Current;
+            Part part = fromParts.Current;
             part.Resources[Resource].amount -= minAmt;
             cycleBalance -= minAmt;
             AmtPumped += minAmt;
@@ -533,11 +533,11 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.ConsumeCharge", Utilities.LogType.Info, SMSettings.VerboseLogging);
       if (SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge") || !SMSettings.EnableXferCost) return true;
-      var iParts = SMAddon.SmVessel.PartsByResource["ElectricCharge"].GetEnumerator();
+      List<Part>.Enumerator iParts = SMAddon.SmVessel.PartsByResource["ElectricCharge"].GetEnumerator();
       while (iParts.MoveNext())
       {
         if (iParts.Current == null) continue;
-        var iPart = iParts.Current;
+        Part iPart = iParts.Current;
         if (iPart.Resources["ElectricCharge"].amount >= deltaCharge)
         {
           iPart.Resources["ElectricCharge"].amount -= deltaCharge;
@@ -558,7 +558,7 @@ namespace ShipManifest.Process
     public static void AbortAllPumpsInProcess(uint pumpId)
     {
       // set a state vars and wait for the next update to pick it up.
-      var tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
+      List<TransferPump>.Enumerator tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
       while (tPumps.MoveNext())
       {
         if (tPumps.Current == null) continue;
@@ -571,7 +571,7 @@ namespace ShipManifest.Process
       if (pumps.Count > 1)
       {
         // Calculate Ratio and transfer amounts.  Ratio is based off the largest amount to move, so will always be less than 1.
-        var ratio = CalcRatio(pumps);
+        double ratio = CalcRatio(pumps);
         pumps[0].PumpId = pumpId;
         pumps[1].PumpId = pumpId;
 
@@ -649,7 +649,7 @@ namespace ShipManifest.Process
 
     internal static List<TransferPump> PumpsInProgress(uint pumpId)
     {
-      var newList =
+      List<TransferPump> newList =
         (from pump in SMAddon.SmVessel.TransferPumps where pump.IsPumpOn && pump.PumpId == pumpId select pump).ToList();
       if (PumpProcessOn)
         return newList;
@@ -661,7 +661,7 @@ namespace ShipManifest.Process
     {
       double amount = 0;
       if (parts == null || selectedResource == null || selectedResource == "") return amount;
-      var list = parts.GetEnumerator();
+      List<Part>.Enumerator list = parts.GetEnumerator();
       while (list.MoveNext())
       {
         if (list.Current == null) continue;
@@ -675,7 +675,7 @@ namespace ShipManifest.Process
     {
       double amount = 0;
       if (parts == null || selectedResource == null || selectedResource == "") return amount;
-      var list = parts.GetEnumerator();
+      List<Part>.Enumerator list = parts.GetEnumerator();
       while (list.MoveNext())
       {
         if (list.Current == null) continue;
@@ -689,7 +689,7 @@ namespace ShipManifest.Process
     {
       double amount = 0;
       if (parts == null || selectedResource == null || selectedResource == "") return amount;
-      var list = parts.GetEnumerator();
+      List<Part>.Enumerator list = parts.GetEnumerator();
       while (list.MoveNext())
       {
         if (list.Current == null) continue;
@@ -707,8 +707,8 @@ namespace ShipManifest.Process
     {
       double maxPumpAmount = 0;
       if (FromParts == null || ToParts == null || FromParts.Count == 0 || ToParts.Count == 0) return maxPumpAmount;
-      var toList = ToParts.GetEnumerator();
-      var fromList = FromParts.GetEnumerator();
+      List<Part>.Enumerator toList = ToParts.GetEnumerator();
+      List<Part>.Enumerator fromList = FromParts.GetEnumerator();
       double fromAmount = 0;
       double toCapacityRemaining = 0;
       while (fromList.MoveNext())
@@ -736,7 +736,7 @@ namespace ShipManifest.Process
       else
       {
         // First determine if there is more than one Resource to move.  get the larger number for a ratio basis.
-        var resIdx = 0;
+        int resIdx = 0;
         if (selectedResources.Count > 1)
         {
           if (CalcResourceCapacity(partsTo, selectedResources[0]) < CalcResourceCapacity(partsTo, selectedResources[1]))
@@ -744,14 +744,14 @@ namespace ShipManifest.Process
         }
         // now lets get the amount to move.  we will use this higher portion to calc lower volume ratio during move.
         double maxFromAmount = 0;
-        var fromParts = partsFrom.GetEnumerator();
+        List<Part>.Enumerator fromParts = partsFrom.GetEnumerator();
         while (fromParts.MoveNext())
         {
           if (fromParts.Current == null) continue;
           if (!fromParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
           maxFromAmount += fromParts.Current.Resources[selectedResources[resIdx]].amount;
         }
-        var toParts = partsTo.GetEnumerator();
+        List<Part>.Enumerator toParts = partsTo.GetEnumerator();
         double maxToAmount = 0;
         while (toParts.MoveNext())
         {
@@ -768,7 +768,7 @@ namespace ShipManifest.Process
 
     private static bool IsPumpComplete(TransferPump pump)
     {
-      var results = pump.PumpStatus == PumpState.Off ||
+      bool results = pump.PumpStatus == PumpState.Off ||
                     pump.PumpStatus == PumpState.Stop ||
                     pump.FromIsEmpty ||
                     (pump.PumpType != TypePump.Dump && pump.ToIsFull) ||
@@ -786,19 +786,19 @@ namespace ShipManifest.Process
       WindowTransfer.DisplayPumps.Clear();
       if (!SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources)) return;
       // Lets create a pump Object for managing pump options and data.
-      var displaySourceParts = WindowTransfer.ShowSourceVessels
+      List<Part> displaySourceParts = WindowTransfer.ShowSourceVessels
         ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsSource;
-      var displayTargetParts = WindowTransfer.ShowTargetVessels
+      List<Part> displayTargetParts = WindowTransfer.ShowTargetVessels
         ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsTarget;
 
-      var resources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
+      List<string>.Enumerator resources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
       while (resources.MoveNext())
       {
-        var pump1 = new TransferPump
+        TransferPump pump1 = new TransferPump
         {
           Resource = resources.Current,
           PumpType = TypePump.SourceToTarget,
@@ -811,7 +811,7 @@ namespace ShipManifest.Process
         };
         WindowTransfer.DisplayPumps.Add(pump1);
 
-        var pump2 = new TransferPump
+        TransferPump pump2 = new TransferPump
         {
           Resource = resources.Current,
           PumpType = TypePump.TargetToSource,
@@ -833,21 +833,21 @@ namespace ShipManifest.Process
       if (!WindowTransfer.DisplayPumps.Any()) CreateDisplayPumps();
 
       // Lets create a pump Object for managing pump options and data.
-      var sourceParts = WindowTransfer.ShowSourceVessels
+      List<Part> sourceParts = WindowTransfer.ShowSourceVessels
         ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsSource;
-      var targetParts = WindowTransfer.ShowTargetVessels
+      List<Part> targetParts = WindowTransfer.ShowTargetVessels
         ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsTarget;
 
-      var dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
+      List<TransferPump>.Enumerator dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
       while (dPumps.MoveNext())
       {
         if (dPumps.Current == null) continue;
         // Lets update pump data (it persists).
-        var pump = dPumps.Current;
+        TransferPump pump = dPumps.Current;
         switch (pump.PumpType)
         {
           case TypePump.Dump:
@@ -868,8 +868,8 @@ namespace ShipManifest.Process
 
     internal static List<TransferPump> GetDisplayPumpsByType(TypePump pumpType)
     {
-      var dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
-      var results = new List<TransferPump>();
+      List<TransferPump>.Enumerator dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
+      List<TransferPump> results = new List<TransferPump>();
       while (dPumps.MoveNext())
       {
         if (dPumps.Current == null) continue;

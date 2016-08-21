@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.Modules;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -12,8 +14,8 @@ namespace ShipManifest.Windows.Tabs
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      var scrollX = WindowControl.Position.x + 10;
-      var scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = WindowControl.Position.x + 10;
+      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -23,22 +25,22 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
-      var step = "start";
+      string step = "start";
       try
       {
         // Display all hatches
-        var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+        List<ModSolarPanel>.Enumerator iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
         while (iPanels.MoveNext())
         {
           if (iPanels.Current == null) continue;
-          var isEnabled = true;
-          var label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
+          bool isEnabled = true;
+          string label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
           if (iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN)
           {
             isEnabled = false;
             label = iPanels.Current.PanelStatus + " - (Broken) - " + iPanels.Current.Title;
           }
-          var open =
+          bool open =
             !(iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTED ||
               iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTING ||
               iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN);
@@ -49,14 +51,14 @@ namespace ShipManifest.Windows.Tabs
           {
             label = iPanels.Current.PanelStatus + " - (Locked) - " + iPanels.Current.Title;
           }
-          var newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
             iPanels.Current.ExtendPanel();
           else if (open && !newOpen)
             iPanels.Current.RetractPanel();
 
-          var rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
@@ -78,7 +80,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void ExtendAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+      List<ModSolarPanel>.Enumerator iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
       while (iPanels.MoveNext())
       {
         if (iPanels.Current == null) continue;
@@ -90,7 +92,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void RetractAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      var iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
+      List<ModSolarPanel>.Enumerator iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
       while (iPanels.MoveNext())
       {
         if (iPanels.Current == null) continue;

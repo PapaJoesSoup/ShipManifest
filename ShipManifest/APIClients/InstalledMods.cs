@@ -44,14 +44,14 @@ namespace ShipManifest.APIClients
     // Methods
     internal static void DisplayAssemblyList()
     {
-      var sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
+      List<Assembly> sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
       if (sortedAssemblies.Count == 0) return;
-      var list = sortedAssemblies.GetEnumerator();
+      List<Assembly>.Enumerator list = sortedAssemblies.GetEnumerator();
       while (list.MoveNext())
       {
         if (list.Current != null)
         {
-          var fullName = list.Current.FullName.Split(',');
+          string[] fullName = list.Current.FullName.Split(',');
           GUILayout.BeginHorizontal();
           GUILayout.Label(fullName[0], GUILayout.Width(190));
           GUILayout.Label(fullName[1]);
@@ -62,14 +62,14 @@ namespace ShipManifest.APIClients
 
     internal static void DisplayModList()
     {
-      var sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
+      List<Assembly> sortedAssemblies = (from a in Assemblies select a).OrderBy(a => a.FullName).ToList();
       if (sortedAssemblies.Count == 0) return;
-      var list = sortedAssemblies.GetEnumerator();
+      List<Assembly>.Enumerator list = sortedAssemblies.GetEnumerator();
       while (list.MoveNext())
       {
         if (list.Current != null)
         {
-          var fullName = list.Current.FullName.Split(',');
+          string[] fullName = list.Current.FullName.Split(',');
           GUILayout.BeginHorizontal();
           GUILayout.Label(fullName[0], GUILayout.Width(190));
           GUILayout.Label(fullName[1]);
@@ -82,7 +82,7 @@ namespace ShipManifest.APIClients
     {
       try
       {
-        var assembly = (from a in Assemblies
+        Assembly assembly = (from a in Assemblies
           where a.FullName.Split(',')[0] == assemblyName
           select a).First();
         return assembly != null;
@@ -95,7 +95,7 @@ namespace ShipManifest.APIClients
 
     private static bool IsKspAssembly(string assemblyName)
     {
-      var kspAssemblies = new List<string>
+      List<string> kspAssemblies = new List<string>
       {
         "Assembly-UnityScript",
         "Assembly-UnityScript-firstpass",

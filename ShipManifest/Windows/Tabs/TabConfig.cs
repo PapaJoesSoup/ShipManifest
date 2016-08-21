@@ -28,7 +28,7 @@ namespace ShipManifest.Windows.Tabs
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
-      var scrollX = 20;
+      int scrollX = 20;
 
       GUILayout.Label("Configuraton", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",

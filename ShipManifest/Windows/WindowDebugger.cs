@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Remoting;
@@ -22,7 +23,7 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var rect = new Rect(Position.width - 20, 4, 16, 16);
+      Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, new GUIContent("", "Close Window")))
       {
         ShowWindow = false;
@@ -37,7 +38,7 @@ namespace ShipManifest.Windows
         GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
-      var errors = Utilities.LogItemList.GetEnumerator();
+      List<string>.Enumerator errors = Utilities.LogItemList.GetEnumerator();
       while (errors.MoveNext())
       {
         if (errors.Current == null) continue;
@@ -77,13 +78,13 @@ namespace ShipManifest.Windows
       try
       {
         // time to create a file...
-        var filename = "DebugLog_" +
+        string filename = "DebugLog_" +
                        DateTime.Now.ToString(CultureInfo.InvariantCulture)
                          .Replace(" ", "_")
                          .Replace("/", "")
                          .Replace(":", "") + ".txt";
 
-        var path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
+        string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
         if (SMSettings.DebugLogPath.StartsWith(@"\\"))
           SMSettings.DebugLogPath = SMSettings.DebugLogPath.Substring(2, SMSettings.DebugLogPath.Length - 2);
         else if (SMSettings.DebugLogPath.StartsWith(@"\"))
@@ -97,8 +98,8 @@ namespace ShipManifest.Windows
 
         try
         {
-          var sb = new StringBuilder();
-          var lines = Utilities.LogItemList.GetEnumerator();
+          StringBuilder sb = new StringBuilder();
+          List<string>.Enumerator lines = Utilities.LogItemList.GetEnumerator();
           while (lines.MoveNext())
           {
             if (lines.Current == null) continue;

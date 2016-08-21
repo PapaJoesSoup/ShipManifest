@@ -243,11 +243,12 @@ namespace ShipManifest
         GUI.skin = null;
 
       // ReSharper disable once PossibleNullReferenceException
-      ToolTipStyle = new GUIStyle(GUI.skin.button)
+      ToolTipStyle = new GUIStyle(GUI.skin.textArea)
       {
+        border = new RectOffset(4, 4, 4, 4),
+        padding = new RectOffset(5, 5, 5, 5),
         alignment = TextAnchor.MiddleLeft,
         fontStyle = FontStyle.Italic,
-        padding = new RectOffset(5, 5, 5, 5),
         wordWrap = false,
         normal = {textColor = Color.green},
         hover = {textColor = Color.green}

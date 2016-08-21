@@ -1,4 +1,12 @@
-﻿Version 5.1.2.1 - Release 24 Jul, 2016 - KSP 1.1.3 Optimization Edition.
+﻿Version 5.1.2.2 - Release 20 Aug, 2016 - KSP 1.1.3 Optimization Edition.
+- New:  Tweak of tooltips to make them more readable.  changed style and added border.
+- New:  Refactored code to ensure explicit variable type assignments.
+- New:  Additional refactoring for performance.
+- Fixed: Crew transfers were incorrectly playing Pumping sounds.  
+- Fixed: Corrected a logic error in Crew Transfers that caused crew swaps in parts that have a crew capacity greater than their internal seat count.
+  SM now properly supports "Standing Room Only Transfers".
+
+Version 5.1.2.1 - Release 24 Jul, 2016 - KSP 1.1.3 Optimization Edition.
 - Fixed: Enumeration error on kerbal action in Roster Window.  Moved action to outside enumerator, so change to list does not throw error.
 - Fixed: Button widths were incorrect in Manifes and Transfer window part selectors under certain realism and configuration settings.
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -21,10 +22,10 @@ namespace ShipManifest
 
     internal static SMVessel GetInstance(Vessel vessel)
     {
-      foreach (var kvp in _controllers.ToArray())
+      foreach (KeyValuePair<WeakReference<Vessel>, SMVessel> kvp in _controllers.ToArray())
       {
-        var wr = kvp.Key;
-        var v = wr.Target;
+        WeakReference<Vessel> wr = kvp.Key;
+        Vessel v = wr.Target;
         if (v == null)
         {
           _controllers.Remove(wr);
@@ -35,7 +36,7 @@ namespace ShipManifest
         }
       }
 
-      var commander = new SMVessel();
+      SMVessel commander = new SMVessel();
       _controllers[new WeakReference<Vessel>(vessel)] = commander;
       return commander;
     }
@@ -211,35 +212,35 @@ namespace ShipManifest
 
       // Let's update...
       if (FlightGlobals.ActiveVessel == null) return;
-      var parts = Vessel.Parts.GetEnumerator();
+      List<Part>.Enumerator parts = Vessel.Parts.GetEnumerator();
       while (parts.MoveNext())
       {
         if (parts.Current == null) continue;
-        var part = parts.Current;
+        Part part = parts.Current;
         // First let's Get any Crew, if desired...
         if (SMSettings.EnableCrew && (part.CrewCapacity > 0 || SMConditions.IsUsiInflatable(part)) && part.partInfo.name != "kerbalEVA")
         {
-          var vResourceFound = false;
+          bool vResourceFound = false;
           // is resource in the list yet?.
           if (_partsByResource.Keys.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
             // found resource.  lets add part to its list.
             vResourceFound = true;
-            var eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
+            List<Part> eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
             part.crewTransferAvailable = SMSettings.EnableStockCrewXfer;
             eParts.Add(part);
           }
           if (!vResourceFound)
           {
             // found a new resource.  lets add it to the list of resources.
-            var nParts = new List<Part> { part };
+            List<Part> nParts = new List<Part> { part };
             _partsByResource.Add(SMConditions.ResourceType.Crew.ToString(), nParts);
           }
         }
         // Let's Get any Science...
         if (SMSettings.EnableScience)
         {
-          var sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
+          IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
           if (sciModules.Length > 0)
           {
             // is resource in the list yet?.
@@ -251,7 +252,7 @@ namespace ShipManifest
             else
             {
               // found a new resource.  lets add it to the list of resources.
-              var nParts = new List<Part> { part };
+              List<Part> nParts = new List<Part> { part };
               _partsByResource.Add(SMConditions.ResourceType.Science.ToString(), nParts);
             }
           }
@@ -260,26 +261,26 @@ namespace ShipManifest
         // Now, let's get flight Resources.
         if (!SMSettings.EnableResources) continue;
         {
-          var resources = part.Resources.GetEnumerator();
+          IEnumerator resources = part.Resources.GetEnumerator();
           while (resources.MoveNext())
           {
             if (resources.Current == null) continue;
-            var resource = (PartResource)resources.Current;
+            PartResource resource = (PartResource)resources.Current;
             // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
             if (SMSettings.RealismMode &&
                 (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
               continue;
-            var vResourceFound = false;
+            bool vResourceFound = false;
             // is resource in the list yet?.
             if (_partsByResource.Keys.Contains(resource.info.name))
             {
               vResourceFound = true;
-              var eParts = _partsByResource[resource.info.name];
+              List<Part> eParts = _partsByResource[resource.info.name];
               eParts.Add(part);
             }
             if (vResourceFound) continue;
             // found a new resource.  lets add it to the list of resources.
-            var nParts = new List<Part> { part };
+            List<Part> nParts = new List<Part> { part };
             _partsByResource.Add(resource.info.name, nParts);
           }
         }
@@ -290,20 +291,20 @@ namespace ShipManifest
       //Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
       if (FlightGlobals.ActiveVessel == null) return;
       _dockedVessels = new List<ModDockedVessel>();
-      var dockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList().GetEnumerator();
+      List<Part>.Enumerator dockingParts = (from p in Vessel.parts where p.Modules.Contains("ModuleDockingNode") select p).ToList().GetEnumerator();
       while (dockingParts.MoveNext())
       {
         if (dockingParts.Current == null) continue;
-        var dPart = dockingParts.Current;
-        var dNodes = (from PartModule m in dPart.Modules where m.moduleName == "ModuleDockingNode" select m).ToList().GetEnumerator();
+        Part dPart = dockingParts.Current;
+        List<PartModule>.Enumerator dNodes = (from PartModule m in dPart.Modules where m.moduleName == "ModuleDockingNode" select m).ToList().GetEnumerator();
         while (dNodes.MoveNext())
         {
           if (dNodes.Current == null) continue;
-          var pModule = dNodes.Current;
-          var dockedInfo = ((ModuleDockingNode) pModule).vesselInfo;
+          PartModule pModule = dNodes.Current;
+          DockedVesselInfo dockedInfo = ((ModuleDockingNode) pModule).vesselInfo;
           if (dockedInfo == null) continue;
-          var modDockedVessel = new ModDockedVessel(dockedInfo);
-          var launchIds = (from m in _dockedVessels where m.LaunchId > 0 select m.LaunchId).ToList();
+          ModDockedVessel modDockedVessel = new ModDockedVessel(dockedInfo);
+          List<uint> launchIds = (from m in _dockedVessels where m.LaunchId > 0 select m.LaunchId).ToList();
           if (!launchIds.Contains(modDockedVessel.LaunchId))
             _dockedVessels.Add(modDockedVessel);
         }
@@ -320,7 +321,7 @@ namespace ShipManifest
           break;
         case 2:
           SelectedResourcesParts.Clear();
-          var partlist = Vessel.Parts.GetEnumerator();
+          List<Part>.Enumerator partlist = Vessel.Parts.GetEnumerator();
           while (partlist.MoveNext())
           {
             if (partlist.Current == null) continue;
@@ -336,17 +337,17 @@ namespace ShipManifest
       _hatches.Clear();
       try
       {
-        var hParts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
+        List<ICLSPart>.Enumerator hParts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
         while (hParts.MoveNext())
         {
           if (hParts.Current == null) continue;
-          var hModules = hParts.Current.Part.Modules.GetEnumerator();
+          IEnumerator hModules = hParts.Current.Part.Modules.GetEnumerator();
           while (hModules.MoveNext())
           {
             if (hModules.Current == null) continue;
-            var pModule = (PartModule) hModules.Current;
+            PartModule pModule = (PartModule) hModules.Current;
             if (pModule.moduleName != "ModuleDockingHatch") continue;
-            var pHatch = new ModHatch
+            ModHatch pHatch = new ModHatch
             {
               HatchModule = (PartModule) hModules.Current,
               ClsPart = hParts.Current
@@ -366,19 +367,19 @@ namespace ShipManifest
       _solarPanels.Clear();
       try
       {
-        var pParts = Vessel.Parts.GetEnumerator();
+        List<Part>.Enumerator pParts = Vessel.Parts.GetEnumerator();
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
-          var pModules = pParts.Current.Modules.GetEnumerator();
+          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
-            var pModule = (PartModule)pModules.Current;
+            PartModule pModule = (PartModule)pModules.Current;
             if (pModule.moduleName != "ModuleDeployableSolarPanel") continue;
-            var iModule = (ModuleDeployableSolarPanel)pModule;
+            ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)pModule;
             if (!iModule.Events["Extend"].active && !iModule.Events["Retract"].active) continue;
-            var pPanel = new ModSolarPanel
+            ModSolarPanel pPanel = new ModSolarPanel
             {
               PanelModule = pModule,
               SPart = pParts.Current
@@ -399,17 +400,17 @@ namespace ShipManifest
       try
       {
         // Added support for RemoteTech antennas
-        var pParts = Vessel.Parts.GetEnumerator();
+        List<Part>.Enumerator pParts = Vessel.Parts.GetEnumerator();
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
           if (!pParts.Current.Modules.Contains("ModuleDataTransmitter") && !pParts.Current.Modules.Contains("ModuleRTAntenna")) continue;
-          var pAntenna = new ModAntenna { SPart = pParts.Current };
-          var pModules = pParts.Current.Modules.GetEnumerator();
+          ModAntenna pAntenna = new ModAntenna { SPart = pParts.Current };
+          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
-            var pModule = (PartModule) pModules.Current;
+            PartModule pModule = (PartModule) pModules.Current;
             if (pModule.moduleName == "ModuleDataTransmitter" || pModule.moduleName == "ModuleRTAntenna")
             {
               pAntenna.XmitterModule = pModule;
@@ -434,18 +435,18 @@ namespace ShipManifest
       _lights.Clear();
       try
       {
-        var pParts = Vessel.Parts.GetEnumerator();
+        List<Part>.Enumerator pParts = Vessel.Parts.GetEnumerator();
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
           if (!pParts.Current.Modules.Contains("ModuleLight")) continue;
-          var pModules = pParts.Current.Modules.GetEnumerator();
+          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
-            var pModule = (PartModule) pModules.Current;
+            PartModule pModule = (PartModule) pModules.Current;
             if (pModule.moduleName != "ModuleLight") continue;
-            var pLight = new ModLight
+            ModLight pLight = new ModLight
             {
               LightModule = pModule,
               SPart = pParts.Current
@@ -465,16 +466,16 @@ namespace ShipManifest
       _labs.Clear();
       try
       {
-        var pParts = Vessel.Parts.GetEnumerator();
+        List<Part>.Enumerator pParts = Vessel.Parts.GetEnumerator();
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
           if (!pParts.Current.Modules.Contains("ModuleScienceLab")) continue;
-          var pModules = pParts.Current.Modules.GetEnumerator();
+          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
-            var pModule = (PartModule) pModules.Current;
+            PartModule pModule = (PartModule) pModules.Current;
             if (pModule.moduleName != "ModuleScienceLab") continue;
             _labs.Add((ModuleScienceLab)pModule);
           }
@@ -488,16 +489,16 @@ namespace ShipManifest
 
     internal List<Part> GetSelectedVesselsParts(List<ModDockedVessel> modDockedVessels, List<string> selectedResources)
     {
-      var resourcePartList = new List<Part>();
+      List<Part> resourcePartList = new List<Part>();
       if (modDockedVessels == null || modDockedVessels.Count <= 0 || selectedResources == null ||
           selectedResources.Count <= 0) return resourcePartList;
       try
       {
-        var dVessels = modDockedVessels.GetEnumerator();
+        List<ModDockedVessel>.Enumerator dVessels = modDockedVessels.GetEnumerator();
         while (dVessels.MoveNext())
         {
           if (dVessels.Current == null) continue;
-          var mdvParts = dVessels.Current.VesselParts.GetEnumerator();
+          List<Part>.Enumerator mdvParts = dVessels.Current.VesselParts.GetEnumerator();
           while (mdvParts.MoveNext())
           {
             if (mdvParts.Current == null) continue;
@@ -522,12 +523,12 @@ namespace ShipManifest
 
     internal List<Part> GetDockedVesselParts(DockedVesselInfo vesselInfo)
     {
-      var vesselpartList = new List<Part>();
+      List<Part> vesselpartList = new List<Part>();
       try
       {
         if (vesselInfo != null)
         {
-          var vesselRoot =
+          Part vesselRoot =
             (from p in Vessel.parts where p.flightID == vesselInfo.rootPartUId select p).SingleOrDefault();
           if (vesselRoot != null)
           {
@@ -545,7 +546,7 @@ namespace ShipManifest
 
     internal Part FindPartByKerbal(ProtoCrewMember pKerbal)
     {
-      var kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
+      Part kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
       return kPart;
     }
 
@@ -562,7 +563,7 @@ namespace ShipManifest
     internal void FillCrew()
     {
       //Utilities.LogMessage("Entering FillCrew", Utilities.LogType.Info, true);
-      var parts = PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
+      List<Part>.Enumerator parts = PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
       while (parts.MoveNext())
       {
         if (parts.Current == null) continue;
@@ -574,11 +575,11 @@ namespace ShipManifest
 
     internal void EmptyCrew()
     {
-      var parts = PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
+      List<Part>.Enumerator parts = PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
       while (parts.MoveNext())
       {
         if (parts.Current == null) continue;
-        for (var i = parts.Current.protoModuleCrew.Count - 1; i >= 0; i--)
+        for (int i = parts.Current.protoModuleCrew.Count - 1; i >= 0; i--)
         {
           TransferCrew.RemoveCrewMember(parts.Current.protoModuleCrew[i], parts.Current);
         }
@@ -588,14 +589,14 @@ namespace ShipManifest
 
     internal void DumpAllResources()
     {
-      var otherResourcesList =
+      List<string> otherResourcesList =
         (from s in SMAddon.SmVessel.PartsByResource.Keys
          where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump
           select s).ToList();
-      var pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()),
+      uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()),
         SMAddon.SmVessel.Vessel.parts.First(), SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump,
         TransferPump.TriggerButton.Preflight);
-      var pumpList =
+      List<TransferPump> pumpList =
         otherResourcesList.Select(
           resource =>
             new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight,
@@ -615,7 +616,7 @@ namespace ShipManifest
     internal static void ToggleDumpResource(string resourceName, uint pumpId)
     {
       //Fired by Resource Dump on Manifest Window.
-      var pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest,
+      TransferPump pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest,
         TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName))
       {
         FromParts = SMAddon.SmVessel.PartsByResource[resourceName],
@@ -631,12 +632,12 @@ namespace ShipManifest
 
     internal void FillResources()
     {
-      var parts = Vessel.parts.GetEnumerator();
+      List<Part>.Enumerator parts = Vessel.parts.GetEnumerator();
       while (parts.MoveNext())
       {
         if (parts.Current == null) continue;
         if (parts.Current.Resources.Count <= 0) continue;
-        var pResources = parts.Current.Resources.GetEnumerator();
+        IEnumerator pResources = parts.Current.Resources.GetEnumerator();
         while (pResources.MoveNext())
         {
           if (pResources.Current == null) continue;
@@ -649,12 +650,12 @@ namespace ShipManifest
 
     internal void FillResource(string resourceName)
     {
-      var parts = PartsByResource[resourceName].GetEnumerator();
+      List<Part>.Enumerator parts = PartsByResource[resourceName].GetEnumerator();
       while (parts.MoveNext())
       {
         if (parts.Current == null) continue;
         if (!parts.Current.Resources.Contains(resourceName)) continue;
-        var resources = parts.Current.Resources.GetEnumerator();
+        IEnumerator resources = parts.Current.Resources.GetEnumerator();
         while (resources.MoveNext())
         {
           if (resources.Current == null) continue;

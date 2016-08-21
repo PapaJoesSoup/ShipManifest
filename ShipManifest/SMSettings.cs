@@ -211,13 +211,13 @@ namespace ShipManifest
       if (Settings == null) LoadSettingsFile();
       if (Settings != null)
       {
-        var windowsNode = Settings.HasNode("SM_Windows")
+        ConfigNode windowsNode = Settings.HasNode("SM_Windows")
           ? Settings.GetNode("SM_Windows")
           : Settings.AddNode("SM_Windows");
-        var settingsNode = Settings.HasNode("SM_Settings")
+        ConfigNode settingsNode = Settings.HasNode("SM_Settings")
           ? Settings.GetNode("SM_Settings")
           : Settings.AddNode("SM_Settings");
-        var hiddenNode = Settings.HasNode("SM_Hidden")
+        ConfigNode hiddenNode = Settings.HasNode("SM_Hidden")
           ? Settings.GetNode("SM_Hidden")
           : Settings.AddNode("SM_Hidden");
 
@@ -440,13 +440,13 @@ namespace ShipManifest
         if (Settings == null)
           Settings = LoadSettingsFile();
 
-        var windowsNode = Settings.HasNode("SM_Windows")
+        ConfigNode windowsNode = Settings.HasNode("SM_Windows")
           ? Settings.GetNode("SM_Windows")
           : Settings.AddNode("SM_Windows");
-        var settingsNode = Settings.HasNode("SM_Settings")
+        ConfigNode settingsNode = Settings.HasNode("SM_Settings")
           ? Settings.GetNode("SM_Settings")
           : Settings.AddNode("SM_Settings");
-        var hiddenNode = Settings.HasNode("SM_Hidden") ? Settings.GetNode("SM_Hidden") : Settings.AddNode("SM_Hidden");
+        ConfigNode hiddenNode = Settings.HasNode("SM_Hidden") ? Settings.GetNode("SM_Hidden") : Settings.AddNode("SM_Hidden");
 
         // Write window positions
         WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
@@ -544,11 +544,11 @@ namespace ShipManifest
       // wrap in a try, as save can be executed outside of the flight scene and we don't care if it fails...
       try
       {
-        var parts = SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
+        List<Part>.Enumerator parts = SMAddon.SmVessel.PartsByResource[SMConditions.ResourceType.Crew.ToString()].GetEnumerator();
         while (parts.MoveNext())
         {
           if (parts.Current == null) continue;
-          var part = parts.Current;
+          Part part = parts.Current;
           part.crewTransferAvailable = EnableStockCrewXfer;
           TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
           if (EnableStockCrewXfer)
@@ -571,10 +571,10 @@ namespace ShipManifest
 
     private static Rect GetRectangle(ConfigNode windowsNode, string rectName, Rect defaultvalue)
     {
-      var thisRect = new Rect();
+      Rect thisRect = new Rect();
       try
       {
-        var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
+        ConfigNode rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
         thisRect.x = rectNode.HasValue("x") ? int.Parse(rectNode.GetValue("x")) : defaultvalue.x;
         thisRect.y = rectNode.HasValue("y") ? int.Parse(rectNode.GetValue("y")) : defaultvalue.y;
         thisRect.width = rectNode.HasValue("width") ? int.Parse(rectNode.GetValue("width")) : defaultvalue.width;
@@ -591,7 +591,7 @@ namespace ShipManifest
 
     private static void WriteRectangle(ConfigNode windowsNode, string rectName, Rect rectValue)
     {
-      var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
+      ConfigNode rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
       WriteValue(rectNode, "x", (int)rectValue.x);
       WriteValue(rectNode, "y", (int)rectValue.y);
       WriteValue(rectNode, "width", (int)rectValue.width);

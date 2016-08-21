@@ -15,7 +15,7 @@ namespace ShipManifest
       if (IsCrewFull(part)) return;
       while (part.CrewCapacity > Utilities.GetPartCrewCount(part))
       {
-        var kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
+        ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
         part.AddCrewmember(kerbal);
         //Utilities.LogMessage(string.Format("Filling crew in part {0}", part.partInfo.name), Utilities.LogType.Info, true);
         if (kerbal.seat != null)
@@ -28,7 +28,7 @@ namespace ShipManifest
       if (!part.vessel.IsRecoverable) return;
       while (part.protoModuleCrew.Count > 0)
       {
-        var kerbal = part.protoModuleCrew.FirstOrDefault();
+        ProtoCrewMember kerbal = part.protoModuleCrew.FirstOrDefault();
         if (kerbal != null)
         {
           part.RemoveCrewmember(kerbal);
@@ -44,7 +44,7 @@ namespace ShipManifest
     {
       if (!InstalledMods.IsDfInstalled || !part.Modules.Contains("DeepFreezer"))
         return part.protoModuleCrew.Count == part.CrewCapacity;
-      var deepFreezer = SMConditions.GetFreezerModule(part);
+      PartModule deepFreezer = SMConditions.GetFreezerModule(part);
       return deepFreezer != null && new DFWrapper.DeepFreezer(deepFreezer).PartFull;
     }
 
@@ -58,7 +58,7 @@ namespace ShipManifest
     {
       // This routine is called by the dump part button on the Transfer Window interface.
       // This routine is also called by the dump docked vessel button on the Transfer window interface.
-      var pumpList =
+      List<TransferPump> pumpList =
         resourceNames.Select(
           resource =>
             new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer,
@@ -81,7 +81,7 @@ namespace ShipManifest
 
     internal static void FillResource(List<Part> partList, string resourceName)
     {
-      var list = partList.Where(part => part.Resources.Contains(resourceName)).GetEnumerator();
+      IEnumerator<Part> list = partList.Where(part => part.Resources.Contains(resourceName)).GetEnumerator();
       while (list.MoveNext())
       {
         list.Current.Resources[resourceName].amount = list.Current.Resources[resourceName].maxAmount;

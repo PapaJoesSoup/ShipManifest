@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using ConnectedLivingSpace;
+using HighlightingSystem;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -25,7 +27,7 @@ namespace ShipManifest.InternalObjects
     {
       if (parts != null)
       {
-        var list = parts.GetEnumerator();
+        List<Part>.Enumerator list = parts.GetEnumerator();
         while (list.MoveNext())
         {
           ClearPartHighlight(list.Current);          
@@ -51,7 +53,7 @@ namespace ShipManifest.InternalObjects
     {
       if (resourceParts != null)
       {
-        var list = resourceParts.GetEnumerator();
+        List<Part>.Enumerator list = resourceParts.GetEnumerator();
         while (list.MoveNext())
         {
           ClearPartHighlight(list.Current);
@@ -68,7 +70,7 @@ namespace ShipManifest.InternalObjects
     {
       try
       {
-        var list = parts.GetEnumerator();
+        List<Part>.Enumerator list = parts.GetEnumerator();
         while (list.MoveNext())
         {
           if (list.Current == null) continue;
@@ -102,7 +104,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void MouseOverHighlight(Part part)
     {
-      var step = "begin";
+      string step = "begin";
       try
       {
         step = "inside box - Part Selection?";
@@ -118,7 +120,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void MouseOverHighlight(List<Part> parts)
     {
-      var step = "begin";
+      string step = "begin";
       try
       {
         step = "inside box - Part Selection?";
@@ -136,7 +138,7 @@ namespace ShipManifest.InternalObjects
     {
       if (SMSettings.EnableEdgeHighlighting)
       {
-        var highlighter = part.highlighter;
+        Highlighter highlighter = part.highlighter;
         if (enable)
         {
           if (string.IsNullOrEmpty(color))
@@ -156,7 +158,7 @@ namespace ShipManifest.InternalObjects
     {
       if (SMSettings.EnableEdgeHighlighting)
       {
-        var list = parts.GetEnumerator();
+        List<Part>.Enumerator list = parts.GetEnumerator();
         while (list.MoveNext())
         {
           if (list.Current == null) continue;
@@ -183,11 +185,11 @@ namespace ShipManifest.InternalObjects
         if (SMAddon.ClsAddon.Vessel == null)
           SMAddon.UpdateClsSpaces();
         if (SMAddon.ClsAddon.Vessel == null) return;
-        var spaces = SMAddon.ClsAddon.Vessel.Spaces.GetEnumerator();
+        List<ICLSSpace>.Enumerator spaces = SMAddon.ClsAddon.Vessel.Spaces.GetEnumerator();
         while (spaces.MoveNext())
         {
           if (spaces.Current == null) continue;
-          var parts = spaces.Current.Parts.GetEnumerator();
+          List<ICLSPart>.Enumerator parts = spaces.Current.Parts.GetEnumerator();
           while (parts.MoveNext())
           {
             parts.Current?.Highlight(enabled, force);
@@ -209,7 +211,7 @@ namespace ShipManifest.InternalObjects
     // This method is expensive.  Refactor to consume less CPU.
     internal static void Update_Highlighter()
     {
-      var step = "";
+      string step = "";
       try
       {
         // Do we even want to highlight?
@@ -257,7 +259,7 @@ namespace ShipManifest.InternalObjects
 
           // Default is yellow
           step = "Set non selected resource part color";
-          var partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
+          Color partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
 
           // match color used by CLS if active
           if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&

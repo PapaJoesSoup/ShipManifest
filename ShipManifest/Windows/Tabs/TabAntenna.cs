@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.Modules;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -14,8 +16,8 @@ namespace ShipManifest.Windows.Tabs
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      var scrollX = WindowControl.Position.x;
-      var scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = WindowControl.Position.x;
+      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -27,26 +29,26 @@ namespace ShipManifest.Windows.Tabs
         SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
-      var step = "start";
+      string step = "start";
       try
       {
         // Display all antennas
-        var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+        List<ModAntenna>.Enumerator iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
         while (iAntennas.MoveNext())
         {
           if (iAntennas.Current == null) continue;
           if (!IsRtAntennas && iAntennas.Current.IsRtModule) IsRtAntennas = true;
           step = "get Antenna label";
-          var label = iAntennas.Current.AntennaStatus + " - " + iAntennas.Current.Title;
-          var open = iAntennas.Current.Extended;
-          var newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
+          string label = iAntennas.Current.AntennaStatus + " - " + iAntennas.Current.Title;
+          bool open = iAntennas.Current.Extended;
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
             iAntennas.Current.ExtendAntenna();
           else if (open && !newOpen)
             iAntennas.Current.RetractAntenna();
 
-          var rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
@@ -68,7 +70,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void ExtendAllAntennas()
     {
       // TODO: for realism, add a closing/opening sound
-      var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+      List<ModAntenna>.Enumerator iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
       while (iAntennas.MoveNext())
       {
         if (iAntennas.Current == null) continue;
@@ -79,7 +81,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void RetractAllAntennas()
     {
       // TODO: for realism, add a closing/opening sound
-      var iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
+      List<ModAntenna>.Enumerator iAntennas = SMAddon.SmVessel.Antennas.GetEnumerator();
       while (iAntennas.MoveNext())
       {
         if (iAntennas.Current == null) continue;

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ConnectedLivingSpace;
 using KSP.UI.Screens;
+using KSP.UI.Screens.Flight;
+using KSP.UI.Screens.Flight.Dialogs;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Process;
@@ -159,6 +162,7 @@ namespace ShipManifest
 
         if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         // Instantiate Event handlers
+        GameEvents.onCrewTransferPartListCreated.Add(OnCrewTransferPartListCreated);
         GameEvents.onCrewTransferSelected.Add(OnCrewTransferSelected);
         GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
         GameEvents.onVesselChange.Add(OnVesselChange);
@@ -213,6 +217,7 @@ namespace ShipManifest
         if (SMSettings.Loaded)
           SMSettings.SaveSettings();
 
+        GameEvents.onCrewTransferPartListCreated.Remove(OnCrewTransferPartListCreated);
         GameEvents.onCrewTransferSelected.Remove(OnCrewTransferSelected);
         GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
         GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
@@ -375,6 +380,52 @@ namespace ShipManifest
     }
 
     // Crew Event handlers
+    internal void OnCrewTransferPartListCreated(GameEvents.FromToAction<List<Part>, List<Part>> eventData)
+    {
+      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM  Crew Transfers are active
+      if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
+
+      // If override is off, then ignore.
+      if (!SMSettings.OverrideStockCrewXfer) return;
+
+      // How can I tell if the parts are in the same space?... I need a starting point!  What part initiated the event?
+      Part sourcePart = null;
+
+      // Get the Dialog and find the source part.
+      CrewHatchDialog dialog = Resources.FindObjectsOfTypeAll<CrewHatchDialog>().FirstOrDefault();
+      if (dialog?.Part == null) return;
+      sourcePart = dialog.Part;
+
+      //Let's manhandle the lists
+      List<Part> fullList = new List<Part>();
+      List<Part>.Enumerator fromList = eventData.from.GetEnumerator();
+      while (fromList.MoveNext())
+      {
+        if (fromList.Current == null) continue;
+        //Check for DeepFreezer full. if full, abort handling Xfer.
+        if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && fromList.Current.Modules.Contains("DeepFreezer"))
+        {
+          if (new DFWrapper.DeepFreezer(fromList.Current.Modules["DeepFreezer"]).FreezerSpace == 0)
+          {
+            fullList.Add(fromList.Current);
+          }
+        }
+        // If CLS is enabled and parts are not in same space.
+        if (!SMConditions.IsClsInSameSpace(sourcePart, fromList.Current))
+        {
+          fullList.Add(fromList.Current);
+        };
+      }
+      if (fullList.Count <= 0) return;
+      CrewTransfer.fullMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
+      List<Part>.Enumerator removeList = fullList.GetEnumerator();
+      while (removeList.MoveNext())
+      {
+        eventData.from.Remove(removeList.Current);
+      }
+      eventData.to.AddRange(fullList);
+    }
+
     /// <summary>
     /// OnCrewTransferSelected (GameEvent Handler)
     /// This method captures a Stock Crew Transfer event just prior to the actual crew move.
@@ -524,7 +575,7 @@ namespace ShipManifest
         // Setup SM WIndow button
         if (HighLogic.LoadedSceneIsFlight && _smButtonStock == null && !SMSettings.EnableBlizzyToolbar)
         {
-          var iconfile = "IconOff_38";
+          string iconfile = "IconOff_38";
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmButtonClicked,
             OnSmButtonClicked,
@@ -545,7 +596,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER && _smSettingsStock == null &&
             !SMSettings.EnableBlizzyToolbar)
         {
-          var iconfile = "IconS_Off_38";
+          string iconfile = "IconS_Off_38";
           _smSettingsStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmSettingsClicked,
             OnSmSettingsClicked,
@@ -566,7 +617,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER || _smRosterStock != null || SMSettings.EnableBlizzyToolbar)
           return;
         {
-          var iconfile = "IconR_Off_38";
+          string iconfile = "IconR_Off_38";
           _smRosterStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmRosterClicked,
             OnSmRosterClicked,
@@ -710,7 +761,7 @@ namespace ShipManifest
 
     internal void Display()
     {
-      var step = "";
+      string step = "";
       try
       {
         step = "0 - Start";
@@ -814,7 +865,7 @@ namespace ShipManifest
     internal static Rect GuiToScreenRect(Rect rect)
     {
       // Must run during OnGui to work...
-      var newRect = new Rect
+      Rect newRect = new Rect
       {
         position = GUIUtility.GUIToScreenPoint(rect.position),
         width = rect.width,
@@ -870,10 +921,10 @@ namespace ShipManifest
           SmVessel.ClsSpaceSource = null;
           SmVessel.ClsPartTarget = null;
           SmVessel.ClsSpaceTarget = null;
-          var spaces = ClsAddon.Vessel.Spaces.GetEnumerator();
+          List<ICLSSpace>.Enumerator spaces = ClsAddon.Vessel.Spaces.GetEnumerator();
           while (spaces.MoveNext())
           {
-            var parts = spaces.Current.Parts.GetEnumerator();
+            List<ICLSPart>.Enumerator parts = spaces.Current.Parts.GetEnumerator();
             while (parts.MoveNext())
             {
               if (SmVessel.SelectedPartsSource.Contains(parts.Current.Part) && SmVessel.ClsPartSource == null)
@@ -976,17 +1027,17 @@ namespace ShipManifest
 
     internal static void DisplayScreenMsg(string strMessage)
     {
-      var smessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
+      ScreenMessage smessage = new ScreenMessage(strMessage, 15f, ScreenMessageStyle.UPPER_CENTER);
       ScreenMessages.PostScreenMessage(smessage);
     }
 
     internal static void RemoveScreenMsg()
     {
-      var smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
-      var smessages = FindObjectOfType<ScreenMessages>();
+      ScreenMessage smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
+      ScreenMessages smessages = FindObjectOfType<ScreenMessages>();
       if (smessages != null)
       {
-        var smessagesToRemove =
+        IEnumerator<ScreenMessage> smessagesToRemove =
           smessages.ActiveMessages.Where(
             x =>
               Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&

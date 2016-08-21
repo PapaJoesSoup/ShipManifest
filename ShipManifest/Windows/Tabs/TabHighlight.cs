@@ -1,4 +1,5 @@
-﻿using ShipManifest.InternalObjects;
+﻿using System.Collections.Generic;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -27,7 +28,7 @@ namespace ShipManifest.Windows.Tabs
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
-      var scrollX = 20;
+      int scrollX = 20;
 
       GUI.enabled = true;
       GUILayout.Label("Highlighting", SMStyle.LabelTabHeader);
@@ -137,7 +138,7 @@ namespace ShipManifest.Windows.Tabs
         {
           if (SMAddon.SmVessel.SelectedResources.Count > 0)
           {
-            var parts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
+            List<Part>.Enumerator parts = SMAddon.SmVessel.SelectedResourcesParts.GetEnumerator();
             while (parts.MoveNext())
             {
               if (parts.Current == null) continue;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipManifest.InternalObjects;
 using ShipManifest.Process;
 using UnityEngine;
@@ -13,8 +14,8 @@ namespace ShipManifest.Windows.Tabs
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      var scrollX = WindowControl.Position.x + 10;
-      var scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = WindowControl.Position.x + 10;
+      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -24,19 +25,19 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
-      var step = "start";
+      string step = "start";
       try
       {
         // Display all Labs
-        var iLabs = SMAddon.SmVessel.Labs.GetEnumerator();
+        List<ModuleScienceLab>.Enumerator iLabs = SMAddon.SmVessel.Labs.GetEnumerator();
         while (iLabs.MoveNext())
         {
           if (iLabs.Current == null) continue;
-          var isEnabled = true;
+          bool isEnabled = true;
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          var label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? "Operational" : "InOp") + ")";
+          string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? "Operational" : "InOp") + ")";
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
         }
       }

@@ -249,12 +249,15 @@ namespace ShipManifest.APIClients
         Dictionary<string, KerbalInfo> DictToReturn = new Dictionary<string, KerbalInfo>();
         try
         {
-          foreach (var item in (IDictionary)actualFrozenKerbals)
+          // SM - Replaced foreach with enumerator for performance (foreach = bad in Unity)
+          IEnumerator frnKbls = ((IDictionary) actualFrozenKerbals).GetEnumerator();
+          while (frnKbls.MoveNext())
           {
-            var typeitem = item.GetType();
+            if (frnKbls.Current == null) continue;
+            Type typeitem = frnKbls.Current.GetType();
             PropertyInfo[] itemprops = typeitem.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            string itemkey = (string)itemprops[0].GetValue(item, null);
-            object itemvalue = (object)itemprops[1].GetValue(item, null);
+            string itemkey = (string)itemprops[0].GetValue(frnKbls.Current, null);
+            object itemvalue = (object)itemprops[1].GetValue(frnKbls.Current, null);
             KerbalInfo itemkerbalinfo = new KerbalInfo(itemvalue);
             DictToReturn[itemkey] = itemkerbalinfo;
           }
@@ -459,10 +462,11 @@ namespace ShipManifest.APIClients
         try
         {
           //iterate each "value" in the dictionary
-
-          foreach (var item in (IList)actualStoredCrewList)
+          // SM modification for performance (foreach = bad in unity)
+          IEnumerator crewList = ((IList)actualStoredCrewList).GetEnumerator();
+          while (crewList.MoveNext())
           {
-            FrznCrewMbr r1 = new FrznCrewMbr(item);
+            FrznCrewMbr r1 = new FrznCrewMbr(crewList.Current);
             ListToReturn.Add(r1);
           }
         }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.Modules;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -12,8 +14,8 @@ namespace ShipManifest.Windows.Tabs
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      var scrollX = WindowControl.Position.x + 20;
-      var scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = WindowControl.Position.x + 20;
+      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -22,23 +24,23 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
-      var step = "start";
+      string step = "start";
       try
       {
         // Display all Lights
-        var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+        List<ModLight>.Enumerator iLights = SMAddon.SmVessel.Lights.GetEnumerator();
         while (iLights.MoveNext())
         {
           if (iLights.Current == null) continue;
-          var label = iLights.Current.Status + " - " + iLights.Current.Title;
-          var onState = iLights.Current.IsOn;
-          var newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(325), GUILayout.Height(40));
+          string label = iLights.Current.Status + " - " + iLights.Current.Title;
+          bool onState = iLights.Current.IsOn;
+          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
           if (!onState && newOnState)
             iLights.Current.TurnOnLight();
           else if (onState && !newOnState)
             iLights.Current.TurnOffLight();
-          var rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
@@ -60,7 +62,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void TurnOnAllLights()
     {
       // iterate thru the hatch parts and open hatches
-      var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+      List<ModLight>.Enumerator iLights = SMAddon.SmVessel.Lights.GetEnumerator();
       while (iLights.MoveNext())
       {
         if (iLights.Current == null) continue;
@@ -71,7 +73,7 @@ namespace ShipManifest.Windows.Tabs
     internal static void TurnOffAllLights()
     {
       // iterate thru the hatch parts and open hatches
-      var iLights = SMAddon.SmVessel.Lights.GetEnumerator();
+      List<ModLight>.Enumerator iLights = SMAddon.SmVessel.Lights.GetEnumerator();
       while (iLights.MoveNext())
       {
         if (iLights.Current == null) continue;

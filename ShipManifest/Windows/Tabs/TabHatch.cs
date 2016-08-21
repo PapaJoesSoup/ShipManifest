@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
 using ShipManifest.InternalObjects;
+using ShipManifest.Modules;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs
@@ -14,8 +16,8 @@ namespace ShipManifest.Windows.Tabs
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      var scrollX = WindowControl.Position.x + 20;
-      var scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = WindowControl.Position.x + 20;
+      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -25,16 +27,16 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
-      var step = "start";
+      string step = "start";
       try
       {
         // Display all hatches
         // ReSharper disable once ForCanBeConvertedToForeach
-        for (var x = 0; x < SMAddon.SmVessel.Hatches.Count; x++)
+        for (int x = 0; x < SMAddon.SmVessel.Hatches.Count; x++)
         {
-          var iHatch = SMAddon.SmVessel.Hatches[x];
-          var isEnabled = true;
-          var open = false;
+          ModHatch iHatch = SMAddon.SmVessel.Hatches[x];
+          bool isEnabled = true;
+          bool open = false;
 
           // get hatch state
           if (!iHatch.IsDocked)
@@ -44,7 +46,7 @@ namespace ShipManifest.Windows.Tabs
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          var newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(325));
+          bool newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(325));
           step = "button toggle check";
           if (!open && newOpen)
           {
@@ -54,7 +56,7 @@ namespace ShipManifest.Windows.Tabs
           {
             iHatch.CloseHatch(true);
           }
-          var rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
             SMHighlighter.IsMouseOver = true;
@@ -78,7 +80,7 @@ namespace ShipManifest.Windows.Tabs
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      var iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
+      IEnumerator<IModuleDockingHatch> iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch) iHatch.HatchModule)
         .Where(iModule => iModule.IsDocked).GetEnumerator();
       while (iModules.MoveNext())
       {
@@ -94,7 +96,7 @@ namespace ShipManifest.Windows.Tabs
     {
       // TODO: for realism, add a closing/opening sound
       // ReSharper disable once SuspiciousTypeConversion.Global
-      var iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch)iHatch.HatchModule)
+      IEnumerator<IModuleDockingHatch> iModules = SMAddon.SmVessel.Hatches.Select(iHatch => (IModuleDockingHatch)iHatch.HatchModule)
         .Where(iModule => iModule.IsDocked).GetEnumerator();
       while (iModules.MoveNext())
       {

@@ -30,13 +30,13 @@ namespace ShipManifest
     {
       LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), LogType.Info,
         SMSettings.VerboseLogging);
-      var img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
+      WWW img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
       img1.LoadImageIntoTexture(tex);
     }
 
     internal static string DisplayVesselResourceTotals(string selectedResource)
     {
-      var displayAmount = "";
+      string displayAmount = "";
       double currAmount = 0;
       double totAmount = 0;
       if (selectedResource == null) return string.Format(" - ({0})", currAmount.ToString("#######0"));
@@ -44,7 +44,7 @@ namespace ShipManifest
       {
         if (SMConditions.IsResourceTypeOther(selectedResource))
         {
-          var parts = SMAddon.SmVessel.PartsByResource[selectedResource].GetEnumerator();
+          List<Part>.Enumerator parts = SMAddon.SmVessel.PartsByResource[selectedResource].GetEnumerator();
           while (parts.MoveNext())
           {
             if (parts.Current == null) continue;
@@ -61,7 +61,7 @@ namespace ShipManifest
             // if DF installed, get total frozen and add to count.
             if (InstalledMods.IsDfInstalled)
             {
-              var cryofreezers = GetFreezerParts().GetEnumerator();
+              List<Part>.Enumerator cryofreezers = GetFreezerParts().GetEnumerator();
               // ReSharper disable once SuspiciousTypeConversion.Global
               while (cryofreezers.MoveNext())
               {
@@ -73,7 +73,7 @@ namespace ShipManifest
             // Now check for occupied external seats
             // external seats that are occupied will show up in getcrewcount and getcrewcapacity
             // Since we cannot yet xfer external crew, we need to remove them from the count..
-            var seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts
+            List<KerbalSeat> seatCount = (from iPart in SMAddon.SmVessel.Vessel.parts
               where iPart.Modules.Contains("KerbalSeat")
               from PartModule iModule in iPart.Modules
               where iModule.ClassName == "KerbalSeat"
@@ -110,12 +110,12 @@ namespace ShipManifest
 
     internal static int GetPartCrewCount(Part part)
     {
-      var crewCount = 0;
+      int crewCount = 0;
       if (!InstalledMods.IsDfApiReady) return crewCount + part.protoModuleCrew.Count;
       if (!part.Modules.Contains("DeepFreezer")) return crewCount + part.protoModuleCrew.Count;
-      var freezerModule = SMConditions.GetFreezerModule(part);
+      PartModule freezerModule = SMConditions.GetFreezerModule(part);
       // ReSharper disable once SuspiciousTypeConversion.Global
-      var freezer = new DFWrapper.DeepFreezer(freezerModule);
+      DFWrapper.DeepFreezer freezer = new DFWrapper.DeepFreezer(freezerModule);
       crewCount += freezer.TotalFrozen;
       return crewCount + part.protoModuleCrew.Count;
     }

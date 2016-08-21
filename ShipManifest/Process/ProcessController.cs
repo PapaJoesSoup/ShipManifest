@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace ShipManifest.Process
@@ -19,11 +20,11 @@ namespace ShipManifest.Process
         // Create lookup list to avoid a slow linear search for each item
         // Value is number of labs that have processed it
         // (would allow to only move data not processed in all labs if there are multiple)
-        var processedScience = new Dictionary<string, int>();
-        var labs = SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().GetEnumerator();
+        Dictionary<string, int> processedScience = new Dictionary<string, int>();
+        List<ModuleScienceLab>.Enumerator labs = SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().GetEnumerator();
         while (labs.MoveNext())
         {
-          var dataitems = labs.Current.ExperimentData.GetEnumerator();
+          List<string>.Enumerator dataitems = labs.Current.ExperimentData.GetEnumerator();
           while (dataitems.MoveNext())
           {
             if (!processedScience.ContainsKey(dataitems.Current))
@@ -33,14 +34,14 @@ namespace ShipManifest.Process
           }
         }
 
-        var moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
+        ScienceData[] moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
 
         if (moduleScience == null || moduleScience.Length <= 0) return;
-        var dataItems = moduleScience.GetEnumerator();
+        IEnumerator dataItems = moduleScience.GetEnumerator();
         while (dataItems.MoveNext())
         {
           if (dataItems.Current == null) continue;
-          var data = (ScienceData)dataItems.Current;
+          ScienceData data = (ScienceData)dataItems.Current;
           bool processed = processedScience.ContainsKey(data.subjectID);
 
           if ((sel == Selection.OnlyProcessed && processed) ||
@@ -63,7 +64,7 @@ namespace ShipManifest.Process
     {
       try
       {
-        var moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
+        ScienceData[] moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
 
         if (moduleScience == null || moduleScience.Length <= 0) return;
         //Utilities.LogMessage("ProcessController.TransferScience:  moduleScience has data...", Utilities.LogType.Info,
@@ -76,11 +77,11 @@ namespace ShipManifest.Process
 
         //Utilities.LogMessage("ProcessController.TransferScience:  ((ModuleScienceContainer)source) data stored",
         //  "Info", SMSettings.VerboseLogging);
-        var dataItems = moduleScience.GetEnumerator();
+        IEnumerator dataItems = moduleScience.GetEnumerator();
         while (dataItems.MoveNext())
         {
           if (dataItems.Current == null) continue;
-          var data = (ScienceData) dataItems.Current;
+          ScienceData data = (ScienceData) dataItems.Current;
           ((IScienceDataContainer) source).DumpData(data);
         }
 
@@ -102,11 +103,11 @@ namespace ShipManifest.Process
       {
         if (SMSettings.RealismMode)
         {
-          var pumps = xferPumps.GetEnumerator();
+          List<TransferPump>.Enumerator pumps = xferPumps.GetEnumerator();
           while (pumps.MoveNext())
           {
             if (pumps.Current == null) continue;
-            var pump = pumps.Current;
+            TransferPump pump = pumps.Current;
             pump.IsPumpOn = true;
           }
           // now lets start the pumping process...
@@ -118,11 +119,11 @@ namespace ShipManifest.Process
         else
         {
           //Not in Realism mode, so just move the resource...
-          var pumps = xferPumps.GetEnumerator();
+          List<TransferPump>.Enumerator pumps = xferPumps.GetEnumerator();
           while (pumps.MoveNext())
           {
             if (pumps.Current == null) continue;
-            var pump = pumps.Current;
+            TransferPump pump = pumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
         }
@@ -143,11 +144,11 @@ namespace ShipManifest.Process
         if (SMSettings.RealismMode)
         {
           // Turn on Pumps for timed process...
-          var epumps = pumps.GetEnumerator();
+          List<TransferPump>.Enumerator epumps = pumps.GetEnumerator();
           while (epumps.MoveNext())
           {
             if (epumps.Current == null) continue;
-            var pump = epumps.Current;
+            TransferPump pump = epumps.Current;
             pump.PumpRatio = 1;
             pump.IsPumpOn = true;
           }
@@ -159,11 +160,11 @@ namespace ShipManifest.Process
         }
         else
         {
-          var epumps = pumps.GetEnumerator();
+          List<TransferPump>.Enumerator epumps = pumps.GetEnumerator();
           while (epumps.MoveNext())
           {
             if (epumps.Current == null) continue;
-            var pump = epumps.Current;
+            TransferPump pump = epumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
           SMAddon.SmVessel.TransferPumps.Clear();

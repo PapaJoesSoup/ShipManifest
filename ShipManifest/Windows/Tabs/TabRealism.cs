@@ -27,7 +27,7 @@ namespace ShipManifest.Windows.Tabs
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
-      var scrollX = 20;
+      int scrollX = 20;
 
       GUI.enabled = true;
       GUILayout.Label(
@@ -37,7 +37,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
-      var isEnabled = !SMSettings.LockSettings;
+      bool isEnabled = !SMSettings.LockSettings;
       // Realism Mode
       GUI.enabled = isEnabled;
       _label = "Enable Realism Mode";
@@ -276,10 +276,10 @@ namespace ShipManifest.Windows.Tabs
 
       // create xfer Flow Rate slider;
       // Lets parse the string to allow decimal points.
-      var strFlowRate = SMSettings.FlowRate.ToString(CultureInfo.InvariantCulture);
-      var strMinFlowRate = SMSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture);
-      var strMaxFlowRate = SMSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
-      var strMaxFlowTime = SMSettings.MaxFlowTimeSec.ToString();
+      string strFlowRate = SMSettings.FlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMinFlowRate = SMSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMaxFlowRate = SMSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMaxFlowTime = SMSettings.MaxFlowTimeSec.ToString();
 
       float newRate;
 

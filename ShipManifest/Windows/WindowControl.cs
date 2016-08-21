@@ -22,7 +22,7 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var rect = new Rect(Position.width - 20, 4, 16, 16);
+      Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, new GUIContent("", "Close Window")))
       {
         ShowWindow = false;
@@ -52,7 +52,7 @@ namespace ShipManifest.Windows
 
       if (!SMSettings.EnableCls)
         GUI.enabled = false;
-      var hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))
       {
         try
@@ -68,7 +68,7 @@ namespace ShipManifest.Windows
         }
       }
       GUI.enabled = true;
-      var panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Solar Panels", panelsStyle, GUILayout.Height(20)))
       {
         try
@@ -83,7 +83,7 @@ namespace ShipManifest.Windows
             true);
         }
       }
-      var antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Antennas", antennaStyle, GUILayout.Height(20)))
       {
         try
@@ -97,7 +97,7 @@ namespace ShipManifest.Windows
             string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
         }
       }
-      var lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Lights", lightsStyle, GUILayout.Height(20)))
       {
         try

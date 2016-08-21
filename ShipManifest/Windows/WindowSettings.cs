@@ -24,7 +24,7 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var rect = new Rect(Position.width - 20, 4, 16, 16);
+      Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect,
         new GUIContent("",
           "Close Window.\r\nSettings will not be immediately saved,\r\n but will be remembered while in game.")))
@@ -88,33 +88,33 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
 
-      var realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Realism", realismStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Realism;
       }
       GUI.enabled = true;
-      var highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Highlight", highlightStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Highlight;
       }
-      var tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("ToolTip", tooltipStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.ToolTips;
       }
-      var soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Sound", soundStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Sounds;
       }
-      var configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Config", configStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Config;
       }
-      var modStyle = _selectedTab == Tab.Mods ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      GUIStyle modStyle = _selectedTab == Tab.Mods ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button("Mods", modStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Mods;

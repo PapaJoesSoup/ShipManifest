@@ -30,7 +30,7 @@ namespace ShipManifest.InternalObjects
     {
       if (SMSettings.ShowToolTips && (toolTip != null) && (toolTip.Trim().Length > 0))
       {
-        var size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(toolTip));
+        Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(toolTip));
         Position = new Rect(toolTipPos.x, toolTipPos.y, size.x, size.y);
         RepositionToolTip();
         GUI.Window(0, Position, EmptyWindow, toolTip, SMStyle.ToolTipStyle);
@@ -45,7 +45,7 @@ namespace ShipManifest.InternalObjects
       {
         toolTipActive = true;
         // Note at this time controlPosition is in Gui Point system and is local position.  convert to screenpoint.
-        var newControl = new Rect
+        Rect newControl = new Rect
         {
           position = GUIUtility.GUIToScreenPoint(control.position),
           width = control.width,
@@ -77,7 +77,7 @@ namespace ShipManifest.InternalObjects
     {
       // Only one of these values can be active at a time (onMouseOver), so this will trap it.
       // (Brute force, but functional)
-      var toolTip = "";
+      string toolTip = "";
       if (!string.IsNullOrEmpty(WindowTransfer.ToolTip)) toolTip = WindowTransfer.ToolTip;
       if (!string.IsNullOrEmpty(WindowRoster.ToolTip)) toolTip = WindowRoster.ToolTip;
       if (!string.IsNullOrEmpty(WindowDebugger.ToolTip)) toolTip = WindowDebugger.ToolTip;
