@@ -69,11 +69,14 @@ namespace ShipManifest.APIClients
       {
         if (list.Current != null)
         {
-          string[] fullName = list.Current.FullName.Split(',');
-          GUILayout.BeginHorizontal();
-          GUILayout.Label(fullName[0], GUILayout.Width(190));
-          GUILayout.Label(fullName[1]);
-          GUILayout.EndHorizontal();
+          if (!IsKspAssembly(list.Current.FullName))
+          {
+            string[] fullName = list.Current.FullName.Split(',');
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(fullName[0], GUILayout.Width(190));
+            GUILayout.Label(fullName[1]);
+            GUILayout.EndHorizontal();
+          }
         }
       }
     }
