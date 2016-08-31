@@ -69,11 +69,14 @@ namespace ShipManifest.APIClients
       {
         if (list.Current != null)
         {
-          string[] fullName = list.Current.FullName.Split(',');
-          GUILayout.BeginHorizontal();
-          GUILayout.Label(fullName[0], GUILayout.Width(190));
-          GUILayout.Label(fullName[1]);
-          GUILayout.EndHorizontal();
+          if (!IsKspAssembly(list.Current.FullName))
+          {
+            string[] fullName = list.Current.FullName.Split(',');
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(fullName[0], GUILayout.Width(190));
+            GUILayout.Label(fullName[1]);
+            GUILayout.EndHorizontal();
+          }
         }
       }
     }
@@ -97,26 +100,32 @@ namespace ShipManifest.APIClients
     {
       List<string> kspAssemblies = new List<string>
       {
-        "Assembly-UnityScript",
-        "Assembly-UnityScript-firstpass",
         "Assembly-CSharp",
         "Assembly-CSharp-firstpass",
+        "Assembly-UnityScript",
+        "Assembly-UnityScript-firstpass",
         "Boo.Lang",
+        "KSPAssets",
+        "KSPCore",
+        "KSPUtil",
         "MiscUtil",
         "Mono.Cecil",
-        "Mono.Cecil.Mdb",
-        "Mono.Cecil.Pdb",
         "Mono.Security",
         "mscorlib",
-        "System.Xml",
+        "SaveUpgradePipeline.Core",
+        "SaveUpgradePipeline.Scripts",
         "System",
         "System.Core",
+        "System.Xml",
         "System.Xml.Linq",
         "TDx.TDxInput",
         "TrackIRUnity",
-        "UnityEngine.UI",
         "UnityEngine",
-        "XmlDiffPatch"
+        "UnityEngine.Networking",
+        "UnityEngine.UI",
+        "Vectrosity",
+        "XmlDiffPatch",
+        "XmlDiffPatch.View"
       };
 
       try
