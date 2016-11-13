@@ -227,7 +227,6 @@ namespace ShipManifest.InternalObjects
         {
           string values = "SmAddon.ShowUI = " + SMAddon.ShowUi + "\r\n";
           values += "HighLogic.LoadedScene = " + HighLogic.LoadedScene + "\r\n";
-          //values += "!MapView.MapIsEnabled = " +MapView.MapIsEnabled.ToString() + "\r\n";
           values += "PauseMenu.isOpen = " + IsPauseMenuOpen() + "\r\n";
           values += "FlightResultsDialog.isDisplaying = " + IsFlightDialogDisplaying() + "\r\n";
           values += "FlightGlobals.fetch != null = " + (FlightGlobals.fetch != null) + "\r\n";

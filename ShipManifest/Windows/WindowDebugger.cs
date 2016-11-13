@@ -20,6 +20,9 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+      // set input locks when mouseover window...
+      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
 

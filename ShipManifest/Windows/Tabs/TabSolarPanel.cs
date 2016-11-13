@@ -35,15 +35,15 @@ namespace ShipManifest.Windows.Tabs
           if (iPanels.Current == null) continue;
           bool isEnabled = true;
           string label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
-          if (iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN)
+          if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
             label = iPanels.Current.PanelStatus + " - (Broken) - " + iPanels.Current.Title;
           }
           bool open =
-            !(iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTED ||
-              iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.RETRACTING ||
-              iPanels.Current.PanelState == ModuleDeployableSolarPanel.panelStates.BROKEN);
+            !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
+              iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTING ||
+              iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN);
 
           step = "gui enable";
           GUI.enabled = isEnabled;
@@ -84,7 +84,7 @@ namespace ShipManifest.Windows.Tabs
       while (iPanels.MoveNext())
       {
         if (iPanels.Current == null) continue;
-        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).panelState != ModuleDeployableSolarPanel.panelStates.RETRACTED) continue;
+        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.RETRACTED) continue;
         ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Extend();
       }
     }
@@ -96,7 +96,7 @@ namespace ShipManifest.Windows.Tabs
       while (iPanels.MoveNext())
       {
         if (iPanels.Current == null) continue;
-        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).panelState != ModuleDeployableSolarPanel.panelStates.EXTENDED) continue;
+        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.EXTENDED) continue;
         ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Retract();
       }
     }

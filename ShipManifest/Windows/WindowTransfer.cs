@@ -63,6 +63,9 @@ namespace ShipManifest.Windows
     // This window assumes that a resource has been selected on the Ship manifest window.
     internal static void Display(int windowId)
     {
+      // set input locks when mouseover window...
+      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
       string displayAmounts = Utilities.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
       Title = "Transfer - " + SMAddon.SmVessel.Vessel.vesselName + displayAmounts;
 
@@ -87,6 +90,7 @@ namespace ShipManifest.Windows
         SMAddon.SmVessel.SelectedVesselsSource.Clear();
         SMAddon.SmVessel.SelectedVesselsTarget.Clear();
         ToolTip = "";
+        SMHighlighter.Update_Highlighter();
         return;
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -363,6 +367,7 @@ namespace ShipManifest.Windows
           if (GUILayout.Button(strDescription, style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
           {
             PartButtonToggled(pumpType, parts.Current);
+            SMHighlighter.Update_Highlighter();
           }
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
@@ -834,9 +839,9 @@ namespace ShipManifest.Windows
             //toolTip += "\r\n-SubjectID:   " + item.subjectID;
             toolTip += "\r\n-Results:    " + results;
             toolTip += "\r\n-Data Amt:   " + ((ScienceData)items.Current).dataAmount + " Mits";
-            toolTip += "\r\n-Xmit Value: " + ((ScienceData)items.Current).transmitValue;
+            toolTip += "\r\n-Xmit Value: " + ((ScienceData) items.Current).baseTransmitValue; // was transmitValue;
             toolTip += "\r\n-Lab Value:  " + ((ScienceData)items.Current).labValue;
-            toolTip += "\r\n-Lab Boost:  " + ((ScienceData)items.Current).labBoost;
+            toolTip += "\r\n-Lab Boost:  " + ((ScienceData)items.Current).transmitBonus;  // Was labBoost
 
             GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205),
               GUILayout.Height(20));

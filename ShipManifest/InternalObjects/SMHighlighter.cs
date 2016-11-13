@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
-using HighlightingSystem;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -136,44 +135,39 @@ namespace ShipManifest.InternalObjects
 
     internal static void EdgeHighight(Part part, bool enable, string color = null)
     {
-      if (SMSettings.EnableEdgeHighlighting)
+      if (!SMSettings.EnableEdgeHighlighting) return;
+      if (enable)
       {
-        Highlighter highlighter = part.highlighter;
-        if (enable)
-        {
-          if (string.IsNullOrEmpty(color))
-            color = SMSettings.MouseOverColor;
-          highlighter.SeeThroughOn();
-          highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
-        }
-        else
-        {
-          highlighter.SeeThroughOff();
-          highlighter.ConstantOffImmediate();
-        }
+        if (string.IsNullOrEmpty(color))
+          color = SMSettings.MouseOverColor;
+        part.highlighter.SeeThroughOn();
+        part.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
+      }
+      else
+      {
+        part.highlighter.SeeThroughOff();
+        part.highlighter.ConstantOffImmediate();
       }
     }
 
     internal static void EdgeHighight(List<Part> parts, bool enable, string color = null)
     {
-      if (SMSettings.EnableEdgeHighlighting)
+      if (!SMSettings.EnableEdgeHighlighting) return;
+      List<Part>.Enumerator list = parts.GetEnumerator();
+      while (list.MoveNext())
       {
-        List<Part>.Enumerator list = parts.GetEnumerator();
-        while (list.MoveNext())
+        if (list.Current == null) continue;
+        if (enable)
         {
-          if (list.Current == null) continue;
-          if (enable)
-          {
-            if (string.IsNullOrEmpty(color))
-              color = SMSettings.MouseOverColor;
-            list.Current.highlighter.SeeThroughOn();
-            list.Current.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
-          }
-          else
-          {
-            list.Current.highlighter.SeeThroughOff();
-            list.Current.highlighter.ConstantOffImmediate();
-          }
+          if (string.IsNullOrEmpty(color))
+            color = SMSettings.MouseOverColor;
+          list.Current.highlighter.SeeThroughOn();
+          list.Current.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
+        }
+        else
+        {
+          list.Current.highlighter.SeeThroughOff();
+          list.Current.highlighter.ConstantOffImmediate();
         }
       }
     }

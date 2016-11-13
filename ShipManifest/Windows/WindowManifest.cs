@@ -38,6 +38,10 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+      // set input locks when mouseover window...
+      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
+
       Title = string.Format("SM {0} - {1}", SMSettings.CurVersion, SMAddon.SmVessel.Vessel.vesselName);
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -53,6 +57,7 @@ namespace ShipManifest.Windows
       {
         SMAddon.OnSmButtonClicked();
         ToolTip = "";
+        SMHighlighter.Update_Highlighter();
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
@@ -175,6 +180,7 @@ namespace ShipManifest.Windows
           if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
           {
             ResourceButtonToggled(keys.Current);
+            SMHighlighter.Update_Highlighter();
           }
 
           // Dump Button

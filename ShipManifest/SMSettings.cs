@@ -35,6 +35,7 @@ namespace ShipManifest
     internal static bool EnableCrew = true;
     internal static bool EnableStockCrewXfer = true;
     internal static bool OverrideStockCrewXfer = true;
+    internal static bool EnableClsAllowTransfer = true;
     internal static bool EnableCls = true;
     internal static bool EnableScience = true;
     internal static bool EnableResources = true;
@@ -153,6 +154,7 @@ namespace ShipManifest
     internal static bool PrevEnablePfCrews;
     internal static bool PrevEnableStockCrewXfer = true;
     internal static bool PrevOverrideStockCrewXfer = true;
+    internal static bool PrevEnableClsAllowTransfer = true;
     internal static bool PrevEnablePfResources = true;
     internal static bool PrevEnableCls = true;
     internal static bool PrevEnableBlizzyToolbar;
@@ -253,6 +255,9 @@ namespace ShipManifest
         OverrideStockCrewXfer = settingsNode.HasValue("OverrideStockCrewTransfer")
           ? bool.Parse(settingsNode.GetValue("OverrideStockCrewTransfer"))
           : OverrideStockCrewXfer;
+        EnableClsAllowTransfer = settingsNode.HasValue("EnableClsAllowTransfer")
+          ? bool.Parse(settingsNode.GetValue("EnableClsAllowTransfer"))
+          : EnableClsAllowTransfer;
         FlowRate = settingsNode.HasValue("FlowRate") ? double.Parse(settingsNode.GetValue("FlowRate")) : FlowRate;
         FlowCost = settingsNode.HasValue("FlowCost") ? double.Parse(settingsNode.GetValue("FlowCost")) : FlowCost;
         MinFlowRate = settingsNode.HasValue("MinFlowRate")
@@ -316,9 +321,9 @@ namespace ShipManifest
         TabConfig.ShowToolTips = settingsNode.HasValue("ConfigToolTips")
           ? bool.Parse(settingsNode.GetValue("ConfigToolTips"))
           : TabConfig.ShowToolTips;
-        TabInstalledMods.ShowToolTips = settingsNode.HasValue("InstalledModsToolTips")
-          ? bool.Parse(settingsNode.GetValue("InstalledModsToolTips"))
-          : TabInstalledMods.ShowToolTips;
+        //TabInstalledMods.ShowToolTips = settingsNode.HasValue("InstalledModsToolTips")
+        //  ? Boolean.Parse(settingsNode.GetValue("InstalledModsToolTips"))
+        //  : TabInstalledMods.ShowToolTips;
         WindowRoster.ShowToolTips = settingsNode.HasValue("RosterToolTips")
           ? bool.Parse(settingsNode.GetValue("RosterToolTips"))
           : WindowRoster.ShowToolTips;
@@ -467,6 +472,7 @@ namespace ShipManifest
         WriteValue(settingsNode, "EnablePFResources", EnablePfResources);
         WriteValue(settingsNode, "EnableCLS", EnableCls);
         WriteValue(settingsNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
+        WriteValue(settingsNode, "EnableClsAllowTransfer", EnableClsAllowTransfer);
         WriteValue(settingsNode, "FlowRate", FlowRate);
         WriteValue(settingsNode, "FlowCost", FlowCost);
         WriteValue(settingsNode, "MinFlowRate", MinFlowRate);
@@ -492,7 +498,7 @@ namespace ShipManifest
         WriteValue(settingsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
         WriteValue(settingsNode, "SoundsToolTips", TabSounds.ShowToolTips);
         WriteValue(settingsNode, "ConfigToolTips", TabConfig.ShowToolTips);
-        WriteValue(settingsNode, "InstalledModsToolTips", TabInstalledMods.ShowToolTips);
+        //WriteValue(settingsNode, "InstalledModsToolTips", TabInstalledMods.ShowToolTips);
         WriteValue(settingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
         WriteValue(settingsNode, "ControlToolTips", WindowControl.ShowToolTips);
         WriteValue(settingsNode, "HatchToolTips", TabHatch.ShowToolTips);
@@ -550,23 +556,36 @@ namespace ShipManifest
           if (parts.Current == null) continue;
           Part part = parts.Current;
           part.crewTransferAvailable = EnableStockCrewXfer;
-          TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
-          if (EnableStockCrewXfer)
-          {
-            if (Tds != null) continue;
-            part.AddModule("TransferDialogSpawner");
-            MonoUtilities.RefreshContextWindows(part);
-          }
-          else
-          {
-            if (Tds != null) part.RemoveModule(Tds);
-          }
+          //TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
+          //if (EnableStockCrewXfer)
+          //{
+          //  if (Tds != null) continue;
+          //  part.AddModule("TransferDialogSpawner");
+          //  MonoUtilities.RefreshContextWindows(part);
+          //}
+          //else
+          //{
+          //  if (Tds != null) part.RemoveModule(Tds);
+          //}
         }
       }
       catch (Exception)
       {
         // Do nothing.   We don't care if it fails when outside of the Flight Scene.
       }
+    }
+
+    internal static void SetClsOverride()
+    {
+      if (!SMSettings.EnableCls || !HighLogic.LoadedSceneIsFlight || !SMSettings.EnableClsAllowTransfer) return;
+      SMAddon.OrigClsAllowCrewXferSetting = SMAddon.ClsAddon.AllowUnrestrictedTransfers;
+      SMAddon.ClsAddon.AllowUnrestrictedTransfers = true;
+    }
+
+    internal static void UpdateClsOverride()
+    {
+      if (!SMSettings.EnableCls || !HighLogic.LoadedSceneIsFlight) return;
+      SMAddon.ClsAddon.AllowUnrestrictedTransfers = SMSettings.EnableClsAllowTransfer;
     }
 
     private static Rect GetRectangle(ConfigNode windowsNode, string rectName, Rect defaultvalue)
@@ -655,6 +674,7 @@ namespace ShipManifest
       PrevEnableCls = EnableCls;
       PrevEnableStockCrewXfer = EnableStockCrewXfer;
       PrevOverrideStockCrewXfer = OverrideStockCrewXfer;
+      PrevEnableClsAllowTransfer = EnableClsAllowTransfer;
       PrevEnableKerbalRename = EnableKerbalRename;
       PrevEnableChangeProfession = EnableChangeProfession;
       PrevUseUnityStyle = UseUnityStyle;
@@ -678,7 +698,7 @@ namespace ShipManifest
       PrevSoundsToolTips = TabSounds.ShowToolTips;
       PrevHighlightToolTips = TabHighlight.ShowToolTips;
       PrevConfigToolTips = TabConfig.ShowToolTips;
-      PrevModsToolTips = TabInstalledMods.ShowToolTips;
+      //PrevModsToolTips = TabInstalledMods.ShowToolTips;
 
       //debugger Settings
       PrevErrorLogLength = ErrorLogLength;
@@ -715,6 +735,7 @@ namespace ShipManifest
       EnableCls = PrevEnableCls;
       EnableStockCrewXfer = PrevEnableStockCrewXfer;
       OverrideStockCrewXfer = PrevOverrideStockCrewXfer;
+      EnableClsAllowTransfer = PrevEnableClsAllowTransfer;
       EnableKerbalRename = PrevEnableKerbalRename;
       EnableChangeProfession = PrevEnableChangeProfession;
       UseUnityStyle = PrevUseUnityStyle;
@@ -738,7 +759,7 @@ namespace ShipManifest
       TabToolTips.ShowToolTips = PrevToolTipsToolTips;
       TabSounds.ShowToolTips = PrevSoundsToolTips;
       TabConfig.ShowToolTips = PrevConfigToolTips;
-      TabInstalledMods.ShowToolTips = PrevModsToolTips;
+      //TabInstalledMods.ShowToolTips = PrevModsToolTips;
 
       //debugger Settings
       PrevErrorLogLength = ErrorLogLength;

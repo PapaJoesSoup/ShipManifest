@@ -170,19 +170,19 @@ namespace ShipManifest.Windows.Tabs
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      // SW - Installed Mods Tab
-      GUILayout.BeginHorizontal();
-      _label = "Installed Mods Tool Tips";
-      _toolTip = "Turns tooltips On or Off for the Settings Window's Installed Mods Tab only.";
-      _toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      _toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabInstalledMods.ShowToolTips = GUILayout.Toggle(TabInstalledMods.ShowToolTips, _guiLabel, GUILayout.Width(300));
-      GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      //// SW - Installed Mods Tab
+      //GUILayout.BeginHorizontal();
+      //_label = "Installed Mods Tool Tips";
+      //_toolTip = "Turns tooltips On or Off for the Settings Window's Installed Mods Tab only.";
+      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
+      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
+      //_guiLabel = new GUIContent(_label, _toolTip);
+      //GUILayout.Space(40);
+      //TabInstalledMods.ShowToolTips = GUILayout.Toggle(TabInstalledMods.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      //GUILayout.EndHorizontal();
+      //_rect = GUILayoutUtility.GetLastRect();
+      //if (Event.current.type == EventType.Repaint && _canShowToolTips)
+      //  ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUI.enabled = SMSettings.ShowToolTips;
 

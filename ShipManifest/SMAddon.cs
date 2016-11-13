@@ -6,6 +6,7 @@ using ConnectedLivingSpace;
 using KSP.UI.Screens;
 using KSP.UI.Screens.Flight;
 using KSP.UI.Screens.Flight.Dialogs;
+using KSPAchievements;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Process;
@@ -14,7 +15,7 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-  [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+  [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
   // ReSharper disable once InconsistentNaming
   public class SMAddon : MonoBehaviour
   {
@@ -30,9 +31,11 @@ namespace ShipManifest
     // current vessel's controller instance
     internal static SMVessel SmVessel;
     internal static ICLSAddon ClsAddon;
+    internal static bool OrigClsAllowCrewXferSetting;
 
     internal static string TextureFolder = "ShipManifest/Textures/";
     internal static string SaveMessage = string.Empty;
+    internal static PartItemTransfer stockTransferItem;
 
     [KSPField(isPersistant = true)] internal static double Elapsed;
 
@@ -83,12 +86,6 @@ namespace ShipManifest
     {
       get { return SmVessel.TransferCrewObj; }
     }
-
-    public List<TransferPump> PumpsInProgress
-    {
-      get { return (from pump in SmVessel.TransferPumps select pump).ToList(); }
-    }
-
     #endregion
 
     #region Event handlers
@@ -160,9 +157,14 @@ namespace ShipManifest
           //RunSave();
         }
 
-        if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         // Instantiate Event handlers
+        GameEvents.onGameSceneSwitchRequested.Add(OnGameSceneSwitchRequested);
+
+        // If we are not in flight, the rest does not get done!
+        if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
+
         GameEvents.onCrewTransferPartListCreated.Add(OnCrewTransferPartListCreated);
+        GameEvents.onItemTransferStarted.Add(OnItemTransferStarted);
         GameEvents.onCrewTransferSelected.Add(OnCrewTransferSelected);
         GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
         GameEvents.onVesselChange.Add(OnVesselChange);
@@ -174,6 +176,7 @@ namespace ShipManifest
 
         // get the current Vessel data
         SmVessel = SMVessel.GetInstance(FlightGlobals.ActiveVessel);
+        SmVessel.RefreshLists();        
 
         // Is CLS installed and enabled?
         if (GetClsAddon())
@@ -189,6 +192,8 @@ namespace ShipManifest
           SMSettings.SaveSettings();
         }
 
+        SMSettings.SetClsOverride();
+
         // Support for DeepFreeze
         //Trigger Update to check and initialize the DeepFreeze Wrapper API
         SceneChangeInitDfWrapper = true;
@@ -202,23 +207,20 @@ namespace ShipManifest
       }
     }
 
+
     internal void OnDestroy()
     {
       //Debug.Log("[ShipManifest]:  SmAddon.OnDestroy");
       try
       {
-        if (HighLogic.LoadedSceneIsFlight)
-          WindowControl.ShowWindow =
-            WindowManifest.ShowWindow =
-              WindowTransfer.ShowWindow = WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
-
         if (SMSettings.Loaded)
           SMSettings.SaveSettings();
 
+        GameEvents.onGameSceneSwitchRequested.Remove(OnGameSceneSwitchRequested);
+
         GameEvents.onCrewTransferPartListCreated.Remove(OnCrewTransferPartListCreated);
         GameEvents.onCrewTransferSelected.Remove(OnCrewTransferSelected);
+        GameEvents.onItemTransferStarted.Remove(OnItemTransferStarted);
         GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
         GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
         GameEvents.onVesselChange.Remove(OnVesselChange);
@@ -307,7 +309,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.FLIGHT) return;
         if (FlightGlobals.fetch == null || FlightGlobals.ActiveVessel == null) return;
 
-        if (SmVessel.SelectedResources.Count > 0) SMHighlighter.Update_Highlighter();
+        //if (SmVessel.SelectedResources.Count > 0) SMHighlighter.Update_Highlighter();
 
         // Realism Mode Resource transfer operation (real time)
         // PumpActive is flagged in the Resource Controller
@@ -366,6 +368,13 @@ namespace ShipManifest
         SceneChangeInitDfWrapper = true;
     }
 
+    private void OnGameSceneSwitchRequested(GameEvents.FromToAction<GameScenes, GameScenes> sceneData)
+    {
+      WindowControl.ShowWindow =
+        WindowManifest.ShowWindow =
+          WindowTransfer.ShowWindow = WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
+    }
+
     // SM UI toggle handlers
     private void OnShowUi()
     {
@@ -380,7 +389,7 @@ namespace ShipManifest
     }
 
     // Crew Event handlers
-    internal void OnCrewTransferPartListCreated(GameEvents.FromToAction<List<Part>, List<Part>> eventData)
+    internal void OnCrewTransferPartListCreated(GameEvents.HostedFromToAction<Part,List<Part>> eventData)
     {
       // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM  Crew Transfers are active
       if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
@@ -389,12 +398,7 @@ namespace ShipManifest
       if (!SMSettings.OverrideStockCrewXfer) return;
 
       // How can I tell if the parts are in the same space?... I need a starting point!  What part initiated the event?
-      Part sourcePart = null;
-
-      // Get the Dialog and find the source part.
-      CrewHatchDialog dialog = Resources.FindObjectsOfTypeAll<CrewHatchDialog>().FirstOrDefault();
-      if (dialog?.Part == null) return;
-      sourcePart = dialog.Part;
+      Part sourcePart = eventData.host;
 
       //Let's manhandle the lists
       List<Part> fullList = new List<Part>();
@@ -417,13 +421,26 @@ namespace ShipManifest
         };
       }
       if (fullList.Count <= 0) return;
-      CrewTransfer.fullMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
       List<Part>.Enumerator removeList = fullList.GetEnumerator();
       while (removeList.MoveNext())
       {
         eventData.from.Remove(removeList.Current);
       }
       eventData.to.AddRange(fullList);
+    }
+
+    internal void OnItemTransferStarted(PartItemTransfer xferPartItem)
+    {
+      if (SMSettings.EnableCls && SMSettings.RealismMode && xferPartItem.type == "Crew")
+        xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
+      stockTransferItem = xferPartItem;
+    }
+
+    internal void OnAttemptTransfer(ProtoCrewMember pkerbal, Part part, CrewHatchController controller)
+    {
+      //if (!SMSettings.EnableCls || !SMSettings.RealismMode) return;
+      //if (SMConditions.IsClsInSameSpace(stockTransferItem.srcPart, part)) return;
+      //stockTransferItem.semiValidMessage = "Parts are not in the same internal Space.  You must EVA.";
     }
 
     /// <summary>
@@ -511,11 +528,9 @@ namespace ShipManifest
     {
       try
       {
-        if (data.Equals(FlightGlobals.ActiveVessel) && data != SmVessel.Vessel)
-        {
-          SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
-          UpdateSMcontroller(data);
-        }
+        if (!data.Equals(FlightGlobals.ActiveVessel) || data == SmVessel.Vessel) return;
+        SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
+        UpdateSMcontroller(data);
       }
       catch (Exception ex)
       {

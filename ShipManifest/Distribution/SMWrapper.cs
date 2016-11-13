@@ -18,7 +18,7 @@ namespace ShipManifestWrapper
   {
     protected static System.Type SMType;
     protected static System.Type TransferCrewType;
-    protected static Object actualSM = null;
+    protected static object actualSM = null;
 
     /// <summary>
     /// This is the ShipManifest object
@@ -32,26 +32,26 @@ namespace ShipManifestWrapper
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static Boolean AssemblyExists { get { return (SMType != null && TransferCrewType != null); } }
+    public static bool AssemblyExists { get { return (SMType != null && TransferCrewType != null); } }
 
     /// <summary>
     /// Whether we managed to hook the running Instance from the assembly.
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static Boolean InstanceExists { get { return (ShipManifestAPI != null); } }
+    public static bool InstanceExists { get { return (ShipManifestAPI != null); } }
 
     /// <summary>
     /// Whether we managed to wrap all the methods/functions from the instance.
     ///
     /// SET AFTER INIT
     /// </summary>
-    private static Boolean _SMWrapped;
+    private static bool _SMWrapped;
 
     /// <summary>
     /// Whether the object has been wrapped and the APIReady flag is set in the real ShipManifest
     /// </summary>
-    public static Boolean SMAPIReady { get { return _SMWrapped; } }
+    public static bool SMAPIReady { get { return _SMWrapped; } }
 
     /// <summary>
     /// This method will set up the ShipManifest object and wrap all the methods/functions
@@ -59,7 +59,7 @@ namespace ShipManifestWrapper
     /// <returns>
     /// Bool indicating success of call
     /// </returns>
-    public static Boolean InitSMWrapper()
+    public static bool InitSMWrapper()
     {
       try
       {
@@ -130,7 +130,7 @@ namespace ShipManifestWrapper
     /// </summary>
     public class SMAPI
     {
-      internal SMAPI(Object a)
+      internal SMAPI(object a)
       {
         try
         {
@@ -204,8 +204,8 @@ namespace ShipManifestWrapper
         }
       }
 
-      private Object actualSMAPI;
-      private Object actualCrewTransfer;
+      private object actualSMAPI;
+      private object actualCrewTransfer;
 
       /// <summary>
       /// True if a crewXfer on the Active Vessel is currently active
@@ -259,7 +259,7 @@ namespace ShipManifestWrapper
         {
           if (actualCrewTransfer == null)
             actualCrewTransfer = getCrewTransferProcess;
-          setCrewXferActiveMethod.Invoke(actualCrewTransfer, new System.Object[] { value });
+          setCrewXferActiveMethod.Invoke(actualCrewTransfer, new object[] { value });
         }
       }
 
@@ -513,7 +513,7 @@ namespace ShipManifestWrapper
     /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
     [System.Diagnostics.Conditional("DEBUG")]
-    internal static void LogFormatted_DebugOnly(String Message, params Object[] strParams)
+    internal static void LogFormatted_DebugOnly(string Message, params object[] strParams)
     {
       LogFormatted(Message, strParams);
     }
@@ -523,10 +523,10 @@ namespace ShipManifestWrapper
     /// </summary>
     /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
-    internal static void LogFormatted(String Message, params Object[] strParams)
+    internal static void LogFormatted(string Message, params object[] strParams)
     {
-      Message = String.Format(Message, strParams);
-      String strMessageLine = String.Format("{0},{2}-{3},{1}",
+      Message = string.Format(Message, strParams);
+      string strMessageLine = string.Format("{0},{2}-{3},{1}",
           DateTime.Now, Message, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
           System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
       UnityEngine.Debug.Log(strMessageLine);

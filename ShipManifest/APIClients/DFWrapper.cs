@@ -19,7 +19,7 @@ namespace ShipManifest.APIClients
     internal static System.Type KerbalInfoType;
     internal static System.Type DeepFreezerType;
     internal static System.Type FrznCrewMbrType;
-    internal static Object actualDF = null;
+    internal static object actualDF = null;
 
     /// <summary>
     /// This is the DeepFreeze object
@@ -33,26 +33,26 @@ namespace ShipManifest.APIClients
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static Boolean AssemblyExists { get { return (DFType != null); } }
+    public static bool AssemblyExists { get { return (DFType != null); } }
 
     /// <summary>
     /// Whether we managed to hook the running Instance from the assembly.
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static Boolean InstanceExists { get { return (DeepFreezeAPI != null); } }
+    public static bool InstanceExists { get { return (DeepFreezeAPI != null); } }
 
     /// <summary>
     /// Whether we managed to wrap all the methods/functions from the instance.
     ///
     /// SET AFTER INIT
     /// </summary>
-    private static Boolean _DFWrapped;
+    private static bool _DFWrapped;
 
     /// <summary>
     /// Whether the object has been wrapped and the APIReady flag is set in the real DeepFreeze
     /// </summary>
-    public static Boolean APIReady { get { return _DFWrapped && DeepFreezeAPI.APIReady; } }
+    public static bool APIReady { get { return _DFWrapped && DeepFreezeAPI.APIReady; } }
 
     /// <summary>
     /// This method will set up the DeepFreeze object and wrap all the methods/functions
@@ -60,7 +60,7 @@ namespace ShipManifest.APIClients
     /// <returns>
     /// Bool indicating success of call
     /// </returns>
-    public static Boolean InitDFWrapper()
+    public static bool InitDFWrapper()
     {
       try
       {
@@ -157,7 +157,7 @@ namespace ShipManifest.APIClients
     /// </summary>
     public class DFAPI
     {
-      internal DFAPI(Object a)
+      internal DFAPI(object a)
       {
         try
         {
@@ -184,7 +184,7 @@ namespace ShipManifest.APIClients
         }
       }
 
-      private Object actualDFAPI;
+      private object actualDFAPI;
 
       private FieldInfo APIReadyField;
       /// <summary>
@@ -200,7 +200,7 @@ namespace ShipManifest.APIClients
           if (APIReadyField == null)
             return false;
 
-          return (Boolean)APIReadyField.GetValue(null);
+          return (bool)APIReadyField.GetValue(null);
         }
       }
 
@@ -244,7 +244,7 @@ namespace ShipManifest.APIClients
       /// <returns>
       /// Dictionary <string, KerbalInfo> of Frozen Kerbals
       /// </returns>
-      private Dictionary<string, KerbalInfo> ExtractFrozenKerbalDict(Object actualFrozenKerbals)
+      private Dictionary<string, KerbalInfo> ExtractFrozenKerbalDict(object actualFrozenKerbals)
       {
         Dictionary<string, KerbalInfo> DictToReturn = new Dictionary<string, KerbalInfo>();
         try
@@ -279,7 +279,7 @@ namespace ShipManifest.APIClients
     /// </summary>
     public class DeepFreezer
     {
-      internal DeepFreezer(Object a)
+      internal DeepFreezer(object a)
       {
         actualDeepFreezer = a;
         //Fields available from Freezer part
@@ -316,7 +316,7 @@ namespace ShipManifest.APIClients
         //LogFormatted_DebugOnly("Success: " + (beginThawKerbalMethod != null).ToString());
       }
 
-      private Object actualDeepFreezer;
+      private object actualDeepFreezer;
 
       #region DeepFreezerFieldMethods
 
@@ -440,7 +440,7 @@ namespace ShipManifest.APIClients
         get { return (FrzrTmpStatus)FrzrTmpMethod.Invoke(actualDeepFreezer, null); }
       }
 
-      private Object actualStoredCrewList;
+      private object actualStoredCrewList;
       private MethodInfo StoredCrewListMethod;
 
       /// <summary>
@@ -456,7 +456,7 @@ namespace ShipManifest.APIClients
       /// </summary>
       /// <param name="actualStoredCrewList"></param>
       /// <returns></returns>
-      private FrznCrewList ExtractStoredCrewList(Object actualStoredCrewList)
+      private FrznCrewList ExtractStoredCrewList(object actualStoredCrewList)
       {
         FrznCrewList ListToReturn = new FrznCrewList();
         try
@@ -494,7 +494,7 @@ namespace ShipManifest.APIClients
       {
         try
         {
-          beginFreezeKerbalMethod.Invoke(actualDeepFreezer, new System.Object[] { CrewMember });
+          beginFreezeKerbalMethod.Invoke(actualDeepFreezer, new object[] { CrewMember });
           return true;
         }
         catch (Exception ex)
@@ -515,7 +515,7 @@ namespace ShipManifest.APIClients
       {
         try
         {
-          beginThawKerbalMethod.Invoke(actualDeepFreezer, new System.Object[] { frozenkerbal });
+          beginThawKerbalMethod.Invoke(actualDeepFreezer, new object[] { frozenkerbal });
           return true;
         }
         catch (Exception ex)
@@ -540,7 +540,7 @@ namespace ShipManifest.APIClients
     /// </summary>
     public class FrznCrewMbr
     {
-      internal FrznCrewMbr(Object a)
+      internal FrznCrewMbr(object a)
       {
         actualFrznCrewMbr = a;
         CrewNameMethod = FrznCrewMbrType.GetMethod("get_CrewName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
@@ -553,7 +553,7 @@ namespace ShipManifest.APIClients
         VesselName = getVesselName;
       }
 
-      private Object actualFrznCrewMbr;
+      private object actualFrznCrewMbr;
 
 
       /// <summary>
@@ -616,7 +616,7 @@ namespace ShipManifest.APIClients
     /// </summary>
     public class KerbalInfo
     {
-      internal KerbalInfo(Object a)
+      internal KerbalInfo(object a)
       {
         actualFrozenKerbalInfo = a;
         lastUpdateField = KerbalInfoType.GetField("lastUpdate");
@@ -630,7 +630,7 @@ namespace ShipManifest.APIClients
         experienceTraitNameField = KerbalInfoType.GetField("experienceTraitName");
       }
 
-      private Object actualFrozenKerbalInfo;
+      private object actualFrozenKerbalInfo;
 
       private FieldInfo lastUpdateField;
 
@@ -731,7 +731,7 @@ namespace ShipManifest.APIClients
     /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
     [System.Diagnostics.Conditional("DEBUG")]
-    internal static void LogFormatted_DebugOnly(String Message, params Object[] strParams)
+    internal static void LogFormatted_DebugOnly(string Message, params object[] strParams)
     {
       LogFormatted(Message, strParams);
     }
@@ -741,10 +741,10 @@ namespace ShipManifest.APIClients
     /// </summary>
     /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
-    internal static void LogFormatted(String Message, params Object[] strParams)
+    internal static void LogFormatted(string Message, params object[] strParams)
     {
-      Message = String.Format(Message, strParams);
-      String strMessageLine = String.Format("{0},{2}-{3},{1}",
+      Message = string.Format(Message, strParams);
+      string strMessageLine = string.Format("{0},{2}-{3},{1}",
           DateTime.Now, Message, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
           System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
       UnityEngine.Debug.Log(strMessageLine);

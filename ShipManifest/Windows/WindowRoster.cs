@@ -55,7 +55,7 @@ namespace ShipManifest.Windows
         _selectedKerbal = value;
         if (_selectedKerbal == null)
         {
-          SMAddon.SaveMessage = String.Empty;
+          SMAddon.SaveMessage = string.Empty;
         }
       }
     }
@@ -65,6 +65,9 @@ namespace ShipManifest.Windows
     #region Gui Layout
     internal static void Display(int windowId)
     {
+      // set input locks when mouseover window...
+      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -115,7 +118,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        Utilities.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           Utilities.LogType.Error, true);
       }
     }
@@ -385,7 +388,7 @@ namespace ShipManifest.Windows
         GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Trait + ")", SMStyle.LabelStyleBold,
           GUILayout.MaxWidth(300));
 
-      if (!String.IsNullOrEmpty(SMAddon.SaveMessage))
+      if (!string.IsNullOrEmpty(SMAddon.SaveMessage))
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
@@ -426,7 +429,7 @@ namespace ShipManifest.Windows
         if (SelectedKerbal != null)
         {
           SMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
-          if (String.IsNullOrEmpty(SMAddon.SaveMessage))
+          if (string.IsNullOrEmpty(SMAddon.SaveMessage))
             SelectedKerbal = null;
         }
       }
@@ -448,7 +451,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format("Error in GetRosterList().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        Utilities.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
       }
     }
 
@@ -573,8 +576,8 @@ namespace ShipManifest.Windows
       while (kerbals.MoveNext())
       {
         if (kerbals.Current == null) continue;
-        if (!kerbals.Current.name.Contains(Char.ConvertFromUtf32(1))) continue;
-        kerbals.Current.name = kerbals.Current.name.Replace(Char.ConvertFromUtf32(1), "");
+        if (!kerbals.Current.name.Contains(char.ConvertFromUtf32(1))) continue;
+        kerbals.Current.KerbalRef.crewMemberName = kerbals.Current.name.Replace(char.ConvertFromUtf32(1), "");
       }
     }
 

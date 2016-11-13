@@ -16,14 +16,14 @@
 
     internal Part SPart { get; set; }
 
-    internal ModuleDeployableSolarPanel.panelStates PanelState
+    internal ModuleDeployableSolarPanel.DeployState PanelState
     {
-      get { return Module.panelState; }
+      get { return Module.deployState; }
     }
 
     internal string PanelStatus
     {
-      get { return Module.stateString; }
+      get { return Module.deployState.ToString(); }
     }
 
     internal bool Retractable
@@ -36,8 +36,8 @@
       get
       {
         if (SMSettings.RealismMode && !Retractable &&
-            (PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDED ||
-             PanelState == ModuleDeployableSolarPanel.panelStates.EXTENDING))
+            (PanelState == ModuleDeployablePart.DeployState.EXTENDED ||
+             PanelState == ModuleDeployablePart.DeployState.EXTENDING))
           return false;
         return true;
       }

@@ -78,23 +78,6 @@ namespace ShipManifest.Windows.Tabs
         }
       }
 
-      // Enable stock Crew Xfers
-      GUI.enabled = isEnabled;
-      GUILayout.BeginHorizontal();
-      _label = "Enable Stock Crew Xfers";
-      _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
-      _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will be Allowed.";
-      _toolTip += "\r\nWhen OFF (requires Realism Mode On), Stock Crew transfers are disabled.";
-      _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
-        GUILayout.Width(300));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-
-      GUILayout.EndHorizontal();
-
       // Set Gui.enabled for child settings to resources...
       GUI.enabled = SMSettings.EnableCrew && isEnabled;
 
@@ -112,8 +95,25 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
+      // Enable stock Crew Xfers
+      GUI.enabled = SMSettings.EnableCrew && isEnabled;
+      GUILayout.BeginHorizontal();
+      _label = "Enable Stock Crew Xfers";
+      _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
+      _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will be Allowed.";
+      _toolTip += "\r\nWhen OFF (requires Realism Mode On), Stock Crew transfers are disabled.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUILayout.Space(20);
+      SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
+        GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.EndHorizontal();
+
       // Enable stock Crew Xfer Override
-      GUI.enabled = isEnabled;
+      GUI.enabled = SMSettings.EnableCrew && isEnabled;
       GUILayout.BeginHorizontal();
       _label = "Override Stock Crew Xfers";
       _toolTip = "Turns on/off Overriding the stock Crew Transfer mechanism with the SM style.";
@@ -159,6 +159,26 @@ namespace ShipManifest.Windows.Tabs
           SMAddon.SmVessel.SelectedResources.Add(SMConditions.ResourceType.Crew.ToString());
         }
       }
+
+      // Enable stock Crew Xfer Override
+      if (!SMSettings.EnableCrew || !SMSettings.ClsInstalled)
+        GUI.enabled = false;
+      else
+        GUI.enabled = isEnabled;
+      GUILayout.BeginHorizontal();
+      _label = "Enable CLS' Allow Unrestricted Crew Xfers switch";
+      _toolTip = "Turns on/off Enabling the CLS Switch allowing unrestricted crew transfers.";
+      _toolTip += "\r\nWhen ON (requires Realism Mode On), SM Manages Stock and CLS aware Crew Transfers.";
+      _toolTip += "\r\nWhen Off (or Realism is off), the setting in CLS is not touched.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUILayout.Space(20);
+      SMSettings.EnableClsAllowTransfer = GUILayout.Toggle(SMSettings.EnableClsAllowTransfer, _guiLabel,
+        GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.EndHorizontal();
 
       // EnableScience Mode
       GUILayout.BeginHorizontal();

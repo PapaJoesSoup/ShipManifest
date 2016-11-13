@@ -97,7 +97,7 @@ namespace ShipManifest.InternalObjects
       if (!string.IsNullOrEmpty(TabSounds.ToolTip)) toolTip = TabSounds.ToolTip;
       if (!string.IsNullOrEmpty(TabToolTips.ToolTip)) toolTip = TabToolTips.ToolTip;
       if (!string.IsNullOrEmpty(TabConfig.ToolTip)) toolTip = TabConfig.ToolTip;
-      if (!string.IsNullOrEmpty(TabInstalledMods.ToolTip)) toolTip = TabInstalledMods.ToolTip;
+      //if (!string.IsNullOrEmpty(TabInstalledMods.ToolTip)) toolTip = TabInstalledMods.ToolTip;
 
       // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
       // Tooltip will not display if changes are made during the current OnGUI.  

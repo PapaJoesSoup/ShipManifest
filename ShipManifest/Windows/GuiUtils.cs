@@ -71,5 +71,46 @@ namespace ShipManifest.Windows
       }
       return thisColor;
     }
+
+    //this block is derived from Kerbal Engineer source. Thanks cybutek!
+    internal static void PreventEditorClickthrough(bool visible, Rect position, ref bool lockedInputs)
+    {
+      bool mouseOverWindow = MouseIsOverWindow(visible, position);
+      if (!lockedInputs && mouseOverWindow)
+      {
+        EditorLogic.fetch.Lock(true, true, true, "SM_Window");
+        lockedInputs = true;
+      }
+      if (!lockedInputs || mouseOverWindow) return;
+      EditorLogic.fetch.Unlock("SM_Window");
+      lockedInputs = false;
+    }
+
+    internal static bool PreventClickthrough(bool visible, Rect position, bool lockedInputs)
+    {
+      // Still in work.  Not behaving correctly in Flight.  Works fine in Editor and Space Center...
+      bool mouseOverWindow = MouseIsOverWindow(visible, position);
+      if (!lockedInputs && mouseOverWindow)
+      {
+        if(HighLogic.LoadedSceneIsFlight)
+          InputLockManager.SetControlLock(ControlTypes.UI | ControlTypes.UI_DIALOGS | ControlTypes.GUI, "SM_Window");
+        else
+        {
+          InputLockManager.SetControlLock(ControlTypes.All, "SM_Window");
+        }
+        lockedInputs = true;
+      }
+      if (!lockedInputs || mouseOverWindow) return lockedInputs;
+      InputLockManager.RemoveControlLock("SM_Window");
+      lockedInputs = false;
+      return lockedInputs;
+    }
+
+    private static bool MouseIsOverWindow(bool visible, Rect position)
+    {
+      return visible
+             && position.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
+    }
+
   }
 }

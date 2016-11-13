@@ -1,6 +1,6 @@
 ﻿Ship Manifest Developer Notes
 -------------------------------------------------
-KSP Version supported:  1.0.5
+KSP Version supported:  1.2
 -------------------------------------------------
 
 

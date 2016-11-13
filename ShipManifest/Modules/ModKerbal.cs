@@ -56,9 +56,9 @@ namespace ShipManifest.Modules
     public void SyncKerbal()
     {
       if (SMSettings.EnableKerbalRename)
-        Kerbal.name = Name;
+        Kerbal.KerbalRef.crewMemberName = Name;
       // remove old save game hack for backwards compatability...
-      Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+      Kerbal.KerbalRef.crewMemberName = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
 
       // New trait management is easy!
       if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)

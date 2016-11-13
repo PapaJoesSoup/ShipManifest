@@ -21,6 +21,9 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+      // set input locks when mouseover window...
+      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -59,6 +62,13 @@ namespace ShipManifest.Windows
       {
         SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
         SMSettings.SaveSettings();
+
+        // Sync SM to CLS override settings with CLS
+        if (SMSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
+        {
+          SMSettings.UpdateClsOverride();
+        }
+
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
           SMAddon.OnSmSettingsClicked();
         else
@@ -135,9 +145,9 @@ namespace ShipManifest.Windows
         case Tab.Highlight:
           TabHighlight.Display(displayViewerPosition);
           break;
-        case Tab.Mods:
-          TabInstalledMods.Display(displayViewerPosition);
-          break;
+        //case Tab.Mods:
+        //  TabInstalledMods.Display(displayViewerPosition);
+        //  break;
         case Tab.Sounds:
           TabSounds.Display(displayViewerPosition);
           break;
