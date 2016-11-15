@@ -53,21 +53,23 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
 
-      if (!SMSettings.EnableCls)
-        GUI.enabled = false;
-      GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))
+      if (SMSettings.EnableCls)
       {
-        try
+        GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+        if (GUILayout.Button("Hatches", hatchesStyle, GUILayout.Height(20)))
         {
-          SMAddon.UpdateClsSpaces();
-          SMAddon.SmVessel.GetHatches();
-          _selectedTab = Tab.Hatch;
-        }
-        catch (Exception ex)
-        {
-          Utilities.LogMessage(
-            string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+          try
+          {
+            SMAddon.UpdateClsSpaces();
+            SMAddon.SmVessel.GetHatches();
+            _selectedTab = Tab.Hatch;
+          }
+          catch (Exception ex)
+          {
+            Utilities.LogMessage(
+              string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+              Utilities.LogType.Error, true);
+          }
         }
       }
       GUI.enabled = true;

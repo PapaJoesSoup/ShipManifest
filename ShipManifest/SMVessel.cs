@@ -614,17 +614,20 @@ namespace ShipManifest
 
     internal static void ToggleDumpResource(string resourceName, uint pumpId)
     {
-      //Fired by Resource Dump on Manifest Window.
-      TransferPump pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest,
-        TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName))
-      {
-        FromParts = SMAddon.SmVessel.PartsByResource[resourceName],
-        PumpId = pumpId
-      };
       if (!TransferPump.IsPumpInProgress(pumpId))
       {
-        SMAddon.SmVessel.TransferPumps.Add(pump);
-        ProcessController.DumpResources(SMAddon.SmVessel.TransferPumps);
+        //Fired by Resource Dump on Manifest Window.
+        TransferPump pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest,
+          TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName))
+        {
+          FromParts = SMAddon.SmVessel.PartsByResource[resourceName],
+          PumpId = pumpId
+        };
+        List<TransferPump> Pumps = new List<TransferPump>
+        {
+          pump
+        };
+        ProcessController.DumpResources(Pumps);
       }
       else TransferPump.AbortAllPumpsInProcess(pumpId);
     }

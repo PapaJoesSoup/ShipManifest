@@ -26,12 +26,15 @@ namespace ShipManifest.Process
     // used during transfer operations.
     public static bool PumpProcessOn { get; internal set; }
 
+
     // Constructor properties
+
+    public uint PumpId;
     public string Resource { get; internal set; }
     public double PumpAmount { get; internal set; }
-    internal TypePump PumpType = TypePump.SourceToTarget;
+    public TypePump PumpType = TypePump.SourceToTarget;
+    public ScopePump PumpScope = ScopePump.Vessel;
     internal TriggerButton PumpTrigger;
-    internal uint PumpId;
 
     // Sources (should be assigned at instantiation or right after)
     public List<Part> FromParts { get; internal set; }
@@ -923,7 +926,7 @@ namespace ShipManifest.Process
 
     #region Enums
 
-    internal enum PumpState
+    public enum PumpState
     {
       Off,
       Start,
@@ -931,7 +934,15 @@ namespace ShipManifest.Process
       Stop
     }
 
-    internal enum TypePump
+
+    public enum ScopePump
+    {
+      Vessel,
+      Resource,
+      Part
+    }
+
+    public enum TypePump
     {
       SourceToTarget,
       TargetToSource,
