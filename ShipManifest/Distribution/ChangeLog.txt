@@ -1,4 +1,4 @@
-﻿Version 5.1.3.0 - Release 12 Nov 2016 - KSP 1.2.1 Compatibility Edition
+﻿Version 5.1.3.0 - Release 14 Nov 2016 - KSP 1.2.1 Compatibility Edition
 - New:  Refactored mod for KSP 1.2.x Compatibility
 - New:  Added support for new events in Crew Transfer, allowing improved performance and customization of Full Part messages during Stock Crew Transfers.
 - New:  Corrected supported versions in the Developer Notes and Installation Notes. (Git Issue #30)
