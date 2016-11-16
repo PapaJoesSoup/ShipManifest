@@ -124,11 +124,6 @@ namespace ShipManifest.Windows
       {
         _selectedTab = Tab.Config;
       }
-      GUIStyle modStyle = _selectedTab == Tab.Mods ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button("Mods", modStyle, GUILayout.Height(20)))
-      {
-        _selectedTab = Tab.Mods;
-      }
       GUILayout.EndHorizontal();
     }
 

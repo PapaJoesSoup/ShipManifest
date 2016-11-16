@@ -38,12 +38,9 @@ namespace ShipManifest.Modules
       if (IsNew)
       {
         // Add to roster.
-        MethodInfo dynMethod = HighLogic.CurrentGame.CrewRoster.GetType()
-          .GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
         Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-        dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] {Kerbal});
+        HighLogic.CurrentGame.CrewRoster.AddCrewMember(Kerbal);
       }
-
       return string.Empty;
     }
 
@@ -56,13 +53,11 @@ namespace ShipManifest.Modules
     public void SyncKerbal()
     {
       if (SMSettings.EnableKerbalRename)
-        Kerbal.KerbalRef.crewMemberName = Name;
-      // remove old save game hack for backwards compatability...
-      Kerbal.KerbalRef.crewMemberName = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
-
-      // New trait management is easy!
-      if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
-        KerbalRoster.SetExperienceTrait(Kerbal, Trait);
+      {
+        Kerbal.ChangeName(Name);
+        if (SMSettings.EnableChangeProfession)
+          KerbalRoster.SetExperienceTrait(Kerbal, Trait);
+      }
       Kerbal.gender = Gender;
       Kerbal.stupidity = Stupidity;
       Kerbal.courage = Courage;

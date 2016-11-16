@@ -429,6 +429,7 @@ namespace ShipManifest.Windows
         if (SelectedKerbal != null)
         {
           SMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
+          GetRosterList();
           if (string.IsNullOrEmpty(SMAddon.SaveMessage))
             SelectedKerbal = null;
         }
@@ -577,7 +578,7 @@ namespace ShipManifest.Windows
       {
         if (kerbals.Current == null) continue;
         if (!kerbals.Current.name.Contains(char.ConvertFromUtf32(1))) continue;
-        kerbals.Current.KerbalRef.crewMemberName = kerbals.Current.name.Replace(char.ConvertFromUtf32(1), "");
+        kerbals.Current.ChangeName(kerbals.Current.name.Replace(char.ConvertFromUtf32(1), ""));
       }
     }
 
@@ -660,9 +661,8 @@ namespace ShipManifest.Windows
     internal static void RespawnKerbal(ProtoCrewMember kerbal)
     {
       kerbal.SetTimeForRespawn(0);
-      // This call causes issues in KSC scene, and is not needed.
-      //kerbal.Spawn();
       kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+      kerbal.KerbalRef.rosterStatus = ProtoCrewMember.RosterStatus.Available;
       HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
     }
 
