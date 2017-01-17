@@ -70,7 +70,7 @@ namespace ShipManifest.Windows
         GUILayout.BeginVertical();
 
         // Prelaunch (landed) Gui
-        if (SMAddon.SmVessel.IsRecoverable)
+        if (SMConditions.IsInPreflight())
         {
           PreLaunchGui();
         }
@@ -237,6 +237,7 @@ namespace ShipManifest.Windows
         SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
 
         // Now let's update our lists...
+        SMAddon.SmVessel.RefreshLists();
         if (!SMAddon.SmVessel.SelectedResources.Contains(resourceName))
         {
           // now lets determine what to do with selection
@@ -281,6 +282,7 @@ namespace ShipManifest.Windows
           string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           Utilities.LogType.Error, true);
       }
+      SMAddon.SmVessel.RefreshLists();
     }
 
     private static void ResourceDetailsViewer()
@@ -540,6 +542,5 @@ namespace ShipManifest.Windows
             ex.StackTrace), Utilities.LogType.Error, true);
       }
     }
-
   }
 }

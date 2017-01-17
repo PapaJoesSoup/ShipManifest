@@ -57,6 +57,9 @@ namespace ShipManifest
     // SM UI toggle
     internal static bool ShowUi = true;
 
+    //CLS Event integration
+    private EventData<Vessel> onCLSVesselChangeEvent;
+
     #endregion
 
     // Makes instance available via reflection
@@ -106,20 +109,7 @@ namespace ShipManifest
         if (SMSettings.AutoSave)
           InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
 
-        if (SMSettings.EnableBlizzyToolbar)
-        {
-          // Let't try to use Blizzy's toolbar
-          if (ActivateBlizzyToolBar()) return;
-          // We failed to activate the toolbar, so revert to stock
-          GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-          GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
-        }
-        else
-        {
-          // Use stock Toolbar
-          GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-          GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
-        }
+        CreateAppIcons();
       }
       catch (Exception ex)
       {
@@ -184,6 +174,8 @@ namespace ShipManifest
           SMSettings.ClsInstalled = true;
           SMSettings.SaveSettings();
           UpdateClsSpaces();
+          onCLSVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
+          if (onCLSVesselChangeEvent != null) onCLSVesselChangeEvent.Add(OnCLSVesselChange);
         }
         else
         {
@@ -206,7 +198,6 @@ namespace ShipManifest
         Utilities.LogMessage("Error in:  SMAddon.Start.  " + ex, Utilities.LogType.Error, true);
       }
     }
-
 
     internal void OnDestroy()
     {
@@ -233,38 +224,8 @@ namespace ShipManifest
         CancelInvoke("RunSave");
 
         // Handle Toolbars
-        if (_smRosterBlizzy == null && _smSettingsBlizzy == null && _smButtonBlizzy == null)
-        {
-          if (_smButtonStock != null)
-          {
-            ApplicationLauncher.Instance.RemoveModApplication(_smButtonStock);
-            _smButtonStock = null;
-          }
-          if (_smSettingsStock != null)
-          {
-            ApplicationLauncher.Instance.RemoveModApplication(_smSettingsStock);
-            _smSettingsStock = null;
-          }
-          if (_smRosterStock != null)
-          {
-            ApplicationLauncher.Instance.RemoveModApplication(_smRosterStock);
-            _smRosterStock = null;
-          }
-          if (_smButtonStock == null && _smSettingsStock == null && _smRosterStock == null)
-          {
-            // Remove the stock toolbar button launcher handler
-            GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
-          }
-        }
-        else
-        {
-          if (_smButtonBlizzy != null)
-            _smButtonBlizzy.Destroy();
-          if (_smRosterBlizzy != null)
-            _smRosterBlizzy.Destroy();
-          if (_smSettingsBlizzy != null)
-            _smSettingsBlizzy.Destroy();
-        }
+        DestroyAppIcons();
+
         //Reset Roster Window data
         WindowRoster.OnCreate = false;
         WindowRoster.SelectedKerbal = null;
@@ -274,6 +235,60 @@ namespace ShipManifest
       catch (Exception ex)
       {
         Utilities.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, Utilities.LogType.Error, true);
+      }
+    }
+
+    internal void CreateAppIcons()
+    {
+      if (SMSettings.EnableBlizzyToolbar)
+      {
+        // Let't try to use Blizzy's toolbar
+        if (ActivateBlizzyToolBar()) return;
+        // We failed to activate the toolbar, so revert to stock
+        GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
+        GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
+      }
+      else
+      {
+        // Use stock Toolbar
+        GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
+        GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
+      }
+    }
+
+    internal void DestroyAppIcons()
+    {
+      if (_smRosterBlizzy == null && _smSettingsBlizzy == null && _smButtonBlizzy == null)
+      {
+        if (_smButtonStock != null)
+        {
+          ApplicationLauncher.Instance.RemoveModApplication(_smButtonStock);
+          _smButtonStock = null;
+        }
+        if (_smSettingsStock != null)
+        {
+          ApplicationLauncher.Instance.RemoveModApplication(_smSettingsStock);
+          _smSettingsStock = null;
+        }
+        if (_smRosterStock != null)
+        {
+          ApplicationLauncher.Instance.RemoveModApplication(_smRosterStock);
+          _smRosterStock = null;
+        }
+        if (_smButtonStock == null && _smSettingsStock == null && _smRosterStock == null)
+        {
+          // Remove the stock toolbar button launcher handler
+          GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
+        }
+      }
+      else
+      {
+        if (_smButtonBlizzy != null)
+          _smButtonBlizzy.Destroy();
+        if (_smRosterBlizzy != null)
+          _smRosterBlizzy.Destroy();
+        if (_smSettingsBlizzy != null)
+          _smSettingsBlizzy.Destroy();
       }
     }
 
@@ -373,6 +388,10 @@ namespace ShipManifest
       WindowControl.ShowWindow =
         WindowManifest.ShowWindow =
           WindowTransfer.ShowWindow = WindowRoster.ShowWindow = WindowSettings.ShowWindow = false;
+
+      // Since the changes to Startup options, ON destroy is not being called when a Scene change occurs.  Startup is being called when the proper scene is loaded.
+      // Let's do some cleanup of the app Icons here as well. to be sure we have only the icons we want...
+      DestroyAppIcons();
     }
 
     // SM UI toggle handlers
@@ -538,6 +557,11 @@ namespace ShipManifest
       }
     }
 
+    private void OnCLSVesselChange(Vessel data)
+    {
+      OnVesselChange(data);
+    }
+
     // Stock vs Blizzy Toolbar switch handler
     private void CheckForToolbarTypeToggle()
     {
@@ -587,7 +611,7 @@ namespace ShipManifest
     {
       try
       {
-        // Setup SM WIndow button
+        // Setup SM Window button
         if (HighLogic.LoadedSceneIsFlight && _smButtonStock == null && !SMSettings.EnableBlizzyToolbar)
         {
           string iconfile = "IconOff_38";
@@ -919,6 +943,7 @@ namespace ShipManifest
         // Now let's update the current vessel view...
         SmVessel = SMVessel.GetInstance(newVessel);
         SmVessel.RefreshLists();
+        SMHighlighter.Update_Highlighter();
       }
       catch (Exception ex)
       {

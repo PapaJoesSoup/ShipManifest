@@ -294,15 +294,12 @@ namespace ShipManifest
       while (dockingParts.MoveNext())
       {
         if (dockingParts.Current == null) continue;
-        Part dPart = dockingParts.Current;
-        List<PartModule>.Enumerator dNodes = (from PartModule m in dPart.Modules where m.moduleName == "ModuleDockingNode" select m).ToList().GetEnumerator();
+        List<ModuleDockingNode>.Enumerator dNodes = dockingParts.Current.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
         while (dNodes.MoveNext())
         {
           if (dNodes.Current == null) continue;
-          PartModule pModule = dNodes.Current;
-          DockedVesselInfo dockedInfo = ((ModuleDockingNode) pModule).vesselInfo;
-          if (dockedInfo == null) continue;
-          ModDockedVessel modDockedVessel = new ModDockedVessel(dockedInfo);
+          if (dNodes.Current.vesselInfo == null) continue;
+          ModDockedVessel modDockedVessel = new ModDockedVessel(dNodes.Current.vesselInfo);
           List<uint> launchIds = (from m in _dockedVessels where m.LaunchId > 0 select m.LaunchId).ToList();
           if (!launchIds.Contains(modDockedVessel.LaunchId))
             _dockedVessels.Add(modDockedVessel);

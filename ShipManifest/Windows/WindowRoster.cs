@@ -338,10 +338,11 @@ namespace ShipManifest.Windows
 
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
           {
-            actionPart = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
+            isAction = true;
             actionKerbal = kerbals.Current;
             actionText = buttonText;
-            isAction = true;
+            if (actionText == "Remove")
+              actionPart = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
           }
           Rect rect2 = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)

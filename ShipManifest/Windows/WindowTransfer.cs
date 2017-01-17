@@ -96,9 +96,6 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-      // Update the pumps for this event.
-      //TransferPump.UpdateDisplayPumps(false);
-
       GUI.enabled = true;
       try
       {
@@ -350,7 +347,7 @@ namespace ShipManifest.Windows
           // set the conditions for a button style change.
           int btnWidth = 273; // Start with full width button...
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = !SMSettings.RealismMode || SMSettings.EnablePfResources ? 173 : 223;
+            btnWidth = !SMSettings.RealismMode || (SMSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
           else if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMConditions.CanShowCrewFillDumpButtons())
             btnWidth = 173;
 
@@ -427,11 +424,13 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
+
+      if (SMSettings.RealismMode || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
       GUIStyle style2 = pumpType == TransferPump.TypePump.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
-      // Fills should only be in Non Realism mode or if Preflight Resources are seleced...
-      if (SMSettings.RealismMode && !SMSettings.EnablePfResources) return;
+      GUIContent fillContent = new GUIContent("Fill", "Fills the Selected part with the selected resource(s)\r\n(Fill is from ground source, NOT from other parts in vessel)");
+      // Fills should only be in Non Realism mode or if Preflight Resources are selected...
       if (selectedResources.Count > 1)
         GUI.enabled = part.Resources[selectedResources[0]].amount <
                       part.Resources[selectedResources[0]].maxAmount ||
@@ -440,7 +439,7 @@ namespace ShipManifest.Windows
       else
         GUI.enabled = part.Resources[selectedResources[0]].amount <
                       part.Resources[selectedResources[0]].maxAmount;
-      if (GUILayout.Button("Fill", style2, GUILayout.Width(30), GUILayout.Height(20)))
+      if (GUILayout.Button(fillContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
       {
         SMPart.FillResource(part, selectedResources[0]);
         if (selectedResources.Count > 1)
@@ -612,7 +611,7 @@ namespace ShipManifest.Windows
           GUI.enabled = true;
           GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
         }
-        else if (!SMConditions.IsClsInSameSpace())
+        else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0], selectedPartsTo.Count > 0? selectedPartsTo[0] : null))
         {
           GUI.enabled = true;
           if (GUILayout.Button(new GUIContent("EVA", EvaToolTip), SMStyle.ButtonStyle, GUILayout.Width(50),
