@@ -300,6 +300,7 @@ namespace ShipManifest
           if (dNodes.Current == null) continue;
           if (dNodes.Current.vesselInfo == null) continue;
           ModDockedVessel modDockedVessel = new ModDockedVessel(dNodes.Current.vesselInfo);
+          if (modDockedVessel.LaunchId == 0) continue;
           List<uint> launchIds = (from m in _dockedVessels where m.LaunchId > 0 select m.LaunchId).ToList();
           if (!launchIds.Contains(modDockedVessel.LaunchId))
             _dockedVessels.Add(modDockedVessel);

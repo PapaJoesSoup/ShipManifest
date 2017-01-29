@@ -35,7 +35,7 @@ namespace ShipManifest.Modules
 
     internal uint LaunchId
     {
-      get { return Rootpart.launchID; }
+      get { return Rootpart != null ? Rootpart.launchID : 0; }
     }
 
     internal string VesselName
