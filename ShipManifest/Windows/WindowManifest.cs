@@ -214,6 +214,7 @@ namespace ShipManifest.Windows
           GUI.enabled = true;
           GUILayout.EndHorizontal();
         }
+        keys.Dispose();
       }
       catch (Exception ex)
       {
@@ -311,10 +312,10 @@ namespace ShipManifest.Windows
               {
                 if (sResources.Current == null) continue;
                 GUILayout.Label(
-                  string.Format(" - {0}:  ({1}/{2})", sResources.Current, part.Resources[sResources.Current].amount.ToString("######0.####"),
-                    part.Resources[sResources.Current].maxAmount.ToString("######0.####")), noPad, GUILayout.Width(265),
+                  string.Format(" - {0}:  ({1:######0.####}/{2:######0.####})", sResources.Current, part.Resources[sResources.Current].amount, part.Resources[sResources.Current].maxAmount), noPad, GUILayout.Width(265),
                   GUILayout.Height(16));
               }
+              sResources.Dispose();
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             {
@@ -343,6 +344,7 @@ namespace ShipManifest.Windows
               GUILayout.EndHorizontal();
             }
           }
+          pParts.Dispose();
         }
       }
       catch (Exception ex)
@@ -448,6 +450,7 @@ namespace ShipManifest.Windows
                 if (!SMAddon.SmVessel.SelectedPartsTarget.Contains(srcParts.Current)) continue;
                 SMAddon.SmVessel.SelectedPartsTarget.Remove(srcParts.Current);
               }
+              srcParts.Dispose();
             }
           }
           else
@@ -472,6 +475,7 @@ namespace ShipManifest.Windows
                   newSources.Add(parts.Current);
               }
             }
+            parts.Dispose();
             SMAddon.SmVessel.SelectedPartsSource.Clear();
             SMAddon.SmVessel.SelectedPartsSource = newSources;
           }
@@ -490,6 +494,7 @@ namespace ShipManifest.Windows
                 if (!SMAddon.SmVessel.SelectedPartsSource.Contains(tgtParts.Current)) continue;
                 SMAddon.SmVessel.SelectedPartsSource.Remove(tgtParts.Current);
               }
+              tgtParts.Dispose();
             }
           }
           else
@@ -514,6 +519,7 @@ namespace ShipManifest.Windows
                   newTargets.Add(tgtParts.Current);
               }
             }
+            tgtParts.Dispose();
             SMAddon.SmVessel.SelectedPartsTarget.Clear();
             SMAddon.SmVessel.SelectedPartsTarget = newTargets;
           }

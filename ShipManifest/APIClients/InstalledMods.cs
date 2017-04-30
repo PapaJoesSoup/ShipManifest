@@ -58,6 +58,7 @@ namespace ShipManifest.APIClients
           GUILayout.EndHorizontal();
         }
       }
+      list.Dispose();
     }
 
     internal static void DisplayModList()
@@ -76,6 +77,7 @@ namespace ShipManifest.APIClients
           GUILayout.EndHorizontal();
         }
       }
+      list.Dispose();
     }
 
     internal static bool IsModInstalled(string assemblyName)

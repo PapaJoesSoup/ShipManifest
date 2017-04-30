@@ -67,6 +67,7 @@ namespace ShipManifest.Windows.Tabs
             SMHighlighter.MouseOverparts = null;
           }
         }
+        iPanels.Dispose();
       }
       catch (Exception ex)
       {
@@ -87,6 +88,7 @@ namespace ShipManifest.Windows.Tabs
         if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.RETRACTED) continue;
         ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Extend();
       }
+      iPanels.Dispose();
     }
 
     internal static void RetractAllPanels()
@@ -99,6 +101,7 @@ namespace ShipManifest.Windows.Tabs
         if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.EXTENDED) continue;
         ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Retract();
       }
+      iPanels.Dispose();
     }
   }
 }

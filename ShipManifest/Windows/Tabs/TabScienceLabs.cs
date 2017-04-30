@@ -40,6 +40,7 @@ namespace ShipManifest.Windows.Tabs
           string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? "Operational" : "InOp") + ")";
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
         }
+        iLabs.Dispose();
       }
       catch (Exception ex)
       {

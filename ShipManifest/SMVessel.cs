@@ -284,6 +284,7 @@ namespace ShipManifest
           }
         }
       }
+      parts.Dispose();
     }
     private void UpdateDockedVessels()
     {
@@ -305,7 +306,9 @@ namespace ShipManifest
           if (!launchIds.Contains(modDockedVessel.LaunchId))
             _dockedVessels.Add(modDockedVessel);
         }
+        dNodes.Dispose();
       }
+      dockingParts.Dispose();
       //Utilities.LogMessage("Exiting:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 
@@ -325,6 +328,7 @@ namespace ShipManifest
             if (partlist.Current.Resources.Contains(SelectedResources[0]) && partlist.Current.Resources.Contains(SelectedResources[1]))
               SelectedResourcesParts.Add(partlist.Current);
           }
+          partlist.Dispose();
           break;
       }
     }
@@ -352,6 +356,7 @@ namespace ShipManifest
             _hatches.Add(pHatch);
           }
         }
+        hParts.Dispose();
       }
       catch (Exception ex)
       {
@@ -384,6 +389,7 @@ namespace ShipManifest
             _solarPanels.Add(pPanel);
           }
         }
+        pParts.Dispose();
       }
       catch (Exception ex)
       {
@@ -420,6 +426,7 @@ namespace ShipManifest
           }
           _antennas.Add(pAntenna);
         }
+        pParts.Dispose();
       }
       catch (Exception ex)
       {
@@ -451,6 +458,7 @@ namespace ShipManifest
             _lights.Add(pLight);
           }
         }
+        pParts.Dispose();
       }
       catch (Exception ex)
       {
@@ -477,6 +485,7 @@ namespace ShipManifest
             _labs.Add((ModuleScienceLab)pModule);
           }
         }
+        pParts.Dispose();
       }
       catch (Exception ex)
       {
@@ -508,7 +517,9 @@ namespace ShipManifest
               resourcePartList.Add(mdvParts.Current);
             }
           }
+          mdvParts.Dispose();
         }
+        dVessels.Dispose();
       }
       catch (Exception ex)
       {
@@ -567,6 +578,7 @@ namespace ShipManifest
         //Utilities.LogMessage(string.Format("Processing FillCrew with part {0}", parts.Current.partInfo.name), Utilities.LogType.Info, true);
         SMPart.FillCrew(parts.Current);
       }
+      parts.Dispose();
       SMAddon.FireEventTriggers();
     }
 
@@ -582,6 +594,7 @@ namespace ShipManifest
         }
         SMAddon.FireEventTriggers();
       }
+      parts.Dispose();
     }
 
     internal void DumpAllResources()
@@ -646,6 +659,7 @@ namespace ShipManifest
           ((PartResource) pResources.Current).amount = ((PartResource) pResources.Current).maxAmount;
         }
       }
+      parts.Dispose();
     }
 
     internal void FillResource(string resourceName)
@@ -663,6 +677,7 @@ namespace ShipManifest
           ((PartResource) resources.Current).amount = ((PartResource) resources.Current).maxAmount;
         }
       }
+      parts.Dispose();
     }
 
     #endregion

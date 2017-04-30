@@ -250,12 +250,12 @@ namespace ShipManifest.Process
 
     internal static void ProcessActivePumps()
     {
-      //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // This routine acts as a queue
       // WHen a pump is set to IsPumOn = true, it will be processed by this routine.
+      //Utilities.LogMessage("Entering:  TransferPump.ProcessActivePumps", Utilities.LogType.Info, SMSettings.VerboseLogging);
       List<TransferPump> pumpsToRemove = new List<TransferPump>();
-      // this task runs every Update when active.
 
+      // this task runs every Update when active.
       try
       {
         List<TransferPump>.Enumerator tPumps = SMAddon.SmVessel.TransferPumps.GetEnumerator();
@@ -300,6 +300,7 @@ namespace ShipManifest.Process
               break;
           }
         }
+        tPumps.Dispose();
         if (pumpsToRemove.Count <= 0) return;
         List<TransferPump>.Enumerator rpumps = pumpsToRemove.GetEnumerator();
         while (rpumps.MoveNext())
@@ -307,6 +308,7 @@ namespace ShipManifest.Process
           if (rpumps.Current == null) continue;
           SMAddon.SmVessel.TransferPumps.Remove(rpumps.Current);
         }
+        rpumps.Dispose();
         pumpsToRemove.Clear();
       }
       catch (Exception ex)
@@ -455,6 +457,7 @@ namespace ShipManifest.Process
           minAmt = thisPartCap;
           remainingPartsCount++;
         }
+        theseParts.Dispose();
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Calculate pump amounts for each To part and Increment.
@@ -473,6 +476,7 @@ namespace ShipManifest.Process
             if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
               part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
           }
+          toParts.Dispose();
         }
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
@@ -508,6 +512,7 @@ namespace ShipManifest.Process
           minAmt = theseParts.Current.Resources[Resource].amount;
           remainingPartsCount++;
         }
+        theseParts.Dispose();
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Decrement.
@@ -526,6 +531,7 @@ namespace ShipManifest.Process
             // Ensure part is empty and does not contain less than 0.
             if (part.Resources[Resource].amount <= SMSettings.Tolerance) part.Resources[Resource].amount = 0;
           }
+          fromParts.Dispose();
         }
         if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
@@ -550,6 +556,7 @@ namespace ShipManifest.Process
         deltaCharge -= iPart.Resources["ElectricCharge"].amount;
         iPart.Resources["ElectricCharge"].amount = 0;
       }
+      iParts.Dispose();
       return !(deltaCharge > 0);
     }
 
@@ -567,6 +574,7 @@ namespace ShipManifest.Process
         if (tPumps.Current == null) continue;
         if (tPumps.Current.PumpId == pumpId && tPumps.Current.IsPumpOn) tPumps.Current.PumpStatus = PumpState.Stop;
       }
+      tPumps.Dispose();
     }
 
     internal static void AssignPumpAmounts(List<TransferPump> pumps, double pumpAmount, uint pumpId)
@@ -671,6 +679,7 @@ namespace ShipManifest.Process
         if (!list.Current.Resources.Contains(selectedResource)) continue;
         amount += list.Current.Resources[selectedResource].amount;
       }
+      list.Dispose();
       return amount;
     }
 
@@ -685,6 +694,7 @@ namespace ShipManifest.Process
         if (!list.Current.Resources.Contains(selectedResource)) continue;
         amount += list.Current.Resources[selectedResource].maxAmount;
       }
+      list.Dispose();
       return amount;
     }
 
@@ -699,6 +709,7 @@ namespace ShipManifest.Process
         if (!list.Current.Resources.Contains(selectedResource)) continue;
         amount += PartRemainingCapacity(list.Current, selectedResource);
       }
+      list.Dispose();
       return amount;
     }
     internal static double PartRemainingCapacity(Part part, string selectedResource)
@@ -719,11 +730,13 @@ namespace ShipManifest.Process
         if (fromList.Current == null) continue;
         fromAmount += fromList.Current.Resources[Resource].amount;
       }
+      fromList.Dispose();
       while (toList.MoveNext())
       {
         if (toList.Current == null) continue;
         toCapacityRemaining += PartRemainingCapacity(toList.Current, Resource);
       }
+      toList.Dispose();
       maxPumpAmount = toCapacityRemaining - fromAmount;
       maxPumpAmount = maxPumpAmount > fromAmount ? fromAmount : maxPumpAmount;
       maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
@@ -754,6 +767,7 @@ namespace ShipManifest.Process
           if (!fromParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
           maxFromAmount += fromParts.Current.Resources[selectedResources[resIdx]].amount;
         }
+        fromParts.Dispose();
         List<Part>.Enumerator toParts = partsTo.GetEnumerator();
         double maxToAmount = 0;
         while (toParts.MoveNext())
@@ -762,6 +776,7 @@ namespace ShipManifest.Process
           if (!toParts.Current.Resources.Contains(selectedResources[resIdx])) continue;
           maxToAmount += PartRemainingCapacity(toParts.Current, selectedResources[resIdx]);
         }
+        toParts.Dispose();
 
         maxPumpAmount = maxToAmount > maxFromAmount ? maxFromAmount : maxToAmount;
         maxPumpAmount = maxPumpAmount < SMSettings.Tolerance ? 0 : maxPumpAmount;
@@ -827,6 +842,7 @@ namespace ShipManifest.Process
         };
         WindowTransfer.DisplayPumps.Add(pump2);
       }
+      resources.Dispose();
     }
 
     internal static void UpdateDisplayPumps()
@@ -867,6 +883,7 @@ namespace ShipManifest.Process
           CalcMaxPumpAmt(pump.FromParts, pump.ToParts, SMAddon.SmVessel.SelectedResources)
             .ToString(CultureInfo.InvariantCulture);
       }
+      dPumps.Dispose();
     }
 
     internal static List<TransferPump> GetDisplayPumpsByType(TypePump pumpType)
@@ -878,6 +895,7 @@ namespace ShipManifest.Process
         if (dPumps.Current == null) continue;
         if (dPumps.Current.PumpType == pumpType) results.Add(dPumps.Current);
       }
+      dPumps.Dispose();
       return results;
     }
 

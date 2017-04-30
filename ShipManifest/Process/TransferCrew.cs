@@ -130,6 +130,7 @@ namespace ShipManifest.Process
               break;
             }
           }
+          fromSeats.Dispose();
         }
         else
         {
@@ -144,6 +145,7 @@ namespace ShipManifest.Process
             ToSeat = seat;
             break;
           }
+          toSeats.Dispose();
           // All seats full?
           if (ToSeat == null)
           {
@@ -158,6 +160,7 @@ namespace ShipManifest.Process
               ToSeat = seat;
               break;
             }
+            moreSeats.Dispose();
           }
         }
 

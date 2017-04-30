@@ -48,6 +48,7 @@ namespace ShipManifest.Windows
         GUILayout.TextArea(errors.Current, GUILayout.Width(460));
         
       }
+      errors.Dispose();
 
       GUILayout.EndVertical();
       GUILayout.EndScrollView();
@@ -108,6 +109,7 @@ namespace ShipManifest.Windows
             if (lines.Current == null) continue;
             sb.AppendLine(lines.Current);
           }
+          lines.Dispose();
 
           File.WriteAllText(filename, sb.ToString());
 

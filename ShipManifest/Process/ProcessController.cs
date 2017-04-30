@@ -32,7 +32,9 @@ namespace ShipManifest.Process
             else
               processedScience[dataitems.Current]++;
           }
+          dataitems.Dispose();
         }
+        labs.Dispose();
 
         ScienceData[] moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
 
@@ -110,6 +112,7 @@ namespace ShipManifest.Process
             TransferPump pump = pumps.Current;
             pump.IsPumpOn = true;
           }
+          pumps.Dispose();
           // now lets start the pumping process...
           SMAddon.SmVessel.TransferPumps.AddRange(xferPumps);
 
@@ -126,6 +129,7 @@ namespace ShipManifest.Process
             TransferPump pump = pumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
+          pumps.Dispose();
         }
       }
       catch (Exception ex)
@@ -152,6 +156,7 @@ namespace ShipManifest.Process
             pump.PumpRatio = 1;
             pump.IsPumpOn = true;
           }
+          epumps.Dispose();
           // Add pumps to pump queue
           SMAddon.SmVessel.TransferPumps.AddRange(pumps);
 
@@ -167,6 +172,7 @@ namespace ShipManifest.Process
             TransferPump pump = epumps.Current;
             pump.RunPumpCycle(pump.PumpAmount);
           }
+          epumps.Dispose();
           SMAddon.SmVessel.TransferPumps.Clear();
         }
       }

@@ -57,6 +57,7 @@ namespace ShipManifest.Windows.Tabs
             SMHighlighter.MouseOverparts = null;
           }
         }
+        iAntennas.Dispose();
       }
       catch (Exception ex)
       {
@@ -76,6 +77,7 @@ namespace ShipManifest.Windows.Tabs
         if (iAntennas.Current == null) continue;
         iAntennas.Current.ExtendAntenna();
       }
+      iAntennas.Dispose();
     }
 
     internal static void RetractAllAntennas()
@@ -87,6 +89,7 @@ namespace ShipManifest.Windows.Tabs
         if (iAntennas.Current == null) continue;
         iAntennas.Current.RetractAntenna();
       }
+      iAntennas.Dispose();
     }
   }
 }

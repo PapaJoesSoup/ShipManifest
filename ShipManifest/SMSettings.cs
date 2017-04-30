@@ -568,6 +568,7 @@ namespace ShipManifest
           //  if (Tds != null) part.RemoveModule(Tds);
           //}
         }
+        parts.Dispose();
       }
       catch (Exception)
       {

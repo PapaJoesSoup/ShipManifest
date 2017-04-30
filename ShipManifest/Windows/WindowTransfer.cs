@@ -391,6 +391,7 @@ namespace ShipManifest.Windows
           GUI.enabled = true;
           GUILayout.EndHorizontal();
         }
+        parts.Dispose();
       }
       catch (Exception ex)
       {
@@ -540,6 +541,7 @@ namespace ShipManifest.Windows
           }
           GUILayout.EndHorizontal();
         }
+        modDockedVessels.Dispose();
       }
       catch (Exception ex)
       {
@@ -688,6 +690,7 @@ namespace ShipManifest.Windows
           }
           GUILayout.EndHorizontal();
         }
+        frznCrew.Dispose();
       }
       catch (Exception ex)
       {
@@ -878,6 +881,7 @@ namespace ShipManifest.Windows
         }
         GUI.enabled = true;
       }
+      modules.Dispose();
     }
 
     private static void ScienceDetailsTarget()
@@ -1095,6 +1099,7 @@ namespace ShipManifest.Windows
           }
           GUILayout.EndHorizontal();
         }
+        displayPumps.Dispose();
       }
       catch (Exception ex)
       {
@@ -1339,6 +1344,7 @@ namespace ShipManifest.Windows
           currAmount += parts.Current.Resources[selectedResources[0]].amount;
           totAmount += parts.Current.Resources[selectedResources[0]].maxAmount;
         }
+        parts.Dispose();
       }
       catch (Exception ex)
       {

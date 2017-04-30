@@ -24,14 +24,13 @@ namespace ShipManifest.InternalObjects
 
     internal static void ClearPartsHighlight(List<Part> parts)
     {
-      if (parts != null)
+      if (parts == null) return;
+      List<Part>.Enumerator list = parts.GetEnumerator();
+      while (list.MoveNext())
       {
-        List<Part>.Enumerator list = parts.GetEnumerator();
-        while (list.MoveNext())
-        {
-          ClearPartHighlight(list.Current);          
-        }
+        ClearPartHighlight(list.Current);          
       }
+      list.Dispose();
     }
 
     /// <summary>
@@ -50,19 +49,16 @@ namespace ShipManifest.InternalObjects
     /// <param name="resourceParts"></param>
     internal static void ClearResourceHighlighting(List<Part> resourceParts)
     {
-      if (resourceParts != null)
+      if (resourceParts == null) return;
+      List<Part>.Enumerator list = resourceParts.GetEnumerator();
+      while (list.MoveNext())
       {
-        List<Part>.Enumerator list = resourceParts.GetEnumerator();
-        while (list.MoveNext())
-        {
-          ClearPartHighlight(list.Current);
-        }
-        if (SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.GetClsVessel())
-        {
-          if (resourceParts.Count > 0 && resourceParts[0] != null)
-            SMAddon.ClsAddon.Vessel.Highlight(false);
-        }
+        ClearPartHighlight(list.Current);
       }
+      list.Dispose();
+      if (!SMSettings.EnableCls || !SMSettings.EnableClsHighlighting || !SMAddon.GetClsVessel()) return;
+      if (resourceParts.Count > 0 && resourceParts[0] != null)
+        SMAddon.ClsAddon.Vessel.Highlight(false);
     }
 
     internal static void SetPartsHighlight(List<Part> parts, Color color, bool force = false)
@@ -76,6 +72,7 @@ namespace ShipManifest.InternalObjects
           if (!list.Current.HighlightActive || force)
           SetPartHighlight(list.Current, color);
         }
+        list.Dispose();
       }
       catch (Exception ex)
       {
@@ -170,6 +167,7 @@ namespace ShipManifest.InternalObjects
           list.Current.highlighter.ConstantOffImmediate();
         }
       }
+      list.Dispose();
     }
 
     internal static void HighlightClsVessel(bool enabled, bool force = false)
@@ -188,7 +186,9 @@ namespace ShipManifest.InternalObjects
           {
             parts.Current?.Highlight(enabled, force);
           }
+          parts.Dispose();
         }
+        spaces.Dispose();
       }
       catch (Exception ex)
       {

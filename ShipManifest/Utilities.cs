@@ -51,6 +51,7 @@ namespace ShipManifest
             currAmount += parts.Current.Resources[selectedResource].amount;
             totAmount += parts.Current.Resources[selectedResource].maxAmount;
           }
+          parts.Dispose();
         }
         switch (SMConditions.TypeOfResource(selectedResource))
         {
@@ -68,6 +69,7 @@ namespace ShipManifest
                 if (cryofreezers.Current == null) continue;
                 currAmount += new DFWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
               }
+              cryofreezers.Dispose();
             }
 
             // Now check for occupied external seats

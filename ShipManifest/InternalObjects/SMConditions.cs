@@ -145,7 +145,7 @@ namespace ShipManifest.InternalObjects
             if (ipart.Part == target) targetSpace = ipart.Space;
             if (sourceSpace != null && targetSpace != null) break;
           }
-
+          parts.Dispose();
           if (sourceSpace != null && targetSpace != null && sourceSpace == targetSpace)
           {
             results = true;

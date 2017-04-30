@@ -41,14 +41,14 @@ namespace ShipManifest.Windows.Tabs
           else if (onState && !newOnState)
             iLights.Current.TurnOffLight();
           Rect rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.IsMouseOver = true;
-            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = iLights.Current.SPart;
-            SMHighlighter.MouseOverparts = null;
-          }
+          if (Event.current.type != EventType.Repaint || !rect.Contains(Event.current.mousePosition)) continue;
+
+          SMHighlighter.IsMouseOver = true;
+          SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+          SMHighlighter.MouseOverpart = iLights.Current.SPart;
+          SMHighlighter.MouseOverparts = null;
         }
+        iLights.Dispose();
       }
       catch (Exception ex)
       {
@@ -68,6 +68,7 @@ namespace ShipManifest.Windows.Tabs
         if (iLights.Current == null) continue;
         iLights.Current.TurnOnLight();
       }
+      iLights.Dispose();
     }
 
     internal static void TurnOffAllLights()
@@ -79,6 +80,7 @@ namespace ShipManifest.Windows.Tabs
         if (iLights.Current == null) continue;
         iLights.Current.TurnOffLight();
       }
+      iLights.Dispose();
     }
   }
 }

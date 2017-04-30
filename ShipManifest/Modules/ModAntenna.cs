@@ -47,14 +47,8 @@ namespace ShipManifest.Modules
       {
         // RT support:
         if (IsRtModule)
-        {
-          if (XmitterModule.Events["EventClose"].active)
-            return "Activated";
-          return "Deactivated";
-        }
-        if (Module.Events["Toggle"].guiName == "Retract")
-          return "Extended";
-        return "Retracted";
+          return XmitterModule.Events["EventClose"].active ? "Activated" : "Deactivated";
+        return Module.Events["Toggle"].guiName == "Retract" ? "Extended" : "Retracted";
       }
     }
 

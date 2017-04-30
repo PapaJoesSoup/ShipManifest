@@ -103,7 +103,6 @@ namespace ShipManifest
       try
       {
         if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
-        DontDestroyOnLoad(this);
         SMSettings.LoadSettings();
 
         if (SMSettings.AutoSave)
@@ -439,12 +438,14 @@ namespace ShipManifest
           fullList.Add(fromList.Current);
         };
       }
+      fromList.Dispose();
       if (fullList.Count <= 0) return;
       List<Part>.Enumerator removeList = fullList.GetEnumerator();
       while (removeList.MoveNext())
       {
         eventData.from.Remove(removeList.Current);
       }
+      removeList.Dispose();
       eventData.to.AddRange(fullList);
     }
 
@@ -518,6 +519,7 @@ namespace ShipManifest
     {
       try
       {
+        if (modVessel != FlightGlobals.ActiveVessel) return;
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
         UpdateSMcontroller(modVessel);
       }
@@ -980,9 +982,11 @@ namespace ShipManifest
               if (SmVessel.ClsPartSource != null && SmVessel.ClsPartTarget != null)
                 break;
             }
+            parts.Dispose();
             if (SmVessel.ClsSpaceSource != null && SmVessel.ClsSpaceTarget != null)
               break;
           }
+          spaces.Dispose();
         }
         catch (Exception ex)
         {

@@ -1,4 +1,8 @@
-﻿Version 5.1.3.3 - Release 29 Jan 2017 - KSP 1.2.2 Compatibility Edition
+﻿Version 5.1.3.4 - Release 03 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
+ - Fixed:  Manifest and other windows disappearing in flight under certain contitions (when staging/part distruction occur).
+ - Fixed:  Antennas not properly working.
+
+Version 5.1.3.3 - Release 29 Jan 2017 - KSP 1.2.2 Compatibility Edition
  - Fixed:  Object not found error in ModDockedVessels Get LaunchID.  now properly returns a 0 if the underlying object is null.
 
 Version 5.1.3.2 - Release 16 Jan 2017 - KSP 1.2.2 Compatibility Edition

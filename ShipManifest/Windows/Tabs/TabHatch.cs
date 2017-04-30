@@ -89,6 +89,7 @@ namespace ShipManifest.Windows.Tabs
         iModules.Current.HatchEvents["OpenHatch"].active = false;
         iModules.Current.HatchOpen = true;
       }
+      iModules.Dispose();
       SMAddon.FireEventTriggers();
     }
 
@@ -105,6 +106,7 @@ namespace ShipManifest.Windows.Tabs
         iModules.Current.HatchEvents["OpenHatch"].active = true;
         iModules.Current.HatchOpen = false;
       }
+      iModules.Dispose();
       SMAddon.FireEventTriggers();
     }
   }

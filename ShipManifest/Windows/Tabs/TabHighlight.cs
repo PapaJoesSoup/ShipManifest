@@ -144,6 +144,7 @@ namespace ShipManifest.Windows.Tabs
               if (parts.Current == null) continue;
               SMHighlighter.EdgeHighight(parts.Current, false);
             }
+            parts.Dispose();
           }
         }
       }

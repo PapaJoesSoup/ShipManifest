@@ -294,6 +294,7 @@ namespace ShipManifest.Windows
                 rosterDetails = "Assigned - " + theseVessels.Current.GetName().Replace("(unloaded)", "");
               }
             }
+            theseVessels.Dispose();
           }
           else if (InstalledMods.IsDfInstalled && DFWrapper.APIReady && kerbals.Current.type == ProtoCrewMember.KerbalType.Unowned)
           {
@@ -350,6 +351,7 @@ namespace ShipManifest.Windows
           GUILayout.EndHorizontal();
           GUI.enabled = true;
         }
+        kerbals.Dispose();
         GUILayout.EndVertical();
         GUILayout.EndScrollView();
 
@@ -622,6 +624,7 @@ namespace ShipManifest.Windows
               break;
             }
           }
+          cryofreezers.Dispose();
         }
         else
         {
@@ -651,6 +654,7 @@ namespace ShipManifest.Windows
           if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginFreezeKerbal(kerbal);
           break;
         }
+        cryofreezers.Dispose();
       }
       catch (Exception ex)
       {
