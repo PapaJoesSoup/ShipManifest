@@ -356,7 +356,8 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.Running", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // 1.  Calculate amount to move based on flow rate and time delta
-      double deltaAmt = deltaT*FlowRate*PumpRatio;
+      //double deltaAmt = deltaT * FlowRate * PumpRatio;
+      double deltaAmt = deltaT * FlowRate * PumpRatio;
 
       // 2.  Determine if move amount exceeds remaining amount in tank(s)  
       deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt;

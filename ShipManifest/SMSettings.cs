@@ -31,8 +31,13 @@ namespace ShipManifest
     // Persisted properties
     // UI Managed Settings
     // Realism Tab Feature Options
-    internal static bool RealismMode = true;
+    internal static int RealismMode = 2;
+    internal static bool RealXfers = true;
+    internal static bool RealControl = true;
     internal static bool EnableCrew = true;
+    internal static bool EnableCrewModify = true;
+    internal static bool EnableKerbalRename = true;
+    internal static bool EnableChangeProfession = true;
     internal static bool EnableStockCrewXfer = true;
     internal static bool OverrideStockCrewXfer = true;
     internal static bool EnableClsAllowTransfer = true;
@@ -106,8 +111,6 @@ namespace ShipManifest
     internal static bool AutoDebug;
     internal static bool SaveLogOnExit;
     internal static string ErrorLogLength = "1000";
-    internal static bool EnableKerbalRename = true;
-    internal static bool EnableChangeProfession = true;
     internal static bool AutoSave;
     internal static int SaveIntervalSec = 60;
     internal static bool UseUnityStyle = true;
@@ -135,7 +138,9 @@ namespace ShipManifest
     internal static bool PrevUseUnityStyle = true;
     internal static int PrevSaveIntervalSec = 60;
 
-    internal static bool PrevRealismMode;
+    internal static int PrevRealismMode = 3;
+    internal static bool PrevRealXfers;
+    internal static bool PrevRealControl;
     internal static bool PrevLockSettings;
 
     internal static double PrevFlowRate = 100;
@@ -151,6 +156,7 @@ namespace ShipManifest
     internal static bool PrevEnableEdgeHighlighting = true;
     internal static bool PrevEnableScience = true;
     internal static bool PrevEnableCrew = true;
+    internal static bool PrevEnableCrewModify = true;
     internal static bool PrevEnablePfCrews;
     internal static bool PrevEnableStockCrewXfer = true;
     internal static bool PrevOverrideStockCrewXfer = true;
@@ -216,9 +222,21 @@ namespace ShipManifest
         ConfigNode windowsNode = Settings.HasNode("SM_Windows")
           ? Settings.GetNode("SM_Windows")
           : Settings.AddNode("SM_Windows");
-        ConfigNode settingsNode = Settings.HasNode("SM_Settings")
-          ? Settings.GetNode("SM_Settings")
-          : Settings.AddNode("SM_Settings");
+        ConfigNode realismNode = Settings.HasNode("SM_Realism")
+          ? Settings.GetNode("SM_Realism")
+          : Settings.AddNode("SM_Realism");
+        ConfigNode highlightNode = Settings.HasNode("SM_Highlight")
+          ? Settings.GetNode("SM_Highlight")
+          : Settings.AddNode("SM_Highlight");
+        ConfigNode toolTipsNode = Settings.HasNode("SM_ToolTips")
+          ? Settings.GetNode("SM_ToolTips")
+          : Settings.AddNode("SM_ToolTips");
+        ConfigNode soundsNode = Settings.HasNode("SM_Sounds")
+          ? Settings.GetNode("SM_Sounds")
+          : Settings.AddNode("SM_Sounds");
+        ConfigNode configNode = Settings.HasNode("SM_Config")
+          ? Settings.GetNode("SM_Config")
+          : Settings.AddNode("SM_Config");
         ConfigNode hiddenNode = Settings.HasNode("SM_Hidden")
           ? Settings.GetNode("SM_Hidden")
           : Settings.AddNode("SM_Hidden");
@@ -233,168 +251,198 @@ namespace ShipManifest
 
         // now the settings
         // Realism Settings
-        RealismMode = settingsNode.HasValue("RealismMode")
-          ? bool.Parse(settingsNode.GetValue("RealismMode"))
+        RealismMode = realismNode.HasValue("RealismMode")
+          ? int.Parse(realismNode.GetValue("RealismMode"))
           : RealismMode;
-        EnableCrew = settingsNode.HasValue("EnableCrew") ? bool.Parse(settingsNode.GetValue("EnableCrew")) : EnableCrew;
-        EnablePfCrews = settingsNode.HasValue("EnablePfCrews") ? bool.Parse(settingsNode.GetValue("EnablePfCrews")) : EnablePfCrews;
-        EnableStockCrewXfer = settingsNode.HasValue("EnableStockCrewTransfer")
-          ? bool.Parse(settingsNode.GetValue("EnableStockCrewTransfer"))
+        RealXfers = realismNode.HasValue("RealXfers")
+          ? bool.Parse(realismNode.GetValue("RealXfers"))
+          : RealXfers;
+        RealControl = realismNode.HasValue("RealControl")
+          ? bool.Parse(realismNode.GetValue("RealControl"))
+          : RealControl;
+        EnableCrew = realismNode.HasValue("EnableCrew") 
+          ? bool.Parse(realismNode.GetValue("EnableCrew")) 
+          : EnableCrew;
+        EnableKerbalRename = realismNode.HasValue("EnableKerbalRename")
+          ? bool.Parse(realismNode.GetValue("EnableKerbalRename"))
+          : EnableKerbalRename;
+        EnableChangeProfession = realismNode.HasValue("EnableChangeProfession")
+          ? bool.Parse(realismNode.GetValue("EnableChangeProfession"))
+          : EnableChangeProfession;
+        EnableCrewModify = realismNode.HasValue("EnableCrewModify") 
+          ? bool.Parse(realismNode.GetValue("EnableCrewModify")) 
+          : EnableCrewModify;
+        EnablePfCrews = realismNode.HasValue("EnablePfCrews") 
+          ? bool.Parse(realismNode.GetValue("EnablePfCrews")) 
+          : EnablePfCrews;
+        EnableStockCrewXfer = realismNode.HasValue("EnableStockCrewTransfer")
+          ? bool.Parse(realismNode.GetValue("EnableStockCrewTransfer"))
           : EnableStockCrewXfer;
 
-        EnableScience = settingsNode.HasValue("EnableScience")
-          ? bool.Parse(settingsNode.GetValue("EnableScience"))
+        EnableScience = realismNode.HasValue("EnableScience")
+          ? bool.Parse(realismNode.GetValue("EnableScience"))
           : EnableScience;
-        EnableResources = settingsNode.HasValue("EnableResources")
-          ? bool.Parse(settingsNode.GetValue("EnableResources"))
+        EnableResources = realismNode.HasValue("EnableResources")
+          ? bool.Parse(realismNode.GetValue("EnableResources"))
           : EnableResources;
-        EnablePfResources = settingsNode.HasValue("EnablePFResources")
-          ? bool.Parse(settingsNode.GetValue("EnablePFResources"))
+        EnablePfResources = realismNode.HasValue("EnablePFResources")
+          ? bool.Parse(realismNode.GetValue("EnablePFResources"))
           : EnablePfResources;
-        EnableCls = settingsNode.HasValue("EnableCLS") ? bool.Parse(settingsNode.GetValue("EnableCLS")) : EnableCls;
-        OverrideStockCrewXfer = settingsNode.HasValue("OverrideStockCrewTransfer")
-          ? bool.Parse(settingsNode.GetValue("OverrideStockCrewTransfer"))
+        EnableCls = realismNode.HasValue("EnableCLS") 
+          ? bool.Parse(realismNode.GetValue("EnableCLS")) 
+          : EnableCls;
+        OverrideStockCrewXfer = realismNode.HasValue("OverrideStockCrewTransfer")
+          ? bool.Parse(realismNode.GetValue("OverrideStockCrewTransfer"))
           : OverrideStockCrewXfer;
-        EnableClsAllowTransfer = settingsNode.HasValue("EnableClsAllowTransfer")
-          ? bool.Parse(settingsNode.GetValue("EnableClsAllowTransfer"))
+        EnableClsAllowTransfer = realismNode.HasValue("EnableClsAllowTransfer")
+          ? bool.Parse(realismNode.GetValue("EnableClsAllowTransfer"))
           : EnableClsAllowTransfer;
-        FlowRate = settingsNode.HasValue("FlowRate") ? double.Parse(settingsNode.GetValue("FlowRate")) : FlowRate;
-        FlowCost = settingsNode.HasValue("FlowCost") ? double.Parse(settingsNode.GetValue("FlowCost")) : FlowCost;
-        MinFlowRate = settingsNode.HasValue("MinFlowRate")
-          ? double.Parse(settingsNode.GetValue("MinFlowRate"))
+        FlowRate = realismNode.HasValue("FlowRate") 
+          ? double.Parse(realismNode.GetValue("FlowRate")) 
+          : FlowRate;
+        FlowCost = realismNode.HasValue("FlowCost") 
+          ? double.Parse(realismNode.GetValue("FlowCost")) 
+          : FlowCost;
+        MinFlowRate = realismNode.HasValue("MinFlowRate")
+          ? double.Parse(realismNode.GetValue("MinFlowRate"))
           : MinFlowRate;
-        MaxFlowRate = settingsNode.HasValue("MaxFlowRate")
-          ? double.Parse(settingsNode.GetValue("MaxFlowRate"))
+        MaxFlowRate = realismNode.HasValue("MaxFlowRate")
+          ? double.Parse(realismNode.GetValue("MaxFlowRate"))
           : MaxFlowRate;
-        MaxFlowTimeSec = settingsNode.HasValue("MaxFlowTimeSec")
-          ? int.Parse(settingsNode.GetValue("MaxFlowTimeSec"))
+        MaxFlowTimeSec = realismNode.HasValue("MaxFlowTimeSec")
+          ? int.Parse(realismNode.GetValue("MaxFlowTimeSec"))
           : MaxFlowTimeSec;
-        EnableXferCost = settingsNode.HasValue("EnableXferCost")
-          ? bool.Parse(settingsNode.GetValue("EnableXferCost"))
+        EnableXferCost = realismNode.HasValue("EnableXferCost")
+          ? bool.Parse(realismNode.GetValue("EnableXferCost"))
           : EnableXferCost;
-        LockSettings = settingsNode.HasValue("LockSettings")
-          ? bool.Parse(settingsNode.GetValue("LockSettings"))
+        LockSettings = realismNode.HasValue("LockSettings")
+          ? bool.Parse(realismNode.GetValue("LockSettings"))
           : LockSettings;
 
         // Highlighting settings
-        EnableHighlighting = settingsNode.HasValue("EnableHighlighting")
-          ? bool.Parse(settingsNode.GetValue("EnableHighlighting"))
+        EnableHighlighting = highlightNode.HasValue("EnableHighlighting")
+          ? bool.Parse(highlightNode.GetValue("EnableHighlighting"))
           : EnableHighlighting;
-        OnlySourceTarget = settingsNode.HasValue("OnlySourceTarget")
-          ? bool.Parse(settingsNode.GetValue("OnlySourceTarget"))
+        OnlySourceTarget = highlightNode.HasValue("OnlySourceTarget")
+          ? bool.Parse(highlightNode.GetValue("OnlySourceTarget"))
           : OnlySourceTarget;
-        EnableClsHighlighting = settingsNode.HasValue("EnableCLSHighlighting")
-          ? bool.Parse(settingsNode.GetValue("EnableCLSHighlighting"))
+        EnableClsHighlighting = highlightNode.HasValue("EnableCLSHighlighting")
+          ? bool.Parse(highlightNode.GetValue("EnableCLSHighlighting"))
           : EnableClsHighlighting;
-        EnableEdgeHighlighting = settingsNode.HasValue("EnableEdgeHighlighting")
-          ? bool.Parse(settingsNode.GetValue("EnableEdgeHighlighting"))
+        EnableEdgeHighlighting = highlightNode.HasValue("EnableEdgeHighlighting")
+          ? bool.Parse(highlightNode.GetValue("EnableEdgeHighlighting"))
           : EnableClsHighlighting;
         ResourcePartColor = hiddenNode.HasValue("ResourcePartColor")
           ? hiddenNode.GetValue("ResourcePartColor")
           : ResourcePartColor;
 
         // ToolTip Settings
-        ShowToolTips = settingsNode.HasValue("ShowToolTips")
-          ? bool.Parse(settingsNode.GetValue("ShowToolTips"))
+        ShowToolTips = toolTipsNode.HasValue("ShowToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("ShowToolTips"))
           : ShowToolTips;
-        WindowManifest.ShowToolTips = settingsNode.HasValue("ManifestToolTips")
-          ? bool.Parse(settingsNode.GetValue("ManifestToolTips"))
+        WindowManifest.ShowToolTips = toolTipsNode.HasValue("ManifestToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("ManifestToolTips"))
           : WindowManifest.ShowToolTips;
-        WindowTransfer.ShowToolTips = settingsNode.HasValue("TransferToolTips")
-          ? bool.Parse(settingsNode.GetValue("TransferToolTips"))
+        WindowTransfer.ShowToolTips = toolTipsNode.HasValue("TransferToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("TransferToolTips"))
           : WindowTransfer.ShowToolTips;
-        WindowSettings.ShowToolTips = settingsNode.HasValue("SettingsToolTips")
-          ? bool.Parse(settingsNode.GetValue("SettingsToolTips"))
+        WindowSettings.ShowToolTips = toolTipsNode.HasValue("SettingsToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("SettingsToolTips"))
           : WindowSettings.ShowToolTips;
-        TabRealism.ShowToolTips = settingsNode.HasValue("RealismToolTips")
-          ? bool.Parse(settingsNode.GetValue("RealismToolTips"))
+        TabRealism.ShowToolTips = toolTipsNode.HasValue("RealismToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("RealismToolTips"))
           : TabRealism.ShowToolTips;
-        TabHighlight.ShowToolTips = settingsNode.HasValue("HighlightingToolTips")
-          ? bool.Parse(settingsNode.GetValue("HighlightingToolTips"))
+        TabHighlight.ShowToolTips = toolTipsNode.HasValue("HighlightingToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("HighlightingToolTips"))
           : TabHighlight.ShowToolTips;
-        TabToolTips.ShowToolTips = settingsNode.HasValue("ToolTipsToolTips")
-          ? bool.Parse(settingsNode.GetValue("ToolTipsToolTips"))
+        TabToolTips.ShowToolTips = toolTipsNode.HasValue("ToolTipsToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("ToolTipsToolTips"))
           : TabToolTips.ShowToolTips;
-        TabSounds.ShowToolTips = settingsNode.HasValue("SoundsToolTips")
-          ? bool.Parse(settingsNode.GetValue("SoundsToolTips"))
+        TabSounds.ShowToolTips = toolTipsNode.HasValue("SoundsToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("SoundsToolTips"))
           : TabSounds.ShowToolTips;
-        TabConfig.ShowToolTips = settingsNode.HasValue("ConfigToolTips")
-          ? bool.Parse(settingsNode.GetValue("ConfigToolTips"))
+        TabConfig.ShowToolTips = toolTipsNode.HasValue("ConfigToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("ConfigToolTips"))
           : TabConfig.ShowToolTips;
-        //TabInstalledMods.ShowToolTips = settingsNode.HasValue("InstalledModsToolTips")
-        //  ? Boolean.Parse(settingsNode.GetValue("InstalledModsToolTips"))
-        //  : TabInstalledMods.ShowToolTips;
-        WindowRoster.ShowToolTips = settingsNode.HasValue("RosterToolTips")
-          ? bool.Parse(settingsNode.GetValue("RosterToolTips"))
+        WindowRoster.ShowToolTips = toolTipsNode.HasValue("RosterToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("RosterToolTips"))
           : WindowRoster.ShowToolTips;
-        WindowControl.ShowToolTips = settingsNode.HasValue("ControlToolTips")
-          ? bool.Parse(settingsNode.GetValue("ControlToolTips"))
+        WindowControl.ShowToolTips = toolTipsNode.HasValue("ControlToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("ControlToolTips"))
           : WindowControl.ShowToolTips;
-        TabHatch.ShowToolTips = settingsNode.HasValue("HatchToolTips")
-          ? bool.Parse(settingsNode.GetValue("HatchToolTips"))
+        TabHatch.ShowToolTips = toolTipsNode.HasValue("HatchToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("HatchToolTips"))
           : TabHatch.ShowToolTips;
-        TabSolarPanel.ShowToolTips = settingsNode.HasValue("PanelToolTips")
-          ? bool.Parse(settingsNode.GetValue("PanelToolTips"))
+        TabSolarPanel.ShowToolTips = toolTipsNode.HasValue("PanelToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("PanelToolTips"))
           : TabSolarPanel.ShowToolTips;
-        TabAntenna.ShowToolTips = settingsNode.HasValue("AntennaToolTips")
-          ? bool.Parse(settingsNode.GetValue("AntennaToolTips"))
+        TabAntenna.ShowToolTips = toolTipsNode.HasValue("AntennaToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("AntennaToolTips"))
           : TabAntenna.ShowToolTips;
-        TabLight.ShowToolTips = settingsNode.HasValue("LightToolTips")
-          ? bool.Parse(settingsNode.GetValue("LightToolTips"))
+        TabLight.ShowToolTips = toolTipsNode.HasValue("LightToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("LightToolTips"))
           : TabLight.ShowToolTips;
-        WindowDebugger.ShowToolTips = settingsNode.HasValue("DebuggerToolTips")
-          ? bool.Parse(settingsNode.GetValue("DebuggerToolTips"))
+        WindowDebugger.ShowToolTips = toolTipsNode.HasValue("DebuggerToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("DebuggerToolTips"))
           : WindowDebugger.ShowToolTips;
 
         // Sounds Settings
-        PumpSoundStart = settingsNode.HasValue("PumpSoundStart")
-          ? settingsNode.GetValue("PumpSoundStart")
+        PumpSoundStart = soundsNode.HasValue("PumpSoundStart")
+          ? soundsNode.GetValue("PumpSoundStart")
           : PumpSoundStart;
-        PumpSoundRun = settingsNode.HasValue("PumpSoundRun") ? settingsNode.GetValue("PumpSoundRun") : PumpSoundRun;
-        PumpSoundStop = settingsNode.HasValue("PumpSoundStop") ? settingsNode.GetValue("PumpSoundStop") : PumpSoundStop;
-        CrewSoundStart = settingsNode.HasValue("CrewSoundStart")
-          ? settingsNode.GetValue("CrewSoundStart")
+        PumpSoundRun = soundsNode.HasValue("PumpSoundRun") 
+          ? soundsNode.GetValue("PumpSoundRun") 
+          : PumpSoundRun;
+        PumpSoundStop = soundsNode.HasValue("PumpSoundStop") 
+          ? soundsNode.GetValue("PumpSoundStop") 
+          : PumpSoundStop;
+        CrewSoundStart = soundsNode.HasValue("CrewSoundStart")
+          ? soundsNode.GetValue("CrewSoundStart")
           : CrewSoundStart;
-        CrewSoundRun = settingsNode.HasValue("CrewSoundRun") ? settingsNode.GetValue("CrewSoundRun") : CrewSoundRun;
-        CrewSoundStop = settingsNode.HasValue("CrewSoundStop") ? settingsNode.GetValue("CrewSoundStop") : CrewSoundStop;
+        CrewSoundRun = soundsNode.HasValue("CrewSoundRun") 
+          ? soundsNode.GetValue("CrewSoundRun") 
+          : CrewSoundRun;
+        CrewSoundStop = soundsNode.HasValue("CrewSoundStop") 
+          ? soundsNode.GetValue("CrewSoundStop") 
+          : CrewSoundStop;
 
-        PumpSoundVol = settingsNode.HasValue("PumpSoundVol")
-          ? double.Parse(settingsNode.GetValue("PumpSoundVol"))
+        PumpSoundVol = soundsNode.HasValue("PumpSoundVol")
+          ? double.Parse(soundsNode.GetValue("PumpSoundVol"))
           : PumpSoundVol;
-        CrewSoundVol = settingsNode.HasValue("CrewSoundVol")
-          ? double.Parse(settingsNode.GetValue("CrewSoundVol"))
+        CrewSoundVol = soundsNode.HasValue("CrewSoundVol")
+          ? double.Parse(soundsNode.GetValue("CrewSoundVol"))
           : CrewSoundVol;
 
         // Config Settings
-        EnableBlizzyToolbar = settingsNode.HasValue("EnableBlizzyToolbar")
-          ? bool.Parse(settingsNode.GetValue("EnableBlizzyToolbar"))
+        EnableBlizzyToolbar = configNode.HasValue("EnableBlizzyToolbar")
+          ? bool.Parse(configNode.GetValue("EnableBlizzyToolbar"))
           : EnableBlizzyToolbar;
-        WindowDebugger.ShowWindow = settingsNode.HasValue("ShowDebugger")
-          ? bool.Parse(settingsNode.GetValue("ShowDebugger"))
+        WindowDebugger.ShowWindow = configNode.HasValue("ShowDebugger")
+          ? bool.Parse(configNode.GetValue("ShowDebugger"))
           : WindowDebugger.ShowWindow;
-        VerboseLogging = settingsNode.HasValue("VerboseLogging")
-          ? bool.Parse(settingsNode.GetValue("VerboseLogging"))
+        VerboseLogging = configNode.HasValue("VerboseLogging")
+          ? bool.Parse(configNode.GetValue("VerboseLogging"))
           : VerboseLogging;
-        AutoSave = settingsNode.HasValue("AutoSave") ? bool.Parse(settingsNode.GetValue("AutoSave")) : AutoSave;
-        SaveIntervalSec = settingsNode.HasValue("SaveIntervalSec")
-          ? int.Parse(settingsNode.GetValue("SaveIntervalSec"))
+        AutoSave = configNode.HasValue("AutoSave") 
+          ? bool.Parse(configNode.GetValue("AutoSave")) 
+          : AutoSave;
+        SaveIntervalSec = configNode.HasValue("SaveIntervalSec")
+          ? int.Parse(configNode.GetValue("SaveIntervalSec"))
           : SaveIntervalSec;
-        AutoDebug = settingsNode.HasValue("AutoDebug") ? bool.Parse(settingsNode.GetValue("AutoDebug")) : AutoDebug;
-        DebugLogPath = settingsNode.HasValue("DebugLogPath") ? settingsNode.GetValue("DebugLogPath") : DebugLogPath;
-        ErrorLogLength = settingsNode.HasValue("ErrorLogLength")
-          ? settingsNode.GetValue("ErrorLogLength")
+        AutoDebug = configNode.HasValue("AutoDebug") 
+          ? bool.Parse(configNode.GetValue("AutoDebug")) 
+          : AutoDebug;
+        DebugLogPath = configNode.HasValue("DebugLogPath") 
+          ? configNode.GetValue("DebugLogPath") 
+          : DebugLogPath;
+        ErrorLogLength = configNode.HasValue("ErrorLogLength")
+          ? configNode.GetValue("ErrorLogLength")
           : ErrorLogLength;
-        SaveLogOnExit = settingsNode.HasValue("SaveLogOnExit")
-          ? bool.Parse(settingsNode.GetValue("SaveLogOnExit"))
+        SaveLogOnExit = configNode.HasValue("SaveLogOnExit")
+          ? bool.Parse(configNode.GetValue("SaveLogOnExit"))
           : SaveLogOnExit;
-        EnableKerbalRename = settingsNode.HasValue("EnableKerbalRename")
-          ? bool.Parse(settingsNode.GetValue("EnableKerbalRename"))
-          : EnableKerbalRename;
-        EnableChangeProfession = settingsNode.HasValue("EnableChangeProfession")
-          ? bool.Parse(settingsNode.GetValue("EnableChangeProfession"))
-          : EnableChangeProfession;
-        UseUnityStyle = settingsNode.HasValue("UseUnityStyle")
-          ? bool.Parse(settingsNode.GetValue("UseUnityStyle"))
+        UseUnityStyle = configNode.HasValue("UseUnityStyle")
+          ? bool.Parse(configNode.GetValue("UseUnityStyle"))
           : UseUnityStyle;
 
         // Hidden Settings
@@ -408,7 +456,9 @@ namespace ShipManifest
         TargetPartCrewColor = hiddenNode.HasValue("TargetPartCrewColor")
           ? hiddenNode.GetValue("TargetPartCrewColor")
           : TargetPartCrewColor;
-        MouseOverColor = hiddenNode.HasValue("MouseOverColor") ? hiddenNode.GetValue("MouseOverColor") : MouseOverColor;
+        MouseOverColor = hiddenNode.HasValue("MouseOverColor") 
+          ? hiddenNode.GetValue("MouseOverColor") 
+          : MouseOverColor;
 
         // Hidden config
         CrewXferDelaySec = hiddenNode.HasValue("CrewXferDelaySec")
@@ -448,10 +498,24 @@ namespace ShipManifest
         ConfigNode windowsNode = Settings.HasNode("SM_Windows")
           ? Settings.GetNode("SM_Windows")
           : Settings.AddNode("SM_Windows");
-        ConfigNode settingsNode = Settings.HasNode("SM_Settings")
-          ? Settings.GetNode("SM_Settings")
-          : Settings.AddNode("SM_Settings");
-        ConfigNode hiddenNode = Settings.HasNode("SM_Hidden") ? Settings.GetNode("SM_Hidden") : Settings.AddNode("SM_Hidden");
+        ConfigNode realismNode = Settings.HasNode("SM_Realism")
+          ? Settings.GetNode("SM_Realism")
+          : Settings.AddNode("SM_Realism");
+        ConfigNode highlightNode = Settings.HasNode("SM_Highlight")
+          ? Settings.GetNode("SM_Highlight")
+          : Settings.AddNode("SM_Highlight");
+        ConfigNode toolTipsNode = Settings.HasNode("SM_ToolTips")
+          ? Settings.GetNode("SM_ToolTips")
+          : Settings.AddNode("SM_ToolTips");
+        ConfigNode soundsNode = Settings.HasNode("SM_Sounds")
+          ? Settings.GetNode("SM_Sounds")
+          : Settings.AddNode("SM_Sounds");
+        ConfigNode configNode = Settings.HasNode("SM_Config")
+          ? Settings.GetNode("SM_Config")
+          : Settings.AddNode("SM_Config");
+        ConfigNode hiddenNode = Settings.HasNode("SM_Hidden") 
+          ? Settings.GetNode("SM_Hidden") 
+          : Settings.AddNode("SM_Hidden");
 
         // Write window positions
         WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
@@ -463,72 +527,74 @@ namespace ShipManifest
 
         //Write settings...
         // Realism Settings
-        WriteValue(settingsNode, "RealismMode", RealismMode);
-        WriteValue(settingsNode, "EnableCrew", EnableCrew);
-        WriteValue(settingsNode, "EnablePfCrews", EnablePfCrews);
-        WriteValue(settingsNode, "EnableStockCrewTransfer", EnableStockCrewXfer);
-        WriteValue(settingsNode, "EnableScience", EnableScience);
-        WriteValue(settingsNode, "EnableResources", EnableResources);
-        WriteValue(settingsNode, "EnablePFResources", EnablePfResources);
-        WriteValue(settingsNode, "EnableCLS", EnableCls);
-        WriteValue(settingsNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
-        WriteValue(settingsNode, "EnableClsAllowTransfer", EnableClsAllowTransfer);
-        WriteValue(settingsNode, "FlowRate", FlowRate);
-        WriteValue(settingsNode, "FlowCost", FlowCost);
-        WriteValue(settingsNode, "MinFlowRate", MinFlowRate);
-        WriteValue(settingsNode, "MaxFlowRate", MaxFlowRate);
-        WriteValue(settingsNode, "MaxFlowTimeSec", MaxFlowTimeSec);
-        WriteValue(settingsNode, "EnableXferCost", EnableXferCost);
-        WriteValue(settingsNode, "LockSettings", LockSettings);
+        WriteValue(realismNode, "RealismMode", RealismMode);
+        WriteValue(realismNode, "RealXfers", RealXfers);
+        WriteValue(realismNode, "RealControl", RealControl);
+        WriteValue(realismNode, "EnableCrew", EnableCrew);
+        WriteValue(realismNode, "EnableCrewModify", EnableCrewModify);
+        WriteValue(realismNode, "EnableKerbalRename", EnableKerbalRename);
+        WriteValue(realismNode, "EnableChangeProfession", EnableChangeProfession);
+        WriteValue(realismNode, "EnablePfCrews", EnablePfCrews);
+        WriteValue(realismNode, "EnableStockCrewTransfer", EnableStockCrewXfer);
+        WriteValue(realismNode, "EnableScience", EnableScience);
+        WriteValue(realismNode, "EnableResources", EnableResources);
+        WriteValue(realismNode, "EnablePFResources", EnablePfResources);
+        WriteValue(realismNode, "EnableCLS", EnableCls);
+        WriteValue(realismNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
+        WriteValue(realismNode, "EnableClsAllowTransfer", EnableClsAllowTransfer);
+        WriteValue(realismNode, "FlowRate", FlowRate);
+        WriteValue(realismNode, "FlowCost", FlowCost);
+        WriteValue(realismNode, "MinFlowRate", MinFlowRate);
+        WriteValue(realismNode, "MaxFlowRate", MaxFlowRate);
+        WriteValue(realismNode, "MaxFlowTimeSec", MaxFlowTimeSec);
+        WriteValue(realismNode, "EnableXferCost", EnableXferCost);
+        WriteValue(realismNode, "LockSettings", LockSettings);
 
         // Highlighting Settings
-        WriteValue(settingsNode, "EnableHighlighting", EnableHighlighting);
-        WriteValue(settingsNode, "OnlySourceTarget", OnlySourceTarget);
-        WriteValue(settingsNode, "EnableCLSHighlighting", EnableClsHighlighting);
-        WriteValue(settingsNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
+        WriteValue(highlightNode, "EnableHighlighting", EnableHighlighting);
+        WriteValue(highlightNode, "OnlySourceTarget", OnlySourceTarget);
+        WriteValue(highlightNode, "EnableCLSHighlighting", EnableClsHighlighting);
+        WriteValue(highlightNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
 
         // ToolTip Settings
-        WriteValue(settingsNode, "ShowToolTips", ShowToolTips);
-        WriteValue(settingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
-        WriteValue(settingsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
-        WriteValue(settingsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
-        WriteValue(settingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
-        WriteValue(settingsNode, "RealismToolTips", TabRealism.ShowToolTips);
-        WriteValue(settingsNode, "HighlightingToolTips", TabHighlight.ShowToolTips);
-        WriteValue(settingsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
-        WriteValue(settingsNode, "SoundsToolTips", TabSounds.ShowToolTips);
-        WriteValue(settingsNode, "ConfigToolTips", TabConfig.ShowToolTips);
-        //WriteValue(settingsNode, "InstalledModsToolTips", TabInstalledMods.ShowToolTips);
-        WriteValue(settingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
-        WriteValue(settingsNode, "ControlToolTips", WindowControl.ShowToolTips);
-        WriteValue(settingsNode, "HatchToolTips", TabHatch.ShowToolTips);
-        WriteValue(settingsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
-        WriteValue(settingsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
-        WriteValue(settingsNode, "LightToolTips", TabLight.ShowToolTips);
+        WriteValue(toolTipsNode, "ShowToolTips", ShowToolTips);
+        WriteValue(toolTipsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
+        WriteValue(toolTipsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
+        WriteValue(toolTipsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
+        WriteValue(toolTipsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
+        WriteValue(toolTipsNode, "RealismToolTips", TabRealism.ShowToolTips);
+        WriteValue(toolTipsNode, "HighlightingToolTips", TabHighlight.ShowToolTips);
+        WriteValue(toolTipsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
+        WriteValue(toolTipsNode, "SoundsToolTips", TabSounds.ShowToolTips);
+        WriteValue(toolTipsNode, "ConfigToolTips", TabConfig.ShowToolTips);
+        WriteValue(toolTipsNode, "RosterToolTips", WindowRoster.ShowToolTips);
+        WriteValue(toolTipsNode, "ControlToolTips", WindowControl.ShowToolTips);
+        WriteValue(toolTipsNode, "HatchToolTips", TabHatch.ShowToolTips);
+        WriteValue(toolTipsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
+        WriteValue(toolTipsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
+        WriteValue(toolTipsNode, "LightToolTips", TabLight.ShowToolTips);
 
         // Sound Settings
-        WriteValue(settingsNode, "PumpSoundStart", PumpSoundStart);
-        WriteValue(settingsNode, "PumpSoundRun", PumpSoundRun);
-        WriteValue(settingsNode, "PumpSoundStop", PumpSoundStop);
-        WriteValue(settingsNode, "CrewSoundStart", CrewSoundStart);
-        WriteValue(settingsNode, "CrewSoundRun", CrewSoundRun);
-        WriteValue(settingsNode, "CrewSoundStop", CrewSoundStop);
-        WriteValue(settingsNode, "PumpSoundVol", PumpSoundVol);
-        WriteValue(settingsNode, "CrewSoundVol", CrewSoundVol);
+        WriteValue(soundsNode, "PumpSoundStart", PumpSoundStart);
+        WriteValue(soundsNode, "PumpSoundRun", PumpSoundRun);
+        WriteValue(soundsNode, "PumpSoundStop", PumpSoundStop);
+        WriteValue(soundsNode, "CrewSoundStart", CrewSoundStart);
+        WriteValue(soundsNode, "CrewSoundRun", CrewSoundRun);
+        WriteValue(soundsNode, "CrewSoundStop", CrewSoundStop);
+        WriteValue(soundsNode, "PumpSoundVol", PumpSoundVol);
+        WriteValue(soundsNode, "CrewSoundVol", CrewSoundVol);
 
         // Config Settings
-        WriteValue(settingsNode, "ShowDebugger", WindowDebugger.ShowWindow);
-        WriteValue(settingsNode, "EnableBlizzyToolbar", EnableBlizzyToolbar);
-        WriteValue(settingsNode, "VerboseLogging", VerboseLogging);
-        WriteValue(settingsNode, "AutoSave", AutoSave);
-        WriteValue(settingsNode, "SaveIntervalSec", SaveIntervalSec);
-        WriteValue(settingsNode, "AutoDebug", AutoDebug);
-        WriteValue(settingsNode, "DebugLogPath", DebugLogPath);
-        WriteValue(settingsNode, "ErrorLogLength", ErrorLogLength);
-        WriteValue(settingsNode, "SaveLogOnExit", SaveLogOnExit);
-        WriteValue(settingsNode, "EnableKerbalRename", EnableKerbalRename);
-        WriteValue(settingsNode, "EnableChangeProfession", EnableChangeProfession);
-        WriteValue(settingsNode, "UseUnityStyle", UseUnityStyle);
+        WriteValue(configNode, "ShowDebugger", WindowDebugger.ShowWindow);
+        WriteValue(configNode, "EnableBlizzyToolbar", EnableBlizzyToolbar);
+        WriteValue(configNode, "VerboseLogging", VerboseLogging);
+        WriteValue(configNode, "AutoSave", AutoSave);
+        WriteValue(configNode, "SaveIntervalSec", SaveIntervalSec);
+        WriteValue(configNode, "AutoDebug", AutoDebug);
+        WriteValue(configNode, "DebugLogPath", DebugLogPath);
+        WriteValue(configNode, "ErrorLogLength", ErrorLogLength);
+        WriteValue(configNode, "SaveLogOnExit", SaveLogOnExit);
+        WriteValue(configNode, "UseUnityStyle", UseUnityStyle);
 
         // Hidden Settings
         WriteValue(hiddenNode, "ResourcePartColor", ResourcePartColor);
@@ -542,6 +608,88 @@ namespace ShipManifest
         if (!Directory.Exists(SettingsPath))
           Directory.CreateDirectory(SettingsPath);
         Settings.Save(SettingsFile);
+      }
+    }
+
+    internal static void SetRealismModeSwitches(int mode)
+    {
+      if (mode != 3) RealismMode = mode;
+      switch (mode)
+      {
+        case 0: // Full
+          RealXfers = true;
+          RealControl = true;
+          EnableCrew = true;
+          EnableKerbalRename = false;
+          EnableChangeProfession = false;
+          EnableCrewModify = false;
+          EnableStockCrewXfer = true;
+          OverrideStockCrewXfer = true;
+          EnableClsAllowTransfer = true;
+          EnableCls = ClsInstalled;
+          EnableScience = true;
+          EnableResources = true;
+          EnablePfCrews = false;
+          EnablePfResources = false;
+          EnableXferCost = true;
+          FlowCost = 0.0015;
+          FlowRate = 100;
+          MinFlowRate = 0;
+          MaxFlowRate = 1000;
+          Tolerance = 0.000001;
+          MaxFlowTimeSec = 180;
+          LockSettings = false;
+          break;
+        case 1: // None
+          RealXfers = false;
+          RealControl = false;
+          EnableCrew = true;
+          EnableCrewModify = true;
+          EnableKerbalRename = true;
+          EnableChangeProfession = true;
+          EnableStockCrewXfer = true;
+          OverrideStockCrewXfer = false;
+          EnableClsAllowTransfer = true;
+          EnableCls = false;
+          EnableScience = true;
+          EnableResources = true;
+          EnablePfCrews = false;
+          EnablePfResources = true;
+          EnableXferCost = false;
+          FlowCost = 0.0015;
+          FlowRate = 100;
+          MinFlowRate = 0;
+          MaxFlowRate = 1000;
+          Tolerance = 0.000001;
+          MaxFlowTimeSec = 180;
+          LockSettings = false;
+          break;
+        case 2: // Default
+          RealXfers = true;
+          RealControl = true;
+          EnableCrew = true;
+          EnableCrewModify = true;
+          EnableKerbalRename = true;
+          EnableChangeProfession = true;
+          EnableStockCrewXfer = true;
+          OverrideStockCrewXfer = true;
+          EnableClsAllowTransfer = true;
+          EnableCls = ClsInstalled;
+          EnableScience = true;
+          EnableResources = true;
+          EnablePfCrews = false;
+          EnablePfResources = true;
+          EnableXferCost = true;
+          FlowCost = 0.0015;
+          FlowRate = 100;
+          MinFlowRate = 0;
+          MaxFlowRate = 1000;
+          Tolerance = 0.000001;
+          MaxFlowTimeSec = 180;
+          LockSettings = false;
+          break;
+        case 3: // Custom  Do nothing.
+          break;
       }
     }
 
@@ -646,6 +794,8 @@ namespace ShipManifest
     internal static void MemStoreTempSettings()
     {
       PrevRealismMode = RealismMode;
+      PrevRealXfers = RealXfers;
+      PrevRealControl = RealControl;
       PrevShowDebugger = WindowDebugger.ShowWindow;
       PrevVerboseLogging = VerboseLogging;
       PrevAutoSave = AutoSave;
@@ -670,6 +820,7 @@ namespace ShipManifest
       PrevOnlySourceTarget = OnlySourceTarget;
       PrevEnableClsHighlighting = EnableClsHighlighting;
       PrevEnableCrew = EnableCrew;
+      PrevEnableCrewModify = EnableCrewModify;
       PrevEnablePfCrews = EnablePfCrews;
       PrevEnablePfResources = EnablePfResources;
       PrevEnableCls = EnableCls;
@@ -699,7 +850,6 @@ namespace ShipManifest
       PrevSoundsToolTips = TabSounds.ShowToolTips;
       PrevHighlightToolTips = TabHighlight.ShowToolTips;
       PrevConfigToolTips = TabConfig.ShowToolTips;
-      //PrevModsToolTips = TabInstalledMods.ShowToolTips;
 
       //debugger Settings
       PrevErrorLogLength = ErrorLogLength;
@@ -708,6 +858,8 @@ namespace ShipManifest
     internal static void MemRestoreTempSettings()
     {
       RealismMode = PrevRealismMode;
+      RealXfers = PrevRealXfers;
+      RealControl = PrevRealControl;
       WindowDebugger.ShowWindow = PrevShowDebugger;
       VerboseLogging = PrevVerboseLogging;
       AutoSave = PrevAutoSave;
@@ -731,6 +883,7 @@ namespace ShipManifest
       OnlySourceTarget = PrevOnlySourceTarget;
       EnableClsHighlighting = PrevEnableClsHighlighting;
       EnableCrew = PrevEnableCrew;
+      EnableCrewModify = PrevEnableCrewModify;
       EnablePfCrews = PrevEnablePfCrews;
       EnablePfResources = PrevEnablePfResources;
       EnableCls = PrevEnableCls;

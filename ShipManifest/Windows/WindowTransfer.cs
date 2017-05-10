@@ -347,7 +347,7 @@ namespace ShipManifest.Windows
           // set the conditions for a button style change.
           int btnWidth = 273; // Start with full width button...
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = !SMSettings.RealismMode || (SMSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
+            btnWidth = !SMSettings.RealXfers || (SMSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
           else if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMConditions.CanShowCrewFillDumpButtons())
             btnWidth = 173;
 
@@ -426,7 +426,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
 
-      if (SMSettings.RealismMode || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
+      if (SMSettings.RealXfers || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
       GUIStyle style2 = pumpType == TransferPump.TypePump.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
@@ -470,7 +470,7 @@ namespace ShipManifest.Windows
 
           // set the conditions for a button style change.
           int btnWidth = 265;
-          if (!SMSettings.RealismMode)
+          if (!SMSettings.RealXfers)
             btnWidth = 180;
 
           // Set style based on viewer and toggled state.
@@ -502,7 +502,7 @@ namespace ShipManifest.Windows
           GUI.enabled = true;
 
           //step = "Render dump/fill buttons";
-          if (!SMSettings.RealismMode)
+          if (!SMSettings.RealXfers)
           {
             if (selectedResources.Count > 1)
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0 ||
@@ -615,7 +615,7 @@ namespace ShipManifest.Windows
         }
         else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0], selectedPartsTo.Count > 0? selectedPartsTo[0] : null))
         {
-          GUI.enabled = true;
+          GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist;
           if (GUILayout.Button(new GUIContent("EVA", EvaToolTip), SMStyle.ButtonStyle, GUILayout.Width(50),
             GUILayout.Height(20)))
           {
@@ -763,7 +763,7 @@ namespace ShipManifest.Windows
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
         {
-          if (SMSettings.RealismMode && !isCollectable)
+          if (SMSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
             toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is marked not transferable";
@@ -852,14 +852,14 @@ namespace ShipManifest.Windows
               Rect rect = GUILayoutUtility.GetLastRect();
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
             }
-            if (SMSettings.RealismMode && !isCollectable)
+            if (SMSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
-              toolTip = "Realism Mode is preventing transfer.\r\nData is marked not transferable";
+              toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";
             }
             else
             {
-              toolTip = "Realism is off, or Data is transferable";
+              toolTip = "Realistic Transfers is off, or Data is transferable";
               GUI.enabled = true;
             }
             if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)

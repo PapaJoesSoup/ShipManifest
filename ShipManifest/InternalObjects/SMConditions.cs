@@ -23,7 +23,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsShipControllable()
     {
-      return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealismMode) || !SMSettings.RealismMode;
+      return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealControl) || !SMSettings.RealControl;
     }
 
     internal static bool IsInPreflight()
@@ -130,7 +130,7 @@ namespace ShipManifest.InternalObjects
     {
       if (source == null || target == null) return false;
       bool results = false;
-      if (SMSettings.EnableCls && SMSettings.RealismMode)
+      if (SMSettings.EnableCls && SMSettings.RealXfers)
       {
         if (SMAddon.ClsAddon.Vessel != null)
         {
@@ -275,13 +275,20 @@ namespace ShipManifest.InternalObjects
       }
       catch
       {
-        return false;
+        try
+        {
+          return KSCPauseMenu.Instance.isActiveAndEnabled;
+        }
+        catch
+        {
+          return false;
+        }
       }
     }
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return (!SMSettings.RealismMode ||
+      return (!SMSettings.RealXfers ||
               SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> {resourceName}))
              &&
              TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
@@ -351,7 +358,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanShowCrewFillDumpButtons()
     {
-      return !SMSettings.RealismMode ||
+      return !SMSettings.RealXfers ||
              (SMAddon.SmVessel.IsRecoverable && SMSettings.EnablePfCrews);
     }
     internal static bool IsUsiInflatable(Part part)
@@ -366,7 +373,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeAdded(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
              SMAddon.SmVessel.SelectedPartsSource.Count > 0 &&
              !SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
@@ -402,21 +409,21 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned &&
              FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeAddedNoSource(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealismMode && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealismMode) &&
+      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
              SMAddon.SmVessel.SelectedPartsSource.Count == 0;
     }
 
     internal static bool KerbalCannotBeAddedRealism(ProtoCrewMember kerbal)
     {
-      return SMSettings.RealismMode && !SMAddon.SmVessel.IsRecoverable &&
+      return SMSettings.RealXfers && !SMAddon.SmVessel.IsRecoverable &&
              kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 

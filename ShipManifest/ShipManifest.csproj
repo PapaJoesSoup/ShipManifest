@@ -143,6 +143,7 @@
     <Content Include="LocalDev\pdb2mdb_exe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Distribution\GameData\ShipManifest\Localization\ShipManifest.cfg" />
     <None Include="Distribution\GameData\ShipManifest\ShipManifest.version" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\14214-1.ogg" />
     <None Include="Distribution\GameData\ShipManifest\Sounds\14214-2.ogg" />

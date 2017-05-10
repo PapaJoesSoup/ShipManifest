@@ -38,21 +38,107 @@ namespace ShipManifest.Windows.Tabs
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       bool isEnabled = !SMSettings.LockSettings;
-      // Realism Mode
+      // RealismMode options
+      _label = "Realism Mode:  ";
+      _toolTip = "Buttons that set the collection of realism settings to suit the category.";
+      _toolTip += "\r\n - Full - Enables all realism settings.";
+      _toolTip += "\r\n - None - Disable all realism settings.";
+      _toolTip += "\r\n - Default - Sets settings to freshly installed realism settings.";
+      _toolTip += "\r\n - Custom - Setting this option makes no changes to your settings.\r\n It is selected automatically when any settings change invalidate the other categories.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      GUIContent[] options =
+      {
+        new GUIContent("Full","Enables full realism. Most restrictive use of SM"),
+        new GUIContent("None","No realism settings enabled.  Most permissive use of SM."),
+        new GUIContent("Default", "Default settings that come with SM when installed.\r\nA blend of settings that leans towards realism."),
+        new GUIContent("Custom", "This setting is selected automatically when any settings\r\nare changed that invalidate the other categories.")
+      };
       GUI.enabled = isEnabled;
-      _label = "Enable Realism Mode";
-      _toolTip = "Turns on/off Realism Mode.";
-      _toolTip += "\r\nWhen ON, causes changes in the interface and limits";
-      _toolTip += "\r\nyour freedom to do things that would not be 'Realistic'.";
+      GUILayout.BeginHorizontal();
+      GUILayout.Label(_guiLabel, GUILayout.Width(85));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      // Store mode value to evalulte for changes.
+      int mode = SMSettings.RealismMode;
+      mode = GUILayout.SelectionGrid(mode, options, 4, GUILayout.Height(20), GUILayout.Width(256));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      GUILayout.EndHorizontal();
+
+      if (mode != SMSettings.RealismMode)
+      {
+        SMSettings.SetRealismModeSwitches(mode);
+        SMSettings.RealismMode = mode;
+      }
+      GUI.enabled = true;
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+
+
+      // RealXfers Mode
+      GUI.enabled = isEnabled;
+      _label = "Realistic Transfers";
+      _toolTip = "Turns on/off Realistic Resource Transfers.";
+      _toolTip += "\r\nWhen ON, Resource fills, Dumps, Crew and Science transfers will behave realistically";
       _toolTip += "\r\nWhen Off, Allows Fills, Dumps, Repeating Science,";
       _toolTip += "\r\ninstantaneous Xfers, Crew Xfers anywwhere, etc.";
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.RealismMode = GUILayout.Toggle(SMSettings.RealismMode, _guiLabel, GUILayout.Width(300));
+      SMSettings.RealXfers = GUILayout.Toggle(SMSettings.RealXfers, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      // EnableCrew Mode
+      // RealControl Mode
+      GUI.enabled = isEnabled;
+      _label = "Realistic Control";
+      _toolTip = "Turns on/off Realistic Shipboard Control.";
+      _toolTip += "\r\nWhen ON, you must have crew aboard, or a valid comm link to a control station or satellite";
+      _toolTip += "\r\nWhen Off, you have full control of the vessel at any time (subject to the availability of resources).";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.RealControl = GUILayout.Toggle(SMSettings.RealControl, _guiLabel, GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      // EnableCrew Modifications
+      GUI.enabled = isEnabled;
+      GUILayout.BeginHorizontal();
+      _label = "Enable Crew Member Modifications";
+      _toolTip = "Enables/Disable Crew Modifications in the Roster Window.";
+      _toolTip += "\r\nWhen ON, You cannot Edit, Create, or Respawn Crew members.";
+      _toolTip += "\r\nWhen Off, You can Edit, Create, or Respawn Crew members.";
+      _toolTip += "\r\nThis works in conjunction with Realism mode, as Realism also restricts some other Crew actions.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.EnableCrewModify = GUILayout.Toggle(SMSettings.EnableCrewModify, _guiLabel, GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.EndHorizontal();
+
+      _label = "Enable Kerbal Renaming";
+      _toolTip = "Allows renaming a Kerbal.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.BeginHorizontal();
+      _label = "Enable Profession management";
+      _toolTip = "When On, SM allows you to change a Kerbal's profession.";
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.EnableChangeProfession = GUILayout.Toggle(SMSettings.EnableChangeProfession, _guiLabel,
+        GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      GUI.enabled = true;
+
+      // EnableCrew Xfer Mode
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
       _label = "Enable Crew Xfers";
@@ -100,8 +186,8 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.BeginHorizontal();
       _label = "Enable Stock Crew Xfers";
       _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
-      _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will be Allowed.";
-      _toolTip += "\r\nWhen OFF (requires Realism Mode On), Stock Crew transfers are disabled.";
+      _toolTip += "\r\nWhen ON (requires Crew Transfers On), stock crew transfers will be Allowed.";
+      _toolTip += "\r\nWhen OFF (requires Crew Transfers On), Stock Crew transfers are disabled.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
       SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
@@ -117,7 +203,7 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.BeginHorizontal();
       _label = "Override Stock Crew Xfers";
       _toolTip = "Turns on/off Overriding the stock Crew Transfer mechanism with the SM style.";
-      _toolTip += "\r\nWhen ON (requires Realism Mode On), stock crew transfers will behave like SM style transfers.";
+      _toolTip += "\r\nWhen ON (requires Crew Transfers On), stock crew transfers will behave like SM style transfers.";
       _toolTip += "\r\nWhen Off (or Realism is off), Stock Crew transfers behave normally.";
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
@@ -420,17 +506,23 @@ namespace ShipManifest.Windows.Tabs
         SMSettings.MaxFlowTimeSec = (int) newRate;
 
       // reset gui.enabled to default
-      GUI.enabled = isEnabled;
+      GUI.enabled = true;
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       // LockSettings Mode
+      GUI.enabled = isEnabled;
       _label = "Lock Settings  (If set ON, disable in config file)";
       _toolTip = "Locks the settings in this section so they cannot be altered in game.";
-      _toolTip += "\r\nTo turn off Locking you MUST edit the Config.xml file.";
+      _toolTip += "\r\nTo turn off Locking you MUST edit the SMSettings.dat file.";
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      GUI.enabled = true;
+      GUILayout.Label("____________________________________________________________________________________________",
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
     }
   }
 }

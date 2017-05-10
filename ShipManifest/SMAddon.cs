@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using ConnectedLivingSpace;
 using KSP.UI.Screens;
-using KSP.UI.Screens.Flight;
-using KSP.UI.Screens.Flight.Dialogs;
-using KSPAchievements;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Process;
@@ -451,7 +447,7 @@ namespace ShipManifest
 
     internal void OnItemTransferStarted(PartItemTransfer xferPartItem)
     {
-      if (SMSettings.EnableCls && SMSettings.RealismMode && xferPartItem.type == "Crew")
+      if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == "Crew")
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
       stockTransferItem = xferPartItem;
     }
@@ -470,7 +466,7 @@ namespace ShipManifest
     /// <param name="crewTransferData"></param>
     internal void OnCrewTransferSelected(CrewTransfer.CrewTransferData crewTransferData)
     {
-      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM  Crew Transfers are active
+      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
       if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // Disable the stock Transfer action if SM dictates.
@@ -504,8 +500,9 @@ namespace ShipManifest
         return;
       };
 
-      if (!SMSettings.RealismMode) return;
-      // OK, ealism and override are on lets manage the Crew transfer
+      // If override is off, then ignore.
+      if (!SMSettings.OverrideStockCrewXfer) return;
+
       // store data from event.
       DisplayScreenMsg("SM is overriding Stock Transfers.  SM based Crew Transfer initiating...");
       SmVessel.TransferCrewObj.FromPart = crewTransferData.sourcePart;
@@ -810,7 +807,8 @@ namespace ShipManifest
           WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display,
             WindowDebugger.Title, GUILayout.MinHeight(20));
 
-        if ((HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER) && ShowUi)
+        if (HighLogic.LoadedScene == GameScenes.FLIGHT && SMConditions.CanShowShipManifest() || 
+            HighLogic.LoadedScene == GameScenes.SPACECENTER && ShowUi && !SMConditions.IsPauseMenuOpen())
         {
           if (WindowSettings.ShowWindow)
           {

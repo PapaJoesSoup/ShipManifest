@@ -203,7 +203,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealismMode)
+            if (SMSettings.RealXfers)
             {
               // Play run sound when start sound is nearly done. (repeats)
               if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
@@ -224,7 +224,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealismMode)
+            if (SMSettings.RealXfers)
             {
               // wait for movement to end...
               if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
@@ -240,7 +240,7 @@ namespace ShipManifest.Process
           case XferState.Stop:
 
             // Spawn crew in parts and in vessel.
-            if (SMSettings.RealismMode)
+            if (SMSettings.RealXfers)
             {
               // play crew sit.
               SMSound.SourceCrewRun.Stop();
@@ -382,7 +382,7 @@ namespace ShipManifest.Process
 
     internal void CrewTransferAbort()
     {
-      if (SMSettings.RealismMode)
+      if (SMSettings.RealXfers)
       {
         SMSound.SourceCrewRun.Stop();
         SMSound.SourceCrewStop.Play();

@@ -35,7 +35,7 @@
     {
       get
       {
-        if (SMSettings.RealismMode && !Retractable &&
+        if (SMSettings.RealControl && !Retractable &&
             (PanelState == ModuleDeployablePart.DeployState.EXTENDED ||
              PanelState == ModuleDeployablePart.DeployState.EXTENDING))
           return false;

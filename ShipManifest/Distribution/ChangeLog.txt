@@ -1,6 +1,16 @@
-﻿Version 5.1.3.4 - Release 03 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
+﻿Version 5.1.3.4 - Release 13 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
+ y New:  Beginnings of Localization system.  Now you can translate SM into your own language!
+ y New:  Realism Settings Refactor!  Added single switch for realism Categories:  Full, None, Default, Custom.  Realism Mode is redefined and settings now more granular.
+ y New:  Crew respawn is always allowed.  Should be disabled for realistic control.  Added setting to the Realism Tab to disable certain roster actions.
+ - Fixed:  Issue with multiple instances of SMAddon class loading when changing scenes.
+ - Fixed:  Roster and Settings windows continue to be displayed even when Pause Menu or Hide UI is on.
  - Fixed:  Manifest and other windows disappearing in flight under certain contitions (when staging/part distruction occur).
- - Fixed:  Antennas not properly working.
+ y Fixed:  Antennas not properly working.
+ y Fixed:  Resource totals not preserved turing Transfers.  Github Issue:  #36
+ - Fixed:  Tourists can go EVA.  Github Issue:  #37
+ - Fixed:  ToolTips displayed even when SM interface is not.  Github Issue: # 38
+ y Fixed:  ToolTips not properly updating. Github Issue:  # 39
+ y Fixed:  Crew Xfers between full parts failing under certain cirmcustances.  Github Issue # 40
 
 Version 5.1.3.3 - Release 29 Jan 2017 - KSP 1.2.2 Compatibility Edition
  - Fixed:  Object not found error in ModDockedVessels Get LaunchID.  now properly returns a 0 if the underlying object is null.
@@ -16,7 +26,7 @@ Version 5.1.3.2 - Release 16 Jan 2017 - KSP 1.2.2 Compatibility Edition
  - Fixed:  Highlighting is disabled temporarily when hatches are opened and closed.
  - Fixed:  Resource selection in the Manifest window is behaving erratically. Resources are disappearing in the display when multiple selections are made.
  - Fixed:  Vessel to vessel transfers are failing with an NRE in ShipManifest.SMVessel.UpdateDockedVessels. http://forum.kerbalspaceprogram.com/index.php?/topic/56643-121-ship-manifest-crew-science-resources-v-5131-15-nov-16/&do=findComment&comment=2881063
- - Fixed:  Sometimes crew transfers do not work.
+ - Fixed:  Sometimes crew transfers do not work.  Github Issue:  # 34
 
 Version 5.1.3.1 - Release 15 Nov 2016 - KSP 1.2.1 Compatibility Edition
 - Fixed:  Create Kerbal fails. Github issue # 33.

@@ -266,7 +266,7 @@ namespace ShipManifest
             if (resources.Current == null) continue;
             PartResource resource = (PartResource)resources.Current;
             // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-            if (SMSettings.RealismMode &&
+            if (SMSettings.RealXfers &&
                 (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
               continue;
             bool vResourceFound = false;

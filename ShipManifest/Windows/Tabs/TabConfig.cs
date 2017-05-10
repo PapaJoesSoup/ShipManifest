@@ -116,29 +116,6 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.Label("(lines)", GUILayout.Width(50));
       GUILayout.EndHorizontal();
 
-      _label = "Enable Kerbal Renaming";
-      _toolTip = "Allows renaming a Kerbal.";
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-
-      if (!SMSettings.EnableKerbalRename)
-        GUI.enabled = false;
-      GUILayout.BeginHorizontal();
-      _label = "Enable Profession management";
-      _toolTip = "When On, SM allows you to change a Kerbal's profession.";
-      _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      SMSettings.EnableChangeProfession = GUILayout.Toggle(SMSettings.EnableChangeProfession, _guiLabel,
-        GUILayout.Width(300));
-      GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      GUI.enabled = true;
-
       _label = "Enable AutoSave Settings";
       _toolTip = "When On, SM automatically saves changes made to settings on a regular interval.";
       _guiLabel = new GUIContent(_label, _toolTip);
