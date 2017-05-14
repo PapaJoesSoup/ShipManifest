@@ -1,11 +1,11 @@
-﻿﻿using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
 
 // TODO: Change this namespace to something specific to your plugin here.
 //EG:
 // namespace MyPlugin_ShipManifestWrapper
-namespace ShipManifestWrapper
+namespace ShipManifest.Distribution
 {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // BELOW HERE SHOULD NOT BE EDITED - this links to the loaded ShipManifest module without requiring a Hard Dependancy

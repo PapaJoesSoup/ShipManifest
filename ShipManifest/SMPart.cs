@@ -13,7 +13,7 @@ namespace ShipManifest
     {
       //Utilities.LogMessage(string.Format("Entering Fill Crew with part {0}", part.partInfo.name), Utilities.LogType.Info, true);
       if (IsCrewFull(part)) return;
-      while (part.CrewCapacity > Utilities.GetPartCrewCount(part))
+      while (part.CrewCapacity > SMUtils.GetPartCrewCount(part))
       {
         ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
         part.AddCrewmember(kerbal);

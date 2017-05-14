@@ -39,10 +39,8 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalsBeXferred(Part sourcePart, Part targetPart)
     {
-      List<Part> sourceParts = new List<Part>();
-      sourceParts.Add(sourcePart);
-      List<Part> targetParts = new List<Part>();
-      targetParts.Add(targetPart);
+      List<Part> sourceParts = new List<Part> {sourcePart};
+      List<Part> targetParts = new List<Part> {targetPart};
 
       return CanKerbalsBeXferred(sourceParts, targetParts);
     }
@@ -54,18 +52,20 @@ namespace ShipManifest.InternalObjects
       {
         if (IsTransferInProgress())
         {
-          WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
+          //WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
+          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_001");
           return false;
         }
         if (selectedPartsSource.Count == 0 || selectedPartsTarget.Count == 0)
         {
-          WindowTransfer.XferToolTip =
-            "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
+          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_002");
+          //  "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
           return false;
         }
         if (selectedPartsSource[0] == selectedPartsTarget[0])
         {
-          WindowTransfer.XferToolTip = "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
+          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_003");
+          // "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
           return false;
         }
         // If one of the parts is a DeepFreeze part and no crew are showing in protoModuleCrew, check it isn't full of frozen Kerbals. 
@@ -85,8 +85,8 @@ namespace ShipManifest.InternalObjects
         {
           if (sourcepartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip =
-              "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+            WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_004");
+            // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
         }
@@ -94,8 +94,8 @@ namespace ShipManifest.InternalObjects
         {
           if (targetpartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip =
-              "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+            WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_004");
+            // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
         }
@@ -103,21 +103,24 @@ namespace ShipManifest.InternalObjects
         // Are there kerbals to move?
         if (selectedPartsSource[0].protoModuleCrew.Count == 0)
         {
-          WindowTransfer.XferToolTip = "No Kerbals to Move.";
+          //WindowTransfer.XferToolTip = "No Kerbals to Move.";
+          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_005");
           return false;
         }
         // now if realism mode, are the parts connected to each other in the same living space?
         results = IsClsInSameSpace(selectedPartsSource[0], selectedPartsTarget[0]);
         if (!results)
-          WindowTransfer.EvaToolTip = "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
+          WindowTransfer.EvaToolTip = SMUtils.Localize("#smloc_conditions_tt_006");
+        // "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(String.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          SMUtils.LogType.Error, true);
       }
-      if (WindowTransfer.XferToolTip == "")
-        WindowTransfer.XferToolTip = "Source and target Part are the same.  Use Move Kerbal instead.";
+      if (results && WindowTransfer.XferToolTip == "")
+        WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_007");  
+      // "Kerbal can be Transfered.";
       return results;
     }
 
@@ -246,9 +249,9 @@ namespace ShipManifest.InternalObjects
           values += "CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = " +
                     (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
 
-          Utilities.LogMessage(
+          SMUtils.LogMessage(
             String.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
-              ex.Message, ex.StackTrace, values), Utilities.LogType.Error, true);
+              ex.Message, ex.StackTrace, values), SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
         return false;

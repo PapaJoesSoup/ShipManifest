@@ -1,15 +1,19 @@
-﻿Version 5.1.3.4 - Release 13 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
- y New:  Beginnings of Localization system.  Now you can translate SM into your own language!
- y New:  Realism Settings Refactor!  Added single switch for realism Categories:  Full, None, Default, Custom.  Realism Mode is redefined and settings now more granular.
- y New:  Crew respawn is always allowed.  Should be disabled for realistic control.  Added setting to the Realism Tab to disable certain roster actions.
+﻿Version 5.1.4.0 - Release 13 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
+ - New:  Beginnings of Localization system.  Now you can translate SM into your own language!
+ y New:  Realism Settings Refactor!  Realism Mode is redefined and settings are now more granular.
+ - New:  Added Radio switch for realism Categories:  Full, None, Default, Custom.  
+ - New:  Added new setting to the Realism Tab "Realistic Control". Thies affects Roster features and ship control.
+ - New:  Added new seting to Realism Tab.  "Realistic Transfers".  This affects Transfer features for crew, science and resources.
+ - New:  Added several new tooltips in the Mod.
+ y Fixed:  Crew respawn is always allowed.  Should be disabled for realistic control.  
  - Fixed:  Issue with multiple instances of SMAddon class loading when changing scenes.
  - Fixed:  Roster and Settings windows continue to be displayed even when Pause Menu or Hide UI is on.
  - Fixed:  Manifest and other windows disappearing in flight under certain contitions (when staging/part distruction occur).
  y Fixed:  Antennas not properly working.
  y Fixed:  Resource totals not preserved turing Transfers.  Github Issue:  #36
- - Fixed:  Tourists can go EVA.  Github Issue:  #37
+ - Fixed:  Tourists can go EVA and should not.  Github Issue:  #37
  - Fixed:  ToolTips displayed even when SM interface is not.  Github Issue: # 38
- y Fixed:  ToolTips not properly updating. Github Issue:  # 39
+ y Fixed:  ToolTips not properly updating in Xfers. Github Issue:  # 39
  y Fixed:  Crew Xfers between full parts failing under certain cirmcustances.  Github Issue # 40
 
 Version 5.1.3.3 - Release 29 Jan 2017 - KSP 1.2.2 Compatibility Edition

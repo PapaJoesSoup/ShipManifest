@@ -105,10 +105,14 @@ namespace ShipManifest
           InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
 
         CreateAppIcons();
+
+        // Cache Localization Strings
+        SMUtils.CacheSMLocalization();
+
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.Awake.  Error:  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.Awake.  Error:  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -190,7 +194,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.Start.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.Start.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -229,7 +233,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -300,7 +304,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnGUI.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnGUI.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -361,9 +365,9 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          Utilities.LogMessage(
+          SMUtils.LogMessage(
             string.Format(" in SMAddon.Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-            Utilities.LogType.Error, true);
+            SMUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -522,7 +526,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnVesselWasModified.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnVesselWasModified.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -536,8 +540,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
+        SMUtils.LogMessage(
+          string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
           true);
       }
     }
@@ -552,7 +556,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -674,7 +678,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnGUIAppLauncherReady.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherReady.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -699,7 +703,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnGUIAppLauncherDestroyed.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherDestroyed.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -741,7 +745,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnSMButtonToggle.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnSMButtonToggle.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -766,7 +770,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnSMRosterToggle.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnSMRosterToggle.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -789,7 +793,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.OnSMSettingsToggle.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.OnSMSettingsToggle.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -871,9 +875,9 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          Utilities.LogMessage(
+          SMUtils.LogMessage(
             string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), Utilities.LogType.Error, true);
+              ex.StackTrace), SMUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -947,7 +951,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  SMAddon.UpdateSMcontroller.  " + ex, Utilities.LogType.Error, true);
+        SMUtils.LogMessage("Error in:  SMAddon.UpdateSMcontroller.  " + ex, SMUtils.LogType.Error, true);
       }
     }
 
@@ -988,8 +992,8 @@ namespace ShipManifest
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage(
-            string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+          SMUtils.LogMessage(
+            string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
         }
       }
     }
@@ -1008,8 +1012,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in SMAddon.GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(
+          string.Format(" in SMAddon.GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
         return false;
       }
     }
@@ -1101,8 +1105,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in SMAddon.RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format(" in SMAddon.RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          SMUtils.LogType.Error, true);
       }
     }
 

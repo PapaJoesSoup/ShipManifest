@@ -360,7 +360,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetHatches().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
       }
     }
 
@@ -393,7 +393,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetSolarPanels().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
       }
     }
 
@@ -430,7 +430,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetAntennas().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetAntennas().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
       }
     }
 
@@ -462,7 +462,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetLights().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
       }
     }
 
@@ -489,7 +489,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetLabs().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetLabs().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
       }
     }
 
@@ -523,7 +523,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
         resourcePartList = new List<Part>();
       }
       return resourcePartList;
@@ -546,7 +546,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format("Error in GetSelectedVesselParts().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
         vesselpartList = new List<Part>();
       }
       return vesselpartList;

@@ -4,7 +4,7 @@ using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using UnityEngine;
 
-namespace ShipManifest.Windows.Tabs
+namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabLight
   {
@@ -21,7 +21,8 @@ namespace ShipManifest.Windows.Tabs
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
-      GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
+      //GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
+      GUILayout.Label(SMUtils.Localize("#smloc_control_light_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -52,8 +53,8 @@ namespace ShipManifest.Windows.Tabs
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in Light Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), Utilities.LogType.Error,
+        SMUtils.LogMessage(
+          string.Format(" in Light Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), SMUtils.LogType.Error,
           true);
       }
       GUILayout.EndVertical();

@@ -1,7 +1,7 @@
 ﻿using ShipManifest.APIClients;
 using UnityEngine;
 
-namespace ShipManifest.Windows.Tabs
+namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabInstalledMods
   {

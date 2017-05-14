@@ -4,7 +4,7 @@ using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
 using UnityEngine;
 
-namespace ShipManifest.Windows.Tabs
+namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabSolarPanel
   {
@@ -22,7 +22,8 @@ namespace ShipManifest.Windows.Tabs
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
-      GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
+      //GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
+      GUILayout.Label(SMUtils.Localize("#smloc_control_panel_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -71,9 +72,9 @@ namespace ShipManifest.Windows.Tabs
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
+        SMUtils.LogMessage(
           string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
+          SMUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

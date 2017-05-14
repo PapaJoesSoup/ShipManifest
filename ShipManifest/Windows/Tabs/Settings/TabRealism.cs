@@ -2,7 +2,7 @@
 using ShipManifest.InternalObjects;
 using UnityEngine;
 
-namespace ShipManifest.Windows.Tabs
+namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabRealism
   {
@@ -30,35 +30,52 @@ namespace ShipManifest.Windows.Tabs
       int scrollX = 20;
 
       GUI.enabled = true;
-      GUILayout.Label(
-        !SMSettings.LockSettings
-          ? "Realism Settings / Options"
-          : "Realism Settings / Options  (Locked.  To unlock, edit SMSettings.dat file)", SMStyle.LabelTabHeader);
+      if (!SMSettings.LockSettings)
+      {
+        // "Realism Settings / Options"
+        GUILayout.Label(SMUtils.Localize("#smloc_settings_realism_001"), SMStyle.LabelTabHeader);        
+      }
+      else
+      {
+        // "Realism Settings / Options  (Locked.  To unlock, edit SMSettings.dat file)"
+        GUILayout.Label(
+          new GUIContent(SMUtils.Localize("#smloc_settings_realism_002"),
+            SMUtils.Localize("#smloc_settings_realism_tt_001")), SMStyle.LabelTabHeader);
+      }
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       bool isEnabled = !SMSettings.LockSettings;
       // RealismMode options
-      _label = "Realism Mode:  ";
-      _toolTip = "Buttons that set the collection of realism settings to suit the category.";
-      _toolTip += "\r\n - Full - Enables all realism settings.";
-      _toolTip += "\r\n - None - Disable all realism settings.";
-      _toolTip += "\r\n - Default - Sets settings to freshly installed realism settings.";
-      _toolTip += "\r\n - Custom - Setting this option makes no changes to your settings.\r\n It is selected automatically when any settings change invalidate the other categories.";
+      // "Realism Mode"
+      _label = $"{SMUtils.Localize("#smloc_settings_realism_003")}:";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_002");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUIContent[] options =
-      {
-        new GUIContent("Full","Enables full realism. Most restrictive use of SM"),
-        new GUIContent("None","No realism settings enabled.  Most permissive use of SM."),
-        new GUIContent("Default", "Default settings that come with SM when installed.\r\nA blend of settings that leans towards realism."),
-        new GUIContent("Custom", "This setting is selected automatically when any settings\r\nare changed that invalidate the other categories.")
-      };
-      GUI.enabled = isEnabled;
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(_guiLabel, GUILayout.Width(85));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      //GUIContent[] options =
+      //{
+      //  new GUIContent("Full","Enables full realism. Most restrictive use of SM"),
+      //  new GUIContent("None","No realism settings enabled.  Most permissive use of SM."),
+      //  new GUIContent("Default", "Default settings that come with SM when installed.\r\nA blend of settings that leans towards realism."),
+      //  new GUIContent("Custom", "This setting is selected automatically when any settings\r\nare changed that invalidate the other categories.")
+      //};
+      GUIContent[] options =
+      {
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_004"), SMUtils.Localize("#smloc_settings_realism_tt_003")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_005"), SMUtils.Localize("#smloc_settings_realism_tt_004")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_006"), SMUtils.Localize("#smloc_settings_realism_tt_005")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_007"), SMUtils.Localize("#smloc_settings_realism_tt_006"))
+      };
+      GUI.enabled = isEnabled;
+      GUILayout.BeginHorizontal();
+      GUILayout.Label(_guiLabel, SMStyle.LabelStyleNoWrap, GUILayout.Width(90));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
       // Store mode value to evalulte for changes.
       int mode = SMSettings.RealismMode;
       mode = GUILayout.SelectionGrid(mode, options, 4, GUILayout.Height(20), GUILayout.Width(256));
@@ -79,11 +96,13 @@ namespace ShipManifest.Windows.Tabs
 
       // RealXfers Mode
       GUI.enabled = isEnabled;
-      _label = "Realistic Transfers";
-      _toolTip = "Turns on/off Realistic Resource Transfers.";
-      _toolTip += "\r\nWhen ON, Resource fills, Dumps, Crew and Science transfers will behave realistically";
-      _toolTip += "\r\nWhen Off, Allows Fills, Dumps, Repeating Science,";
-      _toolTip += "\r\ninstantaneous Xfers, Crew Xfers anywwhere, etc.";
+      //_label = "Realistic Transfers";
+      //_toolTip = "Turns on/off Realistic Resource Transfers.";
+      //_toolTip += "\r\nWhen ON, Resource fills, Dumps, Crew and Science transfers will behave realistically";
+      //_toolTip += "\r\nWhen Off, Allows Fills, Dumps, Repeating Science,";
+      //_toolTip += "\r\ninstantaneous Xfers, Crew Xfers anywwhere, etc.";
+      _label = SMUtils.Localize("#smloc_settings_realism_008");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.RealXfers = GUILayout.Toggle(SMSettings.RealXfers, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -92,10 +111,12 @@ namespace ShipManifest.Windows.Tabs
 
       // RealControl Mode
       GUI.enabled = isEnabled;
-      _label = "Realistic Control";
-      _toolTip = "Turns on/off Realistic Shipboard Control.";
-      _toolTip += "\r\nWhen ON, you must have crew aboard, or a valid comm link to a control station or satellite";
-      _toolTip += "\r\nWhen Off, you have full control of the vessel at any time (subject to the availability of resources).";
+      //_label = "Realistic Control";
+      //_toolTip = "Turns on/off Realistic Shipboard Control.";
+      //_toolTip += "\r\nWhen ON, you must have crew aboard, or a valid comm link to a control station or satellite";
+      //_toolTip += "\r\nWhen Off, you have full control of the vessel at any time (subject to the availability of resources).";
+      _label = SMUtils.Localize("#smloc_settings_realism_009");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_008");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.RealControl = GUILayout.Toggle(SMSettings.RealControl, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -105,11 +126,13 @@ namespace ShipManifest.Windows.Tabs
       // EnableCrew Modifications
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
-      _label = "Enable Crew Member Modifications";
-      _toolTip = "Enables/Disable Crew Modifications in the Roster Window.";
-      _toolTip += "\r\nWhen ON, You cannot Edit, Create, or Respawn Crew members.";
-      _toolTip += "\r\nWhen Off, You can Edit, Create, or Respawn Crew members.";
-      _toolTip += "\r\nThis works in conjunction with Realism mode, as Realism also restricts some other Crew actions.";
+      //_label = "Enable Crew Member Modifications";
+      //_toolTip = "Enables/Disable Crew Modifications in the Roster Window.";
+      //_toolTip += "\r\nWhen ON, You cannot Edit, Create, or Respawn Crew members.";
+      //_toolTip += "\r\nWhen Off, You can Edit, Create, or Respawn Crew members.";
+      //_toolTip += "\r\nThis works in conjunction with Realism mode, as Realism also restricts some other Crew actions.";
+      _label = SMUtils.Localize("#smloc_settings_realism_010");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_009");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableCrewModify = GUILayout.Toggle(SMSettings.EnableCrewModify, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -118,8 +141,10 @@ namespace ShipManifest.Windows.Tabs
 
       GUILayout.EndHorizontal();
 
-      _label = "Enable Kerbal Renaming";
-      _toolTip = "Allows renaming a Kerbal.";
+      //_label = "Enable Kerbal Renaming";
+      //_toolTip = "Allows renaming a Kerbal.";
+      _label = SMUtils.Localize("#smloc_settings_realism_011");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_010");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -127,8 +152,10 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUILayout.BeginHorizontal();
-      _label = "Enable Profession management";
-      _toolTip = "When On, SM allows you to change a Kerbal's profession.";
+      //_label = "Enable Profession management";
+      //_toolTip = "When On, SM allows you to change a Kerbal's profession.";
+      _label = SMUtils.Localize("#smloc_settings_realism_012");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_011");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableChangeProfession = GUILayout.Toggle(SMSettings.EnableChangeProfession, _guiLabel,
         GUILayout.Width(300));
@@ -138,13 +165,33 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUI.enabled = true;
 
+      // Enable stock Crew Xfers
+      GUI.enabled = SMSettings.EnableCrew && isEnabled;
+      GUILayout.BeginHorizontal();
+      //_label = "Enable Stock Crew Xfers";
+      //_toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
+      //_toolTip += "\r\nWhen ON stock crew transfers will be Allowed.";
+      //_toolTip += "\r\nWhen OFF Stock Crew transfers are disabled.";
+      _label = SMUtils.Localize("#smloc_settings_realism_013");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_012");
+      _guiLabel = new GUIContent(_label, _toolTip);
+      SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
+        GUILayout.Width(300));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+
+      GUILayout.EndHorizontal();
+
       // EnableCrew Xfer Mode
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
-      _label = "Enable Crew Xfers";
-      _toolTip = "Turns on/off Crew transfers.";
-      _toolTip += "\r\nWhen ON, The Crew option will appear in your resource list.";
-      _toolTip += "\r\nWhen Off, Crew transfers are not possible.";
+      //_label = "Enable SM Crew Xfers";
+      //_toolTip = "Turns on/off Crew transfers using SM.";
+      //_toolTip += "\r\nWhen ON, The Crew option will appear in your resource list.";
+      //_toolTip += "\r\nWhen Off, Crew transfers are not possible using SM.";
+      _label = SMUtils.Localize("#smloc_settings_realism_014");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_013");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableCrew = GUILayout.Toggle(SMSettings.EnableCrew, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -170,10 +217,12 @@ namespace ShipManifest.Windows.Tabs
       // EnablePFResources Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
-      _label = "Enable Crew Fill and Empty Ops in Pre-Flight";
-      _toolTip = "Turns on/off Fill and Empty Crew when in preflight.";
-      _toolTip += "\r\nWhen ON, Fill & Empty Crew vessel wide are possible (shows in the Resource list).";
-      _toolTip += "\r\nWhen Off, Fill and Empty Crew vessel wide will not appear in the resource list.";
+      //_label = "Enable Crew Fill and Empty Ops in Pre-Flight";
+      //_toolTip = "Turns on/off Fill and Empty Crew when in preflight.";
+      //_toolTip += "\r\nWhen ON, Fill & Empty Crew vessel wide are possible (shows in the Resource list).";
+      //_toolTip += "\r\nWhen Off, Fill and Empty Crew vessel wide will not appear in the resource list.";
+      _label = SMUtils.Localize("#smloc_settings_realism_015");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_014");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnablePfCrews = GUILayout.Toggle(SMSettings.EnablePfCrews, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -181,30 +230,15 @@ namespace ShipManifest.Windows.Tabs
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
-      // Enable stock Crew Xfers
-      GUI.enabled = SMSettings.EnableCrew && isEnabled;
-      GUILayout.BeginHorizontal();
-      _label = "Enable Stock Crew Xfers";
-      _toolTip = "Turns On/Off the stock Crew Transfer mechanism.";
-      _toolTip += "\r\nWhen ON (requires Crew Transfers On), stock crew transfers will be Allowed.";
-      _toolTip += "\r\nWhen OFF (requires Crew Transfers On), Stock Crew transfers are disabled.";
-      _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
-        GUILayout.Width(300));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-
-      GUILayout.EndHorizontal();
-
       // Enable stock Crew Xfer Override
-      GUI.enabled = SMSettings.EnableCrew && isEnabled;
+      GUI.enabled = SMSettings.EnableCrew && isEnabled && SMSettings.EnableStockCrewXfer;
       GUILayout.BeginHorizontal();
-      _label = "Override Stock Crew Xfers";
-      _toolTip = "Turns on/off Overriding the stock Crew Transfer mechanism with the SM style.";
-      _toolTip += "\r\nWhen ON (requires Crew Transfers On), stock crew transfers will behave like SM style transfers.";
-      _toolTip += "\r\nWhen Off (or Realism is off), Stock Crew transfers behave normally.";
+      //_label = "Override Stock Crew Xfers";
+      //_toolTip = "Turns on/off Overriding the stock Crew Transfer mechanism with the SM style.";
+      //_toolTip += "\r\nWhen ON stock crew transfers will behave like SM style transfers.\n(requires both Stock Crew Transfers & SM Crew Transfers ON)";
+      //_toolTip += "\r\nWhen Off Stock Crew transfers behave normally if enabled.";
+      _label = SMUtils.Localize("#smloc_settings_realism_016");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_015");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
       SMSettings.OverrideStockCrewXfer = GUILayout.Toggle(SMSettings.OverrideStockCrewXfer, _guiLabel,
@@ -222,10 +256,12 @@ namespace ShipManifest.Windows.Tabs
         GUI.enabled = false;
       else
         GUI.enabled = isEnabled;
-      _label = "Enable CLS  (Connected Living Spaces)";
-      _toolTip = "Turns on/off Connected Living space support.";
-      _toolTip += "\r\nWhen ON, Crew can only be xfered to a part in the same 'Living Space'.";
-      _toolTip += "\r\nWhen Off, Crew transfers are possible to any part that can hold a kerbal.";
+      //_label = "Enable CLS  (Connected Living Spaces)";
+      //_toolTip = "Turns on/off Connected Living space support.";
+      //_toolTip += "\r\nWhen ON, Crew can only be xfered to a part in the same 'Living Space'.";
+      //_toolTip += "\r\nWhen Off, Crew transfers are possible to any part that can hold a kerbal.";
+      _label = SMUtils.Localize("#smloc_settings_realism_017");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_016");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableCls = GUILayout.Toggle(SMSettings.EnableCls, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -252,10 +288,12 @@ namespace ShipManifest.Windows.Tabs
       else
         GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
-      _label = "Enable CLS' Allow Unrestricted Crew Xfers switch";
-      _toolTip = "Turns on/off Enabling the CLS Switch allowing unrestricted crew transfers.";
-      _toolTip += "\r\nWhen ON (requires Realism Mode On), SM Manages Stock and CLS aware Crew Transfers.";
-      _toolTip += "\r\nWhen Off (or Realism is off), the setting in CLS is not touched.";
+      //_label = "Enable CLS' Allow Unrestricted Crew Xfers switch";
+      //_toolTip = "Turns on/off Enabling the CLS Switch allowing unrestricted crew transfers.";
+      //_toolTip += "\r\nWhen ON (requires Realism Mode On), SM Manages Stock and CLS aware Crew Transfers.";
+      //_toolTip += "\r\nWhen Off (or Realism is off), the setting in CLS is not touched.";
+      _label = SMUtils.Localize("#smloc_settings_realism_018");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_017");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
       SMSettings.EnableClsAllowTransfer = GUILayout.Toggle(SMSettings.EnableClsAllowTransfer, _guiLabel,
@@ -269,10 +307,12 @@ namespace ShipManifest.Windows.Tabs
       // EnableScience Mode
       GUILayout.BeginHorizontal();
       GUI.enabled = isEnabled;
-      _label = "Enable Science Xfers";
-      _toolTip = "Turns on/off Science Xfers.";
-      _toolTip += "\r\nWhen ON, Science transfers are possible and show up in the Resource list.";
-      _toolTip += "\r\nWhen Off, Science transfers will not appear in the resource list.";
+      //_label = "Enable Science Xfers";
+      //_toolTip = "Turns on/off Science Xfers.";
+      //_toolTip += "\r\nWhen ON, Science transfers are possible and show up in the Resource list.";
+      //_toolTip += "\r\nWhen Off, Science transfers will not appear in the resource list.";
+      _label = SMUtils.Localize("#smloc_settings_realism_019");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_018");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableScience = GUILayout.Toggle(SMSettings.EnableScience, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -290,10 +330,12 @@ namespace ShipManifest.Windows.Tabs
       // EnableResources Mode
       GUILayout.BeginHorizontal();
       GUI.enabled = isEnabled;
-      _label = "Enable Resource Xfers";
-      _toolTip = "Turns on/off Resource Xfers.";
-      _toolTip += "\r\nWhen ON, Resource transfers are possible and display in Manifest Window.";
-      _toolTip += "\r\nWhen Off, Resources will not appear in the resource list.";
+      //_label = "Enable Resource Xfers";
+      //_toolTip = "Turns on/off Resource Xfers.";
+      //_toolTip += "\r\nWhen ON, Resource transfers are possible and display in Manifest Window.";
+      //_toolTip += "\r\nWhen Off, Resources will not appear in the resource list.";
+      _label = SMUtils.Localize("#smloc_settings_realism_020");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_019");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableResources = GUILayout.Toggle(SMSettings.EnableResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -316,10 +358,12 @@ namespace ShipManifest.Windows.Tabs
       // EnablePFResources Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
-      _label = "Enable Resources in Pre-Flight";
-      _toolTip = "Turns on/off Fill and Empty Resources when in preflight.";
-      _toolTip += "\r\nWhen ON, Fill & Dump resources vessel wide are possible (shows in the Resource list).";
-      _toolTip += "\r\nWhen Off, Fill and Dump Resources vessel wide will not appear in the resource list.";
+      //_label = "Enable Resources in Pre-Flight";
+      //_toolTip = "Turns on/off Fill and Empty Resources when in preflight.";
+      //_toolTip += "\r\nWhen ON, Fill & Dump resources vessel wide are possible (shows in the Resource list).";
+      //_toolTip += "\r\nWhen Off, Fill and Dump Resources vessel wide will not appear in the resource list.";
+      _label = SMUtils.Localize("#smloc_settings_realism_021");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_020");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnablePfResources = GUILayout.Toggle(SMSettings.EnablePfResources, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -330,10 +374,12 @@ namespace ShipManifest.Windows.Tabs
       // EnableXferCost Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
-      _label = "Enable Resource Xfer Costs";
-      _toolTip = "Turns on/off ElectricCharge cost forResource Xfers.";
-      _toolTip += "\r\nWhen ON, Resource transfers will cost ElectricCharge.";
-      _toolTip += "\r\nWhen Off, Resources Xfers are Free (original SM behavior).";
+      //_label = "Resource Xfers Consume Power";
+      //_toolTip = "Turns on/off ElectricCharge cost forResource Xfers.";
+      //_toolTip += "\r\nWhen ON, Resource transfers will consume ElectricCharge.";
+      //_toolTip += "\r\nWhen Off, Resources Xfers consume no ElectricCharge.";
+      _label = SMUtils.Localize("#smloc_settings_realism_022");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_021");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableXferCost = GUILayout.Toggle(SMSettings.EnableXferCost, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
@@ -343,13 +389,16 @@ namespace ShipManifest.Windows.Tabs
 
       // Resource Xfer EC cost
       float newCost;
+      GUI.enabled = !SMSettings.LockSettings && SMSettings.EnableResources && SMSettings.EnableXferCost;
       GUILayout.BeginHorizontal();
-      GUILayout.Space(30);
-      _label = "Resource Flow Cost:";
-      _toolTip = "Sets the Electrical cost of resource Xfers when Realism Mode is on.";
-      _toolTip += "\r\nThe higher the number the more ElectricCharge used.";
+      GUILayout.Space(35);
+      //_label = "Xfer Power Cost:";
+      //_toolTip = "Sets the Electrical cost of resource Xfers.";
+      //_toolTip += "\r\nThe higher the number the more ElectricCharge used.";
+      _label = SMUtils.Localize("#smloc_settings_realism_023")+ ":";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_022");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
+      GUILayout.Label(_guiLabel, GUILayout.Width(125), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -357,14 +406,16 @@ namespace ShipManifest.Windows.Tabs
       // Lets parse the string to allow decimal points.
       StrFlowCost = SMSettings.FlowCost.ToString(CultureInfo.InvariantCulture);
       // add the decimal point if it was typed.
-      StrFlowCost = Utilities.GetStringDecimal(StrFlowCost);
+      StrFlowCost = SMUtils.GetStringDecimal(StrFlowCost);
       // add the zero if it was typed.
-      StrFlowCost = Utilities.GetStringZero(StrFlowCost);
+      StrFlowCost = SMUtils.GetStringZero(StrFlowCost);
 
       StrFlowCost = GUILayout.TextField(StrFlowCost, 20, GUILayout.Height(20), GUILayout.Width(80));
-      _label = "EC/Unit";
-      _toolTip = "Sets the Electrical cost of resource Xfers when Realism Mode is on.";
-      _toolTip += "\r\nThe higher the number the more ElectricCharge used.";
+      //_label = "EC/Unit";
+      //_toolTip = "Sets the Electrical cost of resource Xfers when Realism Mode is on.";
+      //_toolTip += "\r\nThe higher the number the more ElectricCharge used.";
+      _label = SMUtils.Localize("#smloc_settings_realism_024");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_022");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -373,9 +424,9 @@ namespace ShipManifest.Windows.Tabs
       GUILayout.EndHorizontal();
 
       // update decimal bool 
-      Utilities.SetStringDecimal(StrFlowCost);
+      SMUtils.SetStringDecimal(StrFlowCost);
       //update zero bool 
-      Utilities.SetStringZero(StrFlowCost);
+      SMUtils.SetStringZero(StrFlowCost);
 
       if (float.TryParse(StrFlowCost, out newCost))
         SMSettings.FlowCost = newCost;
@@ -390,22 +441,27 @@ namespace ShipManifest.Windows.Tabs
       float newRate;
 
       // Resource Flow Rate
+      GUI.enabled = !SMSettings.LockSettings && SMSettings.EnableResources && SMSettings.RealXfers;
       GUILayout.BeginHorizontal();
-      GUILayout.Space(30);
-      _label = "Resource Flow Rate:";
-      _toolTip = "Sets the rate that resources Xfer when Realism Mode is on.";
-      _toolTip += "\r\nThe higher the number the faster resources move.";
-      _toolTip += "\r\nYou can also use the slider below to change this value.";
+      GUILayout.Space(25);
+      //_label = "Resource Flow Rate:";
+      //_toolTip = "Sets the rate that resources Xfer when Realistic Transfers is on.";
+      //_toolTip += "\r\nThe higher the number the faster resources move.";
+      //_toolTip += "\r\nYou can also use the slider below to change this value.";
+      _label = SMUtils.Localize("#smloc_settings_realism_025") + ":";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_023");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
+      GUILayout.Label(_guiLabel, GUILayout.Width(135), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       strFlowRate = GUILayout.TextField(strFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
-      _label = "Units/Sec";
-      _toolTip = "Sets the rate that resources Xfer when Realism Mode is on.";
-      _toolTip += "\r\nThe higher the number the faster resources move.";
-      _toolTip += "\r\nYou can also use the slider below to change this value.";
+      //_label = "Units/Sec";
+      //_toolTip = "Sets the rate that resources Xfer when Realism Mode is on.";
+      //_toolTip += "\r\nThe higher the number the faster resources move.";
+      //_toolTip += "\r\nYou can also use the slider below to change this value.";
+      _label = SMUtils.Localize("#smloc_settings_realism_026");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_023");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -423,7 +479,8 @@ namespace ShipManifest.Windows.Tabs
       SMSettings.FlowRate = GUILayout.HorizontalSlider((float) SMSettings.FlowRate, (float) SMSettings.MinFlowRate,
         (float) SMSettings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
       _label = SMSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
-      _toolTip = "Slide control to change the Resource Flow Rate shown above.";
+      //_toolTip = "Slide control to change the Resource Flow Rate shown above.";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_024");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -434,16 +491,20 @@ namespace ShipManifest.Windows.Tabs
       // Min Flow Rate for Slider
       GUILayout.BeginHorizontal();
       GUILayout.Space(30);
-      _label = " - Min Flow Rate:";
-      _toolTip = "Sets the lowest range (left side) on the Flow rate Slider control.";
+      //_label = " - Min Flow Rate:";
+      //_toolTip = "Sets the lower limit (left side) of the Flow rate Slider range.";
+      _label = $" - {SMUtils.Localize("#smloc_settings_realism_027")}:";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_025");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       strMinFlowRate = GUILayout.TextField(strMinFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
-      _label = "Units/Sec";
-      _toolTip = "Sets the lowest range (left side) on the Flow rate Slider control.";
+      //_label = "Units/Sec";
+      //_toolTip = "Sets the lower limit (left side) of the Flow rate Slider range.";
+      _label = SMUtils.Localize("#smloc_settings_realism_026");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_025");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -456,16 +517,20 @@ namespace ShipManifest.Windows.Tabs
       // Max Flow Rate for Slider
       GUILayout.BeginHorizontal();
       GUILayout.Space(30);
-      _label = " - Max Flow Rate:";
-      _toolTip = "Sets the highest range (right side) on the Flow rate Slider control.";
+      //_label = " - Max Flow Rate:";
+      //_toolTip = "Sets the upper limit (right side) of the Flow rate Slider range.";
+      _label = $" - {SMUtils.Localize("#smloc_settings_realism_028")}:";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_026");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       strMaxFlowRate = GUILayout.TextField(strMaxFlowRate, 20, GUILayout.Height(20), GUILayout.Width(80));
-      _label = "Units/Sec";
-      _toolTip = "Sets the highest range (right side) on the Flow rate Slider control.";
+      //_label = "Units/Sec";
+      //_toolTip = "Sets the upper limit (right side) of the Flow rate Slider range.";
+      _label = SMUtils.Localize("#smloc_settings_realism_026");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_026");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -478,24 +543,28 @@ namespace ShipManifest.Windows.Tabs
       // Max Flow Time 
       GUILayout.BeginHorizontal();
       GUILayout.Space(30);
-      _label = " - Max Flow Time:";
-      _toolTip = "Sets the maximum duration (in sec) of a resource transfer.";
-      _toolTip += "\r\nWorks in conjunction with the Flow rate.  if time it would take";
-      _toolTip += "\r\n to move a resource exceeds this number, this number will be used";
-      _toolTip += "\r\n to calculate an adjusted flow rate.";
-      _toolTip += "\r\n(protects your from 20 minute Xfers)";
+      //_label = " - Max Flow Time:";
+      //_toolTip = "Sets the maximum duration (in sec) of a resource transfer.";
+      //_toolTip += "\r\nWorks in conjunction with the Flow rate.  if time it would take";
+      //_toolTip += "\r\n to move a resource exceeds this number, this number will be used";
+      //_toolTip += "\r\n to calculate an adjusted flow rate.";
+      //_toolTip += "\r\n(protects you from long Xfers)";
+      _label = $" - {SMUtils.Localize("#smloc_settings_realism_029")}:";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_027");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(130), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       strMaxFlowTime = GUILayout.TextField(strMaxFlowTime, 20, GUILayout.Height(20), GUILayout.Width(80));
-      _label = "Sec";
-      _toolTip = "Sets the maximum duration (in sec) of a resource transfer.";
-      _toolTip += "\r\nWorks in conjunction with the Flow rate.  if time it would take";
-      _toolTip += "\r\n to move a resource exceeds this number, this number will be used";
-      _toolTip += "\r\n to calculate an adjusted flow rate.";
-      _toolTip += "\r\n(protects your from 20 minute Xfers)";
+      //_label = "Sec";
+      //_toolTip = "Sets the maximum duration (in sec) of a resource transfer.";
+      //_toolTip += "\r\nWorks in conjunction with the Flow rate.  if time it would take";
+      //_toolTip += "\r\n to move a resource exceeds this number, this number will be used";
+      //_toolTip += "\r\n to calculate an adjusted flow rate.";
+      //_toolTip += "\r\n(protects you from long Xfers)";
+      _label = SMUtils.Localize("#smloc_settings_realism_030");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_027");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(80), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
@@ -512,9 +581,11 @@ namespace ShipManifest.Windows.Tabs
 
       // LockSettings Mode
       GUI.enabled = isEnabled;
-      _label = "Lock Settings  (If set ON, disable in config file)";
-      _toolTip = "Locks the settings in this section so they cannot be altered in game.";
-      _toolTip += "\r\nTo turn off Locking you MUST edit the SMSettings.dat file.";
+      //_label = "Lock Realism Settings  (If set ON, disable in config file)";
+      //_toolTip = "Locks the settings in this section so they cannot be altered in game.";
+      //_toolTip += "\r\nTo turn off Locking you MUST edit the SMSettings.dat file.";
+      _label = SMUtils.Localize("#smloc_settings_realism_031");
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_028");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();

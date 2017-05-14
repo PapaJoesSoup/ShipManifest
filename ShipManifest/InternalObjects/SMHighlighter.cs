@@ -76,8 +76,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in  SetPartsHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(
+          string.Format(" in  SetPartsHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
       }
     }
 
@@ -93,8 +93,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
-          string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+        SMUtils.LogMessage(
+          string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
       }
     }
 
@@ -109,8 +109,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
-          Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
+          SMUtils.LogType.Error, true);
       }
     }
 
@@ -125,8 +125,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
-          Utilities.LogType.Error, true);
+        SMUtils.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
+          SMUtils.LogType.Error, true);
       }
     }
 
@@ -194,9 +194,9 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage(
+          SMUtils.LogMessage(
             string.Format(" in HighlightCLSVessel (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), Utilities.LogType.Error, true);
+              ex.StackTrace), SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -280,10 +280,10 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          Utilities.LogMessage(
+          SMUtils.LogMessage(
             string.Format(
               " in SMHighlighter.UpdateHighlighting (repeating error).  Error in step:  " + step +
-              ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error, true);
+              ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }

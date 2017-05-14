@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using ShipManifest.InternalObjects;
-using ShipManifest.Process;
 using UnityEngine;
 
-namespace ShipManifest.Windows.Tabs
+namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabScienceLab
   {
@@ -22,7 +20,8 @@ namespace ShipManifest.Windows.Tabs
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
-      GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
+      //GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
+      GUILayout.Label(SMUtils.Localize("#smloc_control_lab_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -37,16 +36,16 @@ namespace ShipManifest.Windows.Tabs
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? "Operational" : "InOp") + ")";
+          string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? SMUtils.Localize("#smloc_control_lab_001") : SMUtils.Localize("#smloc_control_lab_002")) + ")"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
         }
         iLabs.Dispose();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(
+        SMUtils.LogMessage(
           string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          Utilities.LogType.Error, true);
+          SMUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

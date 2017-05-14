@@ -25,9 +25,7 @@ namespace ShipManifest.Modules
     {
       get
       {
-        if (XmitterModule.moduleName == "ModuleRTAntenna")
-          return true;
-        return false;
+        return XmitterModule.moduleName == "ModuleRTAntenna";
       }
     }
 
