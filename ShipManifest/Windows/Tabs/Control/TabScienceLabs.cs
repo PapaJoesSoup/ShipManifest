@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Control
@@ -12,11 +13,14 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      float scrollX = WindowControl.Position.x + 10;
-      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      //float scrollX = WindowControl.Position.x + 10;
+      //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = 10;
+      float scrollY = 50 - displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
+      SMHighlighter.IsMouseOver = false;
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
@@ -38,8 +42,20 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = isEnabled;
           string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? SMUtils.Localize("#smloc_control_lab_001") : SMUtils.Localize("#smloc_control_lab_002")) + ")"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
+
+          Rect rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+          {
+            SMHighlighter.IsMouseOver = true;
+            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
+            SMHighlighter.MouseOverPart = iLabs.Current.part;
+            SMHighlighter.MouseOverParts = null;
+          }
         }
         iLabs.Dispose();
+
+        // Display MouseOverHighlighting, if any
+        SMHighlighter.MouseOverHighlight();
       }
       catch (Exception ex)
       {

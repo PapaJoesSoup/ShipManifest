@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
+using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -15,8 +17,10 @@ namespace ShipManifest.InternalObjects
     internal static bool IsMouseOver;
     internal static TransferPump.TypePump MouseOverMode = TransferPump.TypePump.SourceToTarget;
     internal static Rect MouseOverRect = new Rect(0, 0, 0, 0);
-    internal static Part MouseOverpart;
-    internal static List<Part> MouseOverparts;
+    internal static Part MouseOverPart;
+    internal static List<Part> MouseOverParts;
+    internal static Part PrevMouseOverPart;
+    internal static List<Part> PrevMouseOverParts;
 
     #endregion
 
@@ -98,6 +102,24 @@ namespace ShipManifest.InternalObjects
       }
     }
 
+    internal static void MouseOverHighlight()
+    {
+      // Supports Transfer Window vessel/part and Control window part Highlighting....
+      RevertMouseOverHighlight();
+      if (MouseOverPart == null && MouseOverParts != null)
+      {
+        MouseOverHighlight(MouseOverParts);
+        PrevMouseOverParts = MouseOverParts;
+        MouseOverParts = null;
+      }
+      else if (MouseOverPart != null)
+      {
+        MouseOverHighlight(MouseOverPart);
+        PrevMouseOverPart = MouseOverPart;
+        MouseOverPart = null;
+      }
+    }
+
     internal static void MouseOverHighlight(Part part)
     {
       string step = "begin";
@@ -128,6 +150,88 @@ namespace ShipManifest.InternalObjects
         SMUtils.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
           SMUtils.LogType.Error, true);
       }
+    }
+
+    internal static void RevertMouseOverHighlight()
+    {
+      // Lets get the right color...
+
+      if (PrevMouseOverParts != null)
+      {
+        string strColor = GetPartsHighlightColor();
+        Color partColor = SMSettings.Colors[strColor];
+        // now lets set the part colors.
+        SetPartsHighlight(PrevMouseOverParts, partColor, true);
+        EdgeHighight(PrevMouseOverParts, true, strColor);
+        if (!IsMouseOver) PrevMouseOverParts = null;
+      }
+      //if (MouseOverParts != null)
+      //{
+      //  // now lets set the part colors.
+      //  SetPartsHighlight(MouseOverParts, partColor, true);
+      //  EdgeHighight(MouseOverParts, true, strColor);
+      //}
+
+     if (PrevMouseOverPart != null)
+      {
+        string strColor = GetPartHighlightColor();
+        Color partColor = SMSettings.Colors[strColor];
+
+        // Now lets set the part color
+        if (partColor == Color.clear)
+        {
+          ClearPartHighlight(PrevMouseOverPart);
+          EdgeHighight(PrevMouseOverPart, false);
+          if(!IsMouseOver) PrevMouseOverPart = null;
+          return;
+        }
+        SetPartHighlight(PrevMouseOverPart, partColor);
+        EdgeHighight(PrevMouseOverPart, true, strColor);
+        if (!IsMouseOver) PrevMouseOverPart = null;
+      }
+      //if (MouseOverPart != null)
+      //{
+      //  // Now lets set the part color
+      //  if (partColor == Color.clear)
+      //  {
+      //    ClearPartHighlight(MouseOverPart);
+      //    EdgeHighight(MouseOverPart, false);
+      //    return;
+      //  }
+      //  SetPartHighlight(MouseOverPart, partColor);
+      //  EdgeHighight(MouseOverPart, true, strColor);
+      //}
+    }
+
+    private static string GetPartsHighlightColor()
+    {
+      string strColor = "clear";
+      // since only transfer vessels can contain multiple mouseover parts, we need only concern ourselves with selected parts
+      // otherwise we want to revert to nothing.
+      if (PrevMouseOverParts == MouseOverParts || PrevMouseOverParts == null) return strColor;
+      if (SMAddon.SmVessel.SelectedPartsSource == PrevMouseOverParts)
+        strColor = SMSettings.SourcePartColor;
+      else if (SMAddon.SmVessel.SelectedPartsTarget == PrevMouseOverParts)
+        strColor = SMSettings.TargetPartColor;
+      else strColor = "yellow";
+      return strColor;
+    }
+
+    private static string GetPartHighlightColor()
+    {
+      string strColor = "clear";
+      // Here, we need to also account for a part selected in the Control window.
+      // so we can have a part revert to nothing...
+      //if (PrevMouseOverPart == MouseOverPart || PrevMouseOverPart == null) return strColor;
+      if (SMAddon.SmVessel.SelectedPartsSource.Contains(PrevMouseOverPart))
+        strColor = SMSettings.SourcePartColor;
+      else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
+        strColor = SMSettings.TargetPartColor;
+      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart))
+      {
+        strColor = SMConditions.IsClsHighlightingEnabled() ? "green" : "yellow";
+      }
+      return strColor;
     }
 
     internal static void EdgeHighight(Part part, bool enable, string color = null)
@@ -216,25 +320,6 @@ namespace ShipManifest.InternalObjects
         // Clear Highlighting on everything, start fresh
         EdgeHighight(SMAddon.SmVessel.Vessel.parts, false);
         ClearPartsHighlight(SMAddon.SmVessel.Vessel.parts);
-
-        step = "Mouseover highlighting, if any";
-        // Supports Transfer Window vessel/part Highlighting....
-        if (IsMouseOver)
-        {
-          if (MouseOverRect.Contains(Event.current.mousePosition))
-          {
-            if (MouseOverpart == null && MouseOverparts != null)
-              MouseOverHighlight(MouseOverparts);
-            else if (MouseOverpart != null)
-              MouseOverHighlight(MouseOverpart);
-          }
-          else
-          {
-            IsMouseOver = false;
-            MouseOverpart = null;
-            MouseOverparts = null;
-          }
-        }
 
         if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
         {

@@ -35,7 +35,7 @@ namespace ShipManifest.Modules
       {
         if (IsRtModule)
           return XmitterModule.Events["EventClose"].active;
-        return Module.Events["Toggle"].guiName == "Retract";
+        return Module.deployState == ModuleDeployablePart.DeployState.EXTENDED;
       }
     }
 
@@ -46,7 +46,7 @@ namespace ShipManifest.Modules
         // RT support:
         if (IsRtModule)
           return XmitterModule.Events["EventClose"].active ? "Activated" : "Deactivated";
-        return Module.Events["Toggle"].guiName == "Retract" ? "Extended" : "Retracted";
+        return Module.deployState == ModuleDeployablePart.DeployState.EXTENDED ? "Extended" : "Retracted";
       }
     }
 
@@ -67,9 +67,9 @@ namespace ShipManifest.Modules
       }
     }
 
-    private ModuleAnimateGeneric Module
+    private ModuleDeployableAntenna Module
     {
-      get { return (ModuleAnimateGeneric) AnimateModule; }
+      get { return (ModuleDeployableAntenna) AnimateModule; }
     }
 
     internal void ExtendAntenna()
@@ -93,8 +93,8 @@ namespace ShipManifest.Modules
         else
           XmitterModule.Events["EventOpen"].Invoke();
       }
-      else if (Module.Events["Toggle"].guiName == "Extend")
-        Module.Toggle();
+      else if (Module.deployState == ModuleDeployablePart.DeployState.RETRACTED)
+        Module.Extend();
     }
 
     internal void RetractAntenna()
@@ -102,8 +102,8 @@ namespace ShipManifest.Modules
       // RT support:
       if (IsRtModule)
         XmitterModule.Events["EventClose"].Invoke();
-      else if (Module.Events["Toggle"].guiName == "Retract")
-        Module.Toggle();
+      else if (Module.deployState == ModuleDeployablePart.DeployState.EXTENDED)
+        Module.Retract();
     }
   }
 }

@@ -58,51 +58,8 @@ namespace ShipManifest.Windows
       GUILayout.EndVertical();
       GUILayout.EndScrollView();
 
-      GUILayout.BeginHorizontal();
-      // Save
-      GUIContent label = new GUIContent(SMUtils.Localize("#smloc_settings_002"), SMUtils.Localize("#smloc_settings_tt_002"));
-      if (GUILayout.Button(label, GUILayout.Height(20)))
-      {
-        ToolTip = "";
-        SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
-        SMSettings.SaveSettings();
+      DisplayActionButtons();
 
-        // Sync SM to CLS override settings with CLS
-        if (SMSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
-        {
-          SMSettings.UpdateClsOverride();
-        }
-
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmSettingsClicked();
-        else
-          ShowWindow = false;
-      }
-      rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-
-      // Cancel
-      label = new GUIContent(SMUtils.Localize("#smloc_settings_003"), SMUtils.Localize("#smloc_settings_tt_003"));
-      if (GUILayout.Button(label, GUILayout.Height(20)))
-      {
-        // We've canclled, so restore original settings.
-        ToolTip = "";
-        SMSettings.MemRestoreTempSettings();
-
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
-          SMAddon.OnSmSettingsClicked();
-        else
-        {
-          SMSettings.MemStoreTempSettings();
-          ShowWindow = false;
-        }
-      }
-      rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-
-      GUILayout.EndHorizontal();
       GUILayout.EndVertical();
 
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
@@ -193,6 +150,56 @@ namespace ShipManifest.Windows
         default:
           throw new ArgumentOutOfRangeException();
       }
+    }
+
+    private static void DisplayActionButtons()
+    {
+      Rect rect;
+      GUILayout.BeginHorizontal();
+
+      // Save
+      //GUIContent label = new GUIContent("Save", "Save the current settings to file.");
+      GUIContent label = new GUIContent(SMUtils.Localize("#smloc_settings_002"), SMUtils.Localize("#smloc_settings_tt_002"));
+      if (GUILayout.Button(label, GUILayout.Height(20)))
+      {
+        ToolTip = "";
+        SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
+        SMSettings.SaveSettings();
+
+        // Sync SM to CLS override settings with CLS
+        if (SMSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
+        {
+          SMSettings.UpdateClsOverride();
+        }
+
+        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+          SMAddon.OnSmSettingsClicked();
+        else
+          ShowWindow = false;
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      // Cancel
+      //label = new GUIContent("Cancel", "Cancel the changes made.\nSettings will revert to before changes were made.");
+      label = new GUIContent(SMUtils.Localize("#smloc_settings_003"), SMUtils.Localize("#smloc_settings_tt_003"));
+      if (GUILayout.Button(label, GUILayout.Height(20)))
+      {
+        ToolTip = "";
+        // We've canclled, so restore original settings.
+        SMSettings.MemRestoreTempSettings();
+
+        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+          SMAddon.OnSmSettingsClicked();
+        else
+          ShowWindow = false;
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      GUILayout.EndHorizontal();
     }
 
     private enum Tab

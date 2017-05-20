@@ -46,50 +46,9 @@ namespace ShipManifest.Windows.Tabs.Settings
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
       bool isEnabled = !SMSettings.LockSettings;
-      // RealismMode options
-      // "Realism Mode"
-      _label = $"{SMUtils.Localize("#smloc_settings_realism_003")}:";
-      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_002");
-      _guiLabel = new GUIContent(_label, _toolTip);
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      //RealismMode Buttons.
+      DisplayRealismButtons();
 
-      //GUIContent[] options =
-      //{
-      //  new GUIContent("Full","Enables full realism. Most restrictive use of SM"),
-      //  new GUIContent("None","No realism settings enabled.  Most permissive use of SM."),
-      //  new GUIContent("Default", "Default settings that come with SM when installed.\r\nA blend of settings that leans towards realism."),
-      //  new GUIContent("Custom", "This setting is selected automatically when any settings\r\nare changed that invalidate the other categories.")
-      //};
-      GUIContent[] options =
-      {
-        new GUIContent(SMUtils.Localize("#smloc_settings_realism_004"), SMUtils.Localize("#smloc_settings_realism_tt_003")),
-        new GUIContent(SMUtils.Localize("#smloc_settings_realism_005"), SMUtils.Localize("#smloc_settings_realism_tt_004")),
-        new GUIContent(SMUtils.Localize("#smloc_settings_realism_006"), SMUtils.Localize("#smloc_settings_realism_tt_005")),
-        new GUIContent(SMUtils.Localize("#smloc_settings_realism_007"), SMUtils.Localize("#smloc_settings_realism_tt_006"))
-      };
-      GUI.enabled = isEnabled;
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(_guiLabel, SMStyle.LabelStyleNoWrap, GUILayout.Width(90));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-
-      // Store mode value to evalulte for changes.
-      int mode = SMSettings.RealismMode;
-      mode = GUILayout.SelectionGrid(mode, options, 4, GUILayout.Height(20), GUILayout.Width(256));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      GUILayout.EndHorizontal();
-
-      if (mode != SMSettings.RealismMode)
-      {
-        SMSettings.SetRealismModeSwitches(mode);
-        SMSettings.RealismMode = mode;
-      }
-      GUI.enabled = true;
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
@@ -126,11 +85,10 @@ namespace ShipManifest.Windows.Tabs.Settings
       // EnableCrew Modifications
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
-      //_label = "Enable Crew Member Modifications";
+      //_label = "Enable Roster Modifications";
       //_toolTip = "Enables/Disable Crew Modifications in the Roster Window.";
       //_toolTip += "\r\nWhen ON, You cannot Edit, Create, or Respawn Crew members.";
       //_toolTip += "\r\nWhen Off, You can Edit, Create, or Respawn Crew members.";
-      //_toolTip += "\r\nThis works in conjunction with Realism mode, as Realism also restricts some other Crew actions.";
       _label = SMUtils.Localize("#smloc_settings_realism_010");
       _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_009");
       _guiLabel = new GUIContent(_label, _toolTip);
@@ -594,6 +552,56 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = true;
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+    }
+
+    private static void DisplayRealismButtons()
+    {
+      // RealismMode options
+      GUIContent[] options =
+      {
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_004"), SMUtils.Localize("#smloc_settings_realism_tt_003")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_005"), SMUtils.Localize("#smloc_settings_realism_tt_004")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_006"), SMUtils.Localize("#smloc_settings_realism_tt_005")),
+        new GUIContent(SMUtils.Localize("#smloc_settings_realism_007"), SMUtils.Localize("#smloc_settings_realism_tt_006"))
+      };
+      GUIStyle[] styles =
+      {
+        SMSettings.RealismMode == 0 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        SMSettings.RealismMode == 1 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        SMSettings.RealismMode == 2 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        SMSettings.RealismMode == 3 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+      };
+
+      // "Realism Mode Label"
+      _label = $"{SMUtils.Localize("#smloc_settings_realism_003")}:";
+      _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_002");
+      _guiLabel = new GUIContent(_label, _toolTip);
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      GUI.enabled = true;
+      GUILayout.BeginHorizontal();
+      GUILayout.Label(_guiLabel, SMStyle.LabelStyleNoWrap, GUILayout.Width(90));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      // Build Option Buttons
+      SMSettings.RealismMode = SMSettings.GetRealismMode();
+      for (int x = 0; x <= 3; x++)
+      {
+        if (x == 3) GUI.enabled = false;
+        if (GUILayout.Button(options[x], styles[x], GUILayout.Height(20)))
+        {
+          if (x != SMSettings.RealismMode) SMSettings.SetRealismMode(x);
+        }
+        _rect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && ShowToolTips)
+          ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, 10);
+        GUI.enabled = true;
+      }
+      GUILayout.EndHorizontal();
     }
   }
 }

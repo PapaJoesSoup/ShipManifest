@@ -47,7 +47,8 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalsBeXferred(List<Part> selectedPartsSource, List<Part> selectedPartsTarget)
     {
-      bool results = false;
+      bool results = true;
+      WindowTransfer.XferToolTip = "";
       try
       {
         if (IsTransferInProgress())
@@ -107,20 +108,20 @@ namespace ShipManifest.InternalObjects
           WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_005");
           return false;
         }
-        // now if realism mode, are the parts connected to each other in the same living space?
+        // now if realistic xfers is enabled, are the parts connected to each other in the same living space?
         results = IsClsInSameSpace(selectedPartsSource[0], selectedPartsTarget[0]);
         if (!results)
           WindowTransfer.EvaToolTip = SMUtils.Localize("#smloc_conditions_tt_006");
         // "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
+        else
+          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_007");  
+          // "Kerbal can be Transfered.";
       }
       catch (Exception ex)
       {
         SMUtils.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
           SMUtils.LogType.Error, true);
       }
-      if (results && WindowTransfer.XferToolTip == "")
-        WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_007");  
-      // "Kerbal can be Transfered.";
       return results;
     }
 
@@ -364,6 +365,7 @@ namespace ShipManifest.InternalObjects
       return !SMSettings.RealXfers ||
              (SMAddon.SmVessel.IsRecoverable && SMSettings.EnablePfCrews);
     }
+
     internal static bool IsUsiInflatable(Part part)
     {
       if (!part.Modules.Contains("USIAnimation")) return false;
@@ -376,10 +378,10 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeAdded(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
-             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
-             SMAddon.SmVessel.SelectedPartsSource.Count > 0 &&
-             !SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
+      return SMSettings.EnableCrewModify 
+        && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
+        && SMAddon.SmVessel.SelectedPartsSource.Count > 0 
+        && !ShipManifest.SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
     }
 
     internal static bool FrozenKerbalNotThawable(ProtoCrewMember kerbal)
@@ -412,22 +414,29 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
-             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned &&
-             FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
+      return SMSettings.EnableCrewModify 
+        && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned 
+        && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
+    }
+
+    internal static bool KerbalCannotBeRemovedRealism(ProtoCrewMember kerbal)
+    {
+      return !SMSettings.EnableCrewModify
+        && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
+        && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeAddedNoSource(ProtoCrewMember kerbal)
     {
-      return ((SMSettings.RealXfers && SMAddon.SmVessel.IsRecoverable) || !SMSettings.RealXfers) &&
-             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available &&
-             SMAddon.SmVessel.SelectedPartsSource.Count == 0;
+      return SMSettings.EnableCrewModify 
+        && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
+        && SMAddon.SmVessel.SelectedPartsSource.Count == 0;
     }
 
     internal static bool KerbalCannotBeAddedRealism(ProtoCrewMember kerbal)
     {
-      return SMSettings.RealXfers && !SMAddon.SmVessel.IsRecoverable &&
-             kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
+      return !SMSettings.EnableCrewModify 
+        && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 
     #endregion

@@ -91,6 +91,7 @@ namespace ShipManifest
 
     private static void DummyHandler()
     {
+      // This is used for Stock Toolbars.  Some delagates are not needed.
     }
 
     // Addon state event handlers
@@ -195,6 +196,22 @@ namespace ShipManifest
       catch (Exception ex)
       {
         SMUtils.LogMessage("Error in:  SMAddon.Start.  " + ex, SMUtils.LogType.Error, true);
+      }
+    }
+
+    internal void OnMouseEnter()
+    {
+      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+      {
+        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseEnter"), SMUtils.LogType.Info, false);
+      }
+    }
+
+    internal void OnMouseExit()
+    {
+      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+      {
+        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseExit"), SMUtils.LogType.Info, false);
       }
     }
 

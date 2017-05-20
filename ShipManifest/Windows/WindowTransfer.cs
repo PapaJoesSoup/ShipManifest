@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using KSP.Localization;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
@@ -66,12 +65,13 @@ namespace ShipManifest.Windows
     {
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
-
+      
       string displayAmounts = SMUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
       Title = SMUtils.Localize("#smloc_transfer_000") + " - " + SMAddon.SmVessel.Vessel.vesselName + displayAmounts; // "Transfer"
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
+      SMHighlighter.IsMouseOver = false;
 
       //GUIContent label = new GUIContent("", "Close Window");
       GUIContent label = new GUIContent("", SMUtils.Localize("#smloc_window_tt_001"));
@@ -133,6 +133,10 @@ namespace ShipManifest.Windows
 
         GUILayout.EndVertical();
         GUILayout.EndHorizontal();
+
+        // Display MouseOverHighlighting, if any
+        SMHighlighter.MouseOverHighlight();
+
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         SMAddon.RepositionWindow(ref Position);
       }
@@ -186,6 +190,7 @@ namespace ShipManifest.Windows
 
     // Transfer Window components
     private static Vector2 _sourceTransferViewerScrollPosition = Vector2.zero;
+    private static Rect xferpartlistRect = new Rect(0,0,300,100);
 
     internal static void SourceTransferViewer()
     {
@@ -333,8 +338,10 @@ namespace ShipManifest.Windows
     private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
       Vector2 viewerScrollPosition)
     {
-      float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
-      float scrollY = Position.y + 30 - viewerScrollPosition.y;
+      //float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
+      //float scrollY = Position.y + 30 - viewerScrollPosition.y;
+      float scrollX = (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
+      float scrollY = 30 - viewerScrollPosition.y;
       string step = "begin";
       try
       {
@@ -375,7 +382,7 @@ namespace ShipManifest.Windows
             SMHighlighter.IsMouseOver = true;
             SMHighlighter.MouseOverMode = pumpType;
             SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = parts.Current;
+            SMHighlighter.MouseOverPart = parts.Current;
           }
 
           // Reset Button enabling.
@@ -461,8 +468,10 @@ namespace ShipManifest.Windows
     private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
       Vector2 viewerScrollPosition)
     {
-      float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
-      float scrollY = Position.y + 30 - viewerScrollPosition.y;
+      //float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
+      //float scrollY = Position.y + 30 - viewerScrollPosition.y;
+      float scrollX = (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
+      float scrollY = 30 - viewerScrollPosition.y;
       string step = "begin";
       try
       {
@@ -501,8 +510,8 @@ namespace ShipManifest.Windows
             SMHighlighter.IsMouseOver = true;
             SMHighlighter.MouseOverMode = pumpType;
             SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverpart = null;
-            SMHighlighter.MouseOverparts = modDockedVessels.Current.VesselParts;
+            SMHighlighter.MouseOverPart = null;
+            SMHighlighter.MouseOverParts = modDockedVessels.Current.VesselParts;
           }
 
           // Reset Button enabling.
@@ -596,6 +605,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
     }
+
     private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo)
     {
       // Since only one Crew Part can currently be selected, all lists will use an index of [0].

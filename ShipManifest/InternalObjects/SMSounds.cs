@@ -101,10 +101,20 @@ namespace ShipManifest.InternalObjects
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          String.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
         // ReSharper disable once PossibleIntendedRethrow
         throw ex;
       }
+    }
+
+    internal static bool SoundSettingsChanged()
+    {
+      return SMSettings.PumpSoundRun != SMSettings.PrevPumpSoundRun
+             || SMSettings.PumpSoundStart != SMSettings.PrevPumpSoundStart
+             || SMSettings.PumpSoundStop != SMSettings.PrevPumpSoundStop
+             || SMSettings.CrewSoundStart != SMSettings.PrevCrewSoundStart
+             || SMSettings.CrewSoundRun != SMSettings.PrevCrewSoundRun
+             || SMSettings.CrewSoundStop != SMSettings.PrevCrewSoundStop;
     }
   }
 }

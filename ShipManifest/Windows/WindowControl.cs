@@ -42,7 +42,7 @@ namespace ShipManifest.Windows
       DisplayWindowTabs();
       // This is a scroll panel (we are using it to make button lists...)
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(200), GUILayout.Width(370));
+        GUILayout.Height(200), GUILayout.Width(380));
       DisplaySelectedTab(_displayViewerPosition);
       GUILayout.EndScrollView();
 
@@ -193,30 +193,35 @@ namespace ShipManifest.Windows
       switch (_selectedTab)
       {
         case Tab.Panel:
+          GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_016"), GUILayout.Height(20))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_007"), GUILayout.Height(20))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Hatch:
+          GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_008"), GUILayout.Height(20))) // "Close All Hatches"
             TabHatch.CloseAllHatches();
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_009"), GUILayout.Height(20))) // "Open All Hatches"
             TabHatch.OpenAllHatches();
           break;
         case Tab.Antenna:
+          GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_010"), GUILayout.Height(20))) // "Retract All Antennas"
             TabAntenna.RetractAllAntennas();
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_011"), GUILayout.Height(20))) // "Extend All Antennas"
             TabAntenna.ExtendAllAntennas();
           break;
         case Tab.Light:
+          GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_012"), GUILayout.Height(20))) // "Turn Off All Lights"
             TabLight.TurnOffAllLights();
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_013"), GUILayout.Height(20))) // "Turn On All Lights"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Lab:
+          GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_014"), GUILayout.Height(20))) // "Turn Off All Labs"
             TabLight.TurnOffAllLights();
           if (GUILayout.Button(SMUtils.Localize("#smloc_control_015"), GUILayout.Height(20))) // "Turn On All Labs"
@@ -227,6 +232,7 @@ namespace ShipManifest.Windows
         default:
           throw new ArgumentOutOfRangeException();
       }
+      GUI.enabled = true;
       GUILayout.EndHorizontal();
     }
 

@@ -14,10 +14,14 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      float scrollX = WindowControl.Position.x + 20;
-      float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      //float scrollX = WindowControl.Position.x + 20;
+      //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
+      float scrollX = 20;
+      float scrollY = 50 - displayViewerPosition.y;
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
+      SMHighlighter.IsMouseOver = false;
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
@@ -46,10 +50,13 @@ namespace ShipManifest.Windows.Tabs.Control
 
           SMHighlighter.IsMouseOver = true;
           SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-          SMHighlighter.MouseOverpart = iLights.Current.SPart;
-          SMHighlighter.MouseOverparts = null;
+          SMHighlighter.MouseOverPart = iLights.Current.SPart;
+          SMHighlighter.MouseOverParts = null;
         }
         iLights.Dispose();
+
+        // Display MouseOverHighlighting, if any
+        SMHighlighter.MouseOverHighlight();
       }
       catch (Exception ex)
       {

@@ -286,6 +286,7 @@ namespace ShipManifest
       }
       parts.Dispose();
     }
+
     private void UpdateDockedVessels()
     {
       //Utilities.LogMessage("Entered:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
@@ -414,17 +415,17 @@ namespace ShipManifest
           {
             if (pModules.Current == null) continue;
             PartModule pModule = (PartModule) pModules.Current;
-            if (pModule.moduleName == "ModuleDataTransmitter" || pModule.moduleName == "ModuleRTAntenna")
+            if (pModule is ModuleDataTransmitter || pModule.moduleName == "ModuleRTAntenna")
             {
               pAntenna.XmitterModule = pModule;
             }
-            if (pModule.moduleName == "ModuleAnimateGeneric" &&
-                (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
+            if (pModule is ModuleDeployableAntenna
+              || pModule is ModuleAnimateGeneric && (pModule.Events["Toggle"].guiName == "Extend" || pModule.Events["Toggle"].guiName == "Retract"))
             {
               pAntenna.AnimateModule = pModule;
             }
           }
-          _antennas.Add(pAntenna);
+          if (pAntenna.AnimateModule != null) _antennas.Add(pAntenna);
         }
         pParts.Dispose();
       }

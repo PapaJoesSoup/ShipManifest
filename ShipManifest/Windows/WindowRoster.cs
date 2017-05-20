@@ -103,7 +103,10 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
-          GUIContent guilabel = new GUIContent(SMUtils.Localize("#smloc_roster_002"), SMUtils.Localize("#smloc_roster_tt_001")); // "Create Kerbal", "Opens the Kerbal creation editor."
+          GUI.enabled = SMSettings.EnableCrewModify;
+          GUIContent guilabel = new GUIContent(SMUtils.Localize("#smloc_roster_002"), GUI.enabled // "Create Kerbal"
+            ? SMUtils.Localize("#smloc_roster_tt_001") // Realistic Control is On.  Create a Kerbal is disabled.
+            : SMUtils.Localize("#smloc_roster_tt_022")); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
             OnCreate = true;
@@ -112,6 +115,7 @@ namespace ShipManifest.Windows
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
           GUILayout.EndHorizontal();
+          GUI.enabled = true;
         }
 
         GUILayout.EndVertical();
@@ -405,7 +409,7 @@ namespace ShipManifest.Windows
       }
       bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SMUtils.Localize("#smloc_roster_017")); // "Gender"
+      GUILayout.Label(SMUtils.Localize("#smloc_roster_017"), GUILayout.Width(85)); // "Gender"
       isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
       isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
       SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
@@ -417,7 +421,7 @@ namespace ShipManifest.Windows
       GUILayout.Label(SMUtils.Localize("#smloc_roster_030")); // "Stupidity"
       SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
 
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SMUtils.Localize("#smloc_roster_031")); // "Badass"
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SMUtils.Localize("#smloc_roster_031"), GUILayout.Height(30)); // "Badass"
 
       GUILayout.BeginHorizontal();
       if (GUILayout.Button(SMUtils.Localize("#smloc_roster_004"), GUILayout.MaxWidth(50))) // "Cancel"
@@ -465,7 +469,7 @@ namespace ShipManifest.Windows
 
     private static void SetupEditButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
 
       //buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit" : "Cancel";
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? SMUtils.Localize("#smloc_roster_020") : SMUtils.Localize("#smloc_roster_004");
@@ -474,8 +478,9 @@ namespace ShipManifest.Windows
           ? SMUtils.Localize("#smloc_roster_tt_007") // "Edit this Kerbal's attributes"
           : SMUtils.Localize("#smloc_roster_tt_008"); // "Cancel any changes to this Kerbal"
       else
-        buttonToolTip = SMUtils.Localize("#smloc_roster_tt_009");
-        // buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
+        buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
+          ? SMUtils.Localize("#smloc_roster_tt_009") // "Kerbal is not available at this time.\r\nEditing is disabled";
+          : SMUtils.Localize("#smloc_roster_tt_021"); // "Realistic Control is On.\r\nEditing is disabled";
     }
 
     private static void SetupActionButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
@@ -516,6 +521,12 @@ namespace ShipManifest.Windows
           buttonText = SMUtils.Localize("#smloc_roster_022");  // "Remove";
           buttonToolTip = SMUtils.Localize("#smloc_roster_tt_014");  // "Removes a Kerbal from the active vessel.\r\nWill then become available.";
         }
+        else if (SMConditions.KerbalCannotBeRemovedRealism(kerbal))
+        {
+          GUI.enabled = false;
+          buttonText = SMUtils.Localize("#smloc_roster_022");  // "Remove";
+          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_023");  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
+        }
         else if (SMConditions.KerbalCannotBeAddedNoSource(kerbal))
         {
           GUI.enabled = false;
@@ -528,7 +539,7 @@ namespace ShipManifest.Windows
           GUI.enabled = false;
           buttonText = SMUtils.Localize("#smloc_roster_023");  // "Add";
           buttonToolTip = SMUtils.Localize("#smloc_roster_tt_016");
-          // buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
+          // buttonToolTip = "Add Disabled.  Roster Modifications is preventing this action.\r\nTo add a Kerbal, Change your Roster Modifications Setting.";
         }
         else
         {
@@ -538,7 +549,7 @@ namespace ShipManifest.Windows
           // buttonToolTip = "Kerbal is not available.\r\nCurrent status does not allow any action.";
         }
       }
-      else
+      else // HighLogic.LoadedScene == GameScenes.SPACECENTER
       {
         GUI.enabled = false;
         buttonText = "--";
@@ -546,18 +557,20 @@ namespace ShipManifest.Windows
         // buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 
+      // Applies to both scenes.
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
-        GUI.enabled = true;
+        GUI.enabled = SMSettings.EnableCrewModify;
         buttonText = SMUtils.Localize("#smloc_roster_024");  // "Respawn";
-        buttonToolTip = SMUtils.Localize("#smloc_roster_tt_019");
-        // buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
+        buttonToolTip = SMSettings.EnableCrewModify 
+          ? SMUtils.Localize("#smloc_roster_tt_020") // "Brings a Kerbal back to life.\r\nWill then become available.";
+          : SMUtils.Localize("#smloc_roster_tt_019"); // "Realistic Control is preventing this action.";
       }
     }
 
     #endregion Gui Layout
 
-    #region Methods
+    #region Action Methods
     private static string GetFrozenKerbalDetails(ProtoCrewMember kerbal)
     {
       try

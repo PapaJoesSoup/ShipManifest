@@ -4,7 +4,6 @@ using System.IO;
 using System.Reflection;
 using ShipManifest.InternalObjects;
 using ShipManifest.Windows;
-using ShipManifest.Windows.Tabs;
 using ShipManifest.Windows.Tabs.Control;
 using ShipManifest.Windows.Tabs.Settings;
 using UnityEngine;
@@ -124,7 +123,7 @@ namespace ShipManifest
     internal static string TargetPartColor = "green";
     internal static string TargetPartCrewColor = "blue";
     internal static string ClsSpaceColor = "green";
-    internal static string MouseOverColor = "green";
+    internal static string MouseOverColor = "burntorange";
     internal static double CrewXferDelaySec = 7;
     internal static int IvaUpdateFrameDelay = 20;
 
@@ -492,6 +491,7 @@ namespace ShipManifest
         {
           SetStockCrewTransferState();
         }
+        if (SMSound.SoundSettingsChanged()) SMSound.LoadSounds();
 
         MemStoreTempSettings();
         if (Settings == null)
@@ -613,9 +613,9 @@ namespace ShipManifest
       }
     }
 
-    internal static void SetRealismModeSwitches(int mode)
+    internal static void SetRealismMode(int mode)
     {
-      if (mode != 3) RealismMode = mode;
+      if (mode < 3) RealismMode = mode;
       switch (mode)
       {
         case 0: // Full
@@ -693,6 +693,78 @@ namespace ShipManifest
         case 3: // Custom  Do nothing.
           break;
       }
+    }
+
+    internal static int GetRealismMode()
+    {
+      if ( // Full
+          RealXfers == true
+          && RealControl == true
+          && EnableCrew == true
+          && EnableKerbalRename == false
+          && EnableChangeProfession == false
+          && EnableCrewModify == false
+          && EnableStockCrewXfer == true
+          && OverrideStockCrewXfer == true
+          && EnableClsAllowTransfer == true
+          && EnableCls == ClsInstalled
+          && EnableScience == true
+          && EnableResources == true
+          && EnablePfCrews == false
+          && EnablePfResources == false
+          && EnableXferCost == true
+          && Math.Abs(FlowCost - 0.0015) < 0.0001f
+          && Math.Abs(FlowRate - 100) < 0.0001f
+          && Math.Abs(MinFlowRate) < 0.0001f
+          && Math.Abs(MaxFlowRate - 1000) < 0.0001f
+          && Math.Abs(Tolerance - 0.000001) < 0.0001f
+          && MaxFlowTimeSec == 180
+          && LockSettings == false)
+        return 0;
+      if ( // None
+          RealXfers == false
+          && RealControl == false
+          && EnableCrew == true
+          && EnableCrewModify == true
+          && EnableKerbalRename == true
+          && EnableChangeProfession == true
+          && EnableStockCrewXfer == true
+          && OverrideStockCrewXfer == false
+          && EnableClsAllowTransfer == true
+          && EnableCls == false
+          && EnableScience == true
+          && EnableResources == true
+          && EnablePfCrews == false
+          && EnablePfResources == true
+          && EnableXferCost == false
+          && LockSettings == false)
+        return 1;
+      if ( // Default
+          RealXfers == true
+          && RealControl == true
+          && EnableCrew == true
+          && EnableCrewModify == true
+          && EnableKerbalRename == true
+          && EnableChangeProfession == true
+          && EnableStockCrewXfer == true
+          && OverrideStockCrewXfer == true
+          && EnableClsAllowTransfer == true
+          && EnableCls == ClsInstalled
+          && EnableScience == true
+          && EnableResources == true
+          && EnablePfCrews == false
+          && EnablePfResources == true
+          && EnableXferCost == true
+          && Math.Abs(FlowCost - 0.0015) < 0.0001f
+          && Math.Abs(FlowRate - 100) < 0.0001f
+          && Math.Abs(MinFlowRate) < 0.0001f
+          && Math.Abs(MaxFlowRate - 1000) < 0.0001f
+          && Math.Abs(Tolerance - 0.000001) < 0.000001f
+          && MaxFlowTimeSec == 180
+          && LockSettings == false)
+        return 2;
+
+        return 3;
     }
 
     internal static void SetStockCrewTransferState()
@@ -779,16 +851,17 @@ namespace ShipManifest
     {
       Colors = new Dictionary<string, Color>
       {
-        {"black", Color.black},
-        {"blue", Color.blue},
-        {"clea", Color.clear},
-        {"cyan", Color.cyan},
-        {"gray", Color.gray},
-        {"green", Color.green},
-        {"magenta", Color.magenta},
-        {"red", Color.red},
-        {"white", Color.white},
-        {"yellow", Color.yellow},
+        {"black", XKCDColors.Black},
+        {"blue", XKCDColors.Blue},
+        {"clear", Color.clear},
+        {"cyan", XKCDColors.Cyan},
+        {"gray", XKCDColors.Grey},
+        {"green", XKCDColors.Green},
+        {"magenta", XKCDColors.Magenta},
+        {"red", XKCDColors.Red},
+        {"white", XKCDColors.White},
+        {"yellow", XKCDColors.Yellow},
+        {"burntorange", XKCDColors.BurntOrange },
         {"default", new Color(0.478f, 0.698f, 0.478f, 0.698f)}
       };
     }
