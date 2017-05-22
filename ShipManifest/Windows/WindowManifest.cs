@@ -166,7 +166,7 @@ namespace ShipManifest.Windows
       try
       {
         // List required here to prevent loop sync errors with live source.
-        Dictionary<string, List<Part>>.KeyCollection.Enumerator keys = SMAddon.SmVessel.PartsByResource.Keys.GetEnumerator();
+        List<string>.Enumerator keys = SMAddon.SmVessel.PartsByResource.Keys.ToList().GetEnumerator();
         while (keys.MoveNext())
         {
           if (string.IsNullOrEmpty(keys.Current)) continue;

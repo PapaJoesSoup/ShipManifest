@@ -76,7 +76,7 @@
   <ItemGroup>
     <Compile Include="APIClients\DFWrapper.cs" />
     <Compile Include="Distribution\SMWrapper.cs" />
-    <Compile Include="InternalObjects\SMPartHighlight.cs" />
+    <Compile Include="InternalObjects\SMPart.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Process\ProcessController.cs" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using ShipManifest.InternalObjects;
-using ShipManifest.Windows.Tabs;
 using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
@@ -40,6 +39,7 @@ namespace ShipManifest.Windows
       // This is a scroll panel (we are using it to make button lists...)
       GUILayout.BeginVertical();
       DisplayWindowTabs();
+
       // This is a scroll panel (we are using it to make button lists...)
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
         GUILayout.Height(200), GUILayout.Width(380));
@@ -48,6 +48,7 @@ namespace ShipManifest.Windows
 
       DisplayTabActions();
       GUILayout.EndVertical();
+
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
       SMAddon.RepositionWindow(ref Position);
     }

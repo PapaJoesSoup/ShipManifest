@@ -1,5 +1,4 @@
 ﻿using ShipManifest.Windows;
-using ShipManifest.Windows.Tabs;
 using ShipManifest.Windows.Tabs.Control;
 using ShipManifest.Windows.Tabs.Settings;
 using UnityEngine;

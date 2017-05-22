@@ -374,6 +374,7 @@ namespace ShipManifest.Windows
           ThawKerbal(actionKerbal.name);
         else if (actionText == SMUtils.Localize("#smloc_roster_026"))// "Freeze"
           FreezeKerbal(actionKerbal);
+        SMAddon.FireEventTriggers();
       }
       catch (Exception ex)
       {

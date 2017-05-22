@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ConnectedLivingSpace;
 using KSP.UI.Dialogs;
 using ShipManifest.APIClients;
@@ -163,56 +162,6 @@ namespace ShipManifest.InternalObjects
       return results;
     }
 
-    //internal static bool IsClsInSameSpace()
-    //{
-    //  bool results = false;
-    //  try
-    //  {
-    //    if (SMSettings.EnableCls && SMSettings.RealismMode)
-    //    {
-    //      if (SMAddon.ClsAddon.Vessel != null)
-    //      {
-    //        if (SMAddon.SmVessel.ClsSpaceSource == null || SMAddon.SmVessel.ClsSpaceTarget == null)
-    //          SMAddon.UpdateClsSpaces();
-    //        if (SMAddon.SmVessel.ClsSpaceSource != null && SMAddon.SmVessel.ClsSpaceTarget != null)
-    //        {
-    //          if (SMAddon.SmVessel.ClsSpaceSource == SMAddon.SmVessel.ClsSpaceTarget)
-    //          {
-    //            WindowTransfer.XferToolTip =
-    //              "Source & Target Part are in the same space.\r\nInternal Xfers are allowed.";
-    //            results = true;
-    //          }
-    //          else
-    //            WindowTransfer.XferToolTip =
-    //              "Source and Target parts are not in the same Living Space.\r\nKerbals will have to go EVA.";
-    //        }
-    //        else
-    //          WindowTransfer.XferToolTip =
-    //            "You should NOT be seeing this, as Source or Target Space is missing.\r\nPlease reselect source or target part.";
-    //      }
-    //      else
-    //        WindowTransfer.XferToolTip =
-    //          "You should NOT be seeing this, as CLS is not behaving correctly.\r\nPlease check your CLS installation.";
-    //    }
-    //    else
-    //    {
-    //      WindowTransfer.XferToolTip = "Realism and/or CLS disabled.\r\nXfers anywhere are allowed.";
-    //      results = true;
-    //    }
-    //  }
-    //  catch (Exception ex)
-    //  {
-    //    if (!SMAddon.FrameErrTripped)
-    //    {
-    //      Utilities.LogMessage(
-    //        string.Format(" in IsInCLS (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), Utilities.LogType.Error,
-    //        true);
-    //      SMAddon.FrameErrTripped = true;
-    //    }
-    //  }
-    //  return results;
-    //}
-
     internal static bool CanShowShipManifest(bool ignoreShowSm = false)
     {
       try
@@ -251,7 +200,7 @@ namespace ShipManifest.InternalObjects
                     (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
 
           SMUtils.LogMessage(
-            String.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
+            string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
               ex.Message, ex.StackTrace, values), SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }

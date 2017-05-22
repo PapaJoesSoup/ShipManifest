@@ -21,6 +21,7 @@ namespace ShipManifest
         if (kerbal.seat != null)
           kerbal.seat.SpawnCrew();
       }
+      SMAddon.FireEventTriggers();
     }
 
     internal static void DumpCrew(Part part)
@@ -38,6 +39,7 @@ namespace ShipManifest
             kerbal.seat.SpawnCrew();
         }
       }
+      SMAddon.FireEventTriggers();
     }
 
     internal static bool IsCrewFull(Part part)

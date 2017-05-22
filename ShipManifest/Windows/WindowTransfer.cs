@@ -415,56 +415,6 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ResourceDumpFillButtons(List<string> selectedResources, TransferPump.TypePump pumpType, Part part)
-    {
-      uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part,
-        pumpType, TransferPump.TriggerButton.Transfer);
-      //GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-      //  ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
-      //  : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
-      GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-        ? new GUIContent(SMUtils.Localize("#smloc_transfer_004"), SMUtils.Localize("#smloc_transfer_tt_001"))
-        : new GUIContent(SMUtils.Localize("#smloc_transfer_005"), SMUtils.Localize("#smloc_transfer_tt_002"));
-      GUIStyle style1 = pumpType == TransferPump.TypePump.SourceToTarget
-        ? SMStyle.ButtonSourceStyle
-        : SMStyle.ButtonTargetStyle;
-      GUI.enabled = CanDumpPart(part);
-
-      if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
-      {
-        SMPart.ToggleDumpResource(part, selectedResources, pumpId);
-      }
-      Rect rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-
-
-      if (SMSettings.RealXfers || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
-      GUIStyle style2 = pumpType == TransferPump.TypePump.SourceToTarget
-        ? SMStyle.ButtonSourceStyle
-        : SMStyle.ButtonTargetStyle;
-      //GUIContent fillContent = new GUIContent("Fill", "Fills the Selected part with the selected resource(s)\r\n(Fill is from ground source, NOT from other parts in vessel)");
-      GUIContent fillContent = new GUIContent(SMUtils.Localize("#smloc_transfer_006"), SMUtils.Localize("#smloc_transfer_tt_003"));
-      // Fills should only be in Non Realism mode or if Preflight Resources are selected...
-      if (selectedResources.Count > 1)
-        GUI.enabled = part.Resources[selectedResources[0]].amount <
-                      part.Resources[selectedResources[0]].maxAmount ||
-                      part.Resources[selectedResources[1]].amount <
-                      part.Resources[selectedResources[1]].maxAmount;
-      else
-        GUI.enabled = part.Resources[selectedResources[0]].amount <
-                      part.Resources[selectedResources[0]].maxAmount;
-      if (GUILayout.Button(fillContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
-      {
-        SMPart.FillResource(part, selectedResources[0]);
-        if (selectedResources.Count > 1)
-          SMPart.FillResource(part, selectedResources[1]);
-      }
-      rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-    }
-
     private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypePump pumpType,
       Vector2 viewerScrollPosition)
     {
@@ -577,6 +527,56 @@ namespace ShipManifest.Windows
           SMAddon.FrameErrTripped = true;
         }
       }
+    }
+
+    private static void ResourceDumpFillButtons(List<string> selectedResources, TransferPump.TypePump pumpType, Part part)
+    {
+      uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part,
+        pumpType, TransferPump.TriggerButton.Transfer);
+      //GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+      //  ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
+      //  : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
+      GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
+        ? new GUIContent(SMUtils.Localize("#smloc_transfer_004"), SMUtils.Localize("#smloc_transfer_tt_001"))
+        : new GUIContent(SMUtils.Localize("#smloc_transfer_005"), SMUtils.Localize("#smloc_transfer_tt_002"));
+      GUIStyle style1 = pumpType == TransferPump.TypePump.SourceToTarget
+        ? SMStyle.ButtonSourceStyle
+        : SMStyle.ButtonTargetStyle;
+      GUI.enabled = CanDumpPart(part);
+
+      if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
+      {
+        SMPart.ToggleDumpResource(part, selectedResources, pumpId);
+      }
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+
+      if (SMSettings.RealXfers || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
+      GUIStyle style2 = pumpType == TransferPump.TypePump.SourceToTarget
+        ? SMStyle.ButtonSourceStyle
+        : SMStyle.ButtonTargetStyle;
+      //GUIContent fillContent = new GUIContent("Fill", "Fills the Selected part with the selected resource(s)\r\n(Fill is from ground source, NOT from other parts in vessel)");
+      GUIContent fillContent = new GUIContent(SMUtils.Localize("#smloc_transfer_006"), SMUtils.Localize("#smloc_transfer_tt_003"));
+      // Fills should only be in Non Realism mode or if Preflight Resources are selected...
+      if (selectedResources.Count > 1)
+        GUI.enabled = part.Resources[selectedResources[0]].amount <
+                      part.Resources[selectedResources[0]].maxAmount ||
+                      part.Resources[selectedResources[1]].amount <
+                      part.Resources[selectedResources[1]].maxAmount;
+      else
+        GUI.enabled = part.Resources[selectedResources[0]].amount <
+                      part.Resources[selectedResources[0]].maxAmount;
+      if (GUILayout.Button(fillContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
+      {
+        SMPart.FillResource(part, selectedResources[0]);
+        if (selectedResources.Count > 1)
+          SMPart.FillResource(part, selectedResources[1]);
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
 
     private static void CrewFillDumpButtons(Part part)
@@ -722,20 +722,6 @@ namespace ShipManifest.Windows
         //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
         //Debug.Log(ex.Message);
       }
-    }
-
-    internal static ProtoCrewMember FindFrozenKerbal(string crewName)
-    {
-      ProtoCrewMember retval = null;
-      IEnumerator<ProtoCrewMember> crew = HighLogic.CurrentGame.CrewRoster.Unowned.GetEnumerator();
-      while (crew.MoveNext())
-      {
-        if (crew.Current == null) continue;
-        if (crew.Current.name != crewName) continue;
-        retval = crew.Current;
-        break;
-      }
-      return retval;
     }
 
     private static void ScienceDetailsSource()
@@ -970,6 +956,7 @@ namespace ShipManifest.Windows
       int xOffset = 30;
       string toolTip = "";
 
+      // Set pump ratios
       TransferPump activePump = TransferPump.GetRatioPump(pumps);
       TransferPump ratioPump = TransferPump.GetRatioPump(pumps, true);
       activePump.PumpRatio = 1;
@@ -978,11 +965,12 @@ namespace ShipManifest.Windows
       // Resource Flow control Display loop
       ResourceFlowButtons(pumpType, xOffset);
 
-      // Xfer Controls Display
       // let's determine how much of a resource we can move to the target.
       double thisXferAmount = double.Parse(activePump.EditSliderAmount);
       double maxPumpAmount = TransferPump.CalcMaxPumpAmt(pumps[0].FromParts, pumps[0].ToParts, selectedResources);
       if (maxPumpAmount <= 0 && !TransferPump.PumpProcessOn) return;
+
+      // Xfer Controls Display
       GUILayout.BeginHorizontal();
       string label;
       if (TransferPump.PumpProcessOn)
@@ -1061,8 +1049,8 @@ namespace ShipManifest.Windows
         //  ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected Part(s)")
         //  : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected Part(s)");
         GUIContent xferContent = !TransferPump.PumpProcessOn
-          ? new GUIContent(SMUtils.Localize("#smloc_transfer_009"), SMUtils.Localize("#smloc_transfer_tt_030"))
-          : new GUIContent(SMUtils.Localize("#smloc_transfer_005"), SMUtils.Localize("#smloc_transfer_tt_031"));
+          ? new GUIContent(SMUtils.Localize("#smloc_transfer_009"), SMUtils.Localize("#smloc_transfer_tt_030")) // Xfer
+          : new GUIContent(SMUtils.Localize("#smloc_transfer_005"), SMUtils.Localize("#smloc_transfer_tt_031")); // Stop
 
         if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
         {
@@ -1243,6 +1231,20 @@ namespace ShipManifest.Windows
     #endregion
 
     #region Utilities
+
+    internal static ProtoCrewMember FindFrozenKerbal(string crewName)
+    {
+      ProtoCrewMember retval = null;
+      IEnumerator<ProtoCrewMember> crew = HighLogic.CurrentGame.CrewRoster.Unowned.GetEnumerator();
+      while (crew.MoveNext())
+      {
+        if (crew.Current == null) continue;
+        if (crew.Current.name != crewName) continue;
+        retval = crew.Current;
+        break;
+      }
+      return retval;
+    }
 
     private static bool CanDumpPart(Part part)
     {

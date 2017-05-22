@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace ShipManifest.Modules
 {
   public class ModKerbal

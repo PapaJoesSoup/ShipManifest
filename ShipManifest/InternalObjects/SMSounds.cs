@@ -101,7 +101,7 @@ namespace ShipManifest.InternalObjects
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          String.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          string.Format(" in SMAddon.LoadSounds.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
         // ReSharper disable once PossibleIntendedRethrow
         throw ex;
       }

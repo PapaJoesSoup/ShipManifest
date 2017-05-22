@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
-using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -372,6 +370,17 @@ namespace ShipManifest.InternalObjects
           SMAddon.FrameErrTripped = true;
         }
       }
+    }
+
+    internal static Color GetHighlightColor(Part part, out string colorstring)
+    {
+      colorstring = "clear";
+      if (SMPart.IsSource(part)) colorstring = SMSettings.SourcePartColor;
+      else if (SMPart.IsTarget(part)) colorstring = SMPart.IsCrew(part)
+        ? SMPart.IsClsTarget(part) ? SMSettings.TargetPartCrewColor : SMSettings.TargetPartColor
+        : SMSettings.TargetPartColor;
+      else if (SMPart.IsSelected(part)) colorstring = SMSettings.ResourcePartColor;
+      return SMSettings.Colors[colorstring];
     }
 
     #endregion

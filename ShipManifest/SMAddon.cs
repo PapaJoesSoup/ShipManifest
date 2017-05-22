@@ -426,7 +426,7 @@ namespace ShipManifest
     // Crew Event handlers
     internal void OnCrewTransferPartListCreated(GameEvents.HostedFromToAction<Part,List<Part>> eventData)
     {
-      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM  Crew Transfers are active
+      // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
       if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // If override is off, then ignore.

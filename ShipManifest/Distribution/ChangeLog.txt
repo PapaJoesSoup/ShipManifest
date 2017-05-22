@@ -1,26 +1,27 @@
-﻿Version 5.1.4.0 - Release 13 May 2017 - KSP 1.2.9 Compatibility Edition (Prerelease)
- - New:  Beginnings of Localization system.  Now you can translate SM into your own language!
- - New:  Realism Settings Refactor!  Realism Mode is redefined and settings are now more granular.
- - New:  Added Radio switch for realism Categories:  Full, None, Default, Custom.  
- - New:  Added new setting to the Realism Tab "Realistic Control". This affects ship control window and resourcetransfers.
- - New:  Added new setting to the Realism Tab "Enable Roster Modifications".  Affects Roster Create, Add, Edit, Remove, and Respawn.
- - New:  Added new seting to Realism Tab.  "Realistic Transfers".  This affects Transfer features for crew, science and resources.
+﻿Version 5.1.4.0 - Release 21 May 2017 - KSP 1.3 Compatibility Edition (1.2.9 Prerelease)
+ - New:  Implemented Localization system.  Now it is possible to translate SM into other languages.
+ - New:  Realism Settings Refactor.  Realism Mode is redefined and easier to use; settings are now more granular.
+ - New:  - Added Radio switch for realism Categories:  Full, None, Default, Custom.  
+ - New:  - Added new setting to the Realism Tab "Realistic Control". This affects ship control window and uncontrolled resource transfers.
+ - New:  - Added new setting to the Realism Tab "Enable Roster Modifications".  Affects Roster actions Create, Add, Edit, Remove, and Respawn.
+ - New:  - Added new setting to Realism Tab.  "Realistic Transfers".  This affects Transfer features for crew, science and resources.
  - New:  Added several new tooltips in the Mod.  Cleaned/updated up several others.
- - Fixed:  Crew respawn is always allowed.  Should be disabled for Realsm.  Fixed with Enable Roster Modifications setting.
+ - Fixed:  Selecting a resource in the Manifest Window triggered an enumeration error.
+ - Fixed:  Crew respawn was always allowed.  Should be disabled for Realism.  Roster actions are now impacted by Enable Roster Modifications setting.
  - Fixed:  Issue with multiple instances of SMAddon class loading when changing scenes.
- - Fixed:  Roster and Settings windows continue to be displayed even when Pause Menu or Hide UI is on.
- - Fixed:  Manifest and other windows disappearing in flight under certain contitions (when staging/part distruction occur).
- - Fixed:  Antennas not properly working. RemoteTech support is not confirmed.
- - Fixed:  Part selection buggon mouseover highlighting of parts was broken.  Bug introduced when I refactored highlighting awhile ago.
- - Fixed:  Sound file changes not taking immediate effect.  Scene change is required. Github Issue #25
- y Fixed:  Resource totals not preserved turing Transfers.  Github Issue:  #36
- - Fixed:  Tourists can go EVA and should not.  Github Issue:  #37
+ - Fixed:  Roster and Settings windows continued to be displayed even when Pause Menu or Hide UI is on.
+ - Fixed:  Manifest and other windows disappeared in flight under certain contitions (when staging/part destruction occurs).
+ - Fixed:  Antennas not properly working. Post fix RemoteTech support is not yet confirmed.
+ - Fixed:  Part highlighting on mouseover of part selection button was broken.  Bug introduced when I refactored highlighting awhile ago.
+ - Fixed:  Sound file changes were not taking immediate effect.  Scene change was required. Github Issue #25
+ y Fixed:  Resource totals not preserved during Transfers.  Github Issue:  #36
+ - Fixed:  Tourists could go EVA, and should not.  Github Issue:  #37
  - Fixed:  ToolTips displayed even when SM interface is not.  Github Issue: #38
- - Fixed:  ToolTips not properly updating in Xfers. Github Issue:  #39
- y Fixed:  Crew Xfers between full parts failing under certain cirmcustances.  Github Issue # 40
+ - Fixed:  ToolTips not properly updating on Xfer button. Github Issue:  #39
+ - Fixed:  Crew Xfers between full parts failing under certain circumstances.  Github Issue #40
 
 Version 5.1.3.3 - Release 29 Jan 2017 - KSP 1.2.2 Compatibility Edition
- - Fixed:  Object not found error in ModDockedVessels Get LaunchID.  now properly returns a 0 if the underlying object is null.
+ - Fixed:  Object not found error in ModDockedVessels Get LaunchID.  now properly returns a 0 if the underlying object is null.  Github Issue: #34
 
 Version 5.1.3.2 - Release 16 Jan 2017 - KSP 1.2.2 Compatibility Edition
  - New:  Refactored for KSP 1.2.2

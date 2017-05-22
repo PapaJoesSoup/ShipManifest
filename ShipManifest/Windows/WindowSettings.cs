@@ -1,6 +1,5 @@
 ﻿using System;
 using ShipManifest.InternalObjects;
-using ShipManifest.Windows.Tabs;
 using ShipManifest.Windows.Tabs.Settings;
 using UnityEngine;
 
