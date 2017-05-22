@@ -359,14 +359,16 @@ namespace ShipManifest.Process
       //double deltaAmt = deltaT * FlowRate * PumpRatio;
       double deltaAmt = deltaT * FlowRate * PumpRatio;
 
-      // 2.  Determine if move amount exceeds remaining amount in tank(s)  
-      deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt;
+      // 2.  Determine if move amount exceeds remaining amount in tank(s) or total amout to move.
+      deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt + AmtPumped > PumpAmount ? PumpAmount - AmtPumped : deltaAmt;
+
       if (PumpType != TypePump.Dump)
         deltaAmt = deltaAmt > ToCapacityRemaining ? ToCapacityRemaining : deltaAmt;
 
+
       if (deltaAmt > SMSettings.Tolerance)
       {
-        double deltaCharge = deltaAmt*SMSettings.FlowCost;
+        double deltaCharge = deltaAmt * SMSettings.FlowCost;
         // 3.  Drain Charge
         if (ConsumeCharge(deltaCharge))
         {
@@ -419,8 +421,7 @@ namespace ShipManifest.Process
         FillParts(cycleAmount);
       }
       // -------------------------------------------------------------------
-      if (IsComplete)
-        PumpStatus = PumpState.Stop;
+      if (IsComplete) PumpStatus = PumpState.Stop;
       //Utilities.LogMessage(string.Format("Exiting:  TransferPump.RunPumpCycle.  PumpStatus = {0}", PumpStatus), Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 

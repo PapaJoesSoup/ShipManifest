@@ -1029,7 +1029,7 @@ namespace ShipManifest.Windows
       }
       GUILayout.EndHorizontal();
 
-      if (SMConditions.IsShipControllable() && SMConditions.CanResourceBeXferred(pumpType, maxPumpAmount))
+      if (SMConditions.IsShipControllable() && (SMConditions.CanResourceBeXferred(pumpType, maxPumpAmount) || activePump.PumpType == pumpType && activePump.IsPumpOn))
       {
         GUILayout.BeginHorizontal();
         GUIStyle noPad = SMStyle.LabelStyleNoPad;
@@ -1048,10 +1048,10 @@ namespace ShipManifest.Windows
         //GUIContent xferContent = !TransferPump.PumpProcessOn
         //  ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected Part(s)")
         //  : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected Part(s)");
-        GUIContent xferContent = !TransferPump.PumpProcessOn
+        GUIContent xferContent = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && !activePump.IsPumpOn
           ? new GUIContent(SMUtils.Localize("#smloc_transfer_009"), SMUtils.Localize("#smloc_transfer_tt_030")) // Xfer
           : new GUIContent(SMUtils.Localize("#smloc_transfer_005"), SMUtils.Localize("#smloc_transfer_tt_031")); // Stop
-
+        GUI.enabled = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && activePump.IsPumpOn;
         if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
         {
           uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),

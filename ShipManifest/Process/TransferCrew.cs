@@ -208,13 +208,11 @@ namespace ShipManifest.Process
                 SMSound.SourceCrewStart.Stop();
                 SMSound.SourceCrewRun.Play();
                 SMAddon.Elapsed = 0;
-                CrewTransferStartAction();
                 CrewXferState = XferState.Transfer;
               }
             }
             else
             {
-              CrewTransferStartAction();
               CrewXferState = XferState.Transfer;
             }
             break;
@@ -227,12 +225,18 @@ namespace ShipManifest.Process
             {
               // wait for movement to end...
               if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
+              {
                 CrewXferState = XferState.Stop;
+                CrewTransferStartAction();
+              }
             }
             else
             {
               if (SMAddon.Elapsed > 1)
+              {
                 CrewXferState = XferState.Stop;
+                CrewTransferStartAction();                
+              } 
             }
             break;
 
