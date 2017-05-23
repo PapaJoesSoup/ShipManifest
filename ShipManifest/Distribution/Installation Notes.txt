@@ -1,7 +1,7 @@
 ----------------
 Ship Manifest
 ----------------
-KSP Version supported:  1.2
+KSP Version supported:  1.3
 ----------------
 
 ----------------
