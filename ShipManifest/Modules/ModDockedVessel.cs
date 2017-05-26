@@ -5,7 +5,7 @@ namespace ShipManifest.Modules
 {
   internal class ModDockedVessel
   {
-    private readonly List<Part> _vesselParts;
+    private List<Part> _vesselParts;
 
     private Part _rootPart;
 
@@ -50,6 +50,7 @@ namespace ShipManifest.Modules
     internal List<Part> VesselParts
     {
       get { return _vesselParts; }
+      set { _vesselParts = value; }
     }
   }
 }
