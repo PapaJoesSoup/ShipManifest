@@ -136,18 +136,8 @@ namespace ShipManifest.InternalObjects
 
     internal static void MouseOverHighlight(List<Part> parts)
     {
-      string step = "begin";
-      try
-      {
-        step = "inside box - Part Selection?";
         SetPartsHighlight(parts, SMSettings.Colors[SMSettings.MouseOverColor]);
         EdgeHighight(parts, true);
-      }
-      catch (Exception ex)
-      {
-        SMUtils.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
-          SMUtils.LogType.Error, true);
-      }
     }
 
     internal static void RevertMouseOverHighlight()
@@ -156,21 +146,23 @@ namespace ShipManifest.InternalObjects
 
       if (PrevMouseOverParts != null)
       {
-        string strColor = GetPartsHighlightColor();
-        Color partColor = SMSettings.Colors[strColor];
+        // Only vessel Transfers have multiple parts highlighted  so clear is the default.
         // now lets set the part colors.
-        SetPartsHighlight(PrevMouseOverParts, partColor, true);
-        EdgeHighight(PrevMouseOverParts, true, strColor);
+        ClearPartsHighlight(PrevMouseOverParts);;
+        EdgeHighight(PrevMouseOverParts, false);
+
+        // now set selected part colors...
+        if (!SMSettings.OnlySourceTarget && SMAddon.SmVessel.SelectedResourcesParts != null)
+          SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, SMSettings.Colors[SMSettings.ResourcePartColor], true);
+        if (SMAddon.SmVessel.SelectedPartsSource != null)
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor],true);
+        if (SMAddon.SmVessel.SelectedPartsTarget != null)
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);
+
         if (!IsMouseOver) PrevMouseOverParts = null;
       }
-      //if (MouseOverParts != null)
-      //{
-      //  // now lets set the part colors.
-      //  SetPartsHighlight(MouseOverParts, partColor, true);
-      //  EdgeHighight(MouseOverParts, true, strColor);
-      //}
 
-     if (PrevMouseOverPart != null)
+      if (PrevMouseOverPart != null)
       {
         string strColor = GetPartHighlightColor();
         Color partColor = SMSettings.Colors[strColor];
@@ -187,32 +179,6 @@ namespace ShipManifest.InternalObjects
         EdgeHighight(PrevMouseOverPart, true, strColor);
         if (!IsMouseOver) PrevMouseOverPart = null;
       }
-      //if (MouseOverPart != null)
-      //{
-      //  // Now lets set the part color
-      //  if (partColor == Color.clear)
-      //  {
-      //    ClearPartHighlight(MouseOverPart);
-      //    EdgeHighight(MouseOverPart, false);
-      //    return;
-      //  }
-      //  SetPartHighlight(MouseOverPart, partColor);
-      //  EdgeHighight(MouseOverPart, true, strColor);
-      //}
-    }
-
-    private static string GetPartsHighlightColor()
-    {
-      string strColor = "clear";
-      // since only transfer vessels can contain multiple mouseover parts, we need only concern ourselves with selected parts
-      // otherwise we want to revert to nothing.
-      if (PrevMouseOverParts == MouseOverParts || PrevMouseOverParts == null) return strColor;
-      if (SMAddon.SmVessel.SelectedPartsSource == PrevMouseOverParts)
-        strColor = SMSettings.SourcePartColor;
-      else if (SMAddon.SmVessel.SelectedPartsTarget == PrevMouseOverParts)
-        strColor = SMSettings.TargetPartColor;
-      else strColor = "yellow";
-      return strColor;
     }
 
     private static string GetPartHighlightColor()
@@ -225,7 +191,7 @@ namespace ShipManifest.InternalObjects
         strColor = SMSettings.SourcePartColor;
       else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
         strColor = SMSettings.TargetPartColor;
-      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart))
+      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
       {
         strColor = SMConditions.IsClsHighlightingEnabled() ? "green" : "yellow";
       }

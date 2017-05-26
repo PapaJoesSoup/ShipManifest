@@ -296,20 +296,36 @@ namespace ShipManifest
       while (dockingParts.MoveNext())
       {
         if (dockingParts.Current == null) continue;
-        List<ModuleDockingNode>.Enumerator dNodes = dockingParts.Current.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
+        List<ModuleDockingNode>.Enumerator dNodes =
+          dockingParts.Current.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
         while (dNodes.MoveNext())
         {
           if (dNodes.Current == null) continue;
           if (dNodes.Current.vesselInfo == null) continue;
           ModDockedVessel modDockedVessel = new ModDockedVessel(dNodes.Current.vesselInfo);
           if (modDockedVessel.LaunchId == 0) continue;
-          List<uint> launchIds = (from m in _dockedVessels where m.LaunchId > 0 select m.LaunchId).ToList();
-          if (!launchIds.Contains(modDockedVessel.LaunchId))
-            _dockedVessels.Add(modDockedVessel);
+          _dockedVessels.Add(modDockedVessel);
         }
         dNodes.Dispose();
       }
       dockingParts.Dispose();
+
+      // Clean up so we have separate vessels with no overlap.
+      ModDockedVessel master = _dockedVessels.FirstOrDefault(dockedVessel => dockedVessel.Rootpart.parent == null);
+      if (master == null) return;
+      List<ModDockedVessel>.Enumerator children = (from vessel in _dockedVessels where vessel.Rootpart.parent != null select vessel).ToList().GetEnumerator();
+      while  (children.MoveNext())
+      {
+        if (children.Current == null) continue;
+        List<Part>.Enumerator parts = children.Current.VesselParts.GetEnumerator();
+        while (parts.MoveNext())
+        {
+          if (parts.Current == null) continue;
+          if (master.VesselParts.Contains(parts.Current)) master.VesselParts.Remove(parts.Current);
+        }
+        parts.Dispose();
+      }
+      children.Dispose();
       //Utilities.LogMessage("Exiting:  SMVessel.UpdateDockedVessels", Utilities.LogType.Info, SMSettings.VerboseLogging);
     }
 
@@ -541,7 +557,8 @@ namespace ShipManifest
             (from p in Vessel.parts where p.flightID == vesselInfo.rootPartUId select p).SingleOrDefault();
           if (vesselRoot != null)
           {
-            vesselpartList = (from p in Vessel.parts where p.launchID == vesselRoot.launchID select p).ToList();
+            //vesselpartList = (from p in Vessel.parts where p.launchID == vesselRoot.launchID select p).ToList();
+            GetChildren(vesselRoot, ref vesselpartList);
           }
         }
       }
@@ -551,6 +568,19 @@ namespace ShipManifest
         vesselpartList = new List<Part>();
       }
       return vesselpartList;
+    }
+
+    private static void GetChildren(Part part, ref List<Part> partList)
+    {
+      if (!partList.Contains(part)) partList.Add(part);
+      List<Part>.Enumerator children = part.children.GetEnumerator();
+      while (children.MoveNext())
+      {
+        if (children.Current == null) continue;
+        if (!partList.Contains(children.Current)) partList.Add(children.Current);
+        GetChildren(children.Current, ref partList);
+      }
+      children.Dispose();
     }
 
     internal Part FindPartByKerbal(ProtoCrewMember pKerbal)

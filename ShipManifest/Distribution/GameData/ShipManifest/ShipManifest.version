@@ -1,12 +1,12 @@
 {
   "NAME": "Ship Manifest",
   "URL":"http://ksp-avc.cybutek.net/version.php?id=124",
-  "DOWNLOAD":"http://spacedock.info/mod/189/ShipManifest",
+  "DOWNLOAD":"https://github.com/PapaJoesSoup/ShipManifest/releases",
   "VERSION": {
     "MAJOR": 5, 
     "MINOR": 1,
     "PATCH": 4,
-	  "BUILD": 0
+	  "BUILD": 1
   },
   "KSP_VERSION": {
     "MAJOR": 1,
@@ -15,7 +15,7 @@
   },
   "KSP_VERSION_MIN": {
     "MAJOR": 1,
-    "MINOR": 2,
-    "PATCH": 9
+    "MINOR": 3,
+    "PATCH": 0
   }
 }
