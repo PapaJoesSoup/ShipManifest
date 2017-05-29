@@ -73,7 +73,7 @@ namespace ShipManifest.Windows
           catch (Exception ex)
           {
             SMUtils.LogMessage(
-              string.Format(" opening Hatches Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+              $" opening Hatches Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
               SMUtils.LogType.Error, true);
           }
         }
@@ -94,7 +94,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Solar Panels Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+            $" opening Solar Panels Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
             true);
         }
       }
@@ -114,7 +114,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Antennas Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+            $" opening Antennas Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         }
       }
       rect = GUILayoutUtility.GetLastRect();
@@ -133,7 +133,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Lights Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+            $" opening Lights Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         }
       }
       rect = GUILayoutUtility.GetLastRect();
@@ -152,7 +152,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Labs Tab.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+            $" opening Labs Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         }
       }
       rect = GUILayoutUtility.GetLastRect();

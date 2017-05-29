@@ -38,11 +38,11 @@ namespace ShipManifest.Windows.Tabs.Control
         {
           if (iPanels.Current == null) continue;
           bool isEnabled = true;
-          string label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
+          string label = $"{iPanels.Current.PanelStatus} - {iPanels.Current.Title}";
           if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
-            label = iPanels.Current.PanelStatus + " - (Broken) - " + iPanels.Current.Title;
+            label = $"{iPanels.Current.PanelStatus} - ({SMUtils.Localize("#smloc_module_004")}) - {iPanels.Current.Title}"; // "Broken"
           }
           bool open =
             !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
@@ -53,7 +53,7 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = isEnabled;
           if (!iPanels.Current.CanBeRetracted)
           {
-            label = iPanels.Current.PanelStatus + " - (Locked) - " + iPanels.Current.Title;
+            label = $"{iPanels.Current.PanelStatus} - ({SMUtils.Localize("#smloc_module_005")}) - {iPanels.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
@@ -80,7 +80,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          $" in Solar Panel Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();

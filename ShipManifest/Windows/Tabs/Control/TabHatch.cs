@@ -50,7 +50,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          bool newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(325));
+          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", GUILayout.Width(325));
           step = "button toggle check";
           if (!open && newOpen)
           {
@@ -75,7 +75,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Hatches Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          $" in Hatches Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
       GUI.enabled = true;

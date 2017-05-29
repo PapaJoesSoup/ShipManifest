@@ -43,7 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iAntennas.Current == null) continue;
           if (!IsRtAntennas && iAntennas.Current.IsRtModule) IsRtAntennas = true;
           step = "get Antenna label";
-          string label = iAntennas.Current.AntennaStatus + " - " + iAntennas.Current.Title;
+          string label = $"{iAntennas.Current.AntennaStatus} - {iAntennas.Current.Title}";
           bool open = iAntennas.Current.Extended;
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
@@ -69,7 +69,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          $" in Antenna Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();

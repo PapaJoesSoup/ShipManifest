@@ -12,7 +12,7 @@ namespace ShipManifest.Windows
   {
     #region Manifest Window - Gui Layout Code
 
-    internal static string Title = string.Format("{0} {1} - ", "Ship Manifest", SMSettings.CurVersion);
+    internal static string Title = $"{"Ship Manifest"} {SMSettings.CurVersion} - ";
     internal static Rect Position = new Rect(0, 0, 0, 0);
     private static bool _showWindow;
 
@@ -38,7 +38,8 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = string.Format("{0} {1} - {2}", SMUtils.Localize("#smloc_manifest_002"), SMSettings.CurVersion, SMAddon.SmVessel.Vessel.vesselName);
+      Title =
+        $"{SMUtils.Localize("#smloc_manifest_002")} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -90,7 +91,7 @@ namespace ShipManifest.Windows
         else if (SMAddon.SmVessel.SelectedResources.Count == 2)
           //resLabel = "Multiple Resources selected";
           resLabel = SMUtils.Localize("#smloc_manifest_004");
-        GUILayout.Label(string.Format("{0}", resLabel), GUILayout.Width(300), GUILayout.Height(20));
+        GUILayout.Label($"{resLabel}", GUILayout.Width(300), GUILayout.Height(20));
 
         // Resource Details List Viewer
         ResourceDetailsViewer();
@@ -107,7 +108,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in WindowManifest.Display.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            $" in WindowManifest.Display.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -154,7 +155,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in PreLaunchGui.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            $" in PreLaunchGui.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -178,7 +179,7 @@ namespace ShipManifest.Windows
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
-          string displayAmounts = string.Format("{0}{1}", keys.Current, SMUtils.DisplayVesselResourceTotals(keys.Current));
+          string displayAmounts = $"{keys.Current}{SMUtils.DisplayVesselResourceTotals(keys.Current)}";
           GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
@@ -210,7 +211,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
-            if (GUILayout.Button(string.Format("{0}", SMUtils.Localize("#smloc_manifest_011")), SMStyle.ButtonStyle, GUILayout.Width(35),
+            if (GUILayout.Button($"{SMUtils.Localize("#smloc_manifest_011")}", SMStyle.ButtonStyle, GUILayout.Width(35),
               GUILayout.Height(20))) // "Fill"
             {
               SMAddon.SmVessel.FillResource(keys.Current);
@@ -226,7 +227,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in WindowManifest.ResourceButtonList.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            $" in WindowManifest.ResourceButtonList.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -285,7 +286,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in WindowManifest.ResourceButtonToggled.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          $" in WindowManifest.ResourceButtonToggled.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true); // in, Error
       }
       SMAddon.SmVessel.RefreshLists();
@@ -309,7 +310,7 @@ namespace ShipManifest.Windows
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
               GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
-              GUILayout.Label(string.Format("{0}", part.partInfo.title), noWrap, GUILayout.Width(265),
+              GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(265),
                 GUILayout.Height(18));
               GUIStyle noPad = SMStyle.LabelStyleNoPad;
               List<string>.Enumerator sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
@@ -317,7 +318,7 @@ namespace ShipManifest.Windows
               {
                 if (sResources.Current == null) continue;
                 GUILayout.Label(
-                  string.Format(" - {0}:  ({1:######0.####}/{2:######0.####})", sResources.Current, part.Resources[sResources.Current].amount, part.Resources[sResources.Current].maxAmount), noPad, GUILayout.Width(265),
+                  $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(265),
                   GUILayout.Height(16));
               }
               sResources.Dispose();
@@ -326,7 +327,7 @@ namespace ShipManifest.Windows
             {
               GUILayout.BeginHorizontal();
               GUILayout.Label(
-                string.Format("{0}, ({1}/{2})", part.partInfo.title, SMUtils.GetPartCrewCount(part), part.CrewCapacity),
+                $"{part.partInfo.title}, ({SMUtils.GetPartCrewCount(part)}/{part.CrewCapacity})",
                 GUILayout.Width(265), GUILayout.Height(20));
               GUILayout.EndHorizontal();
             }
@@ -345,7 +346,7 @@ namespace ShipManifest.Windows
                   scienceCount += ((ModuleScienceExperiment) pm).GetScienceCount();
               }
               GUILayout.BeginHorizontal();
-              GUILayout.Label(string.Format("{0}, ({1})", part.partInfo.title, scienceCount), GUILayout.Width(265));
+              GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", GUILayout.Width(265));
               GUILayout.EndHorizontal();
             }
           }
@@ -357,7 +358,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in WindowManifest.ResourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            $" in WindowManifest.ResourceDetailsViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true); // in, Error
           SMAddon.FrameErrTripped = true;
         }
@@ -385,7 +386,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+            $" opening Settings Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
             true);
         }
       }
@@ -409,7 +410,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+            $" opening Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
             true);
         }
       }
@@ -424,7 +425,7 @@ namespace ShipManifest.Windows
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" opening Control Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+            $" opening Control Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
             true);
         }
       }
@@ -549,7 +550,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-            string.Format(" in WindowManifest.ReconcileSelectedXferParts.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          $" in WindowManifest.ReconcileSelectedXferParts.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true); // in, Error
       }
     }

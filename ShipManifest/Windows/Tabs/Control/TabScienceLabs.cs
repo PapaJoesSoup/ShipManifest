@@ -40,7 +40,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          string label = iLabs.Current.name + " - (" + (iLabs.Current.IsOperational() ? SMUtils.Localize("#smloc_control_lab_001") : SMUtils.Localize("#smloc_control_lab_002")) + ")"; // Operational, InOp
+          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SMUtils.Localize("#smloc_control_lab_001") : SMUtils.Localize("#smloc_control_lab_002"))})"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
 
           Rect rect = GUILayoutUtility.GetLastRect();
@@ -60,7 +60,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
+          $" in Solar Panel Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();

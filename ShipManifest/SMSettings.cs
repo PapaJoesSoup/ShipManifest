@@ -21,10 +21,10 @@ namespace ShipManifest
 
     internal static ConfigNode Settings;
 
-    private static readonly string SettingsPath = string.Format("{0}GameData/ShipManifest/Plugins/PluginData",
-      KSPUtil.ApplicationRootPath);
+    private static readonly string SettingsPath =
+      $"{KSPUtil.ApplicationRootPath}GameData/ShipManifest/Plugins/PluginData";
 
-    private static readonly string SettingsFile = string.Format("{0}/SMSettings.dat", SettingsPath);
+    private static readonly string SettingsFile = $"{SettingsPath}/SMSettings.dat";
 
     // This value is assigned from AssemblyInfo.cs
     internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();

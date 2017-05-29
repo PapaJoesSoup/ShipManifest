@@ -124,7 +124,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in Roster Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }
@@ -219,7 +219,7 @@ namespace ShipManifest.Windows
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(string.Format("{0}:", SMUtils.Localize("#smloc_roster_009")), GUILayout.Width(40)); // Filter
+      GUILayout.Label($"{SMUtils.Localize("#smloc_roster_009")}:", GUILayout.Width(40)); // Filter
 
       bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, SMUtils.Localize("#smloc_roster_010"), GUILayout.Width(60)); // "All"
       if (isAll) CurrentFilter = KerbalFilters.All;
@@ -298,7 +298,8 @@ namespace ShipManifest.Windows
               List<ProtoCrewMember> crew = theseVessels.Current.GetVesselCrew();
               if (crew.Any(crewMember => crewMember == kerbals.Current))
               {
-                rosterDetails = string.Format("{0} - {1}", SMUtils.Localize("#smloc_roster_011"), theseVessels.Current.GetName().Replace("(unloaded)", "")); // "Assigned"
+                rosterDetails =
+                  $"{SMUtils.Localize("#smloc_roster_011")} - {theseVessels.Current.GetName().Replace("(unloaded)", "")}"; // "Assigned"
               }
             }
             theseVessels.Dispose();
@@ -374,13 +375,14 @@ namespace ShipManifest.Windows
           ThawKerbal(actionKerbal.name);
         else if (actionText == SMUtils.Localize("#smloc_roster_026"))// "Freeze"
           FreezeKerbal(actionKerbal);
-        SMAddon.FireEventTriggers();
+        //Refresh all lists... 
+        GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel.Vessel);
       }
       catch (Exception ex)
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          SMUtils.LogMessage($" in RosterListViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         }
       }
     }
@@ -393,11 +395,11 @@ namespace ShipManifest.Windows
       {
         GUILayout.BeginHorizontal();
         SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
-        GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
+        GUILayout.Label($" - ({SelectedKerbal.Kerbal.experienceTrait.Title})");
         GUILayout.EndHorizontal();
       }
       else
-        GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Trait + ")", SMStyle.LabelStyleBold,
+        GUILayout.Label($"{SelectedKerbal.Name} - ({SelectedKerbal.Trait})", SMStyle.LabelStyleBold,
           GUILayout.MaxWidth(300));
 
       if (!string.IsNullOrEmpty(SMAddon.SaveMessage))
@@ -464,7 +466,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format("Error in GetRosterList().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in GetRosterList().\r\nError:  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -581,8 +583,8 @@ namespace ShipManifest.Windows
         if (DFWrapper.APIReady)
         {
           if (DFWrapper.DeepFreezeAPI.FrozenKerbals.ContainsKey(kerbal.name)) // "Frozen"
-            rosterDetails = string.Format("{0} - {1}", SMUtils.Localize("#smloc_roster_015"),
-              DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", ""));
+            rosterDetails =
+              $"{SMUtils.Localize("#smloc_roster_015")} - {DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "")}";
           else
             rosterDetails = SMUtils.Localize("#smloc_roster_015"); // "Frozen";
         }
@@ -592,9 +594,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(string.Format(" in GetRosterList().\r\nError:  {0}", ex), SMUtils.LogType.Error, true);
+          SMUtils.LogMessage($" in GetRosterList().\r\nError:  {ex}", SMUtils.LogType.Error, true);
         }
-        return string.Format("{0}:", SMUtils.Localize("#smloc_error_001")); // "Display Error"
+        return $"{SMUtils.Localize("#smloc_error_001")}:"; // "Display Error"
       }
     }
 
@@ -652,13 +654,13 @@ namespace ShipManifest.Windows
         }
         else
         {
-          SMUtils.LogMessage(string.Format("ThawKerbal.  IsDFInstalled:  {0}", InstalledMods.IsDfInstalled), SMUtils.LogType.Info,
+          SMUtils.LogMessage($"ThawKerbal.  IsDFInstalled:  {InstalledMods.IsDfInstalled}", SMUtils.LogType.Info,
             true);
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in ThawKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in ThawKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }
@@ -682,7 +684,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in FreezeKerbal.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in FreezeKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }

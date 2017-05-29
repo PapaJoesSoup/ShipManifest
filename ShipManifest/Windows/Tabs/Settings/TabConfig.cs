@@ -120,7 +120,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_toolTip = "Sets the maximum number of error entries stored in the log.";
       //_toolTip += "\r\nAdditional entries will cause first entries to be removed from the log (rolling).";
       //_toolTip += "\r\nSetting this value to '0' will allow unlimited entries.";
-      _label = SMUtils.Localize("#smloc_settings_config_007") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_config_007")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_config_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(110));
@@ -145,7 +145,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Save Interval: ";
       //_toolTip = "Sets the time (in seconds) between automatic saves.";
       //_toolTip += "\r\nAutosave Settings must be enabled.";
-      _label = SMUtils.Localize("#smloc_settings_config_009") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_config_009")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_config_tt_009");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(110));

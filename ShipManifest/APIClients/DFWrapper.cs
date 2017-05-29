@@ -170,12 +170,12 @@ namespace ShipManifest.APIClients
 
           LogFormatted("Getting APIReady Object");
           APIReadyField = DFType.GetField("APIReady", BindingFlags.Public | BindingFlags.Static);
-          LogFormatted("Success: " + (APIReadyField != null).ToString());
+          LogFormatted($"Success: {APIReadyField != null}");
 
           LogFormatted("Getting FrozenKerbals Object");
           FrozenKerbalsMethod = DFType.GetMethod("get_FrozenKerbals", BindingFlags.Public | BindingFlags.Instance);
           actualFrozenKerbals = FrozenKerbalsMethod.Invoke(actualDFAPI, null);
-          LogFormatted("Success: " + (actualFrozenKerbals != null).ToString());
+          LogFormatted($"Success: {actualFrozenKerbals != null}");
         }
         catch (Exception ex)
         {
@@ -283,12 +283,12 @@ namespace ShipManifest.APIClients
       {
         actualDeepFreezer = a;
         //Fields available from Freezer part
-        crewXferTOActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferTOActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        crewXferTOActive = getcrewXferTOActive;
-        crewXferFROMActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferFROMActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        crewXferFROMActive = getcrewXferFROMActive;
-        FreezerSizeMethod = DeepFreezerType.GetMethod("get_DFIFreezerSize", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        FreezerSize = getFreezerSize;
+        //crewXferTOActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferTOActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        //crewXferTOActive = getcrewXferTOActive;
+        //crewXferFROMActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferFROMActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        //crewXferFROMActive = getcrewXferFROMActive;
+        //FreezerSizeMethod = DeepFreezerType.GetMethod("get_DFIFreezerSize", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        //FreezerSize = getFreezerSize;
         TotalFrozenMethod = DeepFreezerType.GetMethod("get_DFITotalFrozen", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
         TotalFrozen = getTotalFrozen;
         FreezerSpaceMethod = DeepFreezerType.GetMethod("get_DFIFreezerSpace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
@@ -309,11 +309,11 @@ namespace ShipManifest.APIClients
         //Methods
         //LogFormatted("Getting beginFreezeKerbalMethod Method");
         beginFreezeKerbalMethod = DeepFreezerType.GetMethod("beginFreezeKerbal", BindingFlags.Public | BindingFlags.Instance);
-        //LogFormatted_DebugOnly("Success: " + (beginFreezeKerbalMethod != null).ToString());
+        //LogFormatted_DebugOnly($"Success: {beginFreezeKerbalMethod != null}");
 
         //LogFormatted("Getting beginThawKerbalMethod Method");
         beginThawKerbalMethod = DeepFreezerType.GetMethod("beginThawKerbal", BindingFlags.Public | BindingFlags.Instance);
-        //LogFormatted_DebugOnly("Success: " + (beginThawKerbalMethod != null).ToString());
+        //LogFormatted_DebugOnly($"Success: {beginThawKerbalMethod != null}");
       }
 
       private object actualDeepFreezer;

@@ -45,7 +45,7 @@ namespace ShipManifest.Modules
         }
         catch
         {
-          title = "Unknown";
+          title = SMUtils.Localize("#smloc_module_003"); //"Unknown";
         }
         return title;
       }

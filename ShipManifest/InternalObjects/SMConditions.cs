@@ -118,7 +118,7 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in CanBeXferred.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in CanBeXferred.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
       return results;
@@ -186,22 +186,19 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          string values = "SmAddon.ShowUI = " + SMAddon.ShowUi + "\r\n";
-          values += "HighLogic.LoadedScene = " + HighLogic.LoadedScene + "\r\n";
-          values += "PauseMenu.isOpen = " + IsPauseMenuOpen() + "\r\n";
-          values += "FlightResultsDialog.isDisplaying = " + IsFlightDialogDisplaying() + "\r\n";
-          values += "FlightGlobals.fetch != null = " + (FlightGlobals.fetch != null) + "\r\n";
-          values += "FlightGlobals.ActiveVessel != null = " + (FlightGlobals.ActiveVessel != null) + "\r\n";
-          values += "!FlightGlobals.ActiveVessel.isEVA = " +
-                    (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA) + "\r\n";
+          string values = $"SmAddon.ShowUI = {SMAddon.ShowUi}\r\n";
+          values += $"HighLogic.LoadedScene = {HighLogic.LoadedScene}\r\n";
+          values += $"PauseMenu.isOpen = {IsPauseMenuOpen()}\r\n";
+          values += $"FlightResultsDialog.isDisplaying = {IsFlightDialogDisplaying()}\r\n";
+          values += $"FlightGlobals.fetch != null = {(FlightGlobals.fetch != null)}\r\n";
+          values += $"FlightGlobals.ActiveVessel != null = {(FlightGlobals.ActiveVessel != null)}\r\n";
+          values += $"!FlightGlobals.ActiveVessel.isEVA = {(FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA)}\r\n";
           if (FlightGlobals.ActiveVessel != null)
-            values += "FlightGlobals.ActiveVessel.vesselType = " + FlightGlobals.ActiveVessel.vesselType + "\r\n";
-          values += "CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = " +
-                    (CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA);
+            values += $"FlightGlobals.ActiveVessel.vesselType = {FlightGlobals.ActiveVessel.vesselType}\r\n";
+          values += $"CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = {(CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA)}";
 
           SMUtils.LogMessage(
-            string.Format(" in CanShowShipManifest (repeating error).  Error:  {0} \r\n\r\n{1}\r\n\r\nValues:  {2}",
-              ex.Message, ex.StackTrace, values), SMUtils.LogType.Error, true);
+            $" in CanShowShipManifest (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}\r\n\r\nValues:  {values}", SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
         return false;

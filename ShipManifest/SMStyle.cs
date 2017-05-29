@@ -68,6 +68,7 @@ namespace ShipManifest
         },
         hover = {textColor = Color.blue}
       };
+
       ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
       ButtonToggledStyle.fontStyle = FontStyle.Normal;
       ButtonToggledStyle.alignment = TextAnchor.MiddleCenter;

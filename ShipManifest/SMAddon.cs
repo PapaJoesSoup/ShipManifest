@@ -113,7 +113,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.Awake.  Error:  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.Awake.  Error:  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -195,23 +195,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.Start.  " + ex, SMUtils.LogType.Error, true);
-      }
-    }
-
-    internal void OnMouseEnter()
-    {
-      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
-      {
-        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseEnter"), SMUtils.LogType.Info, false);
-      }
-    }
-
-    internal void OnMouseExit()
-    {
-      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
-      {
-        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseExit"), SMUtils.LogType.Info, false);
+        SMUtils.LogMessage($"Error in:  SMAddon.Start.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -250,7 +234,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnDestroy.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -321,7 +305,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUI.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnGUI.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -383,7 +367,7 @@ namespace ShipManifest
         if (!FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in SMAddon.Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+            $" in SMAddon.Update (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SMUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
@@ -543,7 +527,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnVesselWasModified.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnVesselWasModified.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -558,7 +542,7 @@ namespace ShipManifest
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+          $" in SMAddon.OnVesselChange.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
           true);
       }
     }
@@ -573,7 +557,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnVesselLoaded.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -648,7 +632,7 @@ namespace ShipManifest
           if (WindowManifest.ShowWindow)
             _smButtonStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowManifest.ShowWindow ? TextureFolder + "IconOn_38" : TextureFolder + "IconOff_38", false));
+                WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
         }
 
         // Setup Settings Button
@@ -669,7 +653,7 @@ namespace ShipManifest
           if (WindowSettings.ShowWindow)
             _smSettingsStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
+                WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{TextureFolder}IconS_Off_38", false));
         }
 
         // Setup Roster Button
@@ -690,12 +674,12 @@ namespace ShipManifest
           if (WindowRoster.ShowWindow)
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherReady.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherReady.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -720,7 +704,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherDestroyed.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherDestroyed.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -753,16 +737,16 @@ namespace ShipManifest
 
         if (SMSettings.EnableBlizzyToolbar)
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
-            ? TextureFolder + "IconOn_24"
-            : TextureFolder + "IconOff_24";
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
         else
           _smButtonStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowManifest.ShowWindow ? TextureFolder + "IconOn_38" : TextureFolder + "IconOff_38", false));
+              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMButtonToggle.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -776,24 +760,24 @@ namespace ShipManifest
           WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
           if (SMSettings.EnableBlizzyToolbar)
             _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
-              ? TextureFolder + "IconR_On_24"
-              : TextureFolder + "IconR_Off_24";
+              ? $"{TextureFolder}IconR_On_24"
+              : $"{TextureFolder}IconR_Off_24";
           else
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
           if (WindowRoster.ShowWindow) WindowRoster.GetRosterList();
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMRosterToggle.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnSMRosterToggle.{ex}", SMUtils.LogType.Error, true);
       }
     }
 
     internal static void OnSmSettingsClicked()
     {
-      //Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
+      //Debug.Log($"[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  {WindowSettings.ShowWindow}");
       try
       {
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
@@ -801,16 +785,16 @@ namespace ShipManifest
         SMSettings.MemStoreTempSettings();
         if (SMSettings.EnableBlizzyToolbar)
           _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
-            ? TextureFolder + "IconS_On_24"
-            : TextureFolder + "IconS_Off_24";
+            ? $"{TextureFolder}IconS_On_24"
+            : $"{TextureFolder}IconS_Off_24";
         else
           _smSettingsStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
+              WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{ TextureFolder}IconS_Off_38", false));
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMSettingsToggle.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.OnSMSettingsToggle.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -892,9 +876,7 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), SMUtils.LogType.Error, true);
+          SMUtils.LogMessage($" in Display at or near step:  {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -968,7 +950,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.UpdateSMcontroller.  " + ex, SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($"Error in:  SMAddon.UpdateSMcontroller.  {ex}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -1010,7 +992,7 @@ namespace ShipManifest
         catch (Exception ex)
         {
           SMUtils.LogMessage(
-            string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+            $" in UpdateCLSSpaces.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         }
       }
     }
@@ -1030,7 +1012,7 @@ namespace ShipManifest
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in SMAddon.GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          $" in SMAddon.GetCLSVessel.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         return false;
       }
     }
@@ -1045,8 +1027,8 @@ namespace ShipManifest
         {
           _smButtonBlizzy = ToolbarManager.Instance.add("ShipManifest", "Manifest");
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
-            ? TextureFolder + "IconOn_24"
-            : TextureFolder + "IconOff_24";
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
           _smButtonBlizzy.ToolTip = "Ship Manifest";
           _smButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
           _smButtonBlizzy.Visible = true;
@@ -1056,8 +1038,8 @@ namespace ShipManifest
         {
           _smSettingsBlizzy = ToolbarManager.Instance.add("ShipManifest", "Settings");
           _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
-            ? TextureFolder + "IconS_On_24"
-            : TextureFolder + "IconS_Off_24";
+            ? $"{TextureFolder}IconS_On_24"
+            : $"{TextureFolder}IconS_Off_24";
           _smSettingsBlizzy.ToolTip = "Ship Manifest Settings Window";
           _smSettingsBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
           _smSettingsBlizzy.Visible = true;
@@ -1065,8 +1047,8 @@ namespace ShipManifest
 
           _smRosterBlizzy = ToolbarManager.Instance.add("ShipManifest", "Roster");
           _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
-            ? TextureFolder + "IconR_On_24"
-            : TextureFolder + "IconR_Off_24";
+            ? $"{TextureFolder}IconR_On_24"
+            : $"{TextureFolder}IconR_Off_24";
           _smRosterBlizzy.ToolTip = "Ship Manifest Roster Window";
           _smRosterBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
           _smRosterBlizzy.Visible = true;
@@ -1122,7 +1104,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in SMAddon.RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in SMAddon.RunSave.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }

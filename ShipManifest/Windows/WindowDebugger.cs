@@ -10,7 +10,7 @@ namespace ShipManifest.Windows
 {
   internal class WindowDebugger
   {
-    internal static string Title = string.Format(" Ship Manifest -  Debug Console - Ver. {0}", SMSettings.CurVersion);
+    internal static string Title = $" Ship Manifest -  Debug Console - Ver. {SMSettings.CurVersion}";
     internal static Rect Position = new Rect(0, 0, 0, 0);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
@@ -19,7 +19,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = string.Format("{0}:  {1}", SMUtils.Localize("#smloc_debug_000"), SMSettings.CurVersion);
+      Title = $"{SMUtils.Localize("#smloc_debug_000")}:  {SMSettings.CurVersion}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -58,7 +58,7 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(SMUtils.Localize("#smloc_debug_001"), GUILayout.Height(20))) //"Clear log"
       {
         SMUtils.LogItemList.Clear();
-        SMUtils.LogItemList.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " UTC.");
+        SMUtils.LogItemList.Add($"Info:  Log Cleared at {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC.");
       }
       if (GUILayout.Button(SMUtils.Localize("#smloc_debug_002"), GUILayout.Height(20))) // "Save Log"
       {
@@ -83,11 +83,7 @@ namespace ShipManifest.Windows
       try
       {
         // time to create a file...
-        string filename = "DebugLog_" +
-                       DateTime.Now.ToString(CultureInfo.InvariantCulture)
-                         .Replace(" ", "_")
-                         .Replace("/", "")
-                         .Replace(":", "") + ".txt";
+        string filename = $"DebugLog_{DateTime.Now.ToString(CultureInfo.InvariantCulture).Replace(" ", "_").Replace("/", "").Replace(":", "")}.txt";
 
         string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
         if (SMSettings.DebugLogPath.StartsWith(@"\\"))
@@ -99,7 +95,7 @@ namespace ShipManifest.Windows
           SMSettings.DebugLogPath += @"\";
 
         filename = path + SMSettings.DebugLogPath + filename;
-        SMUtils.LogMessage("File Name = " + filename, SMUtils.LogType.Info, true);
+        SMUtils.LogMessage($"File Name = {filename}", SMUtils.LogType.Info, true);
 
         try
         {
@@ -118,12 +114,12 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage("Error Writing File:  " + ex, SMUtils.LogType.Error, true);
+          SMUtils.LogMessage($"Error Writing File:  {ex}", SMUtils.LogType.Error, true);
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+        SMUtils.LogMessage($" in Savelog.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
           true);
       }
     }

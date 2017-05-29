@@ -67,7 +67,7 @@ namespace ShipManifest.Windows
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
       
       string displayAmounts = SMUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
-      Title = SMUtils.Localize("#smloc_transfer_000") + " - " + SMAddon.SmVessel.Vessel.vesselName + displayAmounts; // "Transfer"
+      Title = $"{SMUtils.Localize("#smloc_transfer_000")} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -143,7 +143,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Ship Manifest Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          $" in Ship Manifest Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -152,17 +152,17 @@ namespace ShipManifest.Windows
       string labelText = "";
       GUILayout.BeginHorizontal();
       if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-        labelText = selectedParts.Count > 0 ? string.Format("{0}", selectedParts[0].partInfo.title) : "No Part Selected";
+        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : "No Part Selected";
       else
       {
         if (selectedParts != null)
         {
           if (selectedParts.Count > 1)
-            labelText = string.Format("{0}", SMUtils.Localize("#smloc_transfer_001")); // "Multiple Parts Selected");
+            labelText = $"{SMUtils.Localize("#smloc_transfer_001")}"; // "Multiple Parts Selected");
           else if (selectedParts.Count == 1)
-            labelText = string.Format("{0}", selectedParts[0].partInfo.title);
+            labelText = $"{selectedParts[0].partInfo.title}";
           else
-            labelText = string.Format("{0}", SMUtils.Localize("#smloc_transfer_002")); // "No Part Selected");
+            labelText = $"{SMUtils.Localize("#smloc_transfer_002")}"; // "No Part Selected");
         }
       }
       GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(200));
@@ -214,8 +214,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Ship Manifest Window - SourceTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), SMUtils.LogType.Error, true);
+          $" in Ship Manifest Window - SourceTransferViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -250,7 +249,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in WindowTransfer.SourceDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          $" in WindowTransfer.SourceDetailsViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }
@@ -290,8 +289,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Ship Manifest Window - TargetTransferViewer.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), SMUtils.LogType.Error, true);
+          $" in Ship Manifest Window - TargetTransferViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
       }
     }
 
@@ -326,7 +324,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in WindowTransfer.TargetDetailsViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+          $" in WindowTransfer.TargetDetailsViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
       }
     }
@@ -407,8 +405,7 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            "Error in Windowtransfer.PartsTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+          SMUtils.LogMessage($"Error in Windowtransfer.PartsTransferViewer ({pumpType}) at step:  {step}.  Error:  {ex}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -449,7 +446,7 @@ namespace ShipManifest.Windows
           GUI.enabled = CanSelectVessel(pumpType, modDockedVessels.Current);
 
           step = "Render vessel Buttons";
-          if (GUILayout.Button(string.Format("{0}", strDescription), style, GUILayout.Width(btnWidth),
+          if (GUILayout.Button($"{strDescription}", style, GUILayout.Width(btnWidth),
             GUILayout.Height(20)))
           {
             VesselButtonToggled(pumpType, modDockedVessels.Current);
@@ -521,8 +518,7 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            "Error in Windowtransfer.VesselTransferViewer (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+          SMUtils.LogMessage($"Error in Windowtransfer.VesselTransferViewer ({pumpType}) at step:  {step}.  Error:  {ex}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -632,7 +628,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
         GUI.enabled = true;
-        GUILayout.Label(string.Format("  {0}", crewMember.name + " (" + crewMember.experienceTrait.Title + ")"),
+        GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })",
           GUILayout.Width(190), GUILayout.Height(20));
         GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
         if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember ||
@@ -699,7 +695,7 @@ namespace ShipManifest.Windows
           ProtoCrewMember frozenKerbal = FindFrozenKerbal(frznCrew.Current.CrewName);
           if (frozenKerbal != null) trait = frozenKerbal.trait;
           GUI.enabled = true;
-          GUILayout.Label(string.Format("  {0} ({1})", frznCrew.Current.CrewName, trait), SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
+          GUILayout.Label($"  {frznCrew.Current.CrewName} ({trait})", SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
           //GUIContent thawContent = new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal");
           GUIContent thawContent = new GUIContent(SMUtils.Localize("#smloc_transfer_010"), SMUtils.Localize("#smloc_transfer_tt_010"));
           if (GUILayout.Button(thawContent, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
@@ -717,8 +713,7 @@ namespace ShipManifest.Windows
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {0} \r\n\r\n{1}",
-            ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          $" in WindowTransfer.CrewDetails.  Error attempting to check DeepFreeze for FrozenKerbals.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
         //Debug.Log("Error attempting to check DeepFreeze for FrozenKerbals");
         //Debug.Log(ex.Message);
       }
@@ -752,7 +747,8 @@ namespace ShipManifest.Windows
 
         string label = "+";
         // string toolTip = string.Format("{0} {1}", "Expand/Collapse Science detail.", GUI.enabled? "" : "(Disabled, nothing to xfer)");
-        string toolTip = string.Format("{0} {1}", SMUtils.Localize("#smloc_transfer_tt_011"), GUI.enabled? "" : SMUtils.Localize("#smloc_transfer_tt_012"));
+        string toolTip =
+          $"{SMUtils.Localize("#smloc_transfer_tt_011")} {(GUI.enabled ? "" : SMUtils.Localize("#smloc_transfer_tt_012"))}";
         GUIStyle expandStyle = ScienceModulesSource[modules.Current] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (ScienceModulesSource[modules.Current]) label = "-";
         if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(15), GUILayout.Height(20)))
@@ -764,7 +760,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
         GUI.enabled = true;
-        GUILayout.Label(string.Format("{0} - ({1})", modules.Current.moduleName, scienceCount), GUILayout.Width(205),
+        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", GUILayout.Width(205),
           GUILayout.Height(20));
 
         // If we have target selected, it is not the same as the source, there is science to xfer.
@@ -846,11 +842,13 @@ namespace ShipManifest.Windows
 
             // Build Tooltip
             toolTip = ((ScienceData)items.Current).title;
-            toolTip += string.Format("\n-{0}:  {1}", SMUtils.Localize("#smloc_transfer_tt_016"), results);
-            toolTip += string.Format("\n-{0}:  {1} {2}", SMUtils.Localize("#smloc_transfer_tt_017"), ((ScienceData)items.Current).dataAmount, SMUtils.Localize("#smloc_transfer_tt_018"));
-            toolTip += string.Format("\n-{0}:  {1}", SMUtils.Localize("#smloc_transfer_tt_019"), ((ScienceData)items.Current).baseTransmitValue); // was transmitValue;
-            toolTip += string.Format("\n-{0}:  {1}", SMUtils.Localize("#smloc_transfer_tt_020"), ((ScienceData)items.Current).labValue);
-            toolTip += string.Format("\n-{0}:  {1}", SMUtils.Localize("#smloc_transfer_tt_021"), ((ScienceData)items.Current).transmitBonus);  // Was labBoost
+            toolTip += $"\n-{SMUtils.Localize("#smloc_transfer_tt_016")}:  {results}";
+            toolTip +=
+              $"\n-{SMUtils.Localize("#smloc_transfer_tt_017")}:  {((ScienceData) items.Current).dataAmount} {SMUtils.Localize("#smloc_transfer_tt_018")}";
+            toolTip +=
+              $"\n-{SMUtils.Localize("#smloc_transfer_tt_019")}:  {((ScienceData) items.Current).baseTransmitValue}"; // was transmitValue;
+            toolTip += $"\n-{SMUtils.Localize("#smloc_transfer_tt_020")}:  {((ScienceData) items.Current).labValue}";
+            toolTip += $"\n-{SMUtils.Localize("#smloc_transfer_tt_021")}:  {((ScienceData) items.Current).transmitBonus}";  // Was labBoost
             //toolTip += "\r\n-Results:    " + results;
             //toolTip += "\r\n-Data Amt:   " + ((ScienceData)items.Current).dataAmount + " Mits";
             //toolTip += "\r\n-Xmit Value: " + ((ScienceData) items.Current).baseTransmitValue; // was transmitValue;
@@ -912,7 +910,7 @@ namespace ShipManifest.Windows
         if (!(modules.Current is IScienceDataContainer) || ((PartModule)modules.Current).moduleName == "ModuleScienceExperiment") continue;
         int scienceCount = ((IScienceDataContainer)modules.Current).GetScienceCount();
         GUILayout.BeginHorizontal();
-        GUILayout.Label(string.Format("{0} - ({1})", ((PartModule)modules.Current).moduleName, scienceCount), GUILayout.Width(220),
+        GUILayout.Label($"{((PartModule) modules.Current).moduleName} - ({scienceCount})", GUILayout.Width(220),
           GUILayout.Height(20));
         // set the conditions for a button style change.
         bool isReceiveToggled = false;
@@ -979,11 +977,11 @@ namespace ShipManifest.Windows
         if (activePump.PumpType == pumpType)
         {
           //GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
-          GUILayout.Label(SMUtils.Localize("#smloc_transfer_014") + ":", GUILayout.Width(120));
+          GUILayout.Label($"{SMUtils.Localize("#smloc_transfer_014")}:", GUILayout.Width(120));
           
           GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"));
           if (SMAddon.SmVessel.SelectedResources.Count > 1)
-            GUILayout.Label(" | " + ratioPump.PumpBalance.ToString("#######0.##"));
+            GUILayout.Label($" | {ratioPump.PumpBalance:#######0.##}");
         }
       }
       else
@@ -995,7 +993,7 @@ namespace ShipManifest.Windows
           //toolTip += "\r\nAllows editing of part's larger capacity resourse xfer value.";
           //toolTip += "\r\nIt then calculates the smaller xfer amount using a ratio";
           //toolTip += "\r\n of the smaller capacity resource to the larger.";
-          label = SMUtils.Localize("#smloc_transfer_015") + ":";
+          label = $"{SMUtils.Localize("#smloc_transfer_015")}:";
           toolTip = SMUtils.Localize("#smloc_transfer_tt_025");
         }
         else
@@ -1003,7 +1001,7 @@ namespace ShipManifest.Windows
           //label = "Xfer Amt:";
           //toolTip += "Displays the Amount of selected resource to xfer.";
           //toolTip += "\r\nAllows editing of the xfer value.";
-          label = SMUtils.Localize("#smloc_transfer_016") + ":";
+          label = $"{SMUtils.Localize("#smloc_transfer_016")}:";
           toolTip = SMUtils.Localize("#smloc_transfer_tt_026");
         }
         GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(65));
@@ -1018,9 +1016,9 @@ namespace ShipManifest.Windows
           : thisXferAmount * ratioPump.PumpRatio;
         if (SMAddon.SmVessel.SelectedResources.Count > 1)
         {
-          label = " | " + ratioXferAmt.ToString("#######0.##");
+          label = $" | {ratioXferAmt:#######0.##}";
           //toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.PumpRatio + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
-          toolTip = string.Format("{0}:  {1}.\n{2}", SMUtils.Localize("#smloc_transfer_tt_027"), ratioPump.PumpRatio, SMUtils.Localize("#smloc_transfer_tt_028"));
+          toolTip = $"{SMUtils.Localize("#smloc_transfer_tt_027")}:  {ratioPump.PumpRatio}.\n{SMUtils.Localize("#smloc_transfer_tt_028")}";
           GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(80));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -1035,7 +1033,7 @@ namespace ShipManifest.Windows
         GUIStyle noPad = SMStyle.LabelStyleNoPad;
         //label = "Xfer:";
         //toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.\r\nYou can use this instead of the text box above.";
-        label = SMUtils.Localize("#smloc_transfer_009") + ":";
+        label = $"{SMUtils.Localize("#smloc_transfer_009")}:";
         toolTip = SMUtils.Localize("#smloc_transfer_tt_029");
         GUILayout.Label(new GUIContent(label, toolTip), noPad, GUILayout.Width(50), GUILayout.Height(20));
         rect = GUILayoutUtility.GetLastRect();
@@ -1089,7 +1087,8 @@ namespace ShipManifest.Windows
           step = "resource quantities labels";
 
           GUILayout.BeginHorizontal();
-          string label = string.Format("{0}: ({1:#######0.##}/{2:######0.##})", displayPumps.Current.Resource, displayPumps.Current.FromRemaining, displayPumps.Current.FromCapacity);
+          string label =
+            $"{displayPumps.Current.Resource}: ({displayPumps.Current.FromRemaining:#######0.##}/{displayPumps.Current.FromCapacity:######0.##})";
           GUILayout.Label(label , SMStyle.LabelStyleNoWrap, GUILayout.Width(220),GUILayout.Height(18));
           GUILayout.Label(flowtext, GUILayout.Width(20), GUILayout.Height(18));
           if (SMAddon.SmVessel.Vessel.IsControllable)
@@ -1119,8 +1118,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            string.Format(" in WindowTransfer.ResourceFlowButtons at step:  " + step + ".  Error:  {0} \r\n\r\n{1}",
-              ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+            $" in WindowTransfer.ResourceFlowButtons at step:  {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -1181,7 +1179,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            "Error in WindowTransfer.PartButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            $"Error in WindowTransfer.PartButtonToggled ({pumpType}) at step:  {step}.  Error:  {ex}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -1221,7 +1219,7 @@ namespace ShipManifest.Windows
         if (!SMAddon.FrameErrTripped)
         {
           SMUtils.LogMessage(
-            "Error in WindowTransfer.VesselButtonToggled (" + pumpType + ") at step:  " + step + ".  Error:  " + ex,
+            $"Error in WindowTransfer.VesselButtonToggled ({pumpType}) at step:  {step}.  Error:  {ex}",
             SMUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
@@ -1303,26 +1301,23 @@ namespace ShipManifest.Windows
 
       if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
       {
-        strDescription = SMUtils.GetPartCrewCount(part) + " - " + part.partInfo.title;
+        strDescription = $"{SMUtils.GetPartCrewCount(part)} - {part.partInfo.title}";
       }
       else if (selectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
       {
         int cntScience = GetScienceCount(part);
-        strDescription = cntScience + " - " + part.partInfo.title;
+        strDescription = $"{cntScience} - {part.partInfo.title}";
       }
       else
       {
-        strDescription = part.Resources[selectedResources[0]].amount.ToString("######0.##") + " - " +
-                         part.partInfo.title;
+        strDescription = $"{part.Resources[selectedResources[0]].amount:######0.##} - {part.partInfo.title}";
       }
       return strDescription;
     }
 
     private static string GetResourceDescription(List<string> selectedResources, ModDockedVessel modDockedVvessel)
     {
-      string strDescription = GetVesselResourceTotals(modDockedVvessel, selectedResources) + " - " +
-                           modDockedVvessel.VesselName;
-      return strDescription;
+      return $"{GetVesselResourceTotals(modDockedVvessel, selectedResources)} - {modDockedVvessel.VesselName}";
     }
 
     private static int GetScienceCount(Part part)
@@ -1333,7 +1328,7 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in GetScienceCount.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
+        SMUtils.LogMessage($" in GetScienceCount.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SMUtils.LogType.Error, true);
         return 0;
       }
@@ -1375,9 +1370,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in DisplayVesselResourceTotals().  Error:  {0}", ex), SMUtils.LogType.Error, true);
+        SMUtils.LogMessage($" in DisplayVesselResourceTotals().  Error:  {ex}", SMUtils.LogType.Error, true);
       }
-      string displayAmount = string.Format("({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"));
+      string displayAmount = $"({currAmount.ToString("#######0")}/{totAmount.ToString("######0")})";
 
       return displayAmount;
     }

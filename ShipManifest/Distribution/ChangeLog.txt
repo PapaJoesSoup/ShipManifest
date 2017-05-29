@@ -1,4 +1,9 @@
-﻿Version 5.1.4.1 - Release 26 May 2017 - KSP 1.3 Compatibility Edition
+﻿Version 5.1.4.2 - Release xx May 2017 - KSP 1.3 Compatibility Edition
+ - Fixed: compatibility with latest DeepFreeze.  Freeze action from Roster Window was failing.
+ - Fixed: Some localization was not complete.  Added additional tags for text not caught in first pass
+ - Misc:  Cleaned up text rendering in general.  Converted to consistent use of C# string interpolation across mod.
+
+Version 5.1.4.1 - Release 26 May 2017 - KSP 1.3 Compatibility Edition
  - New:  Implemented Localization system.  Now it is possible to translate SM into other languages.
  - New:  Realism Settings Refactor.  Realism Mode is redefined and easier to use; settings are now more granular.
  - New:  - Added Radio switch for realism Categories:  Full, None, Default, Custom.  

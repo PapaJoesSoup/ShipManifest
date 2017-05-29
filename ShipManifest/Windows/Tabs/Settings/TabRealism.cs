@@ -353,7 +353,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Xfer Power Cost:";
       //_toolTip = "Sets the Electrical cost of resource Xfers.";
       //_toolTip += "\r\nThe higher the number the more ElectricCharge used.";
-      _label = SMUtils.Localize("#smloc_settings_realism_023")+ ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_realism_023")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_022");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(125), GUILayout.Height(20));
@@ -406,7 +406,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_toolTip = "Sets the rate that resources Xfer when Realistic Transfers is on.";
       //_toolTip += "\r\nThe higher the number the faster resources move.";
       //_toolTip += "\r\nYou can also use the slider below to change this value.";
-      _label = SMUtils.Localize("#smloc_settings_realism_025") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_realism_025")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_realism_tt_023");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(135), GUILayout.Height(20));

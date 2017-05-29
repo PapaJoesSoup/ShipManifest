@@ -23,7 +23,7 @@
         string title;
         try
         {
-          title = SPart.partInfo.title + "\r\n on " + Module.part.parent.partInfo.title;
+          title = $"{SPart.partInfo.title}\r\n {SMUtils.Localize("#smloc_module_001")} {Module.part.parent.partInfo.title}";
         }
         catch
         {

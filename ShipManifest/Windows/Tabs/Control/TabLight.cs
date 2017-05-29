@@ -37,7 +37,7 @@ namespace ShipManifest.Windows.Tabs.Control
         while (iLights.MoveNext())
         {
           if (iLights.Current == null) continue;
-          string label = iLights.Current.Status + " - " + iLights.Current.Title;
+          string label = $"{iLights.Current.Status} - {iLights.Current.Title}";
           bool onState = iLights.Current.IsOn;
           bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
@@ -61,7 +61,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SMUtils.LogMessage(
-          string.Format(" in Light Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+          $" in Light Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
           true);
       }
       GUILayout.EndVertical();

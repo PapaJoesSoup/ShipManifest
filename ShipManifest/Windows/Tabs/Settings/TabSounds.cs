@@ -32,14 +32,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
 
-      GUILayout.Label(SMUtils.Localize("#smloc_settings_sounds_001") + ":", GUILayout.Height(20)); //"Transfer Pump:"
+      GUILayout.Label($"{SMUtils.Localize("#smloc_settings_sounds_001")}:", GUILayout.Height(20)); //"Transfer Pump:"
 
       // Pump Start Sound
       GUILayout.BeginHorizontal();
       //_label = "Pump Starting: ";
       //_toolTip = "Folder location where Pump Starting sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_002") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_002")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_001");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -54,7 +54,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Running: ";
       //_toolTip = "Folder location where Pump Running sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_003") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_003")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_002");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -69,7 +69,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Stopping: ";
       //_toolTip = "Folder location where Pump Stopping sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_004") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_004")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_003");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -84,7 +84,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Volume: ";
       //_toolTip = "How loud do you want it?";
       //_toolTip += "\r\nMove slider to change volume.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_005") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_005")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -108,13 +108,13 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUILayout.Label(" ", GUILayout.Height(10));
       //GUILayout.Label("Crew:", GUILayout.Height(20));
-      GUILayout.Label(SMUtils.Localize("#smloc_settings_sounds_008") + ":", GUILayout.Height(20));
+      GUILayout.Label($"{SMUtils.Localize("#smloc_settings_sounds_008")}:", GUILayout.Height(20));
       // Crew Start Sound
       GUILayout.BeginHorizontal();
       //_label = "Crew Exiting: ";
       //_toolTip = "Folder location where Crew Exiting their seat sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_009") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_009")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_005");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -129,7 +129,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Xfering: ";
       //_toolTip = "Folder location where Crew transferring sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_010") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_010")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_006");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -144,7 +144,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Entering: ";
       //_toolTip = "Folder location where Crew Entering sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_011") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_011")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
@@ -159,7 +159,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Volume: ";
       //_toolTip = "How loud do you want it?";
       //_toolTip += "\r\nMove slider to change volume.";
-      _label = SMUtils.Localize("#smloc_settings_sounds_012") + ":";
+      _label = $"{SMUtils.Localize("#smloc_settings_sounds_012")}:";
       _toolTip = SMUtils.Localize("#smloc_settings_sounds_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(100));
