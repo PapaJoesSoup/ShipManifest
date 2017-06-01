@@ -17,7 +17,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
-      float scrollY = 50 - displayViewerPosition.y;
+      float scrollY = displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -26,7 +26,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SMUtils.Localize("#smloc_control_light_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.Localize("#smloc_control_light_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -46,12 +46,8 @@ namespace ShipManifest.Windows.Tabs.Control
           else if (onState && !newOnState)
             iLights.Current.TurnOffLight();
           Rect rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type != EventType.Repaint || !rect.Contains(Event.current.mousePosition)) continue;
-
-          SMHighlighter.IsMouseOver = true;
-          SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-          SMHighlighter.MouseOverPart = iLights.Current.SPart;
-          SMHighlighter.MouseOverParts = null;
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLights.Current.SPart);
         }
         iLights.Dispose();
 
@@ -60,8 +56,8 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $" in Light Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
+        SmUtils.LogMessage(
+          $" in Light Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
           true);
       }
       GUILayout.EndVertical();

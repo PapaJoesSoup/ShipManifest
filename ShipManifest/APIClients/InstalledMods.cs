@@ -13,7 +13,7 @@ namespace ShipManifest.APIClients
 
     internal static bool IsDfApiReady
     {
-      get { return DFWrapper.APIReady; }
+      get { return DfWrapper.ApiReady; }
     }
 
     internal static bool IsDfInstalled
@@ -49,14 +49,12 @@ namespace ShipManifest.APIClients
       List<Assembly>.Enumerator list = sortedAssemblies.GetEnumerator();
       while (list.MoveNext())
       {
-        if (list.Current != null)
-        {
-          string[] fullName = list.Current.FullName.Split(',');
-          GUILayout.BeginHorizontal();
-          GUILayout.Label(fullName[0], GUILayout.Width(190));
-          GUILayout.Label(fullName[1]);
-          GUILayout.EndHorizontal();
-        }
+        if (list.Current == null) continue;
+        string[] fullName = list.Current.FullName.Split(',');
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(fullName[0], GUILayout.Width(190));
+        GUILayout.Label(fullName[1]);
+        GUILayout.EndHorizontal();
       }
       list.Dispose();
     }
@@ -88,42 +86,6 @@ namespace ShipManifest.APIClients
           where a.FullName.Split(',')[0] == assemblyName
           select a).First();
         return assembly != null;
-      }
-      catch
-      {
-        return false;
-      }
-    }
-
-    private static bool IsKspAssembly(string assemblyName)
-    {
-      List<string> kspAssemblies = new List<string>
-      {
-        "Assembly-UnityScript",
-        "Assembly-UnityScript-firstpass",
-        "Assembly-CSharp",
-        "Assembly-CSharp-firstpass",
-        "Boo.Lang",
-        "MiscUtil",
-        "Mono.Cecil",
-        "Mono.Cecil.Mdb",
-        "Mono.Cecil.Pdb",
-        "Mono.Security",
-        "mscorlib",
-        "System.Xml",
-        "System",
-        "System.Core",
-        "System.Xml.Linq",
-        "TDx.TDxInput",
-        "TrackIRUnity",
-        "UnityEngine.UI",
-        "UnityEngine",
-        "XmlDiffPatch"
-      };
-
-      try
-      {
-        return kspAssemblies.Any(assemblyName.Contains);
       }
       catch
       {

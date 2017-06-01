@@ -278,9 +278,9 @@ namespace ShipManifest.Process
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage($"Transfer State:  {CrewXferState}...", SMUtils.LogType.Error, true);
-          SMUtils.LogMessage(
-            $" in CrewTransferProcess (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($"Transfer State:  {CrewXferState}...", SmUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in CrewTransferProcess (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
           ResetXferProcess();
         }
@@ -311,8 +311,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -334,8 +334,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -418,8 +418,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 

@@ -12,7 +12,7 @@ namespace ShipManifest.Windows
   {
     #region Manifest Window - Gui Layout Code
 
-    internal static string Title = $"{"Ship Manifest"} {SMSettings.CurVersion} - ";
+    internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
     internal static Rect Position = new Rect(0, 0, 0, 0);
     private static bool _showWindow;
 
@@ -39,7 +39,7 @@ namespace ShipManifest.Windows
     internal static void Display(int windowId)
     {
       Title =
-        $"{SMUtils.Localize("#smloc_manifest_002")} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
+        $"{SmUtils.Localize("#smloc_manifest_002")} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -48,11 +48,11 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       //GUIContent label = new GUIContent("", "Close Window");
-      GUIContent label = new GUIContent("", SMUtils.Localize("#smloc_window_tt_001"));
+      GUIContent label = new GUIContent("", SmUtils.Localize("#smloc_window_tt_001"));
       if (SMConditions.IsTransferInProgress())
       {
         //label = new GUIContent("", "Action in progress.  Cannot close window");
-        label = new GUIContent("", SMUtils.Localize("#smloc_window_tt_002"));
+        label = new GUIContent("", SmUtils.Localize("#smloc_window_tt_002"));
         GUI.enabled = false;
       }
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
@@ -85,12 +85,12 @@ namespace ShipManifest.Windows
         GUILayout.EndScrollView();
 
         //string resLabel = "No Resource Selected";
-        string resLabel = SMUtils.Localize("#smloc_manifest_003");
+        string resLabel = SmUtils.Localize("#smloc_manifest_003");
         if (SMAddon.SmVessel.SelectedResources.Count == 1)
           resLabel = SMAddon.SmVessel.SelectedResources[0];
         else if (SMAddon.SmVessel.SelectedResources.Count == 2)
           //resLabel = "Multiple Resources selected";
-          resLabel = SMUtils.Localize("#smloc_manifest_004");
+          resLabel = SmUtils.Localize("#smloc_manifest_004");
         GUILayout.Label($"{resLabel}", GUILayout.Width(300), GUILayout.Height(20));
 
         // Resource Details List Viewer
@@ -107,9 +107,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
+          SmUtils.LogMessage(
             $" in WindowManifest.Display.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true);
+            SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -127,11 +127,11 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
-          if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_005"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Crew"
+          if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_005"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Crew"
           {
             SMAddon.SmVessel.FillCrew();
           }
-          if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_006"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Crew"
+          if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_006"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Crew"
           {
             SMAddon.SmVessel.EmptyCrew();
           }
@@ -140,11 +140,11 @@ namespace ShipManifest.Windows
 
         if (!SMSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_007"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
+        if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_007"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
         {
           SMAddon.SmVessel.FillResources();
         }
-        if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_008"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Resources"
+        if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_008"), SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Resources"
         {
           SMAddon.SmVessel.DumpAllResources();
         }
@@ -154,9 +154,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
+          SmUtils.LogMessage(
             $" in PreLaunchGui.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true);
+            SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -179,7 +179,7 @@ namespace ShipManifest.Windows
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
-          string displayAmounts = $"{keys.Current}{SMUtils.DisplayVesselResourceTotals(keys.Current)}";
+          string displayAmounts = $"{keys.Current}{SmUtils.DisplayVesselResourceTotals(keys.Current)}";
           GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
@@ -197,8 +197,8 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypePump.Dump,
               TransferPump.TriggerButton.Manifest);
             GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-              ? new GUIContent(SMUtils.Localize("#smloc_manifest_009"), SMUtils.Localize("#smloc_manifest_tt_001")) // "Dump", "Dumps the selected resource in this vessel"
-              : new GUIContent(SMUtils.Localize("#smloc_manifest_010"), SMUtils.Localize("#smloc_manifest_tt_002")); // "Stop", "Halts the dumping of the selected resource in this vessel"
+              ? new GUIContent(SmUtils.Localize("#smloc_manifest_009"), SmUtils.Localize("#smloc_manifest_tt_001")) // "Dump", "Dumps the selected resource in this vessel"
+              : new GUIContent(SmUtils.Localize("#smloc_manifest_010"), SmUtils.Localize("#smloc_manifest_tt_002")); // "Stop", "Halts the dumping of the selected resource in this vessel"
             GUI.enabled = SMConditions.CanResourceBeDumped(keys.Current);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
@@ -211,7 +211,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
-            if (GUILayout.Button($"{SMUtils.Localize("#smloc_manifest_011")}", SMStyle.ButtonStyle, GUILayout.Width(35),
+            if (GUILayout.Button($"{SmUtils.Localize("#smloc_manifest_011")}", SMStyle.ButtonStyle, GUILayout.Width(35),
               GUILayout.Height(20))) // "Fill"
             {
               SMAddon.SmVessel.FillResource(keys.Current);
@@ -226,9 +226,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
+          SmUtils.LogMessage(
             $" in WindowManifest.ResourceButtonList.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true);
+            SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -285,9 +285,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
+        SmUtils.LogMessage(
           $" in WindowManifest.ResourceButtonToggled.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true); // in, Error
+          SmUtils.LogType.Error, true); // in, Error
       }
       SMAddon.SmVessel.RefreshLists();
     }
@@ -327,7 +327,7 @@ namespace ShipManifest.Windows
             {
               GUILayout.BeginHorizontal();
               GUILayout.Label(
-                $"{part.partInfo.title}, ({SMUtils.GetPartCrewCount(part)}/{part.CrewCapacity})",
+                $"{part.partInfo.title}, ({SmUtils.GetPartCrewCount(part)}/{part.CrewCapacity})",
                 GUILayout.Width(265), GUILayout.Height(20));
               GUILayout.EndHorizontal();
             }
@@ -357,9 +357,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
+          SmUtils.LogMessage(
             $" in WindowManifest.ResourceDetailsViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true); // in, Error
+            SmUtils.LogType.Error, true); // in, Error
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -372,7 +372,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_012"), settingsStyle, GUILayout.Height(20))) // "Settings"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_012"), settingsStyle, GUILayout.Height(20))) // "Settings"
       {
         try
         {
@@ -385,14 +385,14 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage(
-            $" opening Settings Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
+          SmUtils.LogMessage(
+            $" opening Settings Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
             true);
         }
       }
 
       GUIStyle rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_013"), rosterStyle, GUILayout.Height(20))) // "Roster"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_013"), rosterStyle, GUILayout.Height(20))) // "Roster"
       {
         try
         {
@@ -409,14 +409,14 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage(
-            $" opening Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
+          SmUtils.LogMessage(
+            $" opening Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
             true);
         }
       }
 
       GUIStyle controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SMUtils.Localize("#smloc_manifest_014"), controlStyle, GUILayout.Height(20))) // "Control"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_manifest_014"), controlStyle, GUILayout.Height(20))) // "Control"
       {
         try
         {
@@ -424,8 +424,8 @@ namespace ShipManifest.Windows
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage(
-            $" opening Control Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
+          SmUtils.LogMessage(
+            $" opening Control Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
             true);
         }
       }
@@ -549,9 +549,9 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
+        SmUtils.LogMessage(
           $" in WindowManifest.ReconcileSelectedXferParts.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true); // in, Error
+            SmUtils.LogType.Error, true); // in, Error
       }
     }
   }

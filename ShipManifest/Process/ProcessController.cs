@@ -58,7 +58,7 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in ProcessController.TransferScienceLab:  Error:  {ex}", SMUtils.LogType.Info, SMSettings.VerboseLogging);
+        SmUtils.LogMessage($" in ProcessController.TransferScienceLab:  Error:  {ex}", SmUtils.LogType.Info, SMSettings.VerboseLogging);
       }
     }
 
@@ -91,7 +91,7 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in ProcessController.TransferScience:  Error:  {ex}", SMUtils.LogType.Info, SMSettings.VerboseLogging);
+        SmUtils.LogMessage($" in ProcessController.TransferScience:  Error:  {ex}", SmUtils.LogType.Info, SMSettings.VerboseLogging);
       }
     }
 
@@ -134,9 +134,9 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
+        SmUtils.LogMessage(
           $" in  ProcessController.TransferResources.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+          SmUtils.LogType.Error, true);
       }
     }
 
@@ -178,9 +178,9 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
+        SmUtils.LogMessage(
           $" in  ProcessController.DumpResources.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+          SmUtils.LogType.Error, true);
       }
     }
   }

@@ -13,46 +13,46 @@ namespace ShipManifest.APIClients
   /// <summary>
   /// The Wrapper class to access DeepFreeze from another plugin
   /// </summary>
-  public class DFWrapper
+  public class DfWrapper
   {
-    internal static System.Type DFType;
-    internal static System.Type KerbalInfoType;
-    internal static System.Type DeepFreezerType;
-    internal static System.Type FrznCrewMbrType;
-    internal static object actualDF = null;
+    internal static Type DfType;
+    internal static Type KerbalInfoType;
+    internal static Type DeepFreezerType;
+    internal static Type FrznCrewMbrType;
+    internal static object ActualDf;
 
     /// <summary>
     /// This is the DeepFreeze object
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static DFAPI DeepFreezeAPI;
+    public static DfApi DeepFreezeApi;
 
     /// <summary>
     /// Whether we found the DeepFreeze assembly in the loadedassemblies.
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static bool AssemblyExists { get { return (DFType != null); } }
+    public static bool AssemblyExists { get { return (DfType != null); } }
 
     /// <summary>
     /// Whether we managed to hook the running Instance from the assembly.
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static bool InstanceExists { get { return (DeepFreezeAPI != null); } }
+    public static bool InstanceExists { get { return (DeepFreezeApi != null); } }
 
     /// <summary>
     /// Whether we managed to wrap all the methods/functions from the instance.
     ///
     /// SET AFTER INIT
     /// </summary>
-    private static bool _DFWrapped;
+    private static bool _dfWrapped;
 
     /// <summary>
     /// Whether the object has been wrapped and the APIReady flag is set in the real DeepFreeze
     /// </summary>
-    public static bool APIReady { get { return _DFWrapped && DeepFreezeAPI.APIReady; } }
+    public static bool ApiReady { get { return _dfWrapped && DeepFreezeApi.IsApiReady; } }
 
     /// <summary>
     /// This method will set up the DeepFreeze object and wrap all the methods/functions
@@ -60,32 +60,32 @@ namespace ShipManifest.APIClients
     /// <returns>
     /// Bool indicating success of call
     /// </returns>
-    public static bool InitDFWrapper()
+    public static bool InitDfWrapper()
     {
       try
       {
         //reset the internal objects
-        _DFWrapped = false;
-        actualDF = null;
-        DeepFreezeAPI = null;
-        DFType = null;
+        _dfWrapped = false;
+        ActualDf = null;
+        DeepFreezeApi = null;
+        DfType = null;
         KerbalInfoType = null;
         DeepFreezerType = null;
         FrznCrewMbrType = null;
         LogFormatted("Attempting to Grab DeepFreeze Types...");
 
         //find the base type
-        DFType = AssemblyLoader.loadedAssemblies
+        DfType = AssemblyLoader.loadedAssemblies
             .Select(a => a.assembly.GetExportedTypes())
             .SelectMany(t => t)
             .FirstOrDefault(t => t.FullName == "DF.DeepFreeze");
 
-        if (DFType == null)
+        if (DfType == null)
         {
           return false;
         }
 
-        LogFormatted("DeepFreeze Version:{0}", DFType.Assembly.GetName().Version.ToString());
+        LogFormatted("DeepFreeze Version:{0}", DfType.Assembly.GetName().Version.ToString());
 
         //now the KerbalInfo Type
         KerbalInfoType = AssemblyLoader.loadedAssemblies
@@ -124,14 +124,14 @@ namespace ShipManifest.APIClients
         LogFormatted("Got Assembly Types, grabbing Instance");
         try
         {
-          actualDF = DFType.GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
+          ActualDf = DfType.GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
         }
         catch (Exception)
         {
           LogFormatted("No Instance found - most likely you have an old DeepFreeze installed");
           return false;
         }
-        if (actualDF == null)
+        if (ActualDf == null)
         {
           LogFormatted("Failed grabbing Instance");
           return false;
@@ -139,15 +139,15 @@ namespace ShipManifest.APIClients
 
         //If we get this far we can set up the local object and its methods/functions
         LogFormatted("Got Instance, Creating Wrapper Objects");
-        DeepFreezeAPI = new DFAPI(actualDF);
-        _DFWrapped = true;
+        DeepFreezeApi = new DfApi(ActualDf);
+        _dfWrapped = true;
         return true;
       }
       catch (Exception ex)
       {
         LogFormatted("Unable to setup InitDFWrapper Reflection");
         LogFormatted("Exception: {0}", ex);
-        _DFWrapped = false;
+        _dfWrapped = false;
         return false;
       }
     }
@@ -155,27 +155,27 @@ namespace ShipManifest.APIClients
     /// <summary>
     /// The API Class that is an analogue of the real DeepFreeze. This lets you access all the API-able properties and Methods of the DeepFreeze
     /// </summary>
-    public class DFAPI
+    public class DfApi
     {
-      internal DFAPI(object a)
+      internal DfApi(object a)
       {
         try
         {
           //store the actual object
-          actualDFAPI = a;
+          _actualDfapi = a;
 
           //these sections get and store the reflection info and actual objects where required. Later in the properties we then read the values from the actual objects
           //for events we also add a handler
           //Object tstfrozenkerbals = DFType.GetField("FrozenKerbals", BindingFlags.Public | BindingFlags.Static).GetValue(null);
 
           LogFormatted("Getting APIReady Object");
-          APIReadyField = DFType.GetField("APIReady", BindingFlags.Public | BindingFlags.Static);
-          LogFormatted($"Success: {APIReadyField != null}");
+          _apiReadyField = DfType.GetField("APIReady", BindingFlags.Public | BindingFlags.Static);
+          LogFormatted($"Success: {_apiReadyField != null}");
 
           LogFormatted("Getting FrozenKerbals Object");
-          FrozenKerbalsMethod = DFType.GetMethod("get_FrozenKerbals", BindingFlags.Public | BindingFlags.Instance);
-          actualFrozenKerbals = FrozenKerbalsMethod.Invoke(actualDFAPI, null);
-          LogFormatted($"Success: {actualFrozenKerbals != null}");
+          _frozenKerbalsMethod = DfType.GetMethod("get_FrozenKerbals", BindingFlags.Public | BindingFlags.Instance);
+          _actualFrozenKerbals = _frozenKerbalsMethod.Invoke(_actualDfapi, null);
+          LogFormatted($"Success: {_actualFrozenKerbals != null}");
         }
         catch (Exception ex)
         {
@@ -184,55 +184,55 @@ namespace ShipManifest.APIClients
         }
       }
 
-      private object actualDFAPI;
+      private object _actualDfapi;
 
-      private FieldInfo APIReadyField;
+      private FieldInfo _apiReadyField;
       /// <summary>
       /// Whether the APIReady flag is set in the real KAC
       /// </summary>
       /// <returns>
       /// Bool Indicating if DeepFreeze is ready for API calls
       /// </returns>
-      public bool APIReady
+      public bool IsApiReady
       {
         get
         {
-          if (APIReadyField == null)
+          if (_apiReadyField == null)
             return false;
 
-          return (bool)APIReadyField.GetValue(null);
+          return (bool)_apiReadyField.GetValue(null);
         }
       }
 
       #region Frozenkerbals
 
-      private object actualFrozenKerbals;
-      private MethodInfo FrozenKerbalsMethod;
+      private object _actualFrozenKerbals;
+      private MethodInfo _frozenKerbalsMethod;
 
       /// <summary>
       /// The dictionary of Frozen Kerbals that are currently active in game
       /// </summary>
       /// <returns>
-      /// Dictionary <string, KerbalInfo> of Frozen Kerbals
+      /// Dictionary&lt;string, KerbalInfo&gt; of Frozen Kerbals
       /// </returns>
       internal Dictionary<string, KerbalInfo> FrozenKerbals
       {
         get
         {
           Dictionary<string, KerbalInfo> returnvalue = new Dictionary<string, KerbalInfo>();
-          if (FrozenKerbalsMethod == null)
+          if (_frozenKerbalsMethod == null)
           {
             LogFormatted("Error getting FrozenKerbals - Reflection Method is Null");
             return returnvalue;
           }
-          object actualDFtest = DFType.GetField("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null);
-          FieldInfo gamesettingsfield = DFType.GetField("DFgameSettings", BindingFlags.Instance | BindingFlags.NonPublic);
+          object actualDFtest = DfType.GetField("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null);
+          FieldInfo gamesettingsfield = DfType.GetField("DFgameSettings", BindingFlags.Instance | BindingFlags.NonPublic);
           object gamesettings;
           if (gamesettingsfield != null)
-            gamesettings = gamesettingsfield.GetValue(actualDFAPI);
-          actualFrozenKerbals = null;
-          actualFrozenKerbals = FrozenKerbalsMethod.Invoke(actualDFAPI, null);
-          returnvalue = ExtractFrozenKerbalDict(actualFrozenKerbals);
+            gamesettings = gamesettingsfield.GetValue(_actualDfapi);
+          _actualFrozenKerbals = null;
+          _actualFrozenKerbals = _frozenKerbalsMethod.Invoke(_actualDfapi, null);
+          returnvalue = ExtractFrozenKerbalDict(_actualFrozenKerbals);
           return returnvalue;
         }
       }
@@ -242,11 +242,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       /// <param name="actualFrozenKerbals"></param>
       /// <returns>
-      /// Dictionary <string, KerbalInfo> of Frozen Kerbals
+      /// Dictionary&lt;string, KerbalInfo&gt; of Frozen Kerbals
       /// </returns>
       private Dictionary<string, KerbalInfo> ExtractFrozenKerbalDict(object actualFrozenKerbals)
       {
-        Dictionary<string, KerbalInfo> DictToReturn = new Dictionary<string, KerbalInfo>();
+        Dictionary<string, KerbalInfo> dictToReturn = new Dictionary<string, KerbalInfo>();
         try
         {
           // SM - Replaced foreach with enumerator for performance (foreach = bad in Unity)
@@ -257,16 +257,16 @@ namespace ShipManifest.APIClients
             Type typeitem = frnKbls.Current.GetType();
             PropertyInfo[] itemprops = typeitem.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             string itemkey = (string)itemprops[0].GetValue(frnKbls.Current, null);
-            object itemvalue = (object)itemprops[1].GetValue(frnKbls.Current, null);
+            object itemvalue = itemprops[1].GetValue(frnKbls.Current, null);
             KerbalInfo itemkerbalinfo = new KerbalInfo(itemvalue);
-            DictToReturn[itemkey] = itemkerbalinfo;
+            dictToReturn[itemkey] = itemkerbalinfo;
           }
         }
         catch (Exception ex)
         {
           LogFormatted("Unable to extract FrozenKerbals Dictionary: {0}", ex.Message);
         }
-        return DictToReturn;
+        return dictToReturn;
       }
 
       #endregion Frozenkerbals
@@ -281,79 +281,52 @@ namespace ShipManifest.APIClients
     {
       internal DeepFreezer(object a)
       {
-        actualDeepFreezer = a;
+        _actualDeepFreezer = a;
         //Fields available from Freezer part
-        //crewXferTOActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferTOActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        //crewXferTOActive = getcrewXferTOActive;
-        //crewXferFROMActiveMethod = DeepFreezerType.GetMethod("get_DFIcrewXferFROMActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        //crewXferFROMActive = getcrewXferFROMActive;
+
         //FreezerSizeMethod = DeepFreezerType.GetMethod("get_DFIFreezerSize", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
         //FreezerSize = getFreezerSize;
-        TotalFrozenMethod = DeepFreezerType.GetMethod("get_DFITotalFrozen", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        TotalFrozen = getTotalFrozen;
-        FreezerSpaceMethod = DeepFreezerType.GetMethod("get_DFIFreezerSpace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        FreezerSpace = getFreezerSpace;
-        PartFullMethod = DeepFreezerType.GetMethod("get_DFIPartFull", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        PartFull = getPartFull;
-        IsFreezeActiveMethod = DeepFreezerType.GetMethod("get_DFIIsFreezeActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        IsFreezeActive = getIsFreezeActive;
-        IsThawActiveMethod = DeepFreezerType.GetMethod("get_DFIIsThawActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        IsThawActive = getIsThawActive;
-        FreezerOutofECMethod = DeepFreezerType.GetMethod("get_DFIFreezerOutofEC", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        FreezerOutofEC = getFreezerOutofEC;
-        FrzrTmpMethod = DeepFreezerType.GetMethod("get_DFIFrzrTmp", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        FrzrTmp = getFrzrTmp;
-        StoredCrewListMethod = DeepFreezerType.GetMethod("get_DFIStoredCrewList", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        actualStoredCrewList = StoredCrewListMethod.Invoke(actualDeepFreezer, null);
+        _totalFrozenMethod = DeepFreezerType.GetMethod("get_DFITotalFrozen", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        TotalFrozen = GetTotalFrozen;
+        _freezerSpaceMethod = DeepFreezerType.GetMethod("get_DFIFreezerSpace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        FreezerSpace = GetFreezerSpace;
+        _partFullMethod = DeepFreezerType.GetMethod("get_DFIPartFull", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        PartFull = GetPartFull;
+        _isFreezeActiveMethod = DeepFreezerType.GetMethod("get_DFIIsFreezeActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        IsFreezeActive = GetIsFreezeActive;
+        _isThawActiveMethod = DeepFreezerType.GetMethod("get_DFIIsThawActive", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        IsThawActive = GetIsThawActive;
+        _freezerOutofEcMethod = DeepFreezerType.GetMethod("get_DFIFreezerOutofEC", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        FreezerOutofEc = GetFreezerOutofEc;
+        _frzrTmpMethod = DeepFreezerType.GetMethod("get_DFIFrzrTmp", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        FrzrTmp = GetFrzrTmp;
+        _storedCrewListMethod = DeepFreezerType.GetMethod("get_DFIStoredCrewList", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        _actualStoredCrewList = _storedCrewListMethod.Invoke(_actualDeepFreezer, null);
 
         //Methods
         //LogFormatted("Getting beginFreezeKerbalMethod Method");
-        beginFreezeKerbalMethod = DeepFreezerType.GetMethod("beginFreezeKerbal", BindingFlags.Public | BindingFlags.Instance);
+        _beginFreezeKerbalMethod = DeepFreezerType.GetMethod("beginFreezeKerbal", BindingFlags.Public | BindingFlags.Instance);
         //LogFormatted_DebugOnly($"Success: {beginFreezeKerbalMethod != null}");
 
         //LogFormatted("Getting beginThawKerbalMethod Method");
-        beginThawKerbalMethod = DeepFreezerType.GetMethod("beginThawKerbal", BindingFlags.Public | BindingFlags.Instance);
+        _beginThawKerbalMethod = DeepFreezerType.GetMethod("beginThawKerbal", BindingFlags.Public | BindingFlags.Instance);
         //LogFormatted_DebugOnly($"Success: {beginThawKerbalMethod != null}");
       }
 
-      private object actualDeepFreezer;
+      private object _actualDeepFreezer;
 
       #region DeepFreezerFieldMethods
-
-      /// <summary>
-      /// True if a crewXfter TO this DeepFreezer part is currently active
-      /// </summary>
-      public bool crewXferTOActive;
-
-      private MethodInfo crewXferTOActiveMethod;
-
-      private bool getcrewXferTOActive
-      {
-        get { return (bool)crewXferTOActiveMethod.Invoke(actualDeepFreezer, null); }
-      }
-
-      /// <summary>
-      /// True if a crewXfter FROM this DeepFreezer part is currently active
-      /// </summary>
-      public bool crewXferFROMActive;
-
-      private MethodInfo crewXferFROMActiveMethod;
-
-      private bool getcrewXferFROMActive
-      {
-        get { return (bool)crewXferFROMActiveMethod.Invoke(actualDeepFreezer, null); }
-      }
 
       /// <summary>
       /// The number of cryopods in this DeepFreezer
       /// </summary>
       public int FreezerSize;
 
-      private MethodInfo FreezerSizeMethod;
+      private MethodInfo _freezerSizeMethod;
 
-      private int getFreezerSize
+      private int GetFreezerSize
       {
-        get { return (int)FreezerSizeMethod.Invoke(actualDeepFreezer, null); }
+        get { return (int)_freezerSizeMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -361,11 +334,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public int TotalFrozen;
 
-      private MethodInfo TotalFrozenMethod;
+      private MethodInfo _totalFrozenMethod;
 
-      private int getTotalFrozen
+      private int GetTotalFrozen
       {
-        get { return (int)TotalFrozenMethod.Invoke(actualDeepFreezer, null); }
+        get { return (int)_totalFrozenMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -373,11 +346,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public int FreezerSpace;
 
-      private MethodInfo FreezerSpaceMethod;
+      private MethodInfo _freezerSpaceMethod;
 
-      private int getFreezerSpace
+      private int GetFreezerSpace
       {
-        get { return (int)FreezerSpaceMethod.Invoke(actualDeepFreezer, null); }
+        get { return (int)_freezerSpaceMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -385,11 +358,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public bool PartFull;
 
-      private MethodInfo PartFullMethod;
+      private MethodInfo _partFullMethod;
 
-      private bool getPartFull
+      private bool GetPartFull
       {
-        get { return (bool)PartFullMethod.Invoke(actualDeepFreezer, null); }
+        get { return (bool)_partFullMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -397,11 +370,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public bool IsFreezeActive;
 
-      private MethodInfo IsFreezeActiveMethod;
+      private MethodInfo _isFreezeActiveMethod;
 
-      private bool getIsFreezeActive
+      private bool GetIsFreezeActive
       {
-        get { return (bool)IsFreezeActiveMethod.Invoke(actualDeepFreezer, null); }
+        get { return (bool)_isFreezeActiveMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -409,23 +382,23 @@ namespace ShipManifest.APIClients
       /// </summary>
       public bool IsThawActive;
 
-      private MethodInfo IsThawActiveMethod;
+      private MethodInfo _isThawActiveMethod;
 
-      private bool getIsThawActive
+      private bool GetIsThawActive
       {
-        get { return (bool)IsThawActiveMethod.Invoke(actualDeepFreezer, null); }
+        get { return (bool)_isThawActiveMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
       /// True if this DeepFreezer is currently out of Electric Charge
       /// </summary>
-      public bool FreezerOutofEC;
+      public bool FreezerOutofEc;
 
-      private MethodInfo FreezerOutofECMethod;
+      private MethodInfo _freezerOutofEcMethod;
 
-      private bool getFreezerOutofEC
+      private bool GetFreezerOutofEc
       {
-        get { return (bool)FreezerOutofECMethod.Invoke(actualDeepFreezer, null); }
+        get { return (bool)_freezerOutofEcMethod.Invoke(_actualDeepFreezer, null); }
       }
 
       /// <summary>
@@ -433,22 +406,22 @@ namespace ShipManifest.APIClients
       /// </summary>
       public FrzrTmpStatus FrzrTmp;
 
-      private MethodInfo FrzrTmpMethod;
+      private MethodInfo _frzrTmpMethod;
 
-      private FrzrTmpStatus getFrzrTmp
+      private FrzrTmpStatus GetFrzrTmp
       {
-        get { return (FrzrTmpStatus)FrzrTmpMethod.Invoke(actualDeepFreezer, null); }
+        get { return (FrzrTmpStatus)_frzrTmpMethod.Invoke(_actualDeepFreezer, null); }
       }
 
-      private object actualStoredCrewList;
-      private MethodInfo StoredCrewListMethod;
+      private object _actualStoredCrewList;
+      private MethodInfo _storedCrewListMethod;
 
       /// <summary>
-      /// a List<FrznCrewMbr> of all Frozen Crew in this DeepFreezer
+      /// a List&lt;FrznCrewMbr&gt; of all Frozen Crew in this DeepFreezer
       /// </summary>
       public FrznCrewList StoredCrewList
       {
-        get { return ExtractStoredCrewList(actualStoredCrewList); }
+        get { return ExtractStoredCrewList(_actualStoredCrewList); }
       }
 
       /// <summary>
@@ -458,7 +431,7 @@ namespace ShipManifest.APIClients
       /// <returns></returns>
       private FrznCrewList ExtractStoredCrewList(object actualStoredCrewList)
       {
-        FrznCrewList ListToReturn = new FrznCrewList();
+        FrznCrewList listToReturn = new FrznCrewList();
         try
         {
           //iterate each "value" in the dictionary
@@ -467,7 +440,7 @@ namespace ShipManifest.APIClients
           while (crewList.MoveNext())
           {
             FrznCrewMbr r1 = new FrznCrewMbr(crewList.Current);
-            ListToReturn.Add(r1);
+            listToReturn.Add(r1);
           }
         }
         catch (Exception ex)
@@ -476,25 +449,25 @@ namespace ShipManifest.APIClients
           //throw ex;
           //
         }
-        return ListToReturn;
+        return listToReturn;
       }
 
       #endregion DeepFreezerFieldMethods
 
       #region DeepFreezerMethods
 
-      private MethodInfo beginFreezeKerbalMethod;
+      private MethodInfo _beginFreezeKerbalMethod;
 
       /// <summary>
       /// Begin the Freezing of a Kerbal
       /// </summary>
-      /// <param name="CrewMember">ProtoCrewMember that you want frozen</param>
+      /// <param name="crewMember">ProtoCrewMember that you want frozen</param>
       /// <returns>Bool indicating success of call</returns>
-      public bool beginFreezeKerbal(ProtoCrewMember CrewMember)
+      public bool BeginFreezeKerbal(ProtoCrewMember crewMember)
       {
         try
         {
-          beginFreezeKerbalMethod.Invoke(actualDeepFreezer, new object[] { CrewMember });
+          _beginFreezeKerbalMethod.Invoke(_actualDeepFreezer, new object[] { crewMember });
           return true;
         }
         catch (Exception ex)
@@ -504,18 +477,18 @@ namespace ShipManifest.APIClients
         }
       }
 
-      private MethodInfo beginThawKerbalMethod;
+      private MethodInfo _beginThawKerbalMethod;
 
       /// <summary>
       /// Begin the Thawing of a Kerbal
       /// </summary>
       /// <param name="frozenkerbal">string containing the name of the kerbal you want thawed</param>
       /// <returns>Bool indicating success of call</returns>
-      public bool beginThawKerbal(string frozenkerbal)
+      public bool BeginThawKerbal(string frozenkerbal)
       {
         try
         {
-          beginThawKerbalMethod.Invoke(actualDeepFreezer, new object[] { frozenkerbal });
+          _beginThawKerbalMethod.Invoke(_actualDeepFreezer, new object[] { frozenkerbal });
           return true;
         }
         catch (Exception ex)
@@ -530,9 +503,9 @@ namespace ShipManifest.APIClients
 
     public enum FrzrTmpStatus
     {
-      OK = 0,
-      WARN = 1,
-      RED = 2,
+      Ok = 0,
+      Warn = 1,
+      Red = 2,
     }
 
     /// <summary>
@@ -542,18 +515,18 @@ namespace ShipManifest.APIClients
     {
       internal FrznCrewMbr(object a)
       {
-        actualFrznCrewMbr = a;
-        CrewNameMethod = FrznCrewMbrType.GetMethod("get_CrewName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        CrewName = getCrewName;
-        SeatIdxMethod = FrznCrewMbrType.GetMethod("get_SeatIdx", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        SeatIdx = getSeatIdx;
-        VesselIDMethod = FrznCrewMbrType.GetMethod("get_VesselID", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        VesselID = getVesselID;
-        VesselNameMethod = FrznCrewMbrType.GetMethod("get_VesselName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        VesselName = getVesselName;
+        _actualFrznCrewMbr = a;
+        _crewNameMethod = FrznCrewMbrType.GetMethod("get_CrewName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        CrewName = GetCrewName;
+        _seatIdxMethod = FrznCrewMbrType.GetMethod("get_SeatIdx", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        SeatIdx = GetSeatIdx;
+        _vesselIdMethod = FrznCrewMbrType.GetMethod("get_VesselID", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        VesselId = GetVesselId;
+        _vesselNameMethod = FrznCrewMbrType.GetMethod("get_VesselName", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        VesselName = GetVesselName;
       }
 
-      private object actualFrznCrewMbr;
+      private object _actualFrznCrewMbr;
 
 
       /// <summary>
@@ -561,11 +534,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public string CrewName;
 
-      private MethodInfo CrewNameMethod;
+      private MethodInfo _crewNameMethod;
 
-      private string getCrewName
+      private string GetCrewName
       {
-        get { return (string)CrewNameMethod.Invoke(actualFrznCrewMbr, null); }
+        get { return (string)_crewNameMethod.Invoke(_actualFrznCrewMbr, null); }
       }
 
       /// <summary>
@@ -573,23 +546,23 @@ namespace ShipManifest.APIClients
       /// </summary>
       public int SeatIdx;
 
-      private MethodInfo SeatIdxMethod;
+      private MethodInfo _seatIdxMethod;
 
-      private int getSeatIdx
+      private int GetSeatIdx
       {
-        get { return (int)SeatIdxMethod.Invoke(actualFrznCrewMbr, null); }
+        get { return (int)_seatIdxMethod.Invoke(_actualFrznCrewMbr, null); }
       }
 
       /// <summary>
       /// Vessel ID
       /// </summary>
-      public Guid VesselID;
+      public Guid VesselId;
 
-      private MethodInfo VesselIDMethod;
+      private MethodInfo _vesselIdMethod;
 
-      private Guid getVesselID
+      private Guid GetVesselId
       {
-        get { return (Guid)VesselIDMethod.Invoke(actualFrznCrewMbr, null); }
+        get { return (Guid)_vesselIdMethod.Invoke(_actualFrznCrewMbr, null); }
       }
 
       /// <summary>
@@ -597,11 +570,11 @@ namespace ShipManifest.APIClients
       /// </summary>
       public string VesselName;
 
-      private MethodInfo VesselNameMethod;
+      private MethodInfo _vesselNameMethod;
 
-      private string getVesselName
+      private string GetVesselName
       {
-        get { return (string)VesselNameMethod.Invoke(actualFrznCrewMbr, null); }
+        get { return (string)_vesselNameMethod.Invoke(_actualFrznCrewMbr, null); }
       }
     }
 
@@ -618,108 +591,108 @@ namespace ShipManifest.APIClients
     {
       internal KerbalInfo(object a)
       {
-        actualFrozenKerbalInfo = a;
-        lastUpdateField = KerbalInfoType.GetField("lastUpdate");
-        statusField = KerbalInfoType.GetField("status");
-        typeField = KerbalInfoType.GetField("type");
-        vesselIDField = KerbalInfoType.GetField("vesselID");
-        vesselNameField = KerbalInfoType.GetField("vesselName");
-        partIDField = KerbalInfoType.GetField("partID");
-        seatIdxField = KerbalInfoType.GetField("seatIdx");
-        seatNameField = KerbalInfoType.GetField("seatName");
-        experienceTraitNameField = KerbalInfoType.GetField("experienceTraitName");
+        _actualFrozenKerbalInfo = a;
+        _lastUpdateField = KerbalInfoType.GetField("lastUpdate");
+        _statusField = KerbalInfoType.GetField("status");
+        _typeField = KerbalInfoType.GetField("type");
+        _vesselIdField = KerbalInfoType.GetField("vesselID");
+        _vesselNameField = KerbalInfoType.GetField("vesselName");
+        _partIdField = KerbalInfoType.GetField("partID");
+        _seatIdxField = KerbalInfoType.GetField("seatIdx");
+        _seatNameField = KerbalInfoType.GetField("seatName");
+        _experienceTraitNameField = KerbalInfoType.GetField("experienceTraitName");
       }
 
-      private object actualFrozenKerbalInfo;
+      private object _actualFrozenKerbalInfo;
 
-      private FieldInfo lastUpdateField;
+      private FieldInfo _lastUpdateField;
 
       /// <summary>
       /// last time the FrozenKerbalInfo was updated
       /// </summary>
-      public double lastUpdate
+      public double LastUpdate
       {
-        get { return (double)lastUpdateField.GetValue(actualFrozenKerbalInfo); }
+        get { return (double)_lastUpdateField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo statusField;
+      private FieldInfo _statusField;
 
       /// <summary>
       /// RosterStatus of the frozen kerbal
       /// </summary>
-      public ProtoCrewMember.RosterStatus status
+      public ProtoCrewMember.RosterStatus Status
       {
-        get { return (ProtoCrewMember.RosterStatus)statusField.GetValue(actualFrozenKerbalInfo); }
+        get { return (ProtoCrewMember.RosterStatus)_statusField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo typeField;
+      private FieldInfo _typeField;
 
       /// <summary>
       /// KerbalType of the frozen kerbal
       /// </summary>
-      public ProtoCrewMember.KerbalType type
+      public ProtoCrewMember.KerbalType Type
       {
-        get { return (ProtoCrewMember.KerbalType)typeField.GetValue(actualFrozenKerbalInfo); }
+        get { return (ProtoCrewMember.KerbalType)_typeField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo vesselIDField;
+      private FieldInfo _vesselIdField;
 
       /// <summary>
       /// Guid of the vessel the frozen kerbal is aboard
       /// </summary>
-      public Guid vesselID
+      public Guid VesselId
       {
-        get { return (Guid)vesselIDField.GetValue(actualFrozenKerbalInfo); }
+        get { return (Guid)_vesselIdField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo vesselNameField;
+      private FieldInfo _vesselNameField;
 
       /// <summary>
       /// Name of the vessel the frozen kerbal is aboard
       /// </summary>
-      public string vesselName
+      public string VesselName
       {
-        get { return (string)vesselNameField.GetValue(actualFrozenKerbalInfo); }
+        get { return (string)_vesselNameField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo partIDField;
+      private FieldInfo _partIdField;
 
       /// <summary>
       /// partID of the vessel part the frozen kerbal is aboard
       /// </summary>
-      public uint partID
+      public uint PartId
       {
-        get { return (uint)partIDField.GetValue(actualFrozenKerbalInfo); }
+        get { return (uint)_partIdField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo seatIdxField;
+      private FieldInfo _seatIdxField;
 
       /// <summary>
       /// seat index that the frozen kerbal is in
       /// </summary>
-      public int seatIdx
+      public int SeatIdx
       {
-        get { return (int)seatIdxField.GetValue(actualFrozenKerbalInfo); }
+        get { return (int)_seatIdxField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo seatNameField;
+      private FieldInfo _seatNameField;
 
       /// <summary>
       /// seat name that the frozen kerbal is in
       /// </summary>
-      public string seatName
+      public string SeatName
       {
-        get { return (string)seatNameField.GetValue(actualFrozenKerbalInfo); }
+        get { return (string)_seatNameField.GetValue(_actualFrozenKerbalInfo); }
       }
 
-      private FieldInfo experienceTraitNameField;
+      private FieldInfo _experienceTraitNameField;
 
       /// <summary>
       /// name of the experience trait for the frozen kerbal
       /// </summary>
-      public string experienceTraitName
+      public string ExperienceTraitName
       {
-        get { return (string)experienceTraitNameField.GetValue(actualFrozenKerbalInfo); }
+        get { return (string)_experienceTraitNameField.GetValue(_actualFrozenKerbalInfo); }
       }
     }
 
@@ -728,25 +701,23 @@ namespace ShipManifest.APIClients
     /// <summary>
     /// Some Structured logging to the debug file - ONLY RUNS WHEN DLL COMPILED IN DEBUG MODE
     /// </summary>
-    /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
+    /// <param name="message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
     [System.Diagnostics.Conditional("DEBUG")]
-    internal static void LogFormatted_DebugOnly(string Message, params object[] strParams)
+    internal static void LogFormatted_DebugOnly(string message, params object[] strParams)
     {
-      LogFormatted(Message, strParams);
+      LogFormatted(message, strParams);
     }
 
     /// <summary>
     /// Some Structured logging to the debug file
     /// </summary>
-    /// <param name="Message">Text to be printed - can be formatted as per String.format</param>
+    /// <param name="message">Text to be printed - can be formatted as per String.format</param>
     /// <param name="strParams">Objects to feed into a String.format</param>
-    internal static void LogFormatted(string Message, params object[] strParams)
+    internal static void LogFormatted(string message, params object[] strParams)
     {
-      Message = string.Format(Message, strParams);
-      string strMessageLine = string.Format("{0},{2}-{3},{1}",
-          DateTime.Now, Message, System.Reflection.Assembly.GetExecutingAssembly().GetName().Name,
-          System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name);
+      message = string.Format(message, strParams);
+      string strMessageLine = $"{DateTime.Now},{Assembly.GetExecutingAssembly().GetName().Name}-{MethodBase.GetCurrentMethod()?.DeclaringType?.Name},{message}";
       UnityEngine.Debug.Log(strMessageLine);
     }
 

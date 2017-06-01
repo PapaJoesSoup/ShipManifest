@@ -31,7 +31,7 @@ namespace ShipManifest
 
     internal static string TextureFolder = "ShipManifest/Textures/";
     internal static string SaveMessage = string.Empty;
-    internal static PartItemTransfer stockTransferItem;
+    internal static PartItemTransfer StockTransferItem;
 
     [KSPField(isPersistant = true)] internal static double Elapsed;
 
@@ -54,7 +54,7 @@ namespace ShipManifest
     internal static bool ShowUi = true;
 
     //CLS Event integration
-    private EventData<Vessel> onCLSVesselChangeEvent;
+    private EventData<Vessel> _onClsVesselChangeEvent;
 
     #endregion
 
@@ -108,12 +108,12 @@ namespace ShipManifest
         CreateAppIcons();
 
         // Cache Localization Strings
-        SMUtils.CacheSMLocalization();
+        SmUtils.CacheSmLocalization();
 
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.Awake.  Error:  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.Awake.  Error:  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -174,8 +174,8 @@ namespace ShipManifest
           SMSettings.ClsInstalled = true;
           SMSettings.SaveSettings();
           UpdateClsSpaces();
-          onCLSVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
-          if (onCLSVesselChangeEvent != null) onCLSVesselChangeEvent.Add(OnCLSVesselChange);
+          _onClsVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
+          if (_onClsVesselChangeEvent != null) _onClsVesselChangeEvent.Add(OnCLSVesselChange);
         }
         else
         {
@@ -195,7 +195,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.Start.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.Start.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -234,7 +234,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnDestroy.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnDestroy.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -305,7 +305,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnGUI.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUI.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -317,7 +317,7 @@ namespace ShipManifest
 
         if (SceneChangeInitDfWrapper && Time.timeSinceLevelLoad > 3f && !InstalledMods.IsDfApiReady)
         {
-          DFWrapper.InitDFWrapper();
+          DfWrapper.InitDfWrapper();
           SceneChangeInitDfWrapper = false;
         }
 
@@ -366,9 +366,9 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          SMUtils.LogMessage(
+          SmUtils.LogMessage(
             $" in SMAddon.Update (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-            SMUtils.LogType.Error, true);
+            SmUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -428,7 +428,7 @@ namespace ShipManifest
         //Check for DeepFreezer full. if full, abort handling Xfer.
         if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && fromList.Current.Modules.Contains("DeepFreezer"))
         {
-          if (new DFWrapper.DeepFreezer(fromList.Current.Modules["DeepFreezer"]).FreezerSpace == 0)
+          if (new DfWrapper.DeepFreezer(fromList.Current.Modules["DeepFreezer"]).FreezerSpace == 0)
           {
             fullList.Add(fromList.Current);
           }
@@ -437,7 +437,7 @@ namespace ShipManifest
         if (!SMConditions.IsClsInSameSpace(sourcePart, fromList.Current))
         {
           fullList.Add(fromList.Current);
-        };
+        }
       }
       fromList.Dispose();
       if (fullList.Count <= 0) return;
@@ -454,7 +454,7 @@ namespace ShipManifest
     {
       if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == "Crew")
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
-      stockTransferItem = xferPartItem;
+      StockTransferItem = xferPartItem;
     }
 
     internal void OnAttemptTransfer(ProtoCrewMember pkerbal, Part part, CrewHatchController controller)
@@ -489,7 +489,7 @@ namespace ShipManifest
       //Check for DeepFreezer full. if full, abort handling Xfer.
       if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && crewTransferData.destPart.Modules.Contains("DeepFreezer"))
       {
-        if (new DFWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
+        if (new DfWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
         {
           DisplayScreenMsg("Destination part is a Freezer and it is full. Aborting Transfer.");
           crewTransferData.canTransfer = false;
@@ -503,7 +503,7 @@ namespace ShipManifest
          DisplayScreenMsg("CLS is Enabled in SM. Parts are not in Same Space. Aborting Transfer.");
         crewTransferData.canTransfer = false;
         return;
-      };
+      }
 
       // If override is off, then ignore.
       if (!SMSettings.OverrideStockCrewXfer) return;
@@ -527,7 +527,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnVesselWasModified.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnVesselWasModified.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -541,8 +541,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $" in SMAddon.OnVesselChange.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error,
+        SmUtils.LogMessage(
+          $" in SMAddon.OnVesselChange.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
           true);
       }
     }
@@ -557,7 +557,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnVesselLoaded.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnVesselLoaded.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -679,7 +679,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherReady.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherReady.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -704,7 +704,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherDestroyed.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherDestroyed.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -746,7 +746,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -771,7 +771,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnSMRosterToggle.{ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMRosterToggle.{ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -794,7 +794,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.OnSMSettingsToggle.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMSettingsToggle.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -876,7 +876,7 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          SMUtils.LogMessage($" in Display at or near step:  {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($" in Display at or near step:  {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -950,7 +950,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in:  SMAddon.UpdateSMcontroller.  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.UpdateSMcontroller.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -967,9 +967,11 @@ namespace ShipManifest
           List<ICLSSpace>.Enumerator spaces = ClsAddon.Vessel.Spaces.GetEnumerator();
           while (spaces.MoveNext())
           {
+            if (spaces.Current == null) continue;
             List<ICLSPart>.Enumerator parts = spaces.Current.Parts.GetEnumerator();
             while (parts.MoveNext())
             {
+              if (parts.Current == null) continue;
               if (SmVessel.SelectedPartsSource.Contains(parts.Current.Part) && SmVessel.ClsPartSource == null)
               {
                 SmVessel.ClsPartSource = parts.Current;
@@ -991,15 +993,15 @@ namespace ShipManifest
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage(
-            $" in UpdateCLSSpaces.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in UpdateCLSSpaces.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         }
       }
     }
 
     internal static bool GetClsAddon()
     {
-      ClsAddon = CLSClient.GetCLS();
+      ClsAddon = ClsClient.GetCls();
       return ClsAddon != null;
     }
 
@@ -1011,8 +1013,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          $" in SMAddon.GetCLSVessel.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in SMAddon.GetCLSVessel.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         return false;
       }
     }
@@ -1080,19 +1082,18 @@ namespace ShipManifest
     {
       ScreenMessage smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
       ScreenMessages smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
+      if (smessages == null) return;
+      IEnumerator<ScreenMessage> smessagesToRemove =
+        smessages.ActiveMessages.Where(
+          x =>
+            Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
+            x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
+      while (smessagesToRemove.MoveNext())
       {
-        IEnumerator<ScreenMessage> smessagesToRemove =
-          smessages.ActiveMessages.Where(
-            x =>
-              Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
-        while (smessagesToRemove.MoveNext())
-        {
-          if (smessagesToRemove.Current == null) continue;
-          ScreenMessages.RemoveMessage(smessagesToRemove.Current);
-        }
+        if (smessagesToRemove.Current == null) continue;
+        ScreenMessages.RemoveMessage(smessagesToRemove.Current);
       }
+      smessagesToRemove.Dispose();
     }
 
     // This method is used for autosave...
@@ -1104,8 +1105,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in SMAddon.RunSave.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in SMAddon.RunSave.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
     }
 

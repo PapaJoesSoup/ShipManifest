@@ -698,21 +698,21 @@ namespace ShipManifest
     internal static int GetRealismMode()
     {
       if ( // Full
-          RealXfers == true
-          && RealControl == true
-          && EnableCrew == true
+          RealXfers
+          && RealControl
+          && EnableCrew
           && EnableKerbalRename == false
           && EnableChangeProfession == false
           && EnableCrewModify == false
-          && EnableStockCrewXfer == true
-          && OverrideStockCrewXfer == true
-          && EnableClsAllowTransfer == true
+          && EnableStockCrewXfer
+          && OverrideStockCrewXfer
+          && EnableClsAllowTransfer
           && EnableCls == ClsInstalled
-          && EnableScience == true
-          && EnableResources == true
+          && EnableScience
+          && EnableResources
           && EnablePfCrews == false
           && EnablePfResources == false
-          && EnableXferCost == true
+          && EnableXferCost
           && Math.Abs(FlowCost - 0.0015) < 0.0001f
           && Math.Abs(FlowRate - 100) < 0.0001f
           && Math.Abs(MinFlowRate) < 0.0001f
@@ -724,37 +724,37 @@ namespace ShipManifest
       if ( // None
           RealXfers == false
           && RealControl == false
-          && EnableCrew == true
-          && EnableCrewModify == true
-          && EnableKerbalRename == true
-          && EnableChangeProfession == true
-          && EnableStockCrewXfer == true
+          && EnableCrew
+          && EnableCrewModify
+          && EnableKerbalRename
+          && EnableChangeProfession
+          && EnableStockCrewXfer
           && OverrideStockCrewXfer == false
-          && EnableClsAllowTransfer == true
+          && EnableClsAllowTransfer
           && EnableCls == false
-          && EnableScience == true
-          && EnableResources == true
+          && EnableScience
+          && EnableResources
           && EnablePfCrews == false
-          && EnablePfResources == true
+          && EnablePfResources
           && EnableXferCost == false
           && LockSettings == false)
         return 1;
       if ( // Default
-          RealXfers == true
-          && RealControl == true
-          && EnableCrew == true
-          && EnableCrewModify == true
-          && EnableKerbalRename == true
-          && EnableChangeProfession == true
-          && EnableStockCrewXfer == true
-          && OverrideStockCrewXfer == true
-          && EnableClsAllowTransfer == true
+          RealXfers
+          && RealControl
+          && EnableCrew
+          && EnableCrewModify
+          && EnableKerbalRename
+          && EnableChangeProfession
+          && EnableStockCrewXfer
+          && OverrideStockCrewXfer
+          && EnableClsAllowTransfer
           && EnableCls == ClsInstalled
-          && EnableScience == true
-          && EnableResources == true
+          && EnableScience
+          && EnableResources
           && EnablePfCrews == false
-          && EnablePfResources == true
-          && EnableXferCost == true
+          && EnablePfResources
+          && EnableXferCost
           && Math.Abs(FlowCost - 0.0015) < 0.0001f
           && Math.Abs(FlowRate - 100) < 0.0001f
           && Math.Abs(MinFlowRate) < 0.0001f
@@ -800,15 +800,15 @@ namespace ShipManifest
 
     internal static void SetClsOverride()
     {
-      if (!SMSettings.EnableCls || !HighLogic.LoadedSceneIsFlight || !SMSettings.EnableClsAllowTransfer) return;
+      if (!EnableCls || !HighLogic.LoadedSceneIsFlight || !EnableClsAllowTransfer) return;
       SMAddon.OrigClsAllowCrewXferSetting = SMAddon.ClsAddon.AllowUnrestrictedTransfers;
       SMAddon.ClsAddon.AllowUnrestrictedTransfers = true;
     }
 
     internal static void UpdateClsOverride()
     {
-      if (!SMSettings.EnableCls || !HighLogic.LoadedSceneIsFlight) return;
-      SMAddon.ClsAddon.AllowUnrestrictedTransfers = SMSettings.EnableClsAllowTransfer;
+      if (!EnableCls || !HighLogic.LoadedSceneIsFlight) return;
+      SMAddon.ClsAddon.AllowUnrestrictedTransfers = EnableClsAllowTransfer;
     }
 
     private static Rect GetRectangle(ConfigNode windowsNode, string rectName, Rect defaultvalue)

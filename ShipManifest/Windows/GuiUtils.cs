@@ -102,8 +102,7 @@ namespace ShipManifest.Windows
       }
       if (!lockedInputs || mouseOverWindow) return lockedInputs;
       InputLockManager.RemoveControlLock("SM_Window");
-      lockedInputs = false;
-      return lockedInputs;
+      return false;
     }
 
     private static bool MouseIsOverWindow(bool visible, Rect position)

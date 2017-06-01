@@ -53,18 +53,18 @@ namespace ShipManifest.InternalObjects
         if (IsTransferInProgress())
         {
           //WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
-          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_001");
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_001");
           return false;
         }
         if (selectedPartsSource.Count == 0 || selectedPartsTarget.Count == 0)
         {
-          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_002");
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_002");
           //  "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
           return false;
         }
         if (selectedPartsSource[0] == selectedPartsTarget[0])
         {
-          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_003");
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
           // "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
           return false;
         }
@@ -72,20 +72,20 @@ namespace ShipManifest.InternalObjects
         // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
         // If there is just one spare seat or seat taken by a Thawed Kerbal that is OK because SM will just transfer them into the empty
         // seat or swap them with a thawed Kerbal.
-        DFWrapper.DeepFreezer sourcepartFrzr = null; // selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
-        DFWrapper.DeepFreezer targetpartFrzr = null; // selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+        DfWrapper.DeepFreezer sourcepartFrzr = null; // selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
+        DfWrapper.DeepFreezer targetpartFrzr = null; // selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
 
         PartModule sourcedeepFreezer = GetFreezerModule(selectedPartsSource[0]);
-        if (sourcedeepFreezer != null) sourcepartFrzr = new DFWrapper.DeepFreezer(sourcedeepFreezer);
+        if (sourcedeepFreezer != null) sourcepartFrzr = new DfWrapper.DeepFreezer(sourcedeepFreezer);
 
         PartModule targetdeepFreezer = GetFreezerModule(selectedPartsTarget[0]);
-        if (targetdeepFreezer != null) targetpartFrzr = new DFWrapper.DeepFreezer(targetdeepFreezer);
+        if (targetdeepFreezer != null) targetpartFrzr = new DfWrapper.DeepFreezer(targetdeepFreezer);
 
         if (sourcepartFrzr != null)
         {
           if (sourcepartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_004");
+            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
             // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
@@ -94,7 +94,7 @@ namespace ShipManifest.InternalObjects
         {
           if (targetpartFrzr.FreezerSpace == 0)
           {
-            WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_004");
+            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
             // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
             return false;
           }
@@ -104,22 +104,22 @@ namespace ShipManifest.InternalObjects
         if (selectedPartsSource[0].protoModuleCrew.Count == 0)
         {
           //WindowTransfer.XferToolTip = "No Kerbals to Move.";
-          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_005");
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_005");
           return false;
         }
         // now if realistic xfers is enabled, are the parts connected to each other in the same living space?
         results = IsClsInSameSpace(selectedPartsSource[0], selectedPartsTarget[0]);
         if (!results)
-          WindowTransfer.EvaToolTip = SMUtils.Localize("#smloc_conditions_tt_006");
+          WindowTransfer.EvaToolTip = SmUtils.Localize("#smloc_conditions_tt_006");
         // "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
         else
-          WindowTransfer.XferToolTip = SMUtils.Localize("#smloc_conditions_tt_007");  
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_007");  
           // "Kerbal can be Transfered.";
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in CanBeXferred.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in CanBeXferred.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
       return results;
     }
@@ -197,8 +197,8 @@ namespace ShipManifest.InternalObjects
             values += $"FlightGlobals.ActiveVessel.vesselType = {FlightGlobals.ActiveVessel.vesselType}\r\n";
           values += $"CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = {(CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA)}";
 
-          SMUtils.LogMessage(
-            $" in CanShowShipManifest (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}\r\n\r\nValues:  {values}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in CanShowShipManifest (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}\r\n\r\nValues:  {values}", SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
         return false;
@@ -334,14 +334,14 @@ namespace ShipManifest.InternalObjects
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselID != FlightGlobals.ActiveVessel.id;
+             DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselId != FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool FrozenKerbalIsThawable(ProtoCrewMember kerbal)
     {
       return kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
              kerbal.type == ProtoCrewMember.KerbalType.Unowned &&
-             DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselID == FlightGlobals.ActiveVessel.id;
+             DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselId == FlightGlobals.ActiveVessel.id;
     }
 
     internal static bool CanKerbalBeFrozen(ProtoCrewMember kerbal)
@@ -354,7 +354,7 @@ namespace ShipManifest.InternalObjects
     {
       //return kerbal.seat.part.Modules.Contains("DeepFreezer") && !SMPart.IsCrewFull(kerbal.seat.part);
       PartModule deepFreezer = GetFreezerModule(kerbal.seat.part);
-      if (deepFreezer != null) return new DFWrapper.DeepFreezer(deepFreezer).FreezerSpace > 0;
+      if (deepFreezer != null) return new DfWrapper.DeepFreezer(deepFreezer).FreezerSpace > 0;
       return false;
     }
 

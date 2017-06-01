@@ -10,12 +10,12 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-  internal static class SMUtils
+  internal static class SmUtils
   {
     internal static string AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
     internal static string PlugInPath = $"{AppPath}GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
     internal static Vector2 DebugScrollPosition = Vector2.zero;
-    internal static Dictionary<string, string> SMTags;
+    internal static Dictionary<string, string> SmTags;
 
     // decimal string handlers for tex box
     internal static bool StrHasDecimal;
@@ -70,7 +70,7 @@ namespace ShipManifest
               while (cryofreezers.MoveNext())
               {
                 if (cryofreezers.Current == null) continue;
-                currAmount += new DFWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
+                currAmount += new DfWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
               }
               cryofreezers.Dispose();
             }
@@ -120,7 +120,7 @@ namespace ShipManifest
       if (!part.Modules.Contains("DeepFreezer")) return crewCount + part.protoModuleCrew.Count;
       PartModule freezerModule = SMConditions.GetFreezerModule(part);
       // ReSharper disable once SuspiciousTypeConversion.Global
-      DFWrapper.DeepFreezer freezer = new DFWrapper.DeepFreezer(freezerModule);
+      DfWrapper.DeepFreezer freezer = new DfWrapper.DeepFreezer(freezerModule);
       crewCount += freezer.TotalFrozen;
       return crewCount + part.protoModuleCrew.Count;
     }
@@ -174,23 +174,23 @@ namespace ShipManifest
         StrHasDecimal = false;
     }
 
-    internal static void CacheSMLocalization()
+    internal static void CacheSmLocalization()
     {
-      SMTags = new Dictionary<string, string>();
-      IEnumerator _tags = Localizer.Tags.Keys.GetEnumerator();
-      while (_tags.MoveNext())
+      SmTags = new Dictionary<string, string>();
+      IEnumerator tags = Localizer.Tags.Keys.GetEnumerator();
+      while (tags.MoveNext())
       {
-        if (_tags.Current == null) continue;
-        if (_tags.Current.ToString().Contains("#smloc_"))
+        if (tags.Current == null) continue;
+        if (tags.Current.ToString().Contains("#smloc_"))
         {
-          SMTags.Add(_tags.Current.ToString(), Localizer.GetStringByTag(_tags.Current.ToString()).Replace("\\n", "\n"));
+          SmTags.Add(tags.Current.ToString(), Localizer.GetStringByTag(tags.Current.ToString()).Replace("\\n", "\n"));
         }
       }
     }
 
     internal static string Localize(string tag)
     {
-      return SMTags[tag];
+      return SmTags[tag];
     }
 
     internal enum LogType

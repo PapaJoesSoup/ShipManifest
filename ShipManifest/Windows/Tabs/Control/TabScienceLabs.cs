@@ -25,7 +25,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SMUtils.Localize("#smloc_control_lab_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.Localize("#smloc_control_lab_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -36,21 +36,15 @@ namespace ShipManifest.Windows.Tabs.Control
         while (iLabs.MoveNext())
         {
           if (iLabs.Current == null) continue;
-          bool isEnabled = true;
 
           step = "gui enable";
-          GUI.enabled = isEnabled;
-          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SMUtils.Localize("#smloc_control_lab_001") : SMUtils.Localize("#smloc_control_lab_002"))})"; // Operational, InOp
+          GUI.enabled = true;
+          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SmUtils.Localize("#smloc_control_lab_001") : SmUtils.Localize("#smloc_control_lab_002"))})"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.IsMouseOver = true;
-            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverPart = iLabs.Current.part;
-            SMHighlighter.MouseOverParts = null;
-          }
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLabs.Current.part);
         }
         iLabs.Dispose();
 
@@ -59,9 +53,9 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
+        SmUtils.LogMessage(
           $" in Solar Panel Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+          SmUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

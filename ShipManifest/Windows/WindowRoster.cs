@@ -17,6 +17,7 @@ namespace ShipManifest.Windows
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
     internal static Rect Position = new Rect(0, 0, 0, 0);
+    internal static Rect ViewBox = new Rect(0,0,230,680);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -65,7 +66,7 @@ namespace ShipManifest.Windows
     #region Gui Layout
     internal static void Display(int windowId)
     {
-      Title = SMUtils.Localize("#smloc_roster_001");
+      Title = SmUtils.Localize("#smloc_roster_001");
       
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -74,7 +75,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", SMUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
+      if (GUI.Button(rect, new GUIContent("", SmUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
       {
         OnCreate = false;
         SelectedKerbal = null;
@@ -104,9 +105,9 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           GUI.enabled = SMSettings.EnableCrewModify;
-          GUIContent guilabel = new GUIContent(SMUtils.Localize("#smloc_roster_002"), GUI.enabled // "Create Kerbal"
-            ? SMUtils.Localize("#smloc_roster_tt_001") // Realistic Control is On.  Create a Kerbal is disabled.
-            : SMUtils.Localize("#smloc_roster_tt_022")); // "Opens the Kerbal creation editor."
+          GUIContent guilabel = new GUIContent(SmUtils.Localize("#smloc_roster_002"), GUI.enabled // "Create Kerbal"
+            ? SmUtils.Localize("#smloc_roster_tt_001") // Realistic Control is On.  Create a Kerbal is disabled.
+            : SmUtils.Localize("#smloc_roster_tt_022")); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
             OnCreate = true;
@@ -124,8 +125,8 @@ namespace ShipManifest.Windows
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
     }
 
@@ -173,7 +174,7 @@ namespace ShipManifest.Windows
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
       // "Create", "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster."
-      GUIContent guilabel = new GUIContent(SMUtils.Localize("#smloc_roster_003"), SMUtils.Localize("#smloc_roster_tt_002"));
+      GUIContent guilabel = new GUIContent(SmUtils.Localize("#smloc_roster_003"), SmUtils.Localize("#smloc_roster_tt_002"));
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         bool kerbalFound = false;
@@ -189,7 +190,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       //guilabel = new GUIContent("Cancel", "Cancels current creation and exit editor.");
-      guilabel = new GUIContent(SMUtils.Localize("#smloc_roster_004"), SMUtils.Localize("#smloc_roster_tt_003"));
+      guilabel = new GUIContent(SmUtils.Localize("#smloc_roster_004"), SmUtils.Localize("#smloc_roster_tt_003"));
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         OnCreate = false;
@@ -204,14 +205,14 @@ namespace ShipManifest.Windows
     private static void DisplaySelectProfession()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SMUtils.Localize("#smloc_roster_005"), GUILayout.Width(85)); // "Profession:"
-      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, SMUtils.Localize("#smloc_roster_006"), GUILayout.Width(90)); // "Pilot"
+      GUILayout.Label(SmUtils.Localize("#smloc_roster_005"), GUILayout.Width(85)); // "Profession:"
+      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, SmUtils.Localize("#smloc_roster_006"), GUILayout.Width(90)); // "Pilot"
       if (isPilot) KerbalProfession = Professions.Pilot;
 
-      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, SMUtils.Localize("#smloc_roster_007"), GUILayout.Width(90)); // "Engineer"
+      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, SmUtils.Localize("#smloc_roster_007"), GUILayout.Width(90)); // "Engineer"
       if (isEngineer) KerbalProfession = Professions.Engineer;
 
-      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, SMUtils.Localize("#smloc_roster_008"), GUILayout.Width(90)); // "Scientist"
+      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, SmUtils.Localize("#smloc_roster_008"), GUILayout.Width(90)); // "Scientist"
       if (isScientist) KerbalProfession = Professions.Scientist;
       GUILayout.EndHorizontal();
     }
@@ -219,29 +220,29 @@ namespace ShipManifest.Windows
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label($"{SMUtils.Localize("#smloc_roster_009")}:", GUILayout.Width(40)); // Filter
+      GUILayout.Label($"{SmUtils.Localize("#smloc_roster_009")}:", GUILayout.Width(40)); // Filter
 
-      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, SMUtils.Localize("#smloc_roster_010"), GUILayout.Width(60)); // "All"
+      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, SmUtils.Localize("#smloc_roster_010"), GUILayout.Width(60)); // "All"
       if (isAll) CurrentFilter = KerbalFilters.All;
 
-      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, SMUtils.Localize("#smloc_roster_011"), GUILayout.Width(95)); // "Assigned"
+      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, SmUtils.Localize("#smloc_roster_011"), GUILayout.Width(95)); // "Assigned"
       if (isAssign) CurrentFilter = KerbalFilters.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, SMUtils.Localize("#smloc_roster_012"), GUILayout.Width(80)); // "Vessel"
+        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, SmUtils.Localize("#smloc_roster_012"), GUILayout.Width(80)); // "Vessel"
         if (isVessel) CurrentFilter = KerbalFilters.Vessel;
       }
 
-      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, SMUtils.Localize("#smloc_roster_013"), GUILayout.Width(95)); // "Available"
+      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, SmUtils.Localize("#smloc_roster_013"), GUILayout.Width(95)); // "Available"
       if (isAvail) CurrentFilter = KerbalFilters.Available;
 
-      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, SMUtils.Localize("#smloc_roster_014"), GUILayout.Width(130)); // "Dead/Missing"
+      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, SmUtils.Localize("#smloc_roster_014"), GUILayout.Width(130)); // "Dead/Missing"
       if (isDead) CurrentFilter = KerbalFilters.Dead;
 
       if (InstalledMods.IsDfInstalled)
       {
-        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, SMUtils.Localize("#smloc_roster_015"), GUILayout.Width(80)); // "Frozen"
+        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, SmUtils.Localize("#smloc_roster_015"), GUILayout.Width(80)); // "Frozen"
         if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
       }
       GUILayout.EndHorizontal();
@@ -255,17 +256,17 @@ namespace ShipManifest.Windows
         // Roster List Header...
         GUILayout.BeginHorizontal();
         //GUILayout.Label("", GUILayout.Width(5));
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_016"), GUILayout.Width(140)); // "Name"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_017"), GUILayout.Width(50)); // "Gender"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_005"), GUILayout.Width(70)); // "Profession"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_018"), GUILayout.Width(30)); // "Skill"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_019"), GUILayout.Width(220)); // "Status"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_020"), GUILayout.Width(55)); // "Edit"
-        GUILayout.Label(SMUtils.Localize("#smloc_roster_021"), GUILayout.Width(65)); // "Action"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_016"), GUILayout.Width(140)); // "Name"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_017"), GUILayout.Width(50)); // "Gender"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_005"), GUILayout.Width(70)); // "Profession"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_018"), GUILayout.Width(30)); // "Skill"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_019"), GUILayout.Width(220)); // "Status"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_020"), GUILayout.Width(55)); // "Edit"
+        GUILayout.Label(SmUtils.Localize("#smloc_roster_021"), GUILayout.Width(65)); // "Action"
         GUILayout.EndHorizontal();
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(230), GUILayout.Width(680));
+          GUILayout.Height(ViewBox.height), GUILayout.Width(ViewBox.width));
 
         // vars for acton to occurs after button press
         bool isAction = false;
@@ -299,12 +300,12 @@ namespace ShipManifest.Windows
               if (crew.Any(crewMember => crewMember == kerbals.Current))
               {
                 rosterDetails =
-                  $"{SMUtils.Localize("#smloc_roster_011")} - {theseVessels.Current.GetName().Replace("(unloaded)", "")}"; // "Assigned"
+                  $"{SmUtils.Localize("#smloc_roster_011")} - {theseVessels.Current.GetName().Replace("(unloaded)", "")}"; // "Assigned"
               }
             }
             theseVessels.Dispose();
           }
-          else if (InstalledMods.IsDfInstalled && DFWrapper.APIReady && kerbals.Current.type == ProtoCrewMember.KerbalType.Unowned)
+          else if (InstalledMods.IsDfInstalled && DfWrapper.ApiReady && kerbals.Current.type == ProtoCrewMember.KerbalType.Unowned)
           {
             // This kerbal could be frozen.  Lets find out...
             rosterDetails = GetFrozenKerbalDetails(kerbals.Current);
@@ -350,7 +351,7 @@ namespace ShipManifest.Windows
             isAction = true;
             actionKerbal = kerbals.Current;
             actionText = buttonText;
-            if (actionText == SMUtils.Localize("#smloc_roster_022")) // "Remove"
+            if (actionText == SmUtils.Localize("#smloc_roster_022")) // "Remove"
               actionPart = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
           }
           Rect rect2 = GUILayoutUtility.GetLastRect();
@@ -365,15 +366,15 @@ namespace ShipManifest.Windows
 
         // perform action from button press.
         if (!isAction) return;
-        if (actionText == SMUtils.Localize("#smloc_roster_022")) // "Remove"
+        if (actionText == SmUtils.Localize("#smloc_roster_022")) // "Remove"
           TransferCrew.RemoveCrewMember(actionKerbal, actionPart);
-        else if(actionText == SMUtils.Localize("#smloc_roster_023")) // "Add"
+        else if(actionText == SmUtils.Localize("#smloc_roster_023")) // "Add"
           TransferCrew.AddCrewMember(actionKerbal, SMAddon.SmVessel.SelectedPartsSource[0]);
-        else if (actionText == SMUtils.Localize("#smloc_roster_024")) // "Respawn"
+        else if (actionText == SmUtils.Localize("#smloc_roster_024")) // "Respawn"
           RespawnKerbal(actionKerbal);
-        else if (actionText == SMUtils.Localize("#smloc_roster_025")) // "Thaw"
+        else if (actionText == SmUtils.Localize("#smloc_roster_025")) // "Thaw"
           ThawKerbal(actionKerbal.name);
-        else if (actionText == SMUtils.Localize("#smloc_roster_026"))// "Freeze"
+        else if (actionText == SmUtils.Localize("#smloc_roster_026"))// "Freeze"
           FreezeKerbal(actionKerbal);
         //Refresh all lists... 
         GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel.Vessel);
@@ -382,7 +383,7 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage($" in RosterListViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($" in RosterListViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         }
       }
     }
@@ -390,7 +391,7 @@ namespace ShipManifest.Windows
     private static void EditKerbalViewer()
     {
       //GUILayout.Label(SelectedKerbal.IsNew ? "Create Kerbal" : "Edit Kerbal");
-      GUILayout.Label(SelectedKerbal.IsNew ? SMUtils.Localize("#smloc_roster_002") : SMUtils.Localize("#smloc_roster_027"));
+      GUILayout.Label(SelectedKerbal.IsNew ? SmUtils.Localize("#smloc_roster_002") : SmUtils.Localize("#smloc_roster_027"));
       if (SMSettings.EnableKerbalRename)
       {
         GUILayout.BeginHorizontal();
@@ -412,28 +413,28 @@ namespace ShipManifest.Windows
       }
       bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SMUtils.Localize("#smloc_roster_017"), GUILayout.Width(85)); // "Gender"
+      GUILayout.Label(SmUtils.Localize("#smloc_roster_017"), GUILayout.Width(85)); // "Gender"
       isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
       isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
       SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(SMUtils.Localize("#smloc_roster_029")); // "Courage"
+      GUILayout.Label(SmUtils.Localize("#smloc_roster_029")); // "Courage"
       SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
 
-      GUILayout.Label(SMUtils.Localize("#smloc_roster_030")); // "Stupidity"
+      GUILayout.Label(SmUtils.Localize("#smloc_roster_030")); // "Stupidity"
       SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
 
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SMUtils.Localize("#smloc_roster_031"), GUILayout.Height(30)); // "Badass"
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.Localize("#smloc_roster_031"), GUILayout.Height(30)); // "Badass"
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(SMUtils.Localize("#smloc_roster_004"), GUILayout.MaxWidth(50))) // "Cancel"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_roster_004"), GUILayout.MaxWidth(50))) // "Cancel"
       {
         SelectedKerbal = null;
       }
-      string label = SMUtils.Localize("#smloc_roster_028"); // "Apply"
+      string label = SmUtils.Localize("#smloc_roster_028"); // "Apply"
       //string toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
-      string toolTip = SMUtils.Localize("#smloc_roster_tt_006");
+      string toolTip = SmUtils.Localize("#smloc_roster_tt_006");
       if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
       {
         if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
@@ -461,12 +462,12 @@ namespace ShipManifest.Windows
         RosterList.Clear();
         RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
         // Support for DeepFreeze
-        if (InstalledMods.IsDfInstalled && DFWrapper.APIReady)
+        if (InstalledMods.IsDfInstalled && DfWrapper.ApiReady)
           RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Error in GetRosterList().\r\nError:  {ex}", SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in GetRosterList().\r\nError:  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -475,15 +476,15 @@ namespace ShipManifest.Windows
       GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
 
       //buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit" : "Cancel";
-      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? SMUtils.Localize("#smloc_roster_020") : SMUtils.Localize("#smloc_roster_004");
+      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? SmUtils.Localize("#smloc_roster_020") : SmUtils.Localize("#smloc_roster_004");
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
-          ? SMUtils.Localize("#smloc_roster_tt_007") // "Edit this Kerbal's attributes"
-          : SMUtils.Localize("#smloc_roster_tt_008"); // "Cancel any changes to this Kerbal"
+          ? SmUtils.Localize("#smloc_roster_tt_007") // "Edit this Kerbal's attributes"
+          : SmUtils.Localize("#smloc_roster_tt_008"); // "Cancel any changes to this Kerbal"
       else
         buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
-          ? SMUtils.Localize("#smloc_roster_tt_009") // "Kerbal is not available at this time.\r\nEditing is disabled";
-          : SMUtils.Localize("#smloc_roster_tt_021"); // "Realistic Control is On.\r\nEditing is disabled";
+          ? SmUtils.Localize("#smloc_roster_tt_009") // "Kerbal is not available at this time.\r\nEditing is disabled";
+          : SmUtils.Localize("#smloc_roster_tt_021"); // "Realistic Control is On.\r\nEditing is disabled";
     }
 
     private static void SetupActionButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
@@ -493,62 +494,62 @@ namespace ShipManifest.Windows
         if (SMConditions.CanKerbalBeAdded(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SMUtils.Localize("#smloc_roster_023");  // "Add";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_010");  
+          buttonText = SmUtils.Localize("#smloc_roster_023");  // "Add";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_010");  
           //buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
         }
         else if (SMConditions.FrozenKerbalNotThawable(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SMUtils.Localize("#smloc_roster_025");  // "Thaw";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_011");  
+          buttonText = SmUtils.Localize("#smloc_roster_025");  // "Thaw";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_011");  
           // buttonToolTip = "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.FrozenKerbalIsThawable(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SMUtils.Localize("#smloc_roster_025");  // "Thaw";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_012");
+          buttonText = SmUtils.Localize("#smloc_roster_025");  // "Thaw";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_012");
           // buttonToolTip = "UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.CanKerbalBeFrozen(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SMUtils.Localize("#smloc_roster_026");  // "Freeze";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_013");
+          buttonText = SmUtils.Localize("#smloc_roster_026");  // "Freeze";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_013");
           // buttonToolTip = "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
         }
         else if (SMConditions.CanKerbalBeRemoved(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SMUtils.Localize("#smloc_roster_022");  // "Remove";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_014");  // "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+          buttonText = SmUtils.Localize("#smloc_roster_022");  // "Remove";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_014");  // "Removes a Kerbal from the active vessel.\r\nWill then become available.";
         }
         else if (SMConditions.KerbalCannotBeRemovedRealism(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SMUtils.Localize("#smloc_roster_022");  // "Remove";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_023");  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
+          buttonText = SmUtils.Localize("#smloc_roster_022");  // "Remove";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_023");  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
         }
         else if (SMConditions.KerbalCannotBeAddedNoSource(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SMUtils.Localize("#smloc_roster_023");  // "Add";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_015");
+          buttonText = SmUtils.Localize("#smloc_roster_023");  // "Add";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_015");
           // buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
         }
         else if (SMConditions.KerbalCannotBeAddedRealism(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SMUtils.Localize("#smloc_roster_023");  // "Add";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_016");
+          buttonText = SmUtils.Localize("#smloc_roster_023");  // "Add";
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_016");
           // buttonToolTip = "Add Disabled.  Roster Modifications is preventing this action.\r\nTo add a Kerbal, Change your Roster Modifications Setting.";
         }
         else
         {
           GUI.enabled = false;
           buttonText = "--";
-          buttonToolTip = SMUtils.Localize("#smloc_roster_tt_017");
+          buttonToolTip = SmUtils.Localize("#smloc_roster_tt_017");
           // buttonToolTip = "Kerbal is not available.\r\nCurrent status does not allow any action.";
         }
       }
@@ -556,7 +557,7 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = false;
         buttonText = "--";
-        buttonToolTip = SMUtils.Localize("#smloc_roster_tt_018");
+        buttonToolTip = SmUtils.Localize("#smloc_roster_tt_018");
         // buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 
@@ -564,10 +565,10 @@ namespace ShipManifest.Windows
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
         GUI.enabled = SMSettings.EnableCrewModify;
-        buttonText = SMUtils.Localize("#smloc_roster_024");  // "Respawn";
+        buttonText = SmUtils.Localize("#smloc_roster_024");  // "Respawn";
         buttonToolTip = SMSettings.EnableCrewModify 
-          ? SMUtils.Localize("#smloc_roster_tt_020") // "Brings a Kerbal back to life.\r\nWill then become available.";
-          : SMUtils.Localize("#smloc_roster_tt_019"); // "Realistic Control is preventing this action.";
+          ? SmUtils.Localize("#smloc_roster_tt_020") // "Brings a Kerbal back to life.\r\nWill then become available.";
+          : SmUtils.Localize("#smloc_roster_tt_019"); // "Realistic Control is preventing this action.";
       }
     }
 
@@ -579,14 +580,12 @@ namespace ShipManifest.Windows
       try
       {
         string rosterDetails = "";
-        if (!DFWrapper.APIReady) DFWrapper.InitDFWrapper();
-        if (DFWrapper.APIReady)
+        if (!DfWrapper.ApiReady) DfWrapper.InitDfWrapper();
+        if (DfWrapper.ApiReady)
         {
-          if (DFWrapper.DeepFreezeAPI.FrozenKerbals.ContainsKey(kerbal.name)) // "Frozen"
-            rosterDetails =
-              $"{SMUtils.Localize("#smloc_roster_015")} - {DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbal.name].vesselName.Replace("(unloaded)", "")}";
-          else
-            rosterDetails = SMUtils.Localize("#smloc_roster_015"); // "Frozen";
+          rosterDetails = DfWrapper.DeepFreezeApi.FrozenKerbals.ContainsKey(kerbal.name) 
+            ? $"{SmUtils.Localize("#smloc_roster_015")} - {DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselName.Replace("(unloaded)", "")}" 
+            : SmUtils.Localize("#smloc_roster_015");
         }
         return rosterDetails;
       }
@@ -594,9 +593,9 @@ namespace ShipManifest.Windows
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage($" in GetRosterList().\r\nError:  {ex}", SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($" in GetRosterList().\r\nError:  {ex}", SmUtils.LogType.Error, true);
         }
-        return $"{SMUtils.Localize("#smloc_error_001")}:"; // "Display Error"
+        return $"{SmUtils.Localize("#smloc_error_001")}:"; // "Display Error"
       }
     }
 
@@ -609,6 +608,7 @@ namespace ShipManifest.Windows
         if (!kerbals.Current.name.Contains(char.ConvertFromUtf32(1))) continue;
         kerbals.Current.ChangeName(kerbals.Current.name.Replace(char.ConvertFromUtf32(1), ""));
       }
+      kerbals.Dispose();
     }
 
     private static void SetProfessionFlag()
@@ -636,17 +636,17 @@ namespace ShipManifest.Windows
       {
         if (InstalledMods.IsDfApiReady)
         {
-          DFWrapper.KerbalInfo iKerbal = DFWrapper.DeepFreezeAPI.FrozenKerbals[kerbalName];
+          DfWrapper.KerbalInfo iKerbal = DfWrapper.DeepFreezeApi.FrozenKerbals[kerbalName];
 
-          List<Part>.Enumerator cryofreezers = SMUtils.GetFreezerParts().GetEnumerator();
+          List<Part>.Enumerator cryofreezers = SmUtils.GetFreezerParts().GetEnumerator();
           while (cryofreezers.MoveNext())
           {
             if (cryofreezers.Current == null) continue;
-            if (cryofreezers.Current.flightID == iKerbal.partID)
+            if (cryofreezers.Current.flightID == iKerbal.PartId)
             {
               // ReSharper disable once SuspiciousTypeConversion.Global
               PartModule deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
-              if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginThawKerbal(kerbalName);
+              if (deepFreezer != null) new DfWrapper.DeepFreezer(deepFreezer).BeginThawKerbal(kerbalName);
               break;
             }
           }
@@ -654,14 +654,14 @@ namespace ShipManifest.Windows
         }
         else
         {
-          SMUtils.LogMessage($"ThawKerbal.  IsDFInstalled:  {InstalledMods.IsDfInstalled}", SMUtils.LogType.Info,
+          SmUtils.LogMessage($"ThawKerbal.  IsDFInstalled:  {InstalledMods.IsDfInstalled}", SmUtils.LogType.Info,
             true);
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in ThawKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in ThawKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
     }
 
@@ -670,22 +670,22 @@ namespace ShipManifest.Windows
       try
       {
         if (!InstalledMods.IsDfApiReady) return;
-        List<Part>.Enumerator cryofreezers = SMUtils.GetFreezerParts().GetEnumerator();
+        List<Part>.Enumerator cryofreezers = SmUtils.GetFreezerParts().GetEnumerator();
         while (cryofreezers.MoveNext())
         {
           if (cryofreezers.Current == null) continue;
           if (!cryofreezers.Current.protoModuleCrew.Contains(kerbal)) continue;
           // ReSharper disable once SuspiciousTypeConversion.Global
           PartModule deepFreezer = SMConditions.GetFreezerModule(cryofreezers.Current);
-          if (deepFreezer != null) new DFWrapper.DeepFreezer(deepFreezer).beginFreezeKerbal(kerbal);
+          if (deepFreezer != null) new DfWrapper.DeepFreezer(deepFreezer).BeginFreezeKerbal(kerbal);
           break;
         }
         cryofreezers.Dispose();
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($" in FreezeKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in FreezeKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
     }
 

@@ -28,7 +28,7 @@ namespace ShipManifest.Modules
     {
       if (NameExists())
       {
-        return SMUtils.Localize("#smloc_module_002"); // "That name is in use!";
+        return SmUtils.Localize("#smloc_module_002"); // "That name is in use!";
       }
 
       SyncKerbal();
