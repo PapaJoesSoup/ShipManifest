@@ -14,10 +14,8 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display(Vector2 displayViewerPosition)
     {
-      //float scrollX = WindowControl.Position.x + 10;
-      //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 10;
-      float scrollY = 50 - displayViewerPosition.y;
+      float scrollY = displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -26,7 +24,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SMUtils.Localize("#smloc_control_panel_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.Localize("#smloc_control_panel_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -38,11 +36,11 @@ namespace ShipManifest.Windows.Tabs.Control
         {
           if (iPanels.Current == null) continue;
           bool isEnabled = true;
-          string label = iPanels.Current.PanelStatus + " - " + iPanels.Current.Title;
+          string label = $"{iPanels.Current.PanelStatus} - {iPanels.Current.Title}";
           if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
-            label = iPanels.Current.PanelStatus + " - (Broken) - " + iPanels.Current.Title;
+            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.Localize("#smloc_module_004")}) - {iPanels.Current.Title}"; // "Broken"
           }
           bool open =
             !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
@@ -53,7 +51,7 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = isEnabled;
           if (!iPanels.Current.CanBeRetracted)
           {
-            label = iPanels.Current.PanelStatus + " - (Locked) - " + iPanels.Current.Title;
+            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.Localize("#smloc_module_005")}) - {iPanels.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
@@ -64,24 +62,18 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.IsMouseOver = true;
-            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverPart = iPanels.Current.SPart;
-            SMHighlighter.MouseOverParts = null;
-          }
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iPanels.Current.SPart);
         }
         iPanels.Dispose();
 
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
-
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in Solar Panel Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in Solar Panel Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

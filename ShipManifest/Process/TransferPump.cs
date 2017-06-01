@@ -315,9 +315,8 @@ namespace ShipManifest.Process
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(" in TransferPump.ProcessActivePumps (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in TransferPump.ProcessActivePumps (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }

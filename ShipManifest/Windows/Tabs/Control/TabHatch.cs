@@ -19,7 +19,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
-      float scrollY = 50 - displayViewerPosition.y;
+      float scrollY = displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -28,7 +28,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SMUtils.Localize("#smloc_control_hatch_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.Localize("#smloc_control_hatch_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
       string step = "start";
@@ -50,7 +50,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          bool newOpen = GUILayout.Toggle(open, iHatch.HatchStatus + " - " + iHatch.Title, GUILayout.Width(325));
+          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", GUILayout.Width(325));
           step = "button toggle check";
           if (!open && newOpen)
           {
@@ -62,21 +62,16 @@ namespace ShipManifest.Windows.Tabs.Control
           }
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.IsMouseOver = true;
-            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverPart = iHatch.ClsPart.Part;
-            SMHighlighter.MouseOverParts = null;
-          }
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iHatch.ClsPart.Part);
         }
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in Hatches Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in Hatches Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
       GUI.enabled = true;
       GUILayout.EndVertical();
@@ -90,7 +85,7 @@ namespace ShipManifest.Windows.Tabs.Control
         .Where(iModule => iModule.IsDocked).ToList().GetEnumerator();
       while (iModules.MoveNext())
       {
-        if (iModules.Current == null) continue; ;
+        if (iModules.Current == null) continue;
         iModules.Current.HatchEvents["CloseHatch"].active = true;
         iModules.Current.HatchEvents["OpenHatch"].active = false;
         iModules.Current.HatchOpen = true;
@@ -107,7 +102,7 @@ namespace ShipManifest.Windows.Tabs.Control
         .Where(iModule => iModule.IsDocked).ToList().GetEnumerator();
       while (iModules.MoveNext())
       {
-        if (iModules.Current == null) continue; ;
+        if (iModules.Current == null) continue;
         iModules.Current.HatchEvents["CloseHatch"].active = false;
         iModules.Current.HatchEvents["OpenHatch"].active = true;
         iModules.Current.HatchOpen = false;

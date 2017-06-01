@@ -4,11 +4,11 @@ using System.Reflection;
 
 namespace ShipManifest.APIClients
 {
-  static class CLSClient
+  internal static class ClsClient
   {
-    static PropertyInfo cls;
+    private static PropertyInfo _cls;
 
-    static CLSClient()
+    static ClsClient()
     {
       try
       {
@@ -30,22 +30,22 @@ namespace ShipManifest.APIClients
             .SelectMany(a => a.assembly.GetExportedTypes())
             .SingleOrDefault(t => t.FullName == "ConnectedLivingSpace.CLSAddon");
 
-        if (clsType != null) cls = clsType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+        if (clsType != null) _cls = clsType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage($"Cannot load CLS assembly.  Error:  {ex}", SMUtils.LogType.Error, false);
+        SmUtils.LogMessage($"Cannot load CLS assembly.  Error:  {ex}", SmUtils.LogType.Error, false);
       }
     }
 
-    public static bool CLSInstalled()
+    public static bool ClsInstalled()
     {
-      return cls != null;
+      return _cls != null;
     }
 
-    public static ConnectedLivingSpace.ICLSAddon GetCLS()
+    public static ConnectedLivingSpace.ICLSAddon GetCls()
     {
-      return (ConnectedLivingSpace.ICLSAddon) cls?.GetValue(null, null);
+      return (ConnectedLivingSpace.ICLSAddon) _cls?.GetValue(null, null);
     }
   }
 }

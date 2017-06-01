@@ -16,7 +16,7 @@
 
     internal Part SPart { get; set; }
 
-    internal ModuleDeployableSolarPanel.DeployState PanelState
+    internal ModuleDeployablePart.DeployState PanelState
     {
       get { return Module.deployState; }
     }
@@ -50,7 +50,7 @@
         string title;
         try
         {
-          title = SPart.partInfo.title + "\r\n on " + SPart.parent.partInfo.title;
+          title = $"{SPart.partInfo.title}\r\n {SmUtils.Localize("#smloc_module_001")} {SPart.parent.partInfo.title}";
         }
         catch
         {

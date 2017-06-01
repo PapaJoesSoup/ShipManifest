@@ -19,7 +19,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //float scrollX = WindowControl.Position.x;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 0;
-      float scrollY = 50 - displayViewerPosition.y;
+      float scrollY = displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -29,7 +29,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       GUILayout.Label(
         //InstalledMods.IsRtInstalled ? "Antenna Control Center  (RemoteTech detected)" : "Antenna Control Center ",
-        InstalledMods.IsRtInstalled ? SMUtils.Localize("#smloc_control_antenna_001") : SMUtils.Localize("#smloc_control_antenna_000"),
+        InstalledMods.IsRtInstalled ? SmUtils.Localize("#smloc_control_antenna_001") : SmUtils.Localize("#smloc_control_antenna_000"),
         SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
@@ -43,7 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iAntennas.Current == null) continue;
           if (!IsRtAntennas && iAntennas.Current.IsRtModule) IsRtAntennas = true;
           step = "get Antenna label";
-          string label = iAntennas.Current.AntennaStatus + " - " + iAntennas.Current.Title;
+          string label = $"{iAntennas.Current.AntennaStatus} - {iAntennas.Current.Title}";
           bool open = iAntennas.Current.Extended;
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
           step = "button toggle check";
@@ -54,12 +54,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.IsMouseOver = true;
-            SMHighlighter.MouseOverRect = new Rect(scrollX + rect.x, scrollY + rect.y, rect.width, rect.height);
-            SMHighlighter.MouseOverPart = iAntennas.Current.SPart;
-            SMHighlighter.MouseOverParts = null;
-          }
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iAntennas.Current.SPart);
         }
         iAntennas.Dispose();
 
@@ -68,9 +63,9 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in Antenna Tab at step {0}.  Error:  {1} \r\n\r\n{2}", step, ex.Message, ex.StackTrace),
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in Antenna Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();
     }

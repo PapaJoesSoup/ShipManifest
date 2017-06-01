@@ -10,7 +10,7 @@ namespace ShipManifest.Windows
 {
   internal class WindowDebugger
   {
-    internal static string Title = string.Format(" Ship Manifest -  Debug Console - Ver. {0}", SMSettings.CurVersion);
+    internal static string Title = $" Ship Manifest -  Debug Console - Ver. {SMSettings.CurVersion}";
     internal static Rect Position = new Rect(0, 0, 0, 0);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
@@ -19,7 +19,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = string.Format("{0}:  {1}", SMUtils.Localize("#smloc_debug_000"), SMSettings.CurVersion);
+      Title = $"{SmUtils.Localize("#smloc_debug_000")}:  {SMSettings.CurVersion}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -28,7 +28,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", SMUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
+      if (GUI.Button(rect, new GUIContent("", SmUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
       {
         ShowWindow = false;
         SMSettings.MemStoreTempSettings();
@@ -38,11 +38,11 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
-      SMUtils.DebugScrollPosition = GUILayout.BeginScrollView(SMUtils.DebugScrollPosition, SMStyle.ScrollStyle,
+      SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
         GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
-      List<string>.Enumerator errors = SMUtils.LogItemList.GetEnumerator();
+      List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
       while (errors.MoveNext())
       {
         if (errors.Current == null) continue;
@@ -55,17 +55,17 @@ namespace ShipManifest.Windows
       GUILayout.EndScrollView();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(SMUtils.Localize("#smloc_debug_001"), GUILayout.Height(20))) //"Clear log"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_001"), GUILayout.Height(20))) //"Clear log"
       {
-        SMUtils.LogItemList.Clear();
-        SMUtils.LogItemList.Add("Info:  Log Cleared at " + DateTime.UtcNow.ToString(CultureInfo.InvariantCulture) + " UTC.");
+        SmUtils.LogItemList.Clear();
+        SmUtils.LogItemList.Add($"Info:  Log Cleared at {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC.");
       }
-      if (GUILayout.Button(SMUtils.Localize("#smloc_debug_002"), GUILayout.Height(20))) // "Save Log"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_002"), GUILayout.Height(20))) // "Save Log"
       {
         // Create log file and save.
         Savelog();
       }
-      if (GUILayout.Button(SMUtils.Localize("#smloc_debug_003"), GUILayout.Height(20))) // "Close"
+      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_003"), GUILayout.Height(20))) // "Close"
       {
         // Create log file and save.
         ShowWindow = false;
@@ -83,11 +83,7 @@ namespace ShipManifest.Windows
       try
       {
         // time to create a file...
-        string filename = "DebugLog_" +
-                       DateTime.Now.ToString(CultureInfo.InvariantCulture)
-                         .Replace(" ", "_")
-                         .Replace("/", "")
-                         .Replace(":", "") + ".txt";
+        string filename = $"DebugLog_{DateTime.Now.ToString(CultureInfo.InvariantCulture).Replace(" ", "_").Replace("/", "").Replace(":", "")}.txt";
 
         string path = Directory.GetCurrentDirectory() + @"\GameData\ShipManifest\";
         if (SMSettings.DebugLogPath.StartsWith(@"\\"))
@@ -99,12 +95,12 @@ namespace ShipManifest.Windows
           SMSettings.DebugLogPath += @"\";
 
         filename = path + SMSettings.DebugLogPath + filename;
-        SMUtils.LogMessage("File Name = " + filename, SMUtils.LogType.Info, true);
+        SmUtils.LogMessage($"File Name = {filename}", SmUtils.LogType.Info, true);
 
         try
         {
           StringBuilder sb = new StringBuilder();
-          List<string>.Enumerator lines = SMUtils.LogItemList.GetEnumerator();
+          List<string>.Enumerator lines = SmUtils.LogItemList.GetEnumerator();
           while (lines.MoveNext())
           {
             if (lines.Current == null) continue;
@@ -114,16 +110,16 @@ namespace ShipManifest.Windows
 
           File.WriteAllText(filename, sb.ToString());
 
-          SMUtils.LogMessage("File written", SMUtils.LogType.Info, true);
+          SmUtils.LogMessage("File written", SmUtils.LogType.Info, true);
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage("Error Writing File:  " + ex, SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($"Error Writing File:  {ex}", SmUtils.LogType.Error, true);
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+        SmUtils.LogMessage($" in Savelog.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
           true);
       }
     }

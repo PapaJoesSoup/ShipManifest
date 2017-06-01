@@ -13,7 +13,7 @@ namespace ShipManifest
     {
       //Utilities.LogMessage(string.Format("Entering Fill Crew with part {0}", part.partInfo.name), Utilities.LogType.Info, true);
       if (IsCrewFull(part)) return;
-      while (part.CrewCapacity > SMUtils.GetPartCrewCount(part))
+      while (part.CrewCapacity > SmUtils.GetPartCrewCount(part))
       {
         ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
         part.AddCrewmember(kerbal);
@@ -47,7 +47,7 @@ namespace ShipManifest
       if (!InstalledMods.IsDfInstalled || !part.Modules.Contains("DeepFreezer"))
         return part.protoModuleCrew.Count == part.CrewCapacity;
       PartModule deepFreezer = SMConditions.GetFreezerModule(part);
-      return deepFreezer != null && new DFWrapper.DeepFreezer(deepFreezer).PartFull;
+      return deepFreezer != null && new DfWrapper.DeepFreezer(deepFreezer).PartFull;
     }
 
     internal static void ToggleDumpResource(Part part, List<string> resourceNames, uint pumpId)
@@ -86,8 +86,10 @@ namespace ShipManifest
       IEnumerator<Part> list = partList.Where(part => part.Resources.Contains(resourceName)).GetEnumerator();
       while (list.MoveNext())
       {
+        if (list.Current == null) continue;
         list.Current.Resources[resourceName].amount = list.Current.Resources[resourceName].maxAmount;
       }
+      list.Dispose();
     }
   }
 }

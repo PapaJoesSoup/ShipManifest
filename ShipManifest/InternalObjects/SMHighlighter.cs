@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
+using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -78,8 +79,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in  SetPartsHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in  SetPartsHighlight.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -95,8 +96,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in  SetPartHighlight.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -129,8 +130,8 @@ namespace ShipManifest.InternalObjects
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in SMHighlighter.MouseOverHighlight at step {0}.  Error:  {1}", step, ex),
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in SMHighlighter.MouseOverHighlight at step {step}.  Error:  {ex}",
+          SmUtils.LogType.Error, true);
       }
     }
 
@@ -138,6 +139,26 @@ namespace ShipManifest.InternalObjects
     {
         SetPartsHighlight(parts, SMSettings.Colors[SMSettings.MouseOverColor]);
         EdgeHighight(parts, true);
+    }
+
+    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, ModDockedVessel vessel)
+    {
+      // This must run during onGUI
+      if (rect.y - scrollY < 0 || rect.y - scrollY > height) return;
+      IsMouseOver = true;
+      MouseOverRect = new Rect(rect.x - scrollX, rect.y - scrollY, rect.width, rect.height);
+      MouseOverPart = null;
+      MouseOverParts = vessel.VesselParts;
+    }
+
+    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, Part part)
+    {
+      // This must run during onGUI
+      if (rect.y - scrollY < 0 || rect.y - scrollY > height) return;
+      IsMouseOver = true;
+      MouseOverRect = new Rect(rect.x - scrollX, rect.y - scrollY, rect.width, rect.height);
+      MouseOverPart = part;
+      MouseOverParts = null;
     }
 
     internal static void RevertMouseOverHighlight()
@@ -190,7 +211,11 @@ namespace ShipManifest.InternalObjects
       if (SMAddon.SmVessel.SelectedPartsSource.Contains(PrevMouseOverPart))
         strColor = SMSettings.SourcePartColor;
       else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
-        strColor = SMSettings.TargetPartColor;
+      {
+        strColor = SMAddon.SmVessel.ClsPartTarget.Part == PrevMouseOverPart 
+          ? SMSettings.TargetPartCrewColor 
+          : SMSettings.TargetPartColor;
+      }
       else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
       {
         strColor = SMConditions.IsClsHighlightingEnabled() ? "green" : "yellow";
@@ -262,9 +287,8 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(" in HighlightCLSVessel (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in HighlightCLSVessel (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }
@@ -329,10 +353,8 @@ namespace ShipManifest.InternalObjects
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(
-              " in SMHighlighter.UpdateHighlighting (repeating error).  Error in step:  " + step +
-              ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($" in SMHighlighter.UpdateHighlighting (repeating error).  Error in step:  {step}.  Error:  {ex.Message}\n\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
         }
       }

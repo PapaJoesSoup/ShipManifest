@@ -31,7 +31,7 @@ namespace ShipManifest
 
     internal static string TextureFolder = "ShipManifest/Textures/";
     internal static string SaveMessage = string.Empty;
-    internal static PartItemTransfer stockTransferItem;
+    internal static PartItemTransfer StockTransferItem;
 
     [KSPField(isPersistant = true)] internal static double Elapsed;
 
@@ -54,7 +54,7 @@ namespace ShipManifest
     internal static bool ShowUi = true;
 
     //CLS Event integration
-    private EventData<Vessel> onCLSVesselChangeEvent;
+    private EventData<Vessel> _onClsVesselChangeEvent;
 
     #endregion
 
@@ -108,12 +108,12 @@ namespace ShipManifest
         CreateAppIcons();
 
         // Cache Localization Strings
-        SMUtils.CacheSMLocalization();
+        SmUtils.CacheSmLocalization();
 
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.Awake.  Error:  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.Awake.  Error:  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -174,8 +174,8 @@ namespace ShipManifest
           SMSettings.ClsInstalled = true;
           SMSettings.SaveSettings();
           UpdateClsSpaces();
-          onCLSVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
-          if (onCLSVesselChangeEvent != null) onCLSVesselChangeEvent.Add(OnCLSVesselChange);
+          _onClsVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
+          if (_onClsVesselChangeEvent != null) _onClsVesselChangeEvent.Add(OnCLSVesselChange);
         }
         else
         {
@@ -195,23 +195,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.Start.  " + ex, SMUtils.LogType.Error, true);
-      }
-    }
-
-    internal void OnMouseEnter()
-    {
-      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
-      {
-        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseEnter"), SMUtils.LogType.Info, false);
-      }
-    }
-
-    internal void OnMouseExit()
-    {
-      if (HighLogic.LoadedScene == GameScenes.FLIGHT)
-      {
-        SMUtils.LogMessage(string.Format("Hit object {0}", "OnMouseExit"), SMUtils.LogType.Info, false);
+        SmUtils.LogMessage($"Error in:  SMAddon.Start.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -250,7 +234,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnDestroy.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnDestroy.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -321,7 +305,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUI.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUI.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -333,7 +317,7 @@ namespace ShipManifest
 
         if (SceneChangeInitDfWrapper && Time.timeSinceLevelLoad > 3f && !InstalledMods.IsDfApiReady)
         {
-          DFWrapper.InitDFWrapper();
+          DfWrapper.InitDfWrapper();
           SceneChangeInitDfWrapper = false;
         }
 
@@ -382,9 +366,9 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(" in SMAddon.Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-            SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in SMAddon.Update (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -444,7 +428,7 @@ namespace ShipManifest
         //Check for DeepFreezer full. if full, abort handling Xfer.
         if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && fromList.Current.Modules.Contains("DeepFreezer"))
         {
-          if (new DFWrapper.DeepFreezer(fromList.Current.Modules["DeepFreezer"]).FreezerSpace == 0)
+          if (new DfWrapper.DeepFreezer(fromList.Current.Modules["DeepFreezer"]).FreezerSpace == 0)
           {
             fullList.Add(fromList.Current);
           }
@@ -453,7 +437,7 @@ namespace ShipManifest
         if (!SMConditions.IsClsInSameSpace(sourcePart, fromList.Current))
         {
           fullList.Add(fromList.Current);
-        };
+        }
       }
       fromList.Dispose();
       if (fullList.Count <= 0) return;
@@ -470,7 +454,7 @@ namespace ShipManifest
     {
       if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == "Crew")
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
-      stockTransferItem = xferPartItem;
+      StockTransferItem = xferPartItem;
     }
 
     internal void OnAttemptTransfer(ProtoCrewMember pkerbal, Part part, CrewHatchController controller)
@@ -505,7 +489,7 @@ namespace ShipManifest
       //Check for DeepFreezer full. if full, abort handling Xfer.
       if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && crewTransferData.destPart.Modules.Contains("DeepFreezer"))
       {
-        if (new DFWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
+        if (new DfWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
         {
           DisplayScreenMsg("Destination part is a Freezer and it is full. Aborting Transfer.");
           crewTransferData.canTransfer = false;
@@ -519,7 +503,7 @@ namespace ShipManifest
          DisplayScreenMsg("CLS is Enabled in SM. Parts are not in Same Space. Aborting Transfer.");
         crewTransferData.canTransfer = false;
         return;
-      };
+      }
 
       // If override is off, then ignore.
       if (!SMSettings.OverrideStockCrewXfer) return;
@@ -543,7 +527,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnVesselWasModified.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnVesselWasModified.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -557,8 +541,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in SMAddon.OnVesselChange.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error,
+        SmUtils.LogMessage(
+          $" in SMAddon.OnVesselChange.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
           true);
       }
     }
@@ -573,7 +557,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnVesselLoaded.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnVesselLoaded.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -648,7 +632,7 @@ namespace ShipManifest
           if (WindowManifest.ShowWindow)
             _smButtonStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowManifest.ShowWindow ? TextureFolder + "IconOn_38" : TextureFolder + "IconOff_38", false));
+                WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
         }
 
         // Setup Settings Button
@@ -669,7 +653,7 @@ namespace ShipManifest
           if (WindowSettings.ShowWindow)
             _smSettingsStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
+                WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{TextureFolder}IconS_Off_38", false));
         }
 
         // Setup Roster Button
@@ -690,12 +674,12 @@ namespace ShipManifest
           if (WindowRoster.ShowWindow)
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherReady.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherReady.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -720,7 +704,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnGUIAppLauncherDestroyed.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnGUIAppLauncherDestroyed.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -753,16 +737,16 @@ namespace ShipManifest
 
         if (SMSettings.EnableBlizzyToolbar)
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
-            ? TextureFolder + "IconOn_24"
-            : TextureFolder + "IconOff_24";
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
         else
           _smButtonStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowManifest.ShowWindow ? TextureFolder + "IconOn_38" : TextureFolder + "IconOff_38", false));
+              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMButtonToggle.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -776,24 +760,24 @@ namespace ShipManifest
           WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
           if (SMSettings.EnableBlizzyToolbar)
             _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
-              ? TextureFolder + "IconR_On_24"
-              : TextureFolder + "IconR_Off_24";
+              ? $"{TextureFolder}IconR_On_24"
+              : $"{TextureFolder}IconR_Off_24";
           else
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? TextureFolder + "IconR_On_38" : TextureFolder + "IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
           if (WindowRoster.ShowWindow) WindowRoster.GetRosterList();
         }
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMRosterToggle.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMRosterToggle.{ex}", SmUtils.LogType.Error, true);
       }
     }
 
     internal static void OnSmSettingsClicked()
     {
-      //Debug.Log("[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  " + WindowSettings.ShowWindow);
+      //Debug.Log($"[ShipManifest]:  SMAddon.OnSMRosterToggle. Val:  {WindowSettings.ShowWindow}");
       try
       {
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
@@ -801,16 +785,16 @@ namespace ShipManifest
         SMSettings.MemStoreTempSettings();
         if (SMSettings.EnableBlizzyToolbar)
           _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
-            ? TextureFolder + "IconS_On_24"
-            : TextureFolder + "IconS_Off_24";
+            ? $"{TextureFolder}IconS_On_24"
+            : $"{TextureFolder}IconS_Off_24";
         else
           _smSettingsStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowSettings.ShowWindow ? TextureFolder + "IconS_On_38" : TextureFolder + "IconS_Off_38", false));
+              WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{ TextureFolder}IconS_Off_38", false));
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.OnSMSettingsToggle.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMSettingsToggle.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -892,9 +876,7 @@ namespace ShipManifest
       {
         if (!FrameErrTripped)
         {
-          SMUtils.LogMessage(
-            string.Format(" in Display at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($" in Display at or near step:  {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           FrameErrTripped = true;
         }
       }
@@ -968,7 +950,7 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage("Error in:  SMAddon.UpdateSMcontroller.  " + ex, SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($"Error in:  SMAddon.UpdateSMcontroller.  {ex}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -985,9 +967,11 @@ namespace ShipManifest
           List<ICLSSpace>.Enumerator spaces = ClsAddon.Vessel.Spaces.GetEnumerator();
           while (spaces.MoveNext())
           {
+            if (spaces.Current == null) continue;
             List<ICLSPart>.Enumerator parts = spaces.Current.Parts.GetEnumerator();
             while (parts.MoveNext())
             {
+              if (parts.Current == null) continue;
               if (SmVessel.SelectedPartsSource.Contains(parts.Current.Part) && SmVessel.ClsPartSource == null)
               {
                 SmVessel.ClsPartSource = parts.Current;
@@ -1009,15 +993,15 @@ namespace ShipManifest
         }
         catch (Exception ex)
         {
-          SMUtils.LogMessage(
-            string.Format(" in UpdateCLSSpaces.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in UpdateCLSSpaces.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         }
       }
     }
 
     internal static bool GetClsAddon()
     {
-      ClsAddon = CLSClient.GetCLS();
+      ClsAddon = ClsClient.GetCls();
       return ClsAddon != null;
     }
 
@@ -1029,8 +1013,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format(" in SMAddon.GetCLSVessel.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $" in SMAddon.GetCLSVessel.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         return false;
       }
     }
@@ -1045,8 +1029,8 @@ namespace ShipManifest
         {
           _smButtonBlizzy = ToolbarManager.Instance.add("ShipManifest", "Manifest");
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
-            ? TextureFolder + "IconOn_24"
-            : TextureFolder + "IconOff_24";
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
           _smButtonBlizzy.ToolTip = "Ship Manifest";
           _smButtonBlizzy.Visibility = new GameScenesVisibility(GameScenes.FLIGHT);
           _smButtonBlizzy.Visible = true;
@@ -1056,8 +1040,8 @@ namespace ShipManifest
         {
           _smSettingsBlizzy = ToolbarManager.Instance.add("ShipManifest", "Settings");
           _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
-            ? TextureFolder + "IconS_On_24"
-            : TextureFolder + "IconS_Off_24";
+            ? $"{TextureFolder}IconS_On_24"
+            : $"{TextureFolder}IconS_Off_24";
           _smSettingsBlizzy.ToolTip = "Ship Manifest Settings Window";
           _smSettingsBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
           _smSettingsBlizzy.Visible = true;
@@ -1065,8 +1049,8 @@ namespace ShipManifest
 
           _smRosterBlizzy = ToolbarManager.Instance.add("ShipManifest", "Roster");
           _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
-            ? TextureFolder + "IconR_On_24"
-            : TextureFolder + "IconR_Off_24";
+            ? $"{TextureFolder}IconR_On_24"
+            : $"{TextureFolder}IconR_Off_24";
           _smRosterBlizzy.ToolTip = "Ship Manifest Roster Window";
           _smRosterBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
           _smRosterBlizzy.Visible = true;
@@ -1098,19 +1082,18 @@ namespace ShipManifest
     {
       ScreenMessage smessage = new ScreenMessage(string.Empty, 15f, ScreenMessageStyle.UPPER_CENTER);
       ScreenMessages smessages = FindObjectOfType<ScreenMessages>();
-      if (smessages != null)
+      if (smessages == null) return;
+      IEnumerator<ScreenMessage> smessagesToRemove =
+        smessages.ActiveMessages.Where(
+          x =>
+            Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
+            x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
+      while (smessagesToRemove.MoveNext())
       {
-        IEnumerator<ScreenMessage> smessagesToRemove =
-          smessages.ActiveMessages.Where(
-            x =>
-              Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
-              x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
-        while (smessagesToRemove.MoveNext())
-        {
-          if (smessagesToRemove.Current == null) continue;
-          ScreenMessages.RemoveMessage(smessagesToRemove.Current);
-        }
+        if (smessagesToRemove.Current == null) continue;
+        ScreenMessages.RemoveMessage(smessagesToRemove.Current);
       }
+      smessagesToRemove.Dispose();
     }
 
     // This method is used for autosave...
@@ -1122,8 +1105,8 @@ namespace ShipManifest
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(string.Format(" in SMAddon.RunSave.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace),
-          SMUtils.LogType.Error, true);
+        SmUtils.LogMessage($" in SMAddon.RunSave.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
       }
     }
 

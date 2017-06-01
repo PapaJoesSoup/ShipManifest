@@ -10,12 +10,12 @@ using UnityEngine;
 
 namespace ShipManifest
 {
-  internal static class SMUtils
+  internal static class SmUtils
   {
     internal static string AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
-    internal static string PlugInPath = AppPath + "GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
+    internal static string PlugInPath = $"{AppPath}GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
     internal static Vector2 DebugScrollPosition = Vector2.zero;
-    internal static Dictionary<string, string> SMTags;
+    internal static Dictionary<string, string> SmTags;
 
     // decimal string handlers for tex box
     internal static bool StrHasDecimal;
@@ -31,9 +31,9 @@ namespace ShipManifest
 
     internal static void LoadTexture(ref Texture2D tex, string fileName)
     {
-      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), LogType.Info,
+      LogMessage($"Loading Texture - file://{PlugInPath}{fileName}", LogType.Info,
         SMSettings.VerboseLogging);
-      WWW img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
+      WWW img1 = new WWW($"file://{PlugInPath}{fileName}");
       img1.LoadImageIntoTexture(tex);
     }
 
@@ -42,7 +42,7 @@ namespace ShipManifest
       string displayAmount = "";
       double currAmount = 0;
       double totAmount = 0;
-      if (selectedResource == null) return string.Format(" - ({0})", currAmount.ToString("#######0"));
+      if (selectedResource == null) return $" - ({currAmount:#######0})";
       try
       {
         if (SMConditions.IsResourceTypeOther(selectedResource))
@@ -70,7 +70,7 @@ namespace ShipManifest
               while (cryofreezers.MoveNext())
               {
                 if (cryofreezers.Current == null) continue;
-                currAmount += new DFWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
+                currAmount += new DfWrapper.DeepFreezer(SMConditions.GetFreezerModule(cryofreezers.Current)).TotalFrozen;
               }
               cryofreezers.Dispose();
             }
@@ -97,12 +97,12 @@ namespace ShipManifest
             break;
         }
         displayAmount = selectedResource != SMConditions.ResourceType.Science.ToString()
-          ? string.Format(" - ({0}/{1})", currAmount.ToString("#######0"), totAmount.ToString("######0"))
-          : string.Format(" - ({0})", currAmount.ToString("#######0"));
+          ? $" - ({currAmount:#######0}/{totAmount:######0})"
+          : $" - ({currAmount:#######0})";
       }
       catch (Exception ex)
       {
-        LogMessage(string.Format(" in DisplayResourceTotals().  Error:  {0}", ex), LogType.Error, true);
+        LogMessage($" in DisplayResourceTotals().  Error:  {ex}", LogType.Error, true);
       }
 
       return displayAmount;
@@ -120,7 +120,7 @@ namespace ShipManifest
       if (!part.Modules.Contains("DeepFreezer")) return crewCount + part.protoModuleCrew.Count;
       PartModule freezerModule = SMConditions.GetFreezerModule(part);
       // ReSharper disable once SuspiciousTypeConversion.Global
-      DFWrapper.DeepFreezer freezer = new DFWrapper.DeepFreezer(freezerModule);
+      DfWrapper.DeepFreezer freezer = new DfWrapper.DeepFreezer(freezerModule);
       crewCount += freezer.TotalFrozen;
       return crewCount + part.protoModuleCrew.Count;
     }
@@ -132,15 +132,14 @@ namespace ShipManifest
         // Added rolling error list. This limits growth.  Configure with ErrorListLength
         if (_logItemList.Count > int.Parse(SMSettings.ErrorLogLength) && int.Parse(SMSettings.ErrorLogLength) > 0)
           _logItemList.RemoveRange(0, _logItemList.Count - int.Parse(SMSettings.ErrorLogLength));
-        if (verbose)
-          _logItemList.Add(type + ": " + msg);
+        if (verbose) _logItemList.Add($"{type}: {msg}");
         if (type == LogType.Error && SMSettings.AutoDebug)
           WindowDebugger.ShowWindow = true;
-        Debug.Log(string.Format("[ShipManifest] - {0}:  {1}", type,msg));
+        Debug.Log($"[ShipManifest] - {type}:  {msg}");
       }
       catch (Exception ex)
       {
-        _logItemList.Add("Error: " + ex);
+        _logItemList.Add($"Error: {ex}");
         WindowDebugger.ShowWindow = true;
       }
     }
@@ -175,23 +174,23 @@ namespace ShipManifest
         StrHasDecimal = false;
     }
 
-    internal static void CacheSMLocalization()
+    internal static void CacheSmLocalization()
     {
-      SMTags = new Dictionary<string, string>();
-      IEnumerator _tags = Localizer.Tags.Keys.GetEnumerator();
-      while (_tags.MoveNext())
+      SmTags = new Dictionary<string, string>();
+      IEnumerator tags = Localizer.Tags.Keys.GetEnumerator();
+      while (tags.MoveNext())
       {
-        if (_tags.Current == null) continue;
-        if (_tags.Current.ToString().Contains("#smloc_"))
+        if (tags.Current == null) continue;
+        if (tags.Current.ToString().Contains("#smloc_"))
         {
-          SMTags.Add(_tags.Current.ToString(), Localizer.GetStringByTag(_tags.Current.ToString()).Replace("\\n", "\n"));
+          SmTags.Add(tags.Current.ToString(), Localizer.GetStringByTag(tags.Current.ToString()).Replace("\\n", "\n"));
         }
       }
     }
 
     internal static string Localize(string tag)
     {
-      return SMTags[tag];
+      return SmTags[tag];
     }
 
     internal enum LogType

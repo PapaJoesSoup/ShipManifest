@@ -266,8 +266,7 @@ namespace ShipManifest.Process
             {
               if (IsStockXfer)
                 ScreenMessages.PostScreenMessage(
-                  string.Format("<color=yellow>{0} moved (by SM) to {1}.</color>", FromCrewMember.name,
-                    ToPart.partInfo.title), 5f);
+                  $"<color=yellow>{FromCrewMember.name} moved (by SM) to {ToPart.partInfo.title}.</color>", 5f);
 
               ResetXferProcess();
             }
@@ -279,10 +278,9 @@ namespace ShipManifest.Process
       {
         if (!SMAddon.FrameErrTripped)
         {
-          SMUtils.LogMessage("Transfer State:  " + CrewXferState + "...", SMUtils.LogType.Error, true);
-          SMUtils.LogMessage(
-            string.Format(" in CrewTransferProcess (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message,
-              ex.StackTrace), SMUtils.LogType.Error, true);
+          SmUtils.LogMessage($"Transfer State:  {CrewXferState}...", SmUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in CrewTransferProcess (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
           SMAddon.FrameErrTripped = true;
           ResetXferProcess();
         }
@@ -313,9 +311,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format("in CrewTransferStartAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -337,9 +334,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
@@ -422,9 +418,8 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SMUtils.LogMessage(
-          string.Format("in CrewTransferAction.  Error moving crewmember.  Error:  {0} \r\n\r\n{1}", ex.Message,
-            ex.StackTrace), SMUtils.LogType.Error, true);
+        SmUtils.LogMessage(
+          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
     }
 
