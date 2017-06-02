@@ -373,7 +373,7 @@ namespace ShipManifest.Windows
           }
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, SelectBox.height, parts.Current);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, SelectBox.height, parts.Current, Event.current.mousePosition);
 
           // Reset Button enabling.
           GUI.enabled = true;
@@ -445,7 +445,7 @@ namespace ShipManifest.Windows
           }
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, SelectBox.height, modDockedVessels.Current);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, SelectBox.height, modDockedVessels.Current, Event.current.mousePosition);
 
           // Reset Button enabling.
           GUI.enabled = true;

@@ -17,7 +17,7 @@ namespace ShipManifest.Windows
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
     internal static Rect Position = new Rect(0, 0, 0, 0);
-    internal static Rect ViewBox = new Rect(0,0,230,680);
+    internal static Rect ViewBox = new Rect(0, 0, 680, 230);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;

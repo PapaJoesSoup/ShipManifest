@@ -47,7 +47,7 @@ namespace ShipManifest.Windows.Tabs.Control
             iLights.Current.TurnOffLight();
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLights.Current.SPart);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLights.Current.SPart, Event.current.mousePosition);
         }
         iLights.Dispose();
 

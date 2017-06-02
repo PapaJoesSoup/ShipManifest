@@ -62,7 +62,7 @@ namespace ShipManifest.Windows.Tabs.Control
           }
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iHatch.ClsPart.Part);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iHatch.ClsPart.Part, Event.current.mousePosition);
         }
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();

@@ -141,20 +141,22 @@ namespace ShipManifest.InternalObjects
         EdgeHighight(parts, true);
     }
 
-    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, ModDockedVessel vessel)
+    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, ModDockedVessel vessel, Vector2 mouseposition)
     {
       // This must run during onGUI
-      if (rect.y - scrollY < 0 || rect.y - scrollY > height) return;
+      // Note rect.x and rect.y, as well as mouseposition.x and mouseposition.y are with respect to the container withing the scrollviewer.
+      // this means both need to be aware of the viewable box boundaries 
+      if (mouseposition.y - scrollY < 0 || mouseposition.y - scrollY > height) return;
       IsMouseOver = true;
       MouseOverRect = new Rect(rect.x - scrollX, rect.y - scrollY, rect.width, rect.height);
       MouseOverPart = null;
       MouseOverParts = vessel.VesselParts;
     }
 
-    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, Part part)
+    public static void SetMouseOverData(Rect rect, float scrollY, float scrollX, float height, Part part, Vector2 mouseposition)
     {
       // This must run during onGUI
-      if (rect.y - scrollY < 0 || rect.y - scrollY > height) return;
+      if (mouseposition.y - scrollY < 0 || mouseposition.y - scrollY > height) return;
       IsMouseOver = true;
       MouseOverRect = new Rect(rect.x - scrollX, rect.y - scrollY, rect.width, rect.height);
       MouseOverPart = part;
