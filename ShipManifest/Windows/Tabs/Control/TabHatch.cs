@@ -13,6 +13,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 325;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -30,7 +32,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.Localize("#smloc_control_hatch_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
@@ -50,7 +52,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", GUILayout.Width(325));
+          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", GUILayout.Width(guiToggleWidth));
           step = "button toggle check";
           if (!open && newOpen)
           {

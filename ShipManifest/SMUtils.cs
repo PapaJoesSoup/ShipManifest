@@ -125,6 +125,32 @@ namespace ShipManifest
       return crewCount + part.protoModuleCrew.Count;
     }
 
+    internal static int GetCrewCount(List<Part> parts)
+    {
+      int count = 0;
+      List<Part>.Enumerator part = parts.GetEnumerator();
+      while (part.MoveNext())
+      {
+        if (part.Current == null) continue;
+        if (part.Current.CrewCapacity <= 0) continue;
+        count += part.Current.protoModuleCrew.Count;
+      }
+      part.Dispose();
+      return count;
+    }
+    internal static int GetCrewCapacity(List<Part> parts)
+    {
+      int count = 0;
+      List<Part>.Enumerator part = parts.GetEnumerator();
+      while (part.MoveNext())
+      {
+        if (part.Current == null) continue;
+        if (part.Current.CrewCapacity <= 0) continue;
+        count += part.Current.CrewCapacity;
+      }
+      part.Dispose();
+      return count;
+    }
     internal static void LogMessage(string msg, LogType type, bool verbose)
     {
       try

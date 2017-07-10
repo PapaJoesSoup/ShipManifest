@@ -93,6 +93,7 @@
     <Compile Include="InternalObjects\SMHighlighter.cs" />
     <Compile Include="APIClients\ToolbarWrapper.cs" />
     <Compile Include="Windows\Tabs\Control\TabAntenna.cs" />
+    <Compile Include="Windows\Tabs\Control\TabVessels.cs" />
     <Compile Include="Windows\Tabs\Settings\TabConfig.cs" />
     <Compile Include="Windows\Tabs\Settings\TabHighlight.cs" />
     <Compile Include="Windows\Tabs\Settings\TabRealism.cs" />

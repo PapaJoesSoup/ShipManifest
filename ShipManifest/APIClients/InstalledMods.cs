@@ -8,6 +8,7 @@ namespace ShipManifest.APIClients
 {
   internal class InstalledMods
   {
+    private const float guiWidth = 190;
     // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
@@ -52,7 +53,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(190));
+        GUILayout.Label(fullName[0], GUILayout.Width(guiWidth));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }
@@ -70,7 +71,7 @@ namespace ShipManifest.APIClients
         {
           string[] fullName = list.Current.FullName.Split(',');
           GUILayout.BeginHorizontal();
-          GUILayout.Label(fullName[0], GUILayout.Width(190));
+          GUILayout.Label(fullName[0], GUILayout.Width(guiWidth));
           GUILayout.Label(fullName[1]);
           GUILayout.EndHorizontal();
         }

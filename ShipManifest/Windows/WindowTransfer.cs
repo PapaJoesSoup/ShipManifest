@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using KSP.UI;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
@@ -31,6 +32,13 @@ namespace ShipManifest.Windows
     internal static Rect SelectBox = new Rect(0, 0, 300, 100);
     internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
+    // vessel mode crew selection vars.
+    internal static bool SelectAllFrom = false;
+    internal static bool SelectAllTo = false;
+
+    // Display mode
+    internal static SMConditions.TransferMode DsiplayMode;
+
     // this list is for display use.  Transfers are executed against a separate list.  
     // These objects may be used to derive objects to be added to the transfer process queue.
     internal static List<TransferPump> DisplayPumps = new List<TransferPump>();
@@ -58,6 +66,7 @@ namespace ShipManifest.Windows
 
     #endregion
 
+
     #region TransferWindow (GUI Layout)
 
     // Resource Transfer Window
@@ -67,7 +76,7 @@ namespace ShipManifest.Windows
     {
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
-      
+
       string displayAmounts = SmUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
       Title = $"{SmUtils.Localize("#smloc_transfer_000")} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"
 
@@ -91,7 +100,6 @@ namespace ShipManifest.Windows
         SMAddon.SmVessel.SelectedResources.Clear();
         SMAddon.SmVessel.SelectedPartsSource.Clear();
         SMAddon.SmVessel.SelectedPartsTarget.Clear();
-
         SMAddon.SmVessel.SelectedVesselsSource.Clear();
         SMAddon.SmVessel.SelectedVesselsTarget.Clear();
         ToolTip = "";
@@ -162,7 +170,7 @@ namespace ShipManifest.Windows
           SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
-        if (ShowSourceVessels && CanShowVessels())
+        if (ShowSourceVessels)
           VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.SourceToTarget,
             _sourceTransferViewerScrollPosition);
         else
@@ -192,11 +200,11 @@ namespace ShipManifest.Windows
 
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget);
+          CrewDetails(SMAddon.SmVessel.SourceMembersSelected, SMAddon.SmVessel.SelectedPartsSource, SMAddon.SmVessel.SelectedPartsTarget, ShowSourceVessels, true);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
-          ScienceDetailsSource();
+          ScienceDetailsSource(ShowSourceVessels);
         }
         else
         {
@@ -218,7 +226,10 @@ namespace ShipManifest.Windows
 
     private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypePump pumpType)
     {
+      const float textWidth = 225;
+      const float toggleWidth = 60; 
       string labelText = "";
+
       GUILayout.BeginHorizontal();
       if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : "No Part Selected";
@@ -234,23 +245,20 @@ namespace ShipManifest.Windows
             labelText = $"{SmUtils.Localize("#smloc_transfer_002")}"; // "No Part Selected");
         }
       }
-      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(200));
-      if (CanShowVessels())
+      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
-        if (pumpType == TransferPump.TypePump.SourceToTarget)
-        {
-          bool prevValue = ShowSourceVessels;
-          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, SmUtils.Localize("#smloc_transfer_003"), GUILayout.Width(90)); // "Vessels"
-          if (!prevValue && ShowSourceVessels)
-            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-        }
-        else
-        {
-          bool prevValue = ShowSourceVessels;
-          ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, SmUtils.Localize("#smloc_transfer_003"), GUILayout.Width(90)); // "Vessels"
-          if (!prevValue && ShowSourceVessels)
-            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-        }
+        bool prevValue = ShowSourceVessels;
+        ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, SmUtils.Localize("#smloc_transfer_003"), GUILayout.Width(toggleWidth)); // "Vessels"
+        if (!prevValue && ShowSourceVessels)
+          WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
+      }
+      else
+      {
+        bool prevValue = ShowSourceVessels;
+        ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, SmUtils.Localize("#smloc_transfer_003"), GUILayout.Width(toggleWidth)); // "Vessels"
+        if (!prevValue && ShowSourceVessels)
+          WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
       }
       GUILayout.EndHorizontal();
     }
@@ -274,7 +282,7 @@ namespace ShipManifest.Windows
           SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
-        if (ShowTargetVessels && CanShowVessels())
+        if (ShowTargetVessels)
           VesselTransferViewer(SMAddon.SmVessel.SelectedResources, TransferPump.TypePump.TargetToSource,
             _targetTransferViewerScrollPosition);
         else
@@ -304,7 +312,7 @@ namespace ShipManifest.Windows
         // --------------------------------------------------------------------------
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          CrewDetails(SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource);
+          CrewDetails(SMAddon.SmVessel.TargetMembersSelected, SMAddon.SmVessel.SelectedPartsTarget, SMAddon.SmVessel.SelectedPartsSource, ShowTargetVessels, false);
         }
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
         {
@@ -382,7 +390,7 @@ namespace ShipManifest.Windows
           if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
             if (SMConditions.CanShowCrewFillDumpButtons())
-            CrewFillDumpButtons(parts.Current);
+            CrewFillDumpPartButtons(parts.Current);
           }
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
           {
@@ -409,13 +417,13 @@ namespace ShipManifest.Windows
     {
       //float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       //float scrollY = Position.y + 30 - viewerScrollPosition.y;
-      float scrollX = (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
+      float scrollX = pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320;
       float scrollY = viewerScrollPosition.y;
       string step = "begin";
       try
       {
         step = "begin button loop";
-        List<ModDockedVessel>.Enumerator modDockedVessels = SMAddon.SmVessel.DockedVessels.GetEnumerator();
+        List<ModDockedVessel>.Enumerator modDockedVessels = SMAddon.SmVessel.ModDockedVessels.GetEnumerator();
         while (modDockedVessels.MoveNext())
         {
           if (modDockedVessels.Current == null) continue;
@@ -424,9 +432,8 @@ namespace ShipManifest.Windows
           string strDescription = GetResourceDescription(selectedResources, modDockedVessels.Current);
 
           // set the conditions for a button style change.
-          int btnWidth = 265;
-          if (!SMSettings.RealXfers)
-            btnWidth = 180;
+          int btnWidth = 273;
+          if (!SMSettings.RealXfers) btnWidth = 180;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -438,8 +445,7 @@ namespace ShipManifest.Windows
           GUI.enabled = CanSelectVessel(pumpType, modDockedVessels.Current);
 
           step = "Render vessel Buttons";
-          if (GUILayout.Button($"{strDescription}", style, GUILayout.Width(btnWidth),
-            GUILayout.Height(20)))
+          if (GUILayout.Button($"{strDescription}", style, GUILayout.Width(btnWidth), GUILayout.Height(20)))
           {
             VesselButtonToggled(pumpType, modDockedVessels.Current);
           }
@@ -451,7 +457,17 @@ namespace ShipManifest.Windows
           GUI.enabled = true;
 
           //step = "Render dump/fill buttons";
-          if (!SMSettings.RealXfers)
+          // Crew
+          if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+          {
+            if (SMConditions.CanShowCrewFillDumpButtons())
+              CrewFillDumpVesselButtons(modDockedVessels.Current);
+          }
+
+          // Science
+
+          // Resources
+          else if (!SMSettings.RealXfers)
           {
             if (selectedResources.Count > 1)
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0 ||
@@ -564,7 +580,46 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
 
-    private static void CrewFillDumpButtons(Part part)
+    private static void CrewFillDumpVesselButtons(ModDockedVessel vessel)
+    {
+      //GUIContent dumpContent = new GUIContent("Dump", "Removes any crew members in this vessel");
+      //GUIContent fillContent = new GUIContent("Fill", "Fills this vessel with crew members");
+      GUIContent dumpContent = new GUIContent(SmUtils.Localize("#smloc_transfer_004"), SmUtils.Localize("#smloc_transfer_tt_007"));
+      GUIContent fillContent = new GUIContent(SmUtils.Localize("#smloc_transfer_006"), SmUtils.Localize("#smloc_transfer_tt_008"));
+      int crewCapacity = SmUtils.GetCrewCapacity(vessel.VesselParts);
+      int crewCount = SmUtils.GetCrewCount(vessel.VesselParts);
+      GUI.enabled = SmUtils.GetCrewCapacity(vessel.VesselParts) > 0;
+      if (GUILayout.Button(dumpContent, GUILayout.Width(45), GUILayout.Height(20)))
+      {
+        List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
+        while (part.MoveNext())
+        {
+          if (part.Current == null) continue;
+          SMPart.DumpCrew(part.Current);
+        }
+        part.Dispose();
+      }
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      GUI.enabled = crewCount < crewCapacity;
+      if (GUILayout.Button(fillContent, GUILayout.Width(45), GUILayout.Height(20)))
+      {
+        List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
+        while (part.MoveNext())
+        {
+          if (part.Current == null) continue;
+          SMPart.FillCrew(part.Current);
+        }
+        part.Dispose();
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+    }
+
+    private static void CrewFillDumpPartButtons(Part part)
     {
       //GUIContent dumpContent = new GUIContent("Dump", "Removes any crew members in this part");
       //GUIContent fillContent = new GUIContent("Fill", "Fills this part with crew members");
@@ -588,80 +643,78 @@ namespace ShipManifest.Windows
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-
     }
 
-    private static void CrewDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo)
+    private static void CrewDetails(List<ProtoCrewMember> selectedCrewMembers, List<Part> selectedPartsFrom, List<Part> selectedPartsTo, bool isVesselMode, bool isSourceView)
     {
-      // Since only one Crew Part can currently be selected, all lists will use an index of [0].
       float xOffset = 30;
       Rect rect;
+      int targetCapacity = GetAvailableCrewSpace(selectedPartsTo);
 
       if (selectedPartsFrom.Count <= 0) return;
-      // ReSharper disable once ForCanBeConvertedToForeach
-      for (int x = 0; x < selectedPartsFrom[0].protoModuleCrew.Count; x++)
+      if (isVesselMode)
       {
-        ProtoCrewMember crewMember = selectedPartsFrom[0].protoModuleCrew[x];
+        bool selectAll = false;
         GUILayout.BeginHorizontal();
-        if (SMConditions.IsTransferInProgress()) GUI.enabled = false;
+        GUI.enabled = selectedPartsFrom.Count > 0 && selectedPartsTo.Count > 0 && SmUtils.GetCrewCount(selectedPartsFrom) > 0;
+        // get current setting for selectAll...
+        selectAll = isSourceView ? SelectAllFrom : SelectAllTo;
+        // check to see if crewmembers selected match criteria for a select all setting...
+        selectAll = IsSelectAll(selectedCrewMembers, selectedPartsFrom, isSourceView, targetCapacity, selectAll);
 
-        // GUIContent moveContent = new GUIContent("�", "Move Kerbal to another seat within Part");
-        GUIContent moveContent = new GUIContent("�", SmUtils.Localize("#smloc_transfer_tt_009"));
-        if (GUILayout.Button(moveContent, SMStyle.ButtonStyle, GUILayout.Width(25), GUILayout.Height(20)))
+        GUIContent content = new GUIContent(SmUtils.Localize("#smloc_transfer_020"), SmUtils.Localize(GUI.enabled ? "#smloc_transfer_tt_033" : "#smloc_transfer_tt_034"));
+        selectAll = GUILayout.Toggle(selectAll, content, GUILayout.Width(180));
+        if (selectAll != (isSourceView ? SelectAllFrom : SelectAllTo))
         {
-          ToolTip = "";
-          SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsFrom[0]);
+          if (selectAll)
+          {
+            List<ProtoCrewMember>.Enumerator member =
+              SMAddon.SmVessel.GetCrewFromParts(selectedPartsFrom).GetEnumerator();
+            while (member.MoveNext())
+            {
+              if (member.Current == null) continue;
+              if (!selectedCrewMembers.Contains(member.Current) && targetCapacity > selectedCrewMembers.Count)
+                selectedCrewMembers.Add(member.Current);
+            }
+            member.Dispose();
+          }
+          else
+          {
+            selectedCrewMembers.Clear();
+          }
+          if (isSourceView) SelectAllFrom = selectAll;
+          else SelectAllTo = selectAll;
         }
+        IsSelectAll(selectedCrewMembers, selectedPartsFrom, isSourceView, targetCapacity, selectAll);
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
-        GUI.enabled = true;
-        GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })",
-          GUILayout.Width(190), GUILayout.Height(20));
-        GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
-        if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember ||
-             SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
-        {
-          GUI.enabled = true;
-          //GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
-          GUILayout.Label(SmUtils.Localize("#smloc_transfer_007"), GUILayout.Width(50), GUILayout.Height(20));
-        }
-        else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0], selectedPartsTo.Count > 0? selectedPartsTo[0] : null))
-        {
-          GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist;
-          //GUIContent evaContent = new GUIContent("EVA", EvaToolTip);
-          GUIContent evaContent = new GUIContent(SmUtils.Localize("#smloc_transfer_008"), EvaToolTip);
-          if (GUILayout.Button(evaContent, SMStyle.ButtonStyle, GUILayout.Width(50),
-            GUILayout.Height(20)))
-          {
-            ToolTip = "";
-            FlightEVA.SpawnEVA(crewMember.KerbalRef); 
-          }
-          rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-        }
-        else
-        {
-          if (GUILayout.Button(new GUIContent(SmUtils.Localize("#smloc_transfer_009"), XferToolTip), SMStyle.ButtonStyle, GUILayout.Width(50),
-            GUILayout.Height(20))) // "Xfer"
-          {
-            SMAddon.SmVessel.TransferCrewObj.FromCrewMember = crewMember;
-            SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsTo[0]);
-          }
-          rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-        }
-        GUI.enabled = true;
+        GUI.enabled = selectedCrewMembers.Count > 0 && SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
+        XferToolTip = SmUtils.Localize(selectedCrewMembers.Count <= 0 ? "#smloc_conditions_tt_008" : "#smloc_conditions_tt_009");
+        CrewSelectedXferButton(selectedPartsFrom, selectedPartsTo, selectedCrewMembers, xOffset);
         GUILayout.EndHorizontal();
+        GUI.enabled = true;
       }
+      List<ProtoCrewMember>.Enumerator crewMember = SMAddon.SmVessel.GetCrewFromParts(selectedPartsFrom).GetEnumerator();
+      // ReSharper disable once ForCanBeConvertedToForeach
+      while (crewMember.MoveNext())
+      {
+        if (crewMember.Current == null) continue;
+
+        GUILayout.BeginHorizontal();
+        CrewMemberDetails(selectedPartsFrom, selectedPartsTo, selectedCrewMembers, crewMember.Current, xOffset, isVesselMode, targetCapacity);
+        GUILayout.EndHorizontal();
+        GUI.enabled = true;
+      }
+      crewMember.Dispose();
       // Cater for DeepFreeze Continued... parts - list frozen kerbals
       if (!InstalledMods.IsDfApiReady) return;
       try
       {
-        PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules where pm.moduleName == "DeepFreezer" select pm).SingleOrDefault();
+        PartModule deepFreezer = (from PartModule pm in selectedPartsFrom[0].Modules
+          where pm.moduleName == "DeepFreezer"
+          select pm).SingleOrDefault();
         if (deepFreezer == null) return;
         DfWrapper.DeepFreezer sourcepartFrzr = new DfWrapper.DeepFreezer(deepFreezer);
         if (sourcepartFrzr.StoredCrewList.Count <= 0) return;
@@ -684,9 +737,11 @@ namespace ShipManifest.Windows
           ProtoCrewMember frozenKerbal = FindFrozenKerbal(frznCrew.Current.CrewName);
           if (frozenKerbal != null) trait = frozenKerbal.trait;
           GUI.enabled = true;
-          GUILayout.Label($"  {frznCrew.Current.CrewName} ({trait})", SMStyle.LabelStyleCyan, GUILayout.Width(190), GUILayout.Height(20));
+          GUILayout.Label($"  {frznCrew.Current.CrewName} ({trait})", SMStyle.LabelStyleCyan, GUILayout.Width(190),
+            GUILayout.Height(20));
           //GUIContent thawContent = new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal");
-          GUIContent thawContent = new GUIContent(SmUtils.Localize("#smloc_transfer_010"), SmUtils.Localize("#smloc_transfer_tt_010"));
+          GUIContent thawContent = new GUIContent(SmUtils.Localize("#smloc_transfer_010"),
+            SmUtils.Localize("#smloc_transfer_tt_010"));
           if (GUILayout.Button(thawContent, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
           {
             WindowRoster.ThawKerbal(frznCrew.Current.CrewName);
@@ -708,7 +763,132 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static void ScienceDetailsSource()
+    private static bool IsSelectAll(List<ProtoCrewMember> selectedCrewMembers, List<Part> selectedPartsFrom, bool isSourceView, int targetCapacity, bool selectAll)
+    {
+      if (selectedCrewMembers.Count < SmUtils.GetCrewCount(selectedPartsFrom) &&
+          selectedCrewMembers.Count < targetCapacity)
+      {
+        selectAll = false;
+        if (isSourceView) SelectAllFrom = selectAll;
+        else SelectAllTo = selectAll;
+      }
+      else if (selectedCrewMembers.Count == SmUtils.GetCrewCount(selectedPartsFrom) ||
+               selectedCrewMembers.Count == targetCapacity)
+      {
+        selectAll = true;
+        if (isSourceView) SelectAllFrom = selectAll;
+        else SelectAllTo = selectAll;
+      }
+      return selectAll;
+    }
+
+    private static void CrewMemberDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, ProtoCrewMember crewMember, float xOffset, bool isVesselMode, int targetCapacity)
+    {
+      const float cmWidth = 180;
+      const float cmMoveWidth = 25;
+
+      Rect rect;
+      if (isVesselMode)
+      {
+        bool selected = crewMembers.Contains(crewMember);
+        selected = GUILayout.Toggle(selected, $"{crewMember.name} ({crewMember.experienceTrait.Title})", GUILayout.Width(cmWidth), GUILayout.Height(20));
+        if (selected && !crewMembers.Contains(crewMember))
+        {
+          if (crewMembers.Count < targetCapacity) crewMembers.Add(crewMember);
+        }
+        else if (!selected && crewMembers.Contains(crewMember))
+        {
+          crewMembers.Remove(crewMember);
+        }
+      }
+      else
+      {
+        GUI.enabled = true;
+        GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })", GUILayout.Width(cmWidth), GUILayout.Height(20));
+      }
+      GUI.enabled = !SMConditions.IsTransferInProgress();
+      // GUIContent moveContent = new GUIContent("�", "Move Kerbal to another seat within Part");
+      GUIContent moveContent = new GUIContent("�", SmUtils.Localize("#smloc_transfer_tt_009"));
+      if (GUILayout.Button(moveContent, SMStyle.ButtonStyle, GUILayout.Width(cmMoveWidth), GUILayout.Height(20)))
+      {
+        ToolTip = "";
+        SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsFrom[0]);
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+
+      // Display the Transfer Button.
+      CrewMemberXferButton(selectedPartsFrom, selectedPartsTo, crewMember, xOffset);
+    }
+
+    private static void CrewMemberXferButton(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, ProtoCrewMember crewMember, float xOffset)
+    {
+      const float btnWidth = 60;
+      Rect rect;
+      GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
+      if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember ||
+           SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
+      {
+        GUI.enabled = true;
+        //GUILayout.Label("Moving", GUILayout.Width(btnWidth), GUILayout.Height(20));
+        GUILayout.Label(SmUtils.Localize("#smloc_transfer_007"), GUILayout.Width(btnWidth), GUILayout.Height(20));
+      }
+      else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0],
+        selectedPartsTo.Count > 0 ? selectedPartsTo[0] : null))
+      {
+        GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist;
+        //GUIContent evaContent = new GUIContent("EVA", EvaToolTip);
+        GUIContent evaContent = new GUIContent(SmUtils.Localize("#smloc_transfer_008"), EvaToolTip);
+        if (GUILayout.Button(evaContent, SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20)))
+        {
+          ToolTip = "";
+          FlightEVA.SpawnEVA(crewMember.KerbalRef);
+        }
+        rect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && ShowToolTips)
+          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+      }
+      else
+      {
+        if (GUILayout.Button(new GUIContent(SmUtils.Localize("#smloc_transfer_009"), XferToolTip),
+          SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20))) // "Xfer"
+        {
+          SMAddon.SmVessel.TransferCrewObj.FromCrewMember = crewMember;
+          SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsTo[0]);
+        }
+        rect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && ShowToolTips)
+          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+      }
+    }
+
+    private static void CrewSelectedXferButton(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, float xOffset)
+    {
+      Rect rect;
+      if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMembers == crewMembers ||
+           SMAddon.SmVessel.TransferCrewObj.ToCrewMembers == crewMembers) && SMConditions.IsTransferInProgress())
+      {
+        GUI.enabled = true;
+        //GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
+        GUILayout.Label(SmUtils.Localize("#smloc_transfer_007"), GUILayout.Width(50), GUILayout.Height(20));
+      }
+      else
+      {
+        if (GUILayout.Button(new GUIContent($"{SmUtils.Localize("#smloc_transfer_021")} ({crewMembers.Count})", XferToolTip),
+          SMStyle.ButtonStyle, GUILayout.Width(90),
+          GUILayout.Height(20))) // "Xfer Crew"
+        {
+          SMAddon.SmVessel.TransferCrewObj.FromCrewMembers = crewMembers;
+          SMAddon.SmVessel.TransferCrewObj.CrewTransfersBegin(crewMembers, selectedPartsFrom, selectedPartsTo);
+        }
+        rect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && ShowToolTips)
+          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+      }
+    }
+
+    private static void ScienceDetailsSource(bool isVesselMode)
     {
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
@@ -1182,22 +1362,30 @@ namespace ShipManifest.Windows
         if (pumpType == TransferPump.TypePump.SourceToTarget)
         {
           // Now lets update the list...
-          if (SMAddon.SmVessel.SelectedVesselsSource.Contains(modVessel))
-            SMAddon.SmVessel.SelectedVesselsSource.Remove(modVessel);
+          // Because IEquatable is not implemented by ModDockedVessel, we need to inspect the object for equality.
+          // Additionally, we cannot use the object directly for a List<T>.Remove. Use the found object instead.
+          // Since the objects are reconstructed during Refresh Lists, the objects are no longer reference objects, but value Objects.
+          // I may play with IEquatable to see if it suits my needs at a later date, or alter the object to be consumed differently.
+          ModDockedVessel modDockedVessel =
+            SMAddon.SmVessel.SelectedVesselsSource.Find(v => v.VesselInfo.rootPartUId == modVessel.VesselInfo.rootPartUId);
+          if (modDockedVessel != null)
+            SMAddon.SmVessel.SelectedVesselsSource.Remove(modDockedVessel);
           else
             SMAddon.SmVessel.SelectedVesselsSource.Add(modVessel);
           SMAddon.SmVessel.SelectedPartsSource =
-            SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
+            SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsSource,
               SMAddon.SmVessel.SelectedResources);
         }
         else
         {
-          if (SMAddon.SmVessel.SelectedVesselsTarget.Contains(modVessel))
-            SMAddon.SmVessel.SelectedVesselsTarget.Remove(modVessel);
+          ModDockedVessel modDockedVessel =
+            SMAddon.SmVessel.SelectedVesselsTarget.Find(v => v.VesselInfo.rootPartUId == modVessel.VesselInfo.rootPartUId);
+          if (modDockedVessel != null)
+            SMAddon.SmVessel.SelectedVesselsTarget.Remove(modDockedVessel);
           else
             SMAddon.SmVessel.SelectedVesselsTarget.Add(modVessel);
           SMAddon.SmVessel.SelectedPartsTarget =
-            SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
+            SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsTarget,
               SMAddon.SmVessel.SelectedResources);
         }
         WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
@@ -1245,22 +1433,17 @@ namespace ShipManifest.Windows
       return isDumpable;
     }
 
-    private static bool CanShowVessels()
-    {
-      return SMAddon.SmVessel.DockedVessels.Count > 0 && SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources);
-    }
-
     private static bool CanSelectVessel(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
     {
       bool isSelectable = true;
       if (pumpType == TransferPump.TypePump.SourceToTarget)
       {
-        if (SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel))
+        if (SMAddon.SmVessel.SelectedVesselsTarget.Find(v => v.VesselInfo.rootPartUId == modDockedVessel.VesselInfo.rootPartUId) != null)
           isSelectable = false;
       }
       else
       {
-        if (SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel))
+        if (SMAddon.SmVessel.SelectedVesselsSource.Find(v => v.VesselInfo.rootPartUId == modDockedVessel.VesselInfo.rootPartUId) != null)
           isSelectable = false;
       }
       return isSelectable;
@@ -1278,6 +1461,24 @@ namespace ShipManifest.Windows
       else
       {
         style = SMAddon.SmVessel.SelectedPartsTarget.Contains(part)
+          ? SMStyle.ButtonToggledTargetStyle
+          : SMStyle.ButtonTargetStyle;
+      }
+      return style;
+    }
+
+    private static GUIStyle GetVesselButtonStyle(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
+    {
+      GUIStyle style;
+      if (pumpType == TransferPump.TypePump.SourceToTarget)
+      {
+        style = SMAddon.SmVessel.SelectedVesselsSource.Find(v => v.VesselInfo.rootPartUId == modDockedVessel.VesselInfo.rootPartUId) != null
+          ? SMStyle.ButtonToggledSourceStyle
+          : SMStyle.ButtonSourceStyle;
+      }
+      else
+      {
+        style = SMAddon.SmVessel.SelectedVesselsTarget.Find(v => v.VesselInfo.rootPartUId == modDockedVessel.VesselInfo.rootPartUId) != null
           ? SMStyle.ButtonToggledTargetStyle
           : SMStyle.ButtonTargetStyle;
       }
@@ -1323,22 +1524,26 @@ namespace ShipManifest.Windows
       }
     }
 
-    private static GUIStyle GetVesselButtonStyle(TransferPump.TypePump pumpType, ModDockedVessel modDockedVessel)
+    private static int GetScienceCount(ModDockedVessel vessel)
     {
-      GUIStyle style;
-      if (pumpType == TransferPump.TypePump.SourceToTarget)
+      try
       {
-        style = SMAddon.SmVessel.SelectedVesselsSource.Contains(modDockedVessel)
-          ? SMStyle.ButtonToggledSourceStyle
-          : SMStyle.ButtonSourceStyle;
+        int count = 0;
+        List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
+        while (part.MoveNext())
+        {
+          if (part.Current == null) continue;
+          count += part.Current.Modules.OfType<IScienceDataContainer>().Sum(pm => pm.GetScienceCount());
+        }
+        part.Dispose();
+        return count;
       }
-      else
+      catch (Exception ex)
       {
-        style = SMAddon.SmVessel.SelectedVesselsTarget.Contains(modDockedVessel)
-          ? SMStyle.ButtonToggledTargetStyle
-          : SMStyle.ButtonTargetStyle;
+        SmUtils.LogMessage($" in GetScienceCount.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
+        return 0;
       }
-      return style;
     }
 
     internal static string GetVesselResourceTotals(ModDockedVessel modDockedVessel, List<string> selectedResources)
@@ -1348,14 +1553,27 @@ namespace ShipManifest.Windows
       try
       {
         List<ModDockedVessel> modDockedVessels = new List<ModDockedVessel> { modDockedVessel };
-        List<Part>.Enumerator parts = SMAddon.SmVessel.GetSelectedVesselsParts(modDockedVessels, selectedResources).GetEnumerator();
-        while (parts.MoveNext())
+        if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
-          if (parts.Current == null) continue;
-          currAmount += parts.Current.Resources[selectedResources[0]].amount;
-          totAmount += parts.Current.Resources[selectedResources[0]].maxAmount;
+          currAmount = SmUtils.GetCrewCount(modDockedVessel.VesselParts);
+          totAmount = SmUtils.GetCrewCapacity(modDockedVessel.VesselParts);
         }
-        parts.Dispose();
+        else if (selectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
+        {
+          currAmount = GetScienceCount(modDockedVessel);
+          totAmount = currAmount;
+        }
+        else
+        {
+          List<Part>.Enumerator parts = SMAddon.SmVessel.GetVesselsPartsByResource(modDockedVessels, selectedResources).GetEnumerator();
+          while (parts.MoveNext())
+          {
+            if (parts.Current == null) continue;
+            currAmount += parts.Current.Resources[selectedResources[0]].amount;
+            totAmount += parts.Current.Resources[selectedResources[0]].maxAmount;
+          }
+          parts.Dispose();          
+        }
       }
       catch (Exception ex)
       {
@@ -1384,6 +1602,18 @@ namespace ShipManifest.Windows
       return isSelectable;
     }
 
+    private static int GetAvailableCrewSpace(List<Part> parts)
+    {
+      int results = 0;
+      List<Part>.Enumerator part = parts.GetEnumerator();
+      while (part.MoveNext())
+      {
+        if (part.Current == null) continue;
+        results += part.Current.CrewCapacity - part.Current.protoModuleCrew.Count;
+      }
+      part.Dispose();
+      return results;
+    }
     #endregion
   }
 }

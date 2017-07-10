@@ -11,6 +11,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 325;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -26,7 +28,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.Localize("#smloc_control_panel_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
@@ -53,7 +55,7 @@ namespace ShipManifest.Windows.Tabs.Control
           {
             label = $"{iPanels.Current.PanelStatus} - ({SmUtils.Localize("#smloc_module_005")}) - {iPanels.Current.Title}"; // "Locked"
           }
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
             iPanels.Current.ExtendPanel();

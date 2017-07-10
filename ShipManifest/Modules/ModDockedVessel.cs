@@ -8,15 +8,18 @@ namespace ShipManifest.Modules
     private List<Part> _vesselParts;
 
     private Part _rootPart;
+    private Part _dockingPort;
+    internal bool IsDocked;
 
     internal ModDockedVessel()
     {
     }
 
-    internal ModDockedVessel(DockedVesselInfo vesselInfo)
+    internal ModDockedVessel(ModuleDockingNode dockingNode)
     {
-      VesselInfo = vesselInfo;
-      _vesselParts = SMAddon.SmVessel.GetDockedVesselParts(VesselInfo);
+      _dockingPort = dockingNode.part;
+      VesselInfo = dockingNode.vesselInfo;
+      _vesselParts = SMAddon.SmVessel.GetDockedVesselParts(dockingNode);
     }
 
     internal DockedVesselInfo VesselInfo { get; set; }
@@ -42,9 +45,9 @@ namespace ShipManifest.Modules
     {
       get
       {
-        string title = VesselInfo.name;
-        return title;
+        return VesselInfo.name;
       }
+      set { VesselInfo.name = value; }
     }
 
     internal List<Part> VesselParts

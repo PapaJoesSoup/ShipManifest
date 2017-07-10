@@ -10,6 +10,9 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private const float guiRuleWidth = 350;
+    private const float guiLabelWidth = 260;
+    private const float guiToggleWidth = 325;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -27,7 +30,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.Localize("#smloc_control_lab_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
@@ -40,7 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "gui enable";
           GUI.enabled = true;
           string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SmUtils.Localize("#smloc_control_lab_001") : SmUtils.Localize("#smloc_control_lab_002"))})"; // Operational, InOp
-          GUILayout.Label(label, GUILayout.Width(260), GUILayout.Height(40));
+          GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(40));
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))

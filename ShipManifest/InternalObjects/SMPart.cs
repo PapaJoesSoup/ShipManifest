@@ -10,7 +10,7 @@
 
     internal static bool IsCrew(Part part)
     {
-      return IsSelected(part) && SMAddon.SmVessel.SelectedResources.Contains("Crew");
+      return IsSelected(part) && SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString());
     }
 
     internal static bool IsSource(Part part)

@@ -212,7 +212,7 @@ namespace ShipManifest.InternalObjects
       //if (PrevMouseOverPart == MouseOverPart || PrevMouseOverPart == null) return strColor;
       if (SMAddon.SmVessel.SelectedPartsSource.Contains(PrevMouseOverPart))
         strColor = SMSettings.SourcePartColor;
-      else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
+      else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart) && SMAddon.SmVessel.ClsPartTarget != null)
       {
         strColor = SMAddon.SmVessel.ClsPartTarget.Part == PrevMouseOverPart 
           ? SMSettings.TargetPartCrewColor 

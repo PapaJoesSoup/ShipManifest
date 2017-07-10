@@ -59,6 +59,26 @@ namespace ShipManifest.Windows
       Rect rect;
       GUILayout.BeginHorizontal();
       GUIContent label;
+      GUI.enabled = true;
+      label = new GUIContent(SmUtils.Localize("#smloc_control_017"), SmUtils.Localize("#smloc_control_tt_006"));
+      GUIStyle vesselsStyle = _selectedTab == Tab.Vessel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button(label, vesselsStyle, GUILayout.Height(20))) // Vessels"
+      {
+        try
+        {
+          SMAddon.SmVessel.GetDockedVessels();
+          _selectedTab = Tab.Vessel;
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $" opening Solar Panels Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
+            true);
+        }
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       if (SMSettings.EnableCls)
       {
         label = new GUIContent(SmUtils.Localize("#smloc_control_002"), SmUtils.Localize("#smloc_control_tt_001"));
@@ -167,6 +187,9 @@ namespace ShipManifest.Windows
     {
       switch (_selectedTab)
       {
+        case Tab.Vessel:
+          TabVessel.Display(displayViewerPosition);
+          break;
         case Tab.Hatch:
           TabHatch.Display(displayViewerPosition);
           break;
@@ -229,6 +252,7 @@ namespace ShipManifest.Windows
           if (GUILayout.Button(SmUtils.Localize("#smloc_control_015"), GUILayout.Height(20))) // "Turn On All Labs"
             TabLight.TurnOnAllLights();
           break;
+        case Tab.Vessel:
         case Tab.None:
           break;
         default:
@@ -241,11 +265,12 @@ namespace ShipManifest.Windows
     private enum Tab
     {
       None,
-      Hatch,
-      Panel,
       Antenna,
+      Hatch,
+      Lab,
       Light,
-      Lab
+      Panel,
+      Vessel
     }
   }
 }

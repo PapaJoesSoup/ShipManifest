@@ -806,11 +806,11 @@ namespace ShipManifest.Process
       if (!SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources)) return;
       // Lets create a pump Object for managing pump options and data.
       List<Part> displaySourceParts = WindowTransfer.ShowSourceVessels
-        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
+        ? SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsSource,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsSource;
       List<Part> displayTargetParts = WindowTransfer.ShowTargetVessels
-        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
+        ? SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsTarget,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsTarget;
 
@@ -854,11 +854,11 @@ namespace ShipManifest.Process
 
       // Lets create a pump Object for managing pump options and data.
       List<Part> sourceParts = WindowTransfer.ShowSourceVessels
-        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource,
+        ? SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsSource,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsSource;
       List<Part> targetParts = WindowTransfer.ShowTargetVessels
-        ? SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget,
+        ? SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsTarget,
           SMAddon.SmVessel.SelectedResources)
         : SMAddon.SmVessel.SelectedPartsTarget;
 

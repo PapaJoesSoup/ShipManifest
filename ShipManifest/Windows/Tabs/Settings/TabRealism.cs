@@ -13,6 +13,9 @@ namespace ShipManifest.Windows.Tabs.Settings
     private static Rect _rect;
     private static string _label = "";
     private static GUIContent _guiLabel;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 300;
+    private const float guiIndent = 20;
 
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -43,14 +46,14 @@ namespace ShipManifest.Windows.Tabs.Settings
             SmUtils.Localize("#smloc_settings_realism_tt_001")), SMStyle.LabelTabHeader);
       }
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       bool isEnabled = !SMSettings.LockSettings;
       //RealismMode Buttons.
       DisplayRealismButtons();
 
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
 
       // RealXfers Mode
@@ -63,7 +66,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_008");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.RealXfers = GUILayout.Toggle(SMSettings.RealXfers, _guiLabel, GUILayout.Width(300));
+      SMSettings.RealXfers = GUILayout.Toggle(SMSettings.RealXfers, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -77,7 +80,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_009");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_008");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.RealControl = GUILayout.Toggle(SMSettings.RealControl, _guiLabel, GUILayout.Width(300));
+      SMSettings.RealControl = GUILayout.Toggle(SMSettings.RealControl, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -92,7 +95,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_010");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_009");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableCrewModify = GUILayout.Toggle(SMSettings.EnableCrewModify, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableCrewModify = GUILayout.Toggle(SMSettings.EnableCrewModify, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -104,7 +107,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_011");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_010");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableKerbalRename = GUILayout.Toggle(SMSettings.EnableKerbalRename, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -116,7 +119,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_011");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableChangeProfession = GUILayout.Toggle(SMSettings.EnableChangeProfession, _guiLabel,
-        GUILayout.Width(300));
+        GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -134,7 +137,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_012");
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableStockCrewXfer = GUILayout.Toggle(SMSettings.EnableStockCrewXfer, _guiLabel,
-        GUILayout.Width(300));
+        GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -151,7 +154,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_014");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_013");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableCrew = GUILayout.Toggle(SMSettings.EnableCrew, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableCrew = GUILayout.Toggle(SMSettings.EnableCrew, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -182,7 +185,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_015");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_014");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnablePfCrews = GUILayout.Toggle(SMSettings.EnablePfCrews, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnablePfCrews = GUILayout.Toggle(SMSettings.EnablePfCrews, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -221,7 +224,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_017");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_016");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableCls = GUILayout.Toggle(SMSettings.EnableCls, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableCls = GUILayout.Toggle(SMSettings.EnableCls, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -255,7 +258,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(20);
       SMSettings.EnableClsAllowTransfer = GUILayout.Toggle(SMSettings.EnableClsAllowTransfer, _guiLabel,
-        GUILayout.Width(300));
+        GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -272,7 +275,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_019");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_018");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableScience = GUILayout.Toggle(SMSettings.EnableScience, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableScience = GUILayout.Toggle(SMSettings.EnableScience, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -295,7 +298,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_020");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_019");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableResources = GUILayout.Toggle(SMSettings.EnableResources, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableResources = GUILayout.Toggle(SMSettings.EnableResources, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -323,7 +326,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_021");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_020");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnablePfResources = GUILayout.Toggle(SMSettings.EnablePfResources, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnablePfResources = GUILayout.Toggle(SMSettings.EnablePfResources, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -339,7 +342,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_022");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_021");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableXferCost = GUILayout.Toggle(SMSettings.EnableXferCost, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableXferCost = GUILayout.Toggle(SMSettings.EnableXferCost, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -535,7 +538,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       // reset gui.enabled to default
       GUI.enabled = true;
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       // LockSettings Mode
       GUI.enabled = isEnabled;
@@ -545,13 +548,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_realism_031");
       _toolTip = SmUtils.Localize("#smloc_settings_realism_tt_028");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(300));
+      SMSettings.LockSettings = GUILayout.Toggle(SMSettings.LockSettings, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUI.enabled = true;
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
     }
 
     private static void DisplayRealismButtons()

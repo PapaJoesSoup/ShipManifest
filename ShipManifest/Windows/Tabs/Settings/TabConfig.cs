@@ -13,6 +13,8 @@ namespace ShipManifest.Windows.Tabs.Settings
     private static Rect _rect;
     private static string _label = "";
     private static GUIContent _guiLabel;
+    private const float guiRuleWidth = 350;
+    private const float guiMaintoggleWidth = 300;
 
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -33,7 +35,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //GUILayout.Label("Configuraton", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.Localize("#smloc_settings_config_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       if (!ToolbarManager.ToolbarAvailable)
       {
@@ -50,7 +52,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_001");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_001");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableBlizzyToolbar = GUILayout.Toggle(SMSettings.EnableBlizzyToolbar, _guiLabel, GUILayout.Width(300));
+      SMSettings.EnableBlizzyToolbar = GUILayout.Toggle(SMSettings.EnableBlizzyToolbar, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -63,7 +65,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_002");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_002");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.UseUnityStyle = GUILayout.Toggle(SMSettings.UseUnityStyle, _guiLabel, GUILayout.Width(300));
+      SMSettings.UseUnityStyle = GUILayout.Toggle(SMSettings.UseUnityStyle, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -76,7 +78,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_003");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_003");
       _guiLabel = new GUIContent(_label, _toolTip);
-      WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, _guiLabel, GUILayout.Width(300));
+      WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -87,7 +89,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_004");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.VerboseLogging = GUILayout.Toggle(SMSettings.VerboseLogging, _guiLabel, GUILayout.Width(300));
+      SMSettings.VerboseLogging = GUILayout.Toggle(SMSettings.VerboseLogging, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -98,7 +100,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_005");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_005");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.AutoDebug = GUILayout.Toggle(SMSettings.AutoDebug, _guiLabel, GUILayout.Width(300));
+      SMSettings.AutoDebug = GUILayout.Toggle(SMSettings.AutoDebug, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -109,7 +111,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_006");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_006");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.SaveLogOnExit = GUILayout.Toggle(SMSettings.SaveLogOnExit, _guiLabel, GUILayout.Width(300));
+      SMSettings.SaveLogOnExit = GUILayout.Toggle(SMSettings.SaveLogOnExit, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -136,7 +138,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_config_008");
       _toolTip = SmUtils.Localize("#smloc_settings_config_tt_008");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.AutoSave = GUILayout.Toggle(SMSettings.AutoSave, _guiLabel, GUILayout.Width(300));
+      SMSettings.AutoSave = GUILayout.Toggle(SMSettings.AutoSave, _guiLabel, GUILayout.Width(guiMaintoggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
