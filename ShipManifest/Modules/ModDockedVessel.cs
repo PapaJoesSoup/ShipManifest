@@ -10,7 +10,8 @@ namespace ShipManifest.Modules
     private Part _rootPart;
     private Part _dockingPort;
     internal bool IsDocked;
-
+    internal bool IsEditing = false;
+    internal string renameVessel = null;
     internal ModDockedVessel()
     {
     }

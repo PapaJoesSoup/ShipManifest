@@ -13,9 +13,10 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+
     private const float guiRuleWidth = 350;
-    private const float guiLabelWidth = 250;
-    private const float guiBtnWidth = 70;
+    private const float guiLabelWidth = 230;
+    private const float guiBtnWidth = 60;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -42,6 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
         for (int v = 0; v < SMAddon.SmVessel.DockedVessels.Count; v++)
         {
           GUI.enabled = SMAddon.SmVessel.DockedVessels[v].IsDocked;
+
           GUILayout.BeginHorizontal();
           if (GUILayout.Button("UnDock", GUILayout.Width(guiBtnWidth)))
           {
@@ -54,15 +56,42 @@ namespace ShipManifest.Windows.Tabs.Control
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
             SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, SMAddon.SmVessel.DockedVessels[v], Event.current.mousePosition);
-
           GUI.enabled = true;
-          GUILayout.Label($"{SMAddon.SmVessel.DockedVessels[v].VesselInfo.name}", GUILayout.Width(guiLabelWidth));
+          if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
+            SMAddon.SmVessel.DockedVessels[v].renameVessel = GUILayout.TextField(SMAddon.SmVessel.DockedVessels[v].renameVessel, GUILayout.Width(guiLabelWidth - (guiBtnWidth + 5)));
+          else GUILayout.Label($"{SMAddon.SmVessel.DockedVessels[v].VesselInfo.name}", GUILayout.Width(guiLabelWidth));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
             SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, SMAddon.SmVessel.DockedVessels[v], Event.current.mousePosition);
+          // now editing buttons.
+          GUIContent content = SMAddon.SmVessel.DockedVessels[v].IsEditing ? new GUIContent("Save", "Saves the changes to the docked vessel name.") : new GUIContent("Edit", "Change the docked vessel name.");
+          if (GUILayout.Button(content, GUILayout.Width(50)))
+          {
+            if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
+            {
+              SMAddon.SmVessel.DockedVessels[v].VesselInfo.name = SMAddon.SmVessel.DockedVessels[v].renameVessel;
+              SMAddon.SmVessel.DockedVessels[v].renameVessel = null;
+              SMAddon.SmVessel.DockedVessels[v].IsEditing = false;
+            }
+            else
+            {
+              SMAddon.SmVessel.DockedVessels[v].IsEditing = true;
+              SMAddon.SmVessel.DockedVessels[v].renameVessel = SMAddon.SmVessel.DockedVessels[v].VesselInfo.name;
 
+            }
+          }
+          if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
+          {
+            GUIContent cancelContent = new GUIContent("Cancel","Cancel changes to docked vessel name");
+            if (GUILayout.Button(cancelContent, GUILayout.Width(guiBtnWidth)))
+            {
+              SMAddon.SmVessel.DockedVessels[v].renameVessel = null;
+              SMAddon.SmVessel.DockedVessels[v].IsEditing = false;
+            }
+          }
           GUILayout.EndHorizontal();
         }
+        
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
       }
