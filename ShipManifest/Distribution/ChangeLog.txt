@@ -1,6 +1,7 @@
-﻿Version 5.2.0.0 - Release 09 Jul 2017 - Vessel to Vessel Edition
+﻿Version 5.2.0.0 - Release 12 Jul 2017 - Vessel to Vessel Edition
  - New: Added Docked vessel to vessel Crew and Science transfers!
  - New: Added Docked Vessels Control panel.  View your docked vessels, Rename a vessel, and undock a vessel with a click of a button.
+ - New: Added option to vessel to vessel Crew transfers to limit crew xfr list to tourists only.  Space tourism awaits!
  - New: Spanish localization added.  Thanks to Fitiales!
  - Misc: refactored vessel detection for vessel to vessel transfers, it was not behaving as exected.
  - Misc: A bit of refactoring on highlighting, as it was not behaving as expected

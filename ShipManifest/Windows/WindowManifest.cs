@@ -195,7 +195,7 @@ namespace ShipManifest.Windows
           {
             uint pumpId = TransferPump.GetPumpIdFromHash(keys.Current,
               SMAddon.SmVessel.PartsByResource[keys.Current].First(),
-              SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypePump.Dump,
+              SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypeXfer.Dump,
               TransferPump.TriggerButton.Manifest);
             GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
               ? new GUIContent(SmUtils.Localize("#smloc_manifest_009"), SmUtils.Localize("#smloc_manifest_tt_001")) // "Dump", "Dumps the selected resource in this vessel"

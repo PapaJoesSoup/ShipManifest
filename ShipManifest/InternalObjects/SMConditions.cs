@@ -35,10 +35,10 @@ namespace ShipManifest.InternalObjects
       return SMAddon.SmVessel.IsRecoverable && SMAddon.SmVessel.Vessel.Landed;
     }
 
-    internal static bool CanResourceBeXferred(TransferPump.TypePump thisXferMode, double maxXferAmount)
+    internal static bool CanResourceBeXferred(TransferPump.TypeXfer thisXferMode, double maxXferAmount)
     {
       return (!TransferPump.PumpProcessOn && maxXferAmount > 0) ||
-             (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
+             (TransferPump.PumpProcessOn && SMAddon.ActiveXferType == thisXferMode);
     }
 
     internal static bool CanKerbalsBeXferred(Part sourcePart, Part targetPart)
@@ -117,7 +117,7 @@ namespace ShipManifest.InternalObjects
         }
 
         // Are there kerbals to move?
-        if (SmUtils.GetCrewCount(selectedPartsSource) == 0)
+        if (SmUtils.GetPartsCrewCount(selectedPartsSource) == 0)
         {
           //WindowTransfer.XferToolTip = "No Kerbals to Move.";
           WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_005");

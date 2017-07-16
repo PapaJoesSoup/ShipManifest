@@ -37,7 +37,7 @@ namespace ShipManifest
 
     // Resource xfer vars
     // This is still very entrenched.   Need to look at implications for conversion to instanced.
-    internal static TransferPump.TypePump ActivePumpType = TransferPump.TypePump.SourceToTarget;
+    internal static TransferPump.TypeXfer ActiveXferType = TransferPump.TypeXfer.SourceToTarget;
 
     // Toolbar Integration.
     private static IButton _smButtonBlizzy;

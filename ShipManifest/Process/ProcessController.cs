@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UniLinq;
 
 namespace ShipManifest.Process
 {
@@ -24,9 +25,11 @@ namespace ShipManifest.Process
         List<ModuleScienceLab>.Enumerator labs = SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().GetEnumerator();
         while (labs.MoveNext())
         {
+          if (labs.Current == null) continue;
           List<string>.Enumerator dataitems = labs.Current.ExperimentData.GetEnumerator();
           while (dataitems.MoveNext())
           {
+            if (dataitems.Current == null) continue;
             if (!processedScience.ContainsKey(dataitems.Current))
               processedScience.Add(dataitems.Current, 1);
             else
@@ -36,7 +39,7 @@ namespace ShipManifest.Process
         }
         labs.Dispose();
 
-        ScienceData[] moduleScience = (IScienceDataContainer)source != null ? ((IScienceDataContainer)source).GetData() : null;
+        ScienceData[] moduleScience = ((IScienceDataContainer) source)?.GetData();
 
         if (moduleScience == null || moduleScience.Length <= 0) return;
         IEnumerator dataItems = moduleScience.GetEnumerator();
@@ -46,13 +49,11 @@ namespace ShipManifest.Process
           ScienceData data = (ScienceData)dataItems.Current;
           bool processed = processedScience.ContainsKey(data.subjectID);
 
-          if ((sel == Selection.OnlyProcessed && processed) ||
-              (sel == Selection.OnlyUnprocessed && !processed))
+          if ((sel != Selection.OnlyProcessed || !processed) &&
+              (sel != Selection.OnlyUnprocessed || processed)) continue;
+          if (((ModuleScienceContainer)target).AddData(data))
           {
-            if (((ModuleScienceContainer)target).AddData(data))
-            {
-              ((IScienceDataContainer)source).DumpData(data);
-            }
+            ((IScienceDataContainer)source).DumpData(data);
           }
         }
       }
@@ -60,6 +61,77 @@ namespace ShipManifest.Process
       {
         SmUtils.LogMessage($" in ProcessController.TransferScienceLab:  Error:  {ex}", SmUtils.LogType.Info, SMSettings.VerboseLogging);
       }
+    }
+
+    internal static void TransferScience(List<Part> source, List<Part> target)
+    {
+      // get part modules for source and target
+      List<IScienceDataContainer> sourceContainer = ScienceDataContainers(source, true);
+      List<IScienceDataContainer> targetContainer = ScienceDataContainers(target);
+      if (sourceContainer.Count <= 0 || targetContainer.Count <= 0) return;
+
+      // Pick a destination part. Preferably the Science Lab with the most science stored,  If no lab, then Science Container with most science stored.
+      IScienceDataContainer toContainer = null;
+      bool labFound = false;
+      List<Part>.Enumerator p = target.GetEnumerator();
+
+      while (p.MoveNext())
+      {
+        if (p.Current == null) continue;
+        if (!p.Current.FindModulesImplementing<ModuleScienceLab>().Any()) continue;
+        labFound = true;
+        IScienceDataContainer m = (IScienceDataContainer) p.Current.FindModulesImplementing<ModuleScienceLab>().First();
+        if (m.GetScienceCount() > toContainer.GetScienceCount()) toContainer = m;
+      }
+      p.Dispose();
+      if (!labFound)
+      {
+        // if none of the above, pick the first Container, then check for the container holding the largest amount of science, and move it all there.
+        List<Part>.Enumerator p2 = target.GetEnumerator();
+
+        while (p2.MoveNext())
+        {
+          if (p2.Current == null) continue;
+          if (!p2.Current.FindModulesImplementing<IScienceDataContainer>().Any()) continue;
+          IScienceDataContainer m = p2.Current.FindModulesImplementing<IScienceDataContainer>().First();
+          if (toContainer == null) toContainer = m;
+          if (m.GetScienceCount() > toContainer.GetScienceCount()) toContainer = m;
+        }
+        p2.Dispose();
+      }
+
+
+      // determine if science can be moved.
+      List<IScienceDataContainer>.Enumerator scontainer = sourceContainer.GetEnumerator();
+      while (scontainer.MoveNext())
+      {
+        if (scontainer.Current == null) continue;
+        // Move science to destination.        }
+
+
+      }
+      scontainer.Dispose();
+    }
+
+    private static List<IScienceDataContainer> ScienceDataContainers(List<Part> source, bool hasData = false)
+    {
+      List<IScienceDataContainer> containers = new List<IScienceDataContainer>();
+      List<Part>.Enumerator part = source.GetEnumerator();
+      while (part.MoveNext())
+      {
+        if (part.Current == null) continue;
+        List<IScienceDataContainer>.Enumerator sdModule =
+          part.Current.FindModulesImplementing<IScienceDataContainer>().GetEnumerator();
+        while (sdModule.MoveNext())
+        {
+          if (sdModule.Current == null) continue;
+          if (hasData && sdModule.Current.GetScienceCount() <= 0) continue;
+          containers.Add(sdModule.Current);
+        }
+        sdModule.Dispose();
+      }
+      part.Dispose();
+      return containers;
     }
 
     internal static void TransferScience(PartModule source, PartModule target)

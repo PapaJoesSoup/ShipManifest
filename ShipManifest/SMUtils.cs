@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Experience;
 using KSP.Localization;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
@@ -115,17 +116,17 @@ namespace ShipManifest
 
     internal static int GetPartCrewCount(Part part)
     {
-      int crewCount = 0;
-      if (!InstalledMods.IsDfApiReady) return crewCount + part.protoModuleCrew.Count;
-      if (!part.Modules.Contains("DeepFreezer")) return crewCount + part.protoModuleCrew.Count;
+      int crewCount = part.protoModuleCrew.Count;
+      if (!InstalledMods.IsDfApiReady) return crewCount;
+      if (!part.Modules.Contains("DeepFreezer")) return crewCount;
       PartModule freezerModule = SMConditions.GetFreezerModule(part);
       // ReSharper disable once SuspiciousTypeConversion.Global
       DfWrapper.DeepFreezer freezer = new DfWrapper.DeepFreezer(freezerModule);
       crewCount += freezer.TotalFrozen;
-      return crewCount + part.protoModuleCrew.Count;
+      return crewCount;
     }
 
-    internal static int GetCrewCount(List<Part> parts)
+    internal static int GetPartsCrewCount(List<Part> parts)
     {
       int count = 0;
       List<Part>.Enumerator part = parts.GetEnumerator();
@@ -134,11 +135,17 @@ namespace ShipManifest
         if (part.Current == null) continue;
         if (part.Current.CrewCapacity <= 0) continue;
         count += part.Current.protoModuleCrew.Count;
+        if (!InstalledMods.IsDfApiReady) continue;
+        if (!part.Current.Modules.Contains("DeepFreezer")) continue;
+        PartModule freezerModule = SMConditions.GetFreezerModule(part.Current);
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        DfWrapper.DeepFreezer freezer = new DfWrapper.DeepFreezer(freezerModule);
+        count += freezer.TotalFrozen;
       }
       part.Dispose();
       return count;
     }
-    internal static int GetCrewCapacity(List<Part> parts)
+    internal static int GetPartsCrewCapacity(List<Part> parts)
     {
       int count = 0;
       List<Part>.Enumerator part = parts.GetEnumerator();
@@ -150,6 +157,27 @@ namespace ShipManifest
       }
       part.Dispose();
       return count;
+    }
+
+    internal static bool CrewContainsTourists(List<Part> selectedParts)
+    {
+      bool results = false;
+      List<Part>.Enumerator part = selectedParts.GetEnumerator();
+      while (part.MoveNext())
+      {
+        if (part.Current == null) continue;
+        List<ProtoCrewMember>.Enumerator crew = part.Current.protoModuleCrew.GetEnumerator();
+        while (crew.MoveNext())
+        {
+          if (crew.Current?.type != ProtoCrewMember.KerbalType.Tourist) continue;
+          results = true;
+          break;
+        }
+        crew.Dispose();
+        if (results == true) break;
+      }
+      part.Dispose();
+      return results;
     }
     internal static void LogMessage(string msg, LogType type, bool verbose)
     {

@@ -32,7 +32,7 @@ namespace ShipManifest.Process
     public uint PumpId;
     public string Resource { get; internal set; }
     public double PumpAmount { get; internal set; }
-    public TypePump PumpType = TypePump.SourceToTarget;
+    public TypeXfer PumpType = TypeXfer.SourceToTarget;
     public ScopePump PumpScope = ScopePump.Vessel;
     internal TriggerButton PumpTrigger;
 
@@ -114,10 +114,10 @@ namespace ShipManifest.Process
       {
         switch (PumpType)
         {
-          case TypePump.SourceToTarget:
-          case TypePump.TargetToSource:
+          case TypeXfer.SourceToTarget:
+          case TypeXfer.TargetToSource:
             return CalcResourceCapacity(ToParts, Resource);
-          case TypePump.Dump:
+          case TypeXfer.Dump:
             return CalcResourceCapacity(FromParts, Resource);
         }
         return 0;
@@ -133,10 +133,10 @@ namespace ShipManifest.Process
       {
         switch (PumpType)
         {
-          case TypePump.SourceToTarget:
-          case TypePump.TargetToSource:
+          case TypeXfer.SourceToTarget:
+          case TypeXfer.TargetToSource:
             return CalcRemainingResource(ToParts, Resource);
-          case TypePump.Dump:
+          case TypeXfer.Dump:
             return CalcRemainingResource(FromParts, Resource);
         }
         return 0;
@@ -163,10 +163,10 @@ namespace ShipManifest.Process
       {
         switch (PumpType)
         {
-          case TypePump.SourceToTarget:
-          case TypePump.TargetToSource:
+          case TypeXfer.SourceToTarget:
+          case TypeXfer.TargetToSource:
             return CalcRemainingCapacity(ToParts, Resource);
-          case TypePump.Dump:
+          case TypeXfer.Dump:
             return CalcRemainingCapacity(FromParts, Resource);
         }
         return 0;
@@ -236,7 +236,7 @@ namespace ShipManifest.Process
 
     }
 
-    internal TransferPump(string resourceName, TypePump pumpType, TriggerButton trigger, double pumpAmount)
+    internal TransferPump(string resourceName, TypeXfer pumpType, TriggerButton trigger, double pumpAmount)
     {
       Resource = resourceName;
       PumpType = pumpType;
@@ -361,7 +361,7 @@ namespace ShipManifest.Process
       // 2.  Determine if move amount exceeds remaining amount in tank(s) or total amout to move.
       deltaAmt = deltaAmt > FromRemaining ? FromRemaining : deltaAmt + AmtPumped > PumpAmount ? PumpAmount - AmtPumped : deltaAmt;
 
-      if (PumpType != TypePump.Dump)
+      if (PumpType != TypeXfer.Dump)
         deltaAmt = deltaAmt > ToCapacityRemaining ? ToCapacityRemaining : deltaAmt;
 
 
@@ -405,7 +405,7 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.RunPumpCycle", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // If a Transfer, lets validate From pump amount can be pumped. (and To if needed)
-      if (PumpType != TypePump.Dump)
+      if (PumpType != TypeXfer.Dump)
       {
         double maxAmount = CalcMaxPumpAmt(FromParts, ToParts, new List<string> {Resource});
         if (cycleAmount > maxAmount) cycleAmount = maxAmount;
@@ -415,7 +415,7 @@ namespace ShipManifest.Process
       DrainParts(cycleAmount);
 
       // To Parts (increment)
-      if (PumpType != TypePump.Dump)
+      if (PumpType != TypeXfer.Dump)
       {
         FillParts(cycleAmount);
       }
@@ -790,10 +790,10 @@ namespace ShipManifest.Process
       bool results = pump.PumpStatus == PumpState.Off ||
                     pump.PumpStatus == PumpState.Stop ||
                     pump.FromIsEmpty ||
-                    (pump.PumpType != TypePump.Dump && pump.ToIsFull) ||
+                    (pump.PumpType != TypeXfer.Dump && pump.ToIsFull) ||
                     pump.AmtPumped >= pump.PumpAmount ||
                     pump.PumpAmount - pump.AmtPumped < SMSettings.Tolerance ||
-                    (pump.PumpType != TypePump.Dump &&
+                    (pump.PumpType != TypeXfer.Dump &&
                      CalcMaxPumpAmt(pump.FromParts, pump.ToParts, new List<string> {pump.Resource}) <
                      SMSettings.Tolerance);
       return results;
@@ -820,7 +820,7 @@ namespace ShipManifest.Process
         TransferPump pump1 = new TransferPump
         {
           Resource = resources.Current,
-          PumpType = TypePump.SourceToTarget,
+          PumpType = TypeXfer.SourceToTarget,
           PumpAmount = CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources),
           EditSliderAmount =
             CalcMaxPumpAmt(displaySourceParts, displayTargetParts, SMAddon.SmVessel.SelectedResources)
@@ -833,7 +833,7 @@ namespace ShipManifest.Process
         TransferPump pump2 = new TransferPump
         {
           Resource = resources.Current,
-          PumpType = TypePump.TargetToSource,
+          PumpType = TypeXfer.TargetToSource,
           PumpAmount = CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources),
           EditSliderAmount =
             CalcMaxPumpAmt(displayTargetParts, displaySourceParts, SMAddon.SmVessel.SelectedResources)
@@ -870,12 +870,12 @@ namespace ShipManifest.Process
         TransferPump pump = dPumps.Current;
         switch (pump.PumpType)
         {
-          case TypePump.Dump:
-          case TypePump.SourceToTarget:
+          case TypeXfer.Dump:
+          case TypeXfer.SourceToTarget:
             pump.FromParts = sourceParts;
             pump.ToParts = targetParts;
             break;
-          case TypePump.TargetToSource:
+          case TypeXfer.TargetToSource:
             pump.FromParts = targetParts;
             pump.ToParts = sourceParts;
             break;
@@ -887,7 +887,7 @@ namespace ShipManifest.Process
       dPumps.Dispose();
     }
 
-    internal static List<TransferPump> GetDisplayPumpsByType(TypePump pumpType)
+    internal static List<TransferPump> GetDisplayPumpsByType(TypeXfer pumpType)
     {
       List<TransferPump>.Enumerator dPumps = WindowTransfer.DisplayPumps.GetEnumerator();
       List<TransferPump> results = new List<TransferPump>();
@@ -934,7 +934,7 @@ namespace ShipManifest.Process
       return 1;
     }
 
-    internal static uint GetPumpIdFromHash(string resource, Part firstPart, Part lastPart, TypePump pumpType,
+    internal static uint GetPumpIdFromHash(string resource, Part firstPart, Part lastPart, TypeXfer pumpType,
       TriggerButton trigger)
     {
       return firstPart.flightID + lastPart.flightID + (uint) pumpType.GetHashCode() + (uint) trigger.GetHashCode() +
@@ -961,7 +961,7 @@ namespace ShipManifest.Process
       Part
     }
 
-    public enum TypePump
+    public enum TypeXfer
     {
       SourceToTarget,
       TargetToSource,

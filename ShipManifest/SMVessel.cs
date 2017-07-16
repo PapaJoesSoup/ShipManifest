@@ -484,7 +484,6 @@ namespace ShipManifest
           if (modDockedVessel.LaunchId == 0) continue;
           modDockedVessel.IsDocked = SMConditions.IsVesselDocked(modDockedVessel);
           _dockedVessels.Add(modDockedVessel);
-
         }
         dNodes.Dispose();
       }
@@ -546,7 +545,7 @@ namespace ShipManifest
         while (hParts.MoveNext())
         {
           if (hParts.Current == null) continue;
-          IEnumerator hModules = hParts.Current.Part.Modules.GetEnumerator();
+          List<PartModule>.Enumerator hModules = hParts.Current.Part.Modules.GetEnumerator();
           while (hModules.MoveNext())
           {
             if (hModules.Current == null) continue;
@@ -559,6 +558,7 @@ namespace ShipManifest
             };
             _hatches.Add(pHatch);
           }
+          hModules.Dispose();
         }
         hParts.Dispose();
       }
@@ -577,7 +577,7 @@ namespace ShipManifest
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
-          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
+          List<PartModule>.Enumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
@@ -592,6 +592,7 @@ namespace ShipManifest
             };
             _solarPanels.Add(pPanel);
           }
+          pModules.Dispose();
         }
         pParts.Dispose();
       }
@@ -613,7 +614,7 @@ namespace ShipManifest
           if (pParts.Current == null) continue;
           if (!pParts.Current.Modules.Contains("ModuleDataTransmitter") && !pParts.Current.Modules.Contains("ModuleRTAntenna")) continue;
           ModAntenna pAntenna = new ModAntenna { SPart = pParts.Current };
-          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
+          List<PartModule>.Enumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
@@ -628,6 +629,7 @@ namespace ShipManifest
               pAntenna.AnimateModule = pModule;
             }
           }
+          pModules.Dispose();
           if (pAntenna.AnimateModule != null) _antennas.Add(pAntenna);
         }
         pParts.Dispose();
@@ -647,8 +649,8 @@ namespace ShipManifest
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
-          if (!pParts.Current.Modules.Contains("ModuleLight")) continue;
-          IEnumerator pModules = pParts.Current.Modules.GetEnumerator();
+          if (!pParts.Current.FindModulesImplementing<ModuleLight>().Any()) continue;
+          List<PartModule>.Enumerator pModules = pParts.Current.Modules.GetEnumerator();
           while (pModules.MoveNext())
           {
             if (pModules.Current == null) continue;
@@ -661,6 +663,7 @@ namespace ShipManifest
             };
             _lights.Add(pLight);
           }
+          pModules.Dispose();
         }
         pParts.Dispose();
       }
@@ -771,7 +774,7 @@ namespace ShipManifest
         if (dockingNode != null)
         {
           // The root part matters for the original vessel.  However, vessels that are split from the original vessel have their docking port as the root.
-          // So, if the root is not the docking port, we want to grab the children from the docking port.  if the root is different than the port, we want to use
+          // So, if the root is the docking port, we want to grab the children from the docking port.  if the root is different than the port, we want to use
           // the Root, as the docking port will not have a parent...
           if (!vesselpartList.Contains(dockingNode.part)) vesselpartList.Add(dockingNode.part);
           Part vesselRoot =
@@ -798,7 +801,7 @@ namespace ShipManifest
       {
         if (children.Current == null) continue;
         ModuleDockingNode dNode = children.Current.FindModulesImplementing<ModuleDockingNode>().FirstOrDefault();
-        if (dNode != null && dNode.otherNode != null) continue;
+        if (dNode != null && dNode.vesselInfo != null && dNode.otherNode != null && dNode.otherNode.vesselInfo != null) continue;
         if (!partList.Contains(children.Current)) partList.Add(children.Current);
         GetChildren(children.Current, ref partList);
       }
@@ -857,12 +860,12 @@ namespace ShipManifest
          where SMConditions.TypeOfResource(s) == SMConditions.ResourceType.Pump
           select s).ToList();
       uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", otherResourcesList.ToArray()),
-        SMAddon.SmVessel.Vessel.parts.First(), SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypePump.Dump,
+        SMAddon.SmVessel.Vessel.parts.First(), SMAddon.SmVessel.Vessel.parts.Last(), TransferPump.TypeXfer.Dump,
         TransferPump.TriggerButton.Preflight);
       List<TransferPump> pumpList =
         otherResourcesList.Select(
           resource =>
-            new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Preflight,
+            new TransferPump(resource, TransferPump.TypeXfer.Dump, TransferPump.TriggerButton.Preflight,
               TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resource], resource))
             {
               FromParts = SMAddon.SmVessel.PartsByResource[resource],
@@ -881,7 +884,7 @@ namespace ShipManifest
       if (!TransferPump.IsPumpInProgress(pumpId))
       {
         //Fired by Resource Dump on Manifest Window.
-        TransferPump pump = new TransferPump(resourceName, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Manifest,
+        TransferPump pump = new TransferPump(resourceName, TransferPump.TypeXfer.Dump, TransferPump.TriggerButton.Manifest,
           TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName))
         {
           FromParts = SMAddon.SmVessel.PartsByResource[resourceName],

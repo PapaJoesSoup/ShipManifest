@@ -63,7 +63,7 @@ namespace ShipManifest
       List<TransferPump> pumpList =
         resourceNames.Select(
           resource =>
-            new TransferPump(resource, TransferPump.TypePump.Dump, TransferPump.TriggerButton.Transfer,
+            new TransferPump(resource, TransferPump.TypeXfer.Dump, TransferPump.TriggerButton.Transfer,
               TransferPump.CalcRemainingResource(partList, resource))
             {
               FromParts = partList,
