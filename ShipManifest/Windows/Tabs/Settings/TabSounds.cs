@@ -12,6 +12,9 @@ namespace ShipManifest.Windows.Tabs.Settings
     private static Rect _rect;
     private static string _label = "";
     private static GUIContent _guiLabel;
+    private const float guiRuleWidth = 350;
+    private const float guiTextWidth = 220;
+    private const float guiLabelWidth = 100;
 
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -30,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUILayout.Label(SmUtils.Localize("#smloc_settings_sounds_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       GUILayout.Label($"{SmUtils.Localize("#smloc_settings_sounds_001")}:", GUILayout.Height(20)); //"Transfer Pump:"
 
@@ -42,11 +45,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_002")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_001");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundStart = GUILayout.TextField(SMSettings.PumpSoundStart, GUILayout.Width(220));
+      SMSettings.PumpSoundStart = GUILayout.TextField(SMSettings.PumpSoundStart, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Run Sound
@@ -57,11 +60,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_003")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_002");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundRun = GUILayout.TextField(SMSettings.PumpSoundRun, GUILayout.Width(220));
+      SMSettings.PumpSoundRun = GUILayout.TextField(SMSettings.PumpSoundRun, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Stop Sound
@@ -72,11 +75,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_004")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_003");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundStop = GUILayout.TextField(SMSettings.PumpSoundStop, GUILayout.Width(220));
+      SMSettings.PumpSoundStop = GUILayout.TextField(SMSettings.PumpSoundStop, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Sound Volume
@@ -87,7 +90,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_005")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -117,11 +120,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_009")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_005");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundStart = GUILayout.TextField(SMSettings.CrewSoundStart, GUILayout.Width(220));
+      SMSettings.CrewSoundStart = GUILayout.TextField(SMSettings.CrewSoundStart, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Run Sound
@@ -132,11 +135,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_010")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_006");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundRun = GUILayout.TextField(SMSettings.CrewSoundRun, GUILayout.Width(220));
+      SMSettings.CrewSoundRun = GUILayout.TextField(SMSettings.CrewSoundRun, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Stop Sound
@@ -147,11 +150,11 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_011")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundStop = GUILayout.TextField(SMSettings.CrewSoundStop, GUILayout.Width(220));
+      SMSettings.CrewSoundStop = GUILayout.TextField(SMSettings.CrewSoundStop, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Sound Volume
@@ -162,7 +165,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = $"{SmUtils.Localize("#smloc_settings_sounds_012")}:";
       _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Label(_guiLabel, GUILayout.Width(100));
+      GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);

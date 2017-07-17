@@ -4,9 +4,9 @@
   "DOWNLOAD":"https://github.com/PapaJoesSoup/ShipManifest/releases",
   "VERSION": {
     "MAJOR": 5, 
-    "MINOR": 1,
-    "PATCH": 4,
-	  "BUILD": 2
+    "MINOR": 2,
+    "PATCH": 0,
+	  "BUILD": 0
   },
   "KSP_VERSION": {
     "MAJOR": 1,

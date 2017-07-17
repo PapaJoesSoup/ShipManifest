@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.InternalObjects;
+using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -194,7 +195,7 @@ namespace ShipManifest.Windows
           {
             uint pumpId = TransferPump.GetPumpIdFromHash(keys.Current,
               SMAddon.SmVessel.PartsByResource[keys.Current].First(),
-              SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypePump.Dump,
+              SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypeXfer.Dump,
               TransferPump.TriggerButton.Manifest);
             GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
               ? new GUIContent(SmUtils.Localize("#smloc_manifest_009"), SmUtils.Localize("#smloc_manifest_tt_001")) // "Dump", "Dumps the selected resource in this vessel"
@@ -282,6 +283,7 @@ namespace ShipManifest.Windows
 
         // Now, based on the resourceselection, do we show the Transfer window?
         WindowTransfer.ShowWindow = SMAddon.SmVessel.SelectedResources.Count > 0;
+        if (WindowTransfer.ShowWindow) WindowTransfer.DsiplayMode = SMConditions.GetTransferMode();
       }
       catch (Exception ex)
       {
@@ -440,13 +442,11 @@ namespace ShipManifest.Windows
       {
         if (resourceNames.Count > 0)
         {
-          List<Part> newSources = new List<Part>();
-          List<Part> newTargets = new List<Part>();
-          if (WindowTransfer.ShowSourceVessels &&
-              SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+          List<Part> newSourceParts = new List<Part>();
+          List<Part> newTargetParts = new List<Part>();
+          if (WindowTransfer.ShowSourceVessels)
           {
-            SMAddon.SmVessel.SelectedPartsSource =
-              SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
+              SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsSource, resourceNames);
             if (!WindowTransfer.ShowTargetVessels)
             {
               List<Part>.Enumerator srcParts = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
@@ -468,29 +468,28 @@ namespace ShipManifest.Windows
               if (resourceNames.Count > 1)
               {
                 if (parts.Current.Resources.Contains(resourceNames[0]) && parts.Current.Resources.Contains(resourceNames[1]))
-                  newSources.Add(parts.Current);
+                  newSourceParts.Add(parts.Current);
               }
               else
               {
-                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && parts.Current.CrewCapacity > 0)
-                  newSources.Add(parts.Current);
-                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
-                         parts.Current.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                  newSources.Add(parts.Current);
+                if (resourceNames.Contains(SMConditions.ResourceType.Crew.ToString()) && parts.Current.CrewCapacity > 0)
+                  newSourceParts.Add(parts.Current);
+                else if (resourceNames.Contains(SMConditions.ResourceType.Science.ToString()) 
+                  && parts.Current.FindModulesImplementing<IScienceDataContainer>().Count > 0)
+                  newSourceParts.Add(parts.Current);
                 else if (parts.Current.Resources.Contains(resourceNames[0]))
-                  newSources.Add(parts.Current);
+                  newSourceParts.Add(parts.Current);
               }
             }
             parts.Dispose();
             SMAddon.SmVessel.SelectedPartsSource.Clear();
-            SMAddon.SmVessel.SelectedPartsSource = newSources;
+            SMAddon.SmVessel.SelectedPartsSource = newSourceParts;
           }
 
-          if (WindowTransfer.ShowTargetVessels &&
-              SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
+          if (WindowTransfer.ShowTargetVessels)
           {
             SMAddon.SmVessel.SelectedPartsTarget =
-              SMAddon.SmVessel.GetSelectedVesselsParts(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
+              SMAddon.SmVessel.GetVesselsPartsByResource(SMAddon.SmVessel.SelectedVesselsTarget, resourceNames);
             if (!WindowTransfer.ShowSourceVessels)
             {
               List<Part>.Enumerator tgtParts = SMAddon.SmVessel.SelectedPartsTarget.GetEnumerator();
@@ -512,32 +511,27 @@ namespace ShipManifest.Windows
               if (resourceNames.Count > 1)
               {
                 if (tgtParts.Current.Resources.Contains(resourceNames[0]) && tgtParts.Current.Resources.Contains(resourceNames[1]))
-                  newTargets.Add(tgtParts.Current);
+                  newTargetParts.Add(tgtParts.Current);
               }
               else
               {
-                if (resourceNames[0] == SMConditions.ResourceType.Crew.ToString() && tgtParts.Current.CrewCapacity > 0)
-                  newTargets.Add(tgtParts.Current);
-                else if (resourceNames[0] == SMConditions.ResourceType.Science.ToString() &&
+                if (resourceNames.Contains(SMConditions.ResourceType.Crew.ToString()) && tgtParts.Current.CrewCapacity > 0)
+                  newTargetParts.Add(tgtParts.Current);
+                else if (resourceNames.Contains(SMConditions.ResourceType.Science.ToString()) &&
                          tgtParts.Current.FindModulesImplementing<IScienceDataContainer>().Count > 0)
-                  newTargets.Add(tgtParts.Current);
+                  newTargetParts.Add(tgtParts.Current);
                 else if (tgtParts.Current.Resources.Contains(resourceNames[0]))
-                  newTargets.Add(tgtParts.Current);
+                  newTargetParts.Add(tgtParts.Current);
               }
             }
             tgtParts.Dispose();
             SMAddon.SmVessel.SelectedPartsTarget.Clear();
-            SMAddon.SmVessel.SelectedPartsTarget = newTargets;
+            SMAddon.SmVessel.SelectedPartsTarget = newTargetParts;
           }
 
-          if (SMConditions.AreSelectedResourcesTypeOther(resourceNames))
-          {
-            TransferPump.CreateDisplayPumps();
-            return;
-          }
-
-          SMAddon.SmVessel.SelectedVesselsSource.Clear();
-          SMAddon.SmVessel.SelectedVesselsTarget.Clear();
+          if (!SMConditions.AreSelectedResourcesTypeOther(resourceNames)) return;
+          TransferPump.CreateDisplayPumps();
+          return;
         }
         else
         {

@@ -125,7 +125,7 @@ namespace ShipManifest
     internal static string ClsSpaceColor = "green";
     internal static string MouseOverColor = "burntorange";
     internal static double CrewXferDelaySec = 7;
-    internal static int IvaUpdateFrameDelay = 20;
+    internal static int IvaUpdateFrameDelay = 10;
 
 
     // End Persisted Properties

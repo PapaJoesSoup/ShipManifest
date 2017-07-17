@@ -11,6 +11,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 325;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -28,7 +30,7 @@ namespace ShipManifest.Windows.Tabs.Control
       //GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.Localize("#smloc_control_light_000"), SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
@@ -39,7 +41,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iLights.Current == null) continue;
           string label = $"{iLights.Current.Status} - {iLights.Current.Title}";
           bool onState = iLights.Current.IsOn;
-          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(325), GUILayout.Height(40));
+          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";
           if (!onState && newOnState)
             iLights.Current.TurnOnLight();
@@ -47,7 +49,7 @@ namespace ShipManifest.Windows.Tabs.Control
             iLights.Current.TurnOffLight();
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLights.Current.SPart);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLights.Current.SPart, Event.current.mousePosition);
         }
         iLights.Dispose();
 

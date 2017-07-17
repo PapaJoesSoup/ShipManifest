@@ -37,7 +37,7 @@ namespace ShipManifest
 
     // Resource xfer vars
     // This is still very entrenched.   Need to look at implications for conversion to instanced.
-    internal static TransferPump.TypePump ActivePumpType = TransferPump.TypePump.SourceToTarget;
+    internal static TransferPump.TypeXfer ActiveXferType = TransferPump.TypeXfer.SourceToTarget;
 
     // Toolbar Integration.
     private static IButton _smButtonBlizzy;
@@ -345,7 +345,11 @@ namespace ShipManifest
 
         // Realism Mode Crew transfer operation (real time)
         if (SmVessel.TransferCrewObj.CrewXferActive)
-          SmVessel.TransferCrewObj.CrewTransferProcess();
+        {
+          if (SmVessel.TransferCrewObj.FromCrewMember != null) SmVessel.TransferCrewObj.CrewTransferProcess();
+          else if (SmVessel.TransferCrewObj.FromCrewMembers != null) SmVessel.TransferCrewObj.CrewTransferProcesses();
+          else SmVessel.TransferCrewObj.CrewXferActive = false;
+        }
         else if (SmVessel.TransferCrewObj.IsStockXfer)
         {
           SmVessel.TransferCrewObj.CrewTransferBegin(SmVessel.TransferCrewObj.FromCrewMember,
@@ -452,7 +456,7 @@ namespace ShipManifest
 
     internal void OnItemTransferStarted(PartItemTransfer xferPartItem)
     {
-      if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == "Crew")
+      if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == SMConditions.ResourceType.Crew.ToString())
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
       StockTransferItem = xferPartItem;
     }
@@ -724,6 +728,8 @@ namespace ShipManifest
           SmVessel.SelectedResources.Clear();
           SmVessel.SelectedPartsSource.Clear();
           SmVessel.SelectedPartsTarget.Clear();
+          SmVessel.SelectedVesselsSource.Clear();
+          SmVessel.SelectedVesselsTarget.Clear();
           WindowManifest.ShowWindow = !WindowManifest.ShowWindow;
         }
         else
@@ -838,6 +844,8 @@ namespace ShipManifest
           step = "0a - Vessel Change";
           SmVessel.SelectedPartsSource.Clear();
           SmVessel.SelectedPartsTarget.Clear();
+          SmVessel.SelectedVesselsSource.Clear();
+          SmVessel.SelectedVesselsTarget.Clear();
           SmVessel.SelectedResources.Clear();
           return;
         }

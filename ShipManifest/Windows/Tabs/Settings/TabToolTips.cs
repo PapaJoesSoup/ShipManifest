@@ -13,6 +13,10 @@ namespace ShipManifest.Windows.Tabs.Settings
     private static Rect _rect;
     private static string _label = "";
     private static GUIContent _guiLabel;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 300;
+    private const float guiIndent = 20;
+    private const float gui2xIndent = 40;
 
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -34,7 +38,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = true;
       GUILayout.Label(SmUtils.Localize("#smloc_settings_tooltips_000"), SMStyle.LabelTabHeader); //"ToolTips"
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       //_label = "Enable All Tool Tips";
       //_toolTip = "Turns all tooltips On or Off.";
@@ -42,7 +46,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_001");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_001");
       _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -57,8 +61,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_002");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_002");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -72,8 +76,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_003");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_003");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowManifest.ShowToolTips = GUILayout.Toggle(WindowManifest.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowManifest.ShowToolTips = GUILayout.Toggle(WindowManifest.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -87,8 +91,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_004");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_004");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowTransfer.ShowToolTips = GUILayout.Toggle(WindowTransfer.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowTransfer.ShowToolTips = GUILayout.Toggle(WindowTransfer.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -102,8 +106,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_005");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_005");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -120,8 +124,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_006");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_006");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabRealism.ShowToolTips = GUILayout.Toggle(TabRealism.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabRealism.ShowToolTips = GUILayout.Toggle(TabRealism.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -136,8 +140,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_007");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_007");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabHighlight.ShowToolTips = GUILayout.Toggle(TabHighlight.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabHighlight.ShowToolTips = GUILayout.Toggle(TabHighlight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -152,8 +156,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_008");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_008");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      ShowToolTips = GUILayout.Toggle(ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      ShowToolTips = GUILayout.Toggle(ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -168,8 +172,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_009");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_009");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -184,8 +188,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_010");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_010");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -201,8 +205,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_011");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_011");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -216,8 +220,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_012");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_012");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(20);
-      WindowControl.ShowToolTips = GUILayout.Toggle(WindowControl.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(guiIndent);
+      WindowControl.ShowToolTips = GUILayout.Toggle(WindowControl.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -234,8 +238,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_013");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_013");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabHatch.ShowToolTips = GUILayout.Toggle(TabHatch.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabHatch.ShowToolTips = GUILayout.Toggle(TabHatch.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -250,8 +254,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_014");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_014");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabSolarPanel.ShowToolTips = GUILayout.Toggle(TabSolarPanel.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabSolarPanel.ShowToolTips = GUILayout.Toggle(TabSolarPanel.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -266,8 +270,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_015");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_015");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabAntenna.ShowToolTips = GUILayout.Toggle(TabAntenna.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabAntenna.ShowToolTips = GUILayout.Toggle(TabAntenna.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -282,8 +286,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_016");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_016");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -298,8 +302,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       _label = SmUtils.Localize("#smloc_settings_tooltips_017");
       _toolTip = SmUtils.Localize("#smloc_settings_tooltips_tt_017");
       _guiLabel = new GUIContent(_label, _toolTip);
-      GUILayout.Space(40);
-      TabScienceLab.ShowToolTips = GUILayout.Toggle(TabScienceLab.ShowToolTips, _guiLabel, GUILayout.Width(300));
+      GUILayout.Space(gui2xIndent);
+      TabScienceLab.ShowToolTips = GUILayout.Toggle(TabScienceLab.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)

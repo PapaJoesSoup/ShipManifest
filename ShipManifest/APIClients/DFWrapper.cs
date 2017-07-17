@@ -284,8 +284,8 @@ namespace ShipManifest.APIClients
         _actualDeepFreezer = a;
         //Fields available from Freezer part
 
-        //FreezerSizeMethod = DeepFreezerType.GetMethod("get_DFIFreezerSize", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
-        //FreezerSize = getFreezerSize;
+        _freezerSizeMethod = DeepFreezerType.GetMethod("get_DFIFreezerSize", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        FreezerSize = GetFreezerSize;
         _totalFrozenMethod = DeepFreezerType.GetMethod("get_DFITotalFrozen", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
         TotalFrozen = GetTotalFrozen;
         _freezerSpaceMethod = DeepFreezerType.GetMethod("get_DFIFreezerSpace", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);

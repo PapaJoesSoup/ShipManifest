@@ -1,11 +1,25 @@
-﻿Version 5.1.4.2 - Release 31 May 2017 - KSP 1.3 Compatibility Edition
+﻿Version 5.2.0.0 - Release 17 Jul 2017 - Vessel to Vessel Edition
+ - New: Added Docked vessel to vessel Crew and Science transfers!
+ - New: Added Docked Vessels Control panel.  View your docked vessels, Rename a vessel, and undock a vessel with a click of a button.
+ - New: Added option to vessel to vessel Crew transfers to limit crew xfr list to tourists only.  Space tourism awaits!
+ - New: Added ability to create Tourists from Roster Window.
+ - New: Spanish localization added.  Thanks to Fitiales!
+ - Misc: refactored vessel detection for vessel to vessel transfers, it was not behaving as exected.
+ - Misc: A bit of refactoring on highlighting, as it was not behaving as expected
+ - Misc: Increased base volume of crew movement sound files.
+
+Version 5.1.4.3 - Release 01 Jun 2017 - KSP 1.3 Compatibility Edition
+ - Fixed: Error in scrollviewer dimensions refactor.  reversed height and width.
+ - Fixed: Minor boundary detection error with mouseover highlighting.  The visible button list window boundaries were not completely respected.
+
+Version 5.1.4.2 - Release 31 May 2017 - KSP 1.3 Compatibility Edition
  - Fixed: compatibility with latest DeepFreeze.  Freeze action from Roster Window was failing.
  - Fixed: Some localization was not complete.  Added additional tags for text not caught in first pass.
  - Fixed: Highlighting of parts was occurring outside the boundaries of the scroll windows.
  - Misc:  Cleaned up text rendering in general.  Converted to consistent use of C# string interpolation across mod.
  - Misc:  Cleaned up some code style issues.  I've been wanting to do this for a while, so KSP 1.3 was a good time to do it.
           This affected the SMWrapper.cs class for modders, and may break your mod.   
-          If you use this or reflection to access SM, some methods had capitization changes.  
+          If you use this or reflection to access SM, some methods had capitalization changes.  
           Ex: SM... was replaced with Sm... get... was replaced with Get...  Nothing is gone, just "altered" :)
  
 Version 5.1.4.1 - Release 26 May 2017 - KSP 1.3 Compatibility Edition
@@ -17,6 +31,29 @@ Version 5.1.4.1 - Release 26 May 2017 - KSP 1.3 Compatibility Edition
  - New:  - Added new setting to Realism Tab.  "Realistic Transfers".  This affects Transfer features for crew, science and resources.
  - New:  Added several new tooltips in the Mod.  Cleaned/updated up several others.
  - New:  Refactored Vessel to Vessel transfers.  Now separates multiple vessels originating from the same launch.
+ - Fixed:  Selecting a resource in the Manifest Window triggered an enumeration error.
+ - Fixed:  Crew respawn was always allowed.  Should be disabled for Realism.  Roster actions are now impacted by Enable Roster Modifications setting.
+ - Fixed:  Issue with multiple instances of SMAddon class loading when changing scenes.
+ - Fixed:  Roster and Settings windows continued to be displayed even when Pause Menu or Hide UI is on.
+ - Fixed:  Manifest and other windows disappeared in flight under certain conditions (when staging/part destruction occurs).
+ - Fixed:  Antennas not properly working. Post fix RemoteTech support is not yet confirmed.
+ - Fixed:  Part highlighting on mouseover of part selection button was broken.  Bug introduced when I refactored highlighting awhile ago.
+ - Fixed:  Sound file changes were not taking immediate effect.  Scene change was required. Github Issue #25
+ - Fixed:  Resource totals not preserved during Transfers.  Github Issue:  #36
+ - Fixed:  Resource Transfers exhibited incorrect stop button behavior with Target to source transfers.
+ - Fixed:  Tourists could go EVA, and should not.  Github Issue:  #37
+ - Fixed:  ToolTips displayed even when SM interface is not.  Github Issue: #38
+ - Fixed:  ToolTips not properly updating on Xfer button. Github Issue:  #39
+ - Fixed:  Crew Xfers between full parts failing under certain circumstances.  Github Issue #40
+
+Version 5.1.4.0 - Release 26 May 2017 - KSP 1.3 Compatibility Edition (1.2.9 Prerelease) Not for Official Distribution
+ - New:  Implemented Localization system.  Now it is possible to translate SM into other languages.
+ - New:  Realism Settings Refactor.  Realism Mode is redefined and easier to use; settings are now more granular.
+ - New:  - Added Radio switch for realism Categories:  Full, None, Default, Custom.  
+ - New:  - Added new setting to the Realism Tab "Realistic Control". This affects ship control window and uncontrolled resource transfers.
+ - New:  - Added new setting to the Realism Tab "Enable Roster Modifications".  Affects Roster actions Create, Add, Edit, Remove, and Respawn.
+ - New:  - Added new setting to Realism Tab.  "Realistic Transfers".  This affects Transfer features for crew, science and resources.
+ - New:  Added several new tooltips in the Mod.  Cleaned/updated up several others.
  - Fixed:  Selecting a resource in the Manifest Window triggered an enumeration error.
  - Fixed:  Crew respawn was always allowed.  Should be disabled for Realism.  Roster actions are now impacted by Enable Roster Modifications setting.
  - Fixed:  Issue with multiple instances of SMAddon class loading when changing scenes.

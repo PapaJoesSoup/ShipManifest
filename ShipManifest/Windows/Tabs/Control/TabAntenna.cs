@@ -13,6 +13,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static bool IsRtAntennas;
+    private const float guiRuleWidth = 350;
+    private const float guiToggleWidth = 325;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -32,7 +34,7 @@ namespace ShipManifest.Windows.Tabs.Control
         InstalledMods.IsRtInstalled ? SmUtils.Localize("#smloc_control_antenna_001") : SmUtils.Localize("#smloc_control_antenna_000"),
         SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(350));
+        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
@@ -45,7 +47,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "get Antenna label";
           string label = $"{iAntennas.Current.AntennaStatus} - {iAntennas.Current.Title}";
           bool open = iAntennas.Current.Extended;
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(325), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
             iAntennas.Current.ExtendAntenna();
@@ -54,7 +56,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iAntennas.Current.SPart);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iAntennas.Current.SPart, Event.current.mousePosition);
         }
         iAntennas.Dispose();
 

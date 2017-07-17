@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.InternalObjects;
+using ShipManifest.Windows;
 
 namespace ShipManifest.Process
 {
@@ -34,8 +35,16 @@ namespace ShipManifest.Process
     public InternalSeat ToSeat { get; internal set; }
     public Part FromPart { get; internal set; }
     public Part ToPart { get; internal set; }
+
+    // Used for single crew transfers.
     public ProtoCrewMember FromCrewMember { get; internal set; }
     public ProtoCrewMember ToCrewMember { get; internal set; }
+
+    // Used for multi crew transfers.
+    public List<Part> FromParts { get; internal set; }
+    public List<Part> ToParts { get; internal set; }
+    public List<ProtoCrewMember> FromCrewMembers { get; internal set; }
+    public List<ProtoCrewMember> ToCrewMembers { get; internal set; }
 
     // These 2 vars needed to support proper portrait updating.  A small delay is needed to allow for internal KSP crew move callbacks to complete before calling vessel.SpawnCrew
     // Ref:   http://forum.kerbalspaceprogram.com/threads/62270-1-0-2-Ship-Manifest-%28Crew-Science-Resources%29-v-4-1-4-4-10-Apr-15?p=982594&viewfull=1#post982594
@@ -93,6 +102,31 @@ namespace ShipManifest.Process
 
     #region Internal Methods
 
+    internal void CrewTransfersBegin(List<ProtoCrewMember> crewMembers, List<Part> fromParts, List<Part> toParts)
+    {
+      FromParts = fromParts;
+      ToParts = toParts;
+      FromCrewMembers = crewMembers;
+      ToCrewMembers = null;
+
+      //if (FromPart.internalModel != null && ToPart.internalModel != null)
+      //{
+      //  // seats have been chosen.
+      //  AssignSeats();
+
+      //  // Do we need to swap places with another Kerbal?
+      //  if (ToSeat != null && ToSeat.taken)
+      //  {
+      //    // get Kerbal to swap with through his seat...
+      //    ToCrewMember = ToSeat.kerbalRef.protoCrewMember;
+      //  }
+      //  // if moving within a part, set the seat2seat flag
+      //  IsSeat2SeatXfer = FromPart == ToPart;
+      //}
+
+      CrewHatchController.fetch.DisableInterface();
+      _crewXferActive = true;
+    }
     internal void CrewTransferBegin(ProtoCrewMember crewMember, Part fromPart, Part toPart)
     {
       FromPart = fromPart;
@@ -235,13 +269,13 @@ namespace ShipManifest.Process
               if (SMAddon.Elapsed > 1)
               {
                 CrewXferState = XferState.Stop;
-                CrewTransferStartAction();                
-              } 
+                CrewTransferStartAction();
+              }
             }
             break;
 
           case XferState.Stop:
-
+            if (SMConditions.ListsUpdating) break;
             // Spawn crew in parts and in vessel.
             if (SMSettings.RealXfers)
             {
@@ -287,12 +321,135 @@ namespace ShipManifest.Process
       }
     }
 
+    internal void CrewTransferProcesses()
+    {
+      try
+      {
+        if (!CrewXferActive) return;
+        if (CameraManager.Instance.currentCameraMode == CameraManager.CameraMode.IVA)
+        {
+          ScreenMessages.PostScreenMessage("<color=orange>Cannot go IVA.  An SM Crew Xfer is in progress</color>", 4f);
+          CameraManager.Instance.SetCameraMode(CameraManager.CameraMode.Flight);
+        }
+
+        switch (CrewXferState)
+        {
+          case XferState.Off:
+            // We're just starting loop, so set some evnironment stuff.
+            // We want to run the start sound no matter what the realism settings are 
+            // to give an audio indication to the player that the process is active
+            Timestamp = DateTime.Now;
+            SMSound.SourceCrewStart.Play();
+            CrewXferState = XferState.Start;
+            break;
+
+          case XferState.Start:
+
+            SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
+
+            if (SMSettings.RealXfers)
+            {
+              // Play run sound when start sound is nearly done. (repeats)
+              if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
+              {
+                SMSound.SourceCrewStart.Stop();
+                SMSound.SourceCrewRun.Play();
+                SMAddon.Elapsed = 0;
+                CrewXferState = XferState.Transfer;
+              }
+            }
+            else
+            {
+              CrewXferState = XferState.Transfer;
+            }
+            break;
+
+          case XferState.Transfer:
+
+            SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
+
+            if (SMSettings.RealXfers)
+            {
+              // wait for movement to end...
+              if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
+              {
+                CrewXferState = XferState.Stop;
+                CrewTransferStartAction();
+              }
+            }
+            else
+            {
+              if (SMAddon.Elapsed > 1)
+              {
+                CrewXferState = XferState.Stop;
+              } 
+            }
+            break;
+
+          case XferState.Stop:
+
+            // Spawn crew in parts and in vessel.
+            if (SMSettings.RealXfers)
+            {
+              // play crew sit.
+              SMSound.SourceCrewRun.Stop();
+              SMSound.SourceCrewStop.Play();
+            }
+            CrewTransferStartAction();
+            CrewTransferStopAction();
+            Vessel.CrewWasModified(SMAddon.SmVessel.Vessel);
+            SMAddon.SmVessel.Vessel.DespawnCrew();
+            SMAddon.Elapsed = 0;
+            CrewXferState = XferState.Portraits;
+            IvaDelayActive = true;
+            break;
+
+          case XferState.Portraits:
+
+            // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
+            SMAddon.SmVessel.Vessel.SpawnCrew();
+            if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
+            {
+              IvaPortraitDelay += 1;
+            }
+            else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
+            {
+              if (IsStockXfer)
+                ScreenMessages.PostScreenMessage(
+                  $"<color=yellow>{FromCrewMember.name} moved (by SM) to {ToPart.partInfo.title}.</color>", 5f);
+
+              ResetXferProcess();
+            }
+            break;
+        }
+        if (CrewXferState != XferState.Off) Timestamp = DateTime.Now;
+      }
+      catch (Exception ex)
+      {
+        if (!SMAddon.FrameErrTripped)
+        {
+          SmUtils.LogMessage($"Transfer State:  {CrewXferState}...", SmUtils.LogType.Error, true);
+          SmUtils.LogMessage(
+            $" in CrewTransferProcess (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
+          SMAddon.FrameErrTripped = true;
+          ResetXferProcess();
+        }
+      }
+    }
+
     private void ResetXferProcess()
     {
       IvaDelayActive = false;
       IvaPortraitDelay = 0;
-      FromCrewMember = ToCrewMember = null;
+      FromPart = ToPart = null;
       FromSeat = ToSeat = null;
+      FromCrewMember = ToCrewMember = null;
+
+      FromParts = ToParts = null;
+      FromCrewMembers = ToCrewMembers = null;
+      SMAddon.SmVessel.SourceMembersSelected.Clear();
+      SMAddon.SmVessel.TargetMembersSelected.Clear();
+
       SMAddon.SmVessel.RespawnCrew();
       CrewHatchController.fetch.EnableInterface();
       CameraManager.ICameras_ResetAll();
@@ -303,39 +460,89 @@ namespace ShipManifest.Process
     internal void CrewTransferStartAction()
     {
       // This removes the kerbal(s) from the current (source) part(s)
-      try
+      if (FromCrewMember != null)
       {
-        if (FromCrewMember != null) RemoveCrewMember(FromCrewMember, FromPart);
-        if (ToCrewMember != null) RemoveCrewMember(ToCrewMember, ToPart);
-        SMAddon.FireEventTriggers();
+        try
+        {
+          if (FromCrewMember != null) RemoveCrewMember(FromCrewMember, FromPart);
+          if (ToCrewMember != null) RemoveCrewMember(ToCrewMember, ToPart);
+          //SMAddon.FireEventTriggers();
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
+        }
       }
-      catch (Exception ex)
+      else
       {
-        SmUtils.LogMessage(
-          $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
+        // Must be multi-crew...
+        try
+        {
+          if (FromCrewMembers != null) RemoveCrewMembers(FromCrewMembers, FromParts);
+          //SMAddon.FireEventTriggers();
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $"in CrewTransferStartAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
+        }
       }
     }
 
     internal void CrewTransferStopAction()
     {
       // This adds the kerbal(s) to the destination part(s)
-      try
+      if (FromCrewMember != null)
       {
-        // Add Source Crewmember to target part
-        if (FromCrewMember != null && ToPart.CrewCapacity > ToPart.protoModuleCrew.Count)
-          AddCrewMember(FromCrewMember, ToPart, ToSeat);
+        try
+        {
+          // Add Source Crewmember to target part
+          if (FromCrewMember != null && ToPart.CrewCapacity > ToPart.protoModuleCrew.Count)
+            AddCrewMember(FromCrewMember, ToPart, ToSeat);
 
-        // Add Target Crewmember to source part
-        if (ToCrewMember != null && FromPart.CrewCapacity > FromPart.protoModuleCrew.Count)
-          AddCrewMember(ToCrewMember, FromPart, FromSeat);
+          // Add Target Crewmember to source part
+          if (ToCrewMember != null && FromPart.CrewCapacity > FromPart.protoModuleCrew.Count)
+            AddCrewMember(ToCrewMember, FromPart, FromSeat);
 
-        SMAddon.SmVessel.TransferCrewObj.IvaDelayActive = true;
-        SMAddon.FireEventTriggers();
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
+        }
       }
-      catch (Exception ex)
+      else
       {
-        SmUtils.LogMessage(
-          $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
+        // Must be multi-crew...
+        try
+        {
+          List<Part>.Enumerator toPart = ToParts.GetEnumerator();
+          int crewIdx = 0;
+          while (toPart.MoveNext())
+          {
+            if (toPart.Current == null) continue;
+            // Add Source Crewmember(s) to target part
+            if (toPart.Current.CrewCapacity <= toPart.Current.protoModuleCrew.Count) continue;
+            int space = toPart.Current.CrewCapacity - toPart.Current.protoModuleCrew.Count;
+            for (int idx = 0; idx < space; idx++)
+            {
+              if (crewIdx > FromCrewMembers.Count - 1) break;
+              AddCrewMember(FromCrewMembers[crewIdx], toPart.Current);
+              crewIdx++;
+            }
+          }
+          toPart.Dispose();
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $"in CrewTransferAction.  Error moving crewmember.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+            SmUtils.LogType.Error, true);
+        }
       }
     }
 
@@ -467,14 +674,23 @@ namespace ShipManifest.Process
         part.AddCrewmember(pKerbal);
     }
 
-    internal static void RemoveCrewMembers(Dictionary<ProtoCrewMember, Part> pKerbals)
+    internal static void RemoveCrewMembers(List<ProtoCrewMember> pKerbals, List<Part> fParts)
     {
-      Dictionary<ProtoCrewMember, Part>.Enumerator kerbals = pKerbals.GetEnumerator();
-      while (kerbals.MoveNext())
+      List<ProtoCrewMember>.Enumerator kerbal = pKerbals.GetEnumerator();
+      while (kerbal.MoveNext())
       {
-        RemoveCrewMember(kerbals.Current.Key, kerbals.Current.Value);
+        if (kerbal.Current == null) continue;
+        List<Part>.Enumerator part = fParts.GetEnumerator();
+        while (part.MoveNext())
+        {
+          if (part.Current == null) continue;
+          if (!part.Current.protoModuleCrew.Contains(kerbal.Current)) continue;
+          RemoveCrewMember(kerbal.Current, part.Current);
+          break;
+        }
+        part.Dispose();
       }
-      kerbals.Dispose();
+      kerbal.Dispose();
     }
 
     internal static void RemoveCrewMember(ProtoCrewMember pKerbal, Part part)
@@ -493,4 +709,4 @@ namespace ShipManifest.Process
       Portraits
     }
   }
-}
+} 

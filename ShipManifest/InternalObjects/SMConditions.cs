@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using ConnectedLivingSpace;
 using KSP.UI.Dialogs;
 using ShipManifest.APIClients;
+using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows;
+using UniLinq;
+using UnityEngine;
 
 namespace ShipManifest.InternalObjects
 {
@@ -20,6 +23,8 @@ namespace ShipManifest.InternalObjects
   {
     #region Condition Methods
 
+    internal static bool ListsUpdating;
+
     internal static bool IsShipControllable()
     {
       return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealControl) || !SMSettings.RealControl;
@@ -30,10 +35,10 @@ namespace ShipManifest.InternalObjects
       return SMAddon.SmVessel.IsRecoverable && SMAddon.SmVessel.Vessel.Landed;
     }
 
-    internal static bool CanResourceBeXferred(TransferPump.TypePump thisXferMode, double maxXferAmount)
+    internal static bool CanResourceBeXferred(TransferPump.TypeXfer thisXferMode, double maxXferAmount)
     {
       return (!TransferPump.PumpProcessOn && maxXferAmount > 0) ||
-             (TransferPump.PumpProcessOn && SMAddon.ActivePumpType == thisXferMode);
+             (TransferPump.PumpProcessOn && SMAddon.ActiveXferType == thisXferMode);
     }
 
     internal static bool CanKerbalsBeXferred(Part sourcePart, Part targetPart)
@@ -62,11 +67,23 @@ namespace ShipManifest.InternalObjects
           //  "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
           return false;
         }
-        if (selectedPartsSource[0] == selectedPartsTarget[0])
+        if (selectedPartsSource.Count == 1 && selectedPartsTarget.Count == 1)
         {
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
-          // "Source and Target Part are the same.\r\nUse Move Kerbal (>>) instead.";
-          return false;
+          if (selectedPartsSource[0] == selectedPartsTarget[0])
+          {
+            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
+            // "Source and Target Parts are the same.\r\nUse Move Kerbal (>>) instead.";
+            return false;
+          }
+        }
+        else if (selectedPartsSource.Count > 1 || selectedPartsTarget.Count > 1)
+        {
+          if (selectedPartsSource == selectedPartsTarget)
+          {
+            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
+            // "Source and Target Parts are the same.\r\nUse Move individual Kerbals (>>) instead.";
+            return false;
+          }
         }
         // If one of the parts is a DeepFreeze part and no crew are showing in protoModuleCrew, check it isn't full of frozen Kerbals. 
         // This is to prevent SM from Transferring crew into a DeepFreeze part that is full of frozen kerbals.
@@ -75,40 +92,39 @@ namespace ShipManifest.InternalObjects
         DfWrapper.DeepFreezer sourcepartFrzr = null; // selectedPartsSource[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
         DfWrapper.DeepFreezer targetpartFrzr = null; // selectedPartsTarget[0].FindModuleImplementing<DFWrapper.DeepFreezer>();
 
-        PartModule sourcedeepFreezer = GetFreezerModule(selectedPartsSource[0]);
-        if (sourcedeepFreezer != null) sourcepartFrzr = new DfWrapper.DeepFreezer(sourcedeepFreezer);
-
-        PartModule targetdeepFreezer = GetFreezerModule(selectedPartsTarget[0]);
-        if (targetdeepFreezer != null) targetpartFrzr = new DfWrapper.DeepFreezer(targetdeepFreezer);
-
-        if (sourcepartFrzr != null)
+        List<Part>.Enumerator srcPart = selectedPartsSource.GetEnumerator();
+        while (srcPart.MoveNext())
         {
-          if (sourcepartFrzr.FreezerSpace == 0)
-          {
-            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
-            // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
-            return false;
-          }
+          if (srcPart.Current == null) continue;
+          PartModule sourcedeepFreezer = GetFreezerModule(srcPart.Current);
+          if (sourcedeepFreezer != null) sourcepartFrzr = new DfWrapper.DeepFreezer(sourcedeepFreezer);
+          if (sourcepartFrzr?.FreezerSpace != 0) continue;
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
+          // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+          return false;
         }
-        if (targetpartFrzr != null)
+
+        List<Part>.Enumerator tgtPart = selectedPartsSource.GetEnumerator();
+        while (tgtPart.MoveNext())
         {
-          if (targetpartFrzr.FreezerSpace == 0)
-          {
-            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
-            // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
-            return false;
-          }
+          if (tgtPart.Current == null) continue;
+          PartModule targetdeepFreezer = GetFreezerModule(tgtPart.Current);
+          if (targetdeepFreezer != null) targetpartFrzr = new DfWrapper.DeepFreezer(targetdeepFreezer);
+          if (targetpartFrzr?.FreezerSpace != 0) continue;
+          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
+          // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
+          return false;
         }
 
         // Are there kerbals to move?
-        if (selectedPartsSource[0].protoModuleCrew.Count == 0)
+        if (SmUtils.GetPartsCrewCount(selectedPartsSource) == 0)
         {
           //WindowTransfer.XferToolTip = "No Kerbals to Move.";
           WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_005");
           return false;
         }
         // now if realistic xfers is enabled, are the parts connected to each other in the same living space?
-        results = IsClsInSameSpace(selectedPartsSource[0], selectedPartsTarget[0]);
+        results = IsClsInSameSpace(selectedPartsSource, selectedPartsTarget);
         if (!results)
           WindowTransfer.EvaToolTip = SmUtils.Localize("#smloc_conditions_tt_006");
         // "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
@@ -129,30 +145,47 @@ namespace ShipManifest.InternalObjects
       return !selectedPartSource.Modules.Contains("DeepFreezer") ? null : selectedPartSource.Modules["DeepFreezer"];
     }
 
+    internal static bool IsClsInSameSpace(List<Part> source, List<Part> target)
+    {
+      if (!SMSettings.EnableCls ||  !SMSettings.RealXfers) return true;
+
+      bool result = false;
+      List<Part>.Enumerator srcPart = source.GetEnumerator();
+      while (srcPart.MoveNext())
+      {
+        if (srcPart.Current == null) continue;
+        List<Part>.Enumerator destPart = target.GetEnumerator();
+        while (destPart.MoveNext())
+        {
+          if (destPart.Current == null) continue;
+          result = IsClsInSameSpace(srcPart.Current, destPart.Current);
+        }
+      }
+      return result;
+    }
+
     internal static bool IsClsInSameSpace(Part source, Part target)
     {
-      if (source == null || target == null) return false;
       bool results = false;
+      if (source == null || target == null) return results;
       if (SMSettings.EnableCls && SMSettings.RealXfers)
       {
-        if (SMAddon.ClsAddon.Vessel != null)
+        if (SMAddon.ClsAddon.Vessel == null) return results;
+        ICLSSpace sourceSpace = null;
+        ICLSSpace targetSpace = null;
+        List<ICLSPart>.Enumerator parts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
+        while (parts.MoveNext())
         {
-          ICLSSpace sourceSpace = null;
-          ICLSSpace targetSpace = null;
-          List<ICLSPart>.Enumerator parts = SMAddon.ClsAddon.Vessel.Parts.GetEnumerator();
-          while (parts.MoveNext())
-          {
-            ICLSPart ipart = parts.Current;
-            if (ipart == null) continue;
-            if (ipart.Part == source) sourceSpace = ipart.Space;
-            if (ipart.Part == target) targetSpace = ipart.Space;
-            if (sourceSpace != null && targetSpace != null) break;
-          }
-          parts.Dispose();
-          if (sourceSpace != null && targetSpace != null && sourceSpace == targetSpace)
-          {
-            results = true;
-          }
+          ICLSPart ipart = parts.Current;
+          if (ipart == null) continue;
+          if (ipart.Part == source) sourceSpace = ipart.Space;
+          if (ipart.Part == target) targetSpace = ipart.Space;
+          if (sourceSpace != null && targetSpace != null) break;
+        }
+        parts.Dispose();
+        if (sourceSpace != null && targetSpace != null && sourceSpace == targetSpace)
+        {
+          results = true;
         }
       }
       else
@@ -287,6 +320,11 @@ namespace ShipManifest.InternalObjects
              !resourceNames.Contains(ResourceType.Science.ToString());
     }
 
+    internal static bool IsClsEnabled()
+    {
+      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null;
+    }
+
     internal static bool IsClsActive()
     {
       return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null &&
@@ -318,6 +356,27 @@ namespace ShipManifest.InternalObjects
       return part.Modules["USIAnimation"].Fields["CrewCapacity"] != null;
     }
 
+    internal static bool IsVesselDocked(ModDockedVessel vessel)
+    {
+      bool result = false;
+      List<Part>.Enumerator parts = vessel.VesselParts.GetEnumerator();
+      while (parts.MoveNext())
+      {
+        if (parts.Current == null ) continue;
+        List<ModuleDockingNode>.Enumerator nodes = parts.Current.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
+        while (nodes.MoveNext())
+        {
+          if (nodes.Current == null) continue;
+          if (nodes.Current.otherNode == null) continue;
+          result = true;
+          break;
+        }
+        nodes.Dispose();
+        if (result) break;
+      }
+      parts.Dispose();
+      return result;
+    }
     #endregion
 
     #region Roster Window methods
@@ -385,6 +444,12 @@ namespace ShipManifest.InternalObjects
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 
+    internal static TransferMode GetTransferMode()
+    {
+      if (SMAddon.SmVessel.SelectedResources.Contains(TransferMode.Crew.ToString())) return TransferMode.Crew;
+      return SMAddon.SmVessel.SelectedResources.Contains(TransferMode.Crew.ToString()) ? TransferMode.Science : TransferMode.Resources;
+    }
+
     #endregion
 
     #region Enums
@@ -410,6 +475,13 @@ namespace ShipManifest.InternalObjects
       WindowManifest,
       WindowSettings,
       WindowTransfer
+    }
+
+    public enum TransferMode
+    {
+      Crew,
+      Science,
+      Resources
     }
 
     #endregion

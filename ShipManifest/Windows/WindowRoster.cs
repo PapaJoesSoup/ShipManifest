@@ -17,7 +17,7 @@ namespace ShipManifest.Windows
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
     internal static Rect Position = new Rect(0, 0, 0, 0);
-    internal static Rect ViewBox = new Rect(0,0,230,680);
+    internal static Rect ViewBox = new Rect(0, 0, 680, 230);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -178,9 +178,12 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         bool kerbalFound = false;
+        ProtoCrewMember.KerbalType kerbalType = KerbalProfession == Professions.Tourist
+          ? ProtoCrewMember.KerbalType.Tourist
+          : ProtoCrewMember.KerbalType.Crew;
         while (!kerbalFound)
         {
-          SelectedKerbal = ModKerbal.CreateKerbal();
+          SelectedKerbal = ModKerbal.CreateKerbal(kerbalType);
           if (SelectedKerbal.Trait == KerbalProfession.ToString())
             kerbalFound = true;
         }
@@ -214,6 +217,10 @@ namespace ShipManifest.Windows
 
       bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, SmUtils.Localize("#smloc_roster_008"), GUILayout.Width(90)); // "Scientist"
       if (isScientist) KerbalProfession = Professions.Scientist;
+
+      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, SmUtils.Localize("#smloc_roster_032"), GUILayout.Width(90)); // "Toruist"
+      if (isTourist) KerbalProfession = Professions.Tourist;
+
       GUILayout.EndHorizontal();
     }
 
@@ -461,6 +468,7 @@ namespace ShipManifest.Windows
       {
         RosterList.Clear();
         RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+        RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
         // Support for DeepFreeze
         if (InstalledMods.IsDfInstalled && DfWrapper.ApiReady)
           RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);

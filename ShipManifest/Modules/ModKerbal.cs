@@ -42,9 +42,9 @@ namespace ShipManifest.Modules
       return string.Empty;
     }
 
-    public static ModKerbal CreateKerbal()
+    public static ModKerbal CreateKerbal(ProtoCrewMember.KerbalType kerbalType)
     {
-      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
+      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype(kerbalType);
       return new ModKerbal(kerbal, true);
     }
 
