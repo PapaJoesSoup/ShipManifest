@@ -103,6 +103,7 @@ namespace ShipManifest
     internal List<Part> SelectedPartsSource = new List<Part>();
     internal List<Part> SelectedPartsTarget = new List<Part>();
 
+    // Used for part to part Science transfers.
     internal PartModule SelectedModuleSource;
     internal PartModule SelectedModuleTarget;
 

@@ -53,19 +53,49 @@ namespace ShipManifest.Windows
         if (_scienceModulesSource != null) return _scienceModulesSource;
         _scienceModulesSource = new Dictionary<PartModule, bool>();
         if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return _scienceModulesSource;
-        IScienceDataContainer[] modules = SMAddon.SmVessel.SelectedPartsSource[0].FindModulesImplementing<IScienceDataContainer>().ToArray();
-        if (modules.Length <= 0) return _scienceModulesSource;
-        IEnumerator sourceModules = modules.GetEnumerator();
-        while (sourceModules.MoveNext())
+        List<Part>.Enumerator part = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+        while (part.MoveNext())
         {
-          if (sourceModules.Current == null) continue;
-          PartModule pm = (PartModule) sourceModules.Current;
-          _scienceModulesSource.Add(pm, false);
+          if (part.Current == null) continue;
+          List<IScienceDataContainer>.Enumerator module = part.Current.FindModulesImplementing<IScienceDataContainer>().GetEnumerator();
+          while (module.MoveNext())
+          {
+            if (module.Current == null) continue;
+            PartModule pm = (PartModule) module.Current;
+            _scienceModulesSource.Add(pm, false);
+          }
+          module.Dispose();
         }
+        part.Dispose();
         return _scienceModulesSource;
       }
     }
 
+    private static Dictionary<PartModule, bool> _scienceModulesTarget;
+    internal static Dictionary<PartModule, bool> ScienceModulesTarget
+    {
+      get
+      {
+        if (_scienceModulesTarget != null) return _scienceModulesTarget;
+        _scienceModulesTarget = new Dictionary<PartModule, bool>();
+        if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return _scienceModulesTarget;
+        List<Part>.Enumerator part = SMAddon.SmVessel.SelectedPartsSource.GetEnumerator();
+        while (part.MoveNext())
+        {
+          if (part.Current == null) continue;
+          List<IScienceDataContainer>.Enumerator module = part.Current.FindModulesImplementing<IScienceDataContainer>().GetEnumerator();
+          while (module.MoveNext())
+          {
+            if (module.Current == null) continue;
+            PartModule pm = (PartModule)module.Current;
+            _scienceModulesTarget.Add(pm, false);
+          }
+          module.Dispose();
+        }
+        part.Dispose();
+        return _scienceModulesTarget;
+      }
+    }
     #endregion
 
 
@@ -249,7 +279,7 @@ namespace ShipManifest.Windows
         }
       }
       GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
-      if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
+      if (SMAddon.SmVessel.ModDockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
       {
         if (xferType == TransferPump.TypeXfer.SourceToTarget)
         {
@@ -951,12 +981,17 @@ namespace ShipManifest.Windows
 
     #region Science Details Viewer
 
-    private static void ScienceVesselDetails(List<Part> sourceParts, List<Part> targetParts, bool isVesselMode)
+    private static void ScienceVesselDetails(Dictionary<PartModule, bool> sourceModules, Dictionary<PartModule, bool> targetModules, bool isVesselMode)
     {
-      if (sourceParts.Count <= 0 || targetParts.Count <= 0) return;
+      if (sourceModules.Count <= 0 || targetModules.Count <= 0) return;
       const float xOffset = 30;
+      // Okay, for vessels we want summaries.  then a result list of modules to transfer based on those summaries.
+      // - Collectable Science
+      // - Processed Science (Labs)
+      // - Uncollectable Science (eva only Experiments)
+      // - Unprocessed science (Labs)
 
-      Dictionary<PartModule, bool>.KeyCollection.Enumerator modules = ScienceModulesSource.Keys.GetEnumerator();
+      Dictionary<PartModule, bool>.KeyCollection.Enumerator modules = sourceModules.Keys.GetEnumerator();
       while (modules.MoveNext())
       {
         if (modules.Current == null) continue;
@@ -970,6 +1005,10 @@ namespace ShipManifest.Windows
             break;
           case "ModuleScienceContainer":
             isCollectable = ((ModuleScienceContainer)modules.Current).dataIsCollectable;
+            break;
+          case "ModuleScienceLab":
+          case "ModuleScienceConverter":
+            isCollectable = true;
             break;
         }
 
