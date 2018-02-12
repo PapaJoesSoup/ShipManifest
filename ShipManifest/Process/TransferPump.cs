@@ -411,7 +411,6 @@ namespace ShipManifest.Process
         if (cycleAmount > maxAmount) cycleAmount = maxAmount;
       }
 
-      SmUtils.LogMessage("RunPumpCycle: cycleAmount = " + cycleAmount, SmUtils.LogType.Error, true);
       // From Parts.  used by Dump and Transfer.
       DrainParts(cycleAmount);
 
