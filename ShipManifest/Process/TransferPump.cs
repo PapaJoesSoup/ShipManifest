@@ -411,6 +411,7 @@ namespace ShipManifest.Process
         if (cycleAmount > maxAmount) cycleAmount = maxAmount;
       }
 
+      SmUtils.LogMessage("RunPumpCycle: cycleAmount = " + cycleAmount, SmUtils.LogType.Error, true);
       // From Parts.  used by Dump and Transfer.
       DrainParts(cycleAmount);
 
@@ -438,49 +439,46 @@ namespace ShipManifest.Process
       double cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
-        // calc average of parts in list.
-        double toPartAvgAmt = cycleAmount/ToParts.Count;
-
-        // reduce to the smallest container.
-        double minAmt = toPartAvgAmt;
-        int remainingPartsCount = 0;
+        // find minimum but positive remaining capacity or single tank!
+        double minAmt = Double.MaxValue;
         List<Part>.Enumerator theseParts = ToParts.GetEnumerator();
+        List<Part> nonFullParts = new List<Part>();
         while (theseParts.MoveNext())
         {
-          if (theseParts.Current == null) continue;
-          double thisPartCap = PartRemainingCapacity(theseParts.Current, Resource);
+          Part part = theseParts.Current;
+          if (part == null) continue;
+          double thisPartCap = PartRemainingCapacity(part, Resource);
           if (thisPartCap <= SMSettings.Tolerance) continue;
-          if (thisPartCap >= minAmt)
+          if (thisPartCap < minAmt)
           {
-            remainingPartsCount++;
-            continue;
+            minAmt = thisPartCap;
           }
-          minAmt = thisPartCap;
-          remainingPartsCount++;
+          nonFullParts.Add(part);
         }
         theseParts.Dispose();
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Calculate pump amounts for each To part and Increment.
-        if (remainingPartsCount > 0)
+        if (nonFullParts.Count > 0)
         {
-          List<Part>.Enumerator toParts = ToParts.GetEnumerator();
+          double toTransfer = Math.Min(cycleBalance / nonFullParts.Count, minAmt);
+          List<Part>.Enumerator toParts = nonFullParts.GetEnumerator();
           while (toParts.MoveNext())
           {
-            if (toParts.Current == null) continue;
-            if (PartRemainingCapacity(toParts.Current, Resource) <= SMSettings.Tolerance) continue;
             Part part = toParts.Current;
-            part.Resources[Resource].amount += minAmt;
-            cycleBalance -= minAmt;
+            part.Resources[Resource].amount += toTransfer;
+            cycleBalance -= toTransfer;
 
             // Ensure part is capped and does not contain more than allowed.
             if (part.Resources[Resource].amount > part.Resources[Resource].maxAmount)
+            {
               part.Resources[Resource].amount = part.Resources[Resource].maxAmount;
+            }
           }
           toParts.Dispose();
         }
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
-        if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
+        if (nonFullParts.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
       }
     }
 
@@ -494,47 +492,42 @@ namespace ShipManifest.Process
       double cycleBalance = cycleAmount;
       while (cycleBalance > SMSettings.Tolerance)
       {
-        // calc average of parts in list.
-        double fromPartAvgAmt = cycleAmount / FromParts.Count;
-
-        // reduce to the smallest container.
-        double minAmt = fromPartAvgAmt;
-        int remainingPartsCount = 0;
+        // find least but positive amount of resource in single tank!
+        double minAmt = Double.MaxValue;
         List<Part>.Enumerator theseParts = FromParts.GetEnumerator();
+        List<Part> nonEmptyParts = new List<Part>();
         while (theseParts.MoveNext())
         {
-          if (theseParts.Current == null) continue;
-          if (theseParts.Current.Resources[Resource].amount <= SMSettings.Tolerance) continue;
-          if (theseParts.Current.Resources[Resource].amount >= minAmt)
+          Part part = theseParts.Current;
+          if (part == null) continue;
+          if (part.Resources[Resource].amount <= SMSettings.Tolerance) continue;
+          if (part.Resources[Resource].amount < minAmt)
           {
-            remainingPartsCount++;
-            continue;
+            minAmt = part.Resources[Resource].amount;
           }
-          minAmt = theseParts.Current.Resources[Resource].amount;
-          remainingPartsCount++;
+          nonEmptyParts.Add(theseParts.Current);
         }
         theseParts.Dispose();
 
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
         // Decrement.
-        if (remainingPartsCount > 0)
+        if (nonEmptyParts.Count > 0)
         {
-          List<Part>.Enumerator fromParts = FromParts.GetEnumerator();
+          double toTransfer = Math.Min(cycleBalance / nonEmptyParts.Count, minAmt);
+          List<Part>.Enumerator fromParts = nonEmptyParts.GetEnumerator();
           while (fromParts.MoveNext())
           {
-            if (fromParts.Current == null) continue;
-            if (fromParts.Current.Resources[Resource].amount <= SMSettings.Tolerance) continue;
             Part part = fromParts.Current;
-            part.Resources[Resource].amount -= minAmt;
-            cycleBalance -= minAmt;
-            AmtPumped += minAmt;
+            part.Resources[Resource].amount -= toTransfer;
+            cycleBalance -= toTransfer;
+            AmtPumped += toTransfer;
 
             // Ensure part is empty and does not contain less than 0.
             if (part.Resources[Resource].amount <= SMSettings.Tolerance) part.Resources[Resource].amount = 0;
           }
           fromParts.Dispose();
         }
-        if (remainingPartsCount == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
+        if (nonEmptyParts.Count == 0 && cycleBalance > SMSettings.Tolerance) cycleBalance = 0;
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
       }
     }
