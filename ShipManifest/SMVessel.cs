@@ -578,22 +578,15 @@ namespace ShipManifest
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
-          List<PartModule>.Enumerator pModules = pParts.Current.Modules.GetEnumerator();
-          while (pModules.MoveNext())
+          ModuleDeployableSolarPanel solarPanel = pParts.Current.FindModuleImplementing<ModuleDeployableSolarPanel>();
+          if (solarPanel == null) continue;
+          if (!solarPanel.Events["Extend"].active && !solarPanel.Events["Retract"].active) continue;
+          ModSolarPanel pPanel = new ModSolarPanel
           {
-            if (pModules.Current == null) continue;
-            PartModule pModule = (PartModule)pModules.Current;
-            if (pModule.moduleName != "ModuleDeployableSolarPanel") continue;
-            ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)pModule;
-            if (!iModule.Events["Extend"].active && !iModule.Events["Retract"].active) continue;
-            ModSolarPanel pPanel = new ModSolarPanel
-            {
-              PanelModule = pModule,
-              SPart = pParts.Current
-            };
-            _solarPanels.Add(pPanel);
-          }
-          pModules.Dispose();
+            PanelModule = solarPanel,
+            SPart = pParts.Current
+          };
+          _solarPanels.Add(pPanel);
         }
         pParts.Dispose();
       }
