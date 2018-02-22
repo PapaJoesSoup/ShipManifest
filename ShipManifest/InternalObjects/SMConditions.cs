@@ -6,8 +6,6 @@ using ShipManifest.APIClients;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows;
-using UniLinq;
-using UnityEngine;
 
 namespace ShipManifest.InternalObjects
 {
@@ -58,12 +56,12 @@ namespace ShipManifest.InternalObjects
         if (IsTransferInProgress())
         {
           //WindowTransfer.XferToolTip = "Transfer in progress.  Xfers disabled.";
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_001");
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_001"];
           return false;
         }
         if (selectedPartsSource.Count == 0 || selectedPartsTarget.Count == 0)
         {
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_002");
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_002"];
           //  "Source or Target Part is not selected.\r\nPlease Select a Source AND a Target part.";
           return false;
         }
@@ -71,7 +69,7 @@ namespace ShipManifest.InternalObjects
         {
           if (selectedPartsSource[0] == selectedPartsTarget[0])
           {
-            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
+            WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_003"];
             // "Source and Target Parts are the same.\r\nUse Move Kerbal (>>) instead.";
             return false;
           }
@@ -80,7 +78,7 @@ namespace ShipManifest.InternalObjects
         {
           if (selectedPartsSource == selectedPartsTarget)
           {
-            WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_003");
+            WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_003"];
             // "Source and Target Parts are the same.\r\nUse Move individual Kerbals (>>) instead.";
             return false;
           }
@@ -99,7 +97,7 @@ namespace ShipManifest.InternalObjects
           PartModule sourcedeepFreezer = GetFreezerModule(srcPart.Current);
           if (sourcedeepFreezer != null) sourcepartFrzr = new DfWrapper.DeepFreezer(sourcedeepFreezer);
           if (sourcepartFrzr?.FreezerSpace != 0) continue;
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_004"];
           // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
           return false;
         }
@@ -111,7 +109,7 @@ namespace ShipManifest.InternalObjects
           PartModule targetdeepFreezer = GetFreezerModule(tgtPart.Current);
           if (targetdeepFreezer != null) targetpartFrzr = new DfWrapper.DeepFreezer(targetdeepFreezer);
           if (targetpartFrzr?.FreezerSpace != 0) continue;
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_004");
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_004"];
           // "DeepFreeze Part is full of frozen kerbals.\r\nCannot Xfer until some are thawed.";
           return false;
         }
@@ -120,16 +118,16 @@ namespace ShipManifest.InternalObjects
         if (SmUtils.GetPartsCrewCount(selectedPartsSource) == 0)
         {
           //WindowTransfer.XferToolTip = "No Kerbals to Move.";
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_005");
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_005"];
           return false;
         }
         // now if realistic xfers is enabled, are the parts connected to each other in the same living space?
         results = IsClsInSameSpace(selectedPartsSource, selectedPartsTarget);
         if (!results)
-          WindowTransfer.EvaToolTip = SmUtils.Localize("#smloc_conditions_tt_006");
+          WindowTransfer.EvaToolTip = SmUtils.SmTags["#smloc_conditions_tt_006"];
         // "CLS is preventing internal Crew Transfer.  Click to initiate EVA operation.";
         else
-          WindowTransfer.XferToolTip = SmUtils.Localize("#smloc_conditions_tt_007");  
+          WindowTransfer.XferToolTip = SmUtils.SmTags["#smloc_conditions_tt_007"];  
           // "Kerbal can be Transfered.";
       }
       catch (Exception ex)

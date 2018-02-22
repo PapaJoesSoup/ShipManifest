@@ -31,7 +31,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       GUILayout.Label(
         //InstalledMods.IsRtInstalled ? "Antenna Control Center  (RemoteTech detected)" : "Antenna Control Center ",
-        InstalledMods.IsRtInstalled ? SmUtils.Localize("#smloc_control_antenna_001") : SmUtils.Localize("#smloc_control_antenna_000"),
+        InstalledMods.IsRtInstalled ? SmUtils.SmTags["#smloc_control_antenna_001"] : SmUtils.SmTags["#smloc_control_antenna_000"],
         SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));

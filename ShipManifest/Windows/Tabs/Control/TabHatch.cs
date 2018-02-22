@@ -30,7 +30,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.Localize("#smloc_control_hatch_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_control_hatch_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";

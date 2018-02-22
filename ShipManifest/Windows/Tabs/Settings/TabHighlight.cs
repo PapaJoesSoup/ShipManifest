@@ -34,7 +34,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       int scrollX = 20;
 
       GUI.enabled = true;
-      GUILayout.Label(SmUtils.Localize("#smloc_settings_highlight_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_settings_highlight_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
@@ -43,8 +43,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Enable Highlighting";
       //_toolTip = "Enables highlighting of all parts that contain the resource(s) selected in the Manifest Window.";
       //_toolTip += "\r\nThis is a global setting.  Does not affect mouseover highlighting.";
-      _label = SmUtils.Localize("#smloc_settings_highlight_001");
-      _toolTip = SmUtils.Localize("#smloc_settings_highlight_tt_001");
+      _label = SmUtils.SmTags["#smloc_settings_highlight_001"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_001"];
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableHighlighting = GUILayout.Toggle(SMSettings.EnableHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
@@ -75,8 +75,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_toolTip = "Disables general highlighting of parts for a selected Resource or resources.";
       //_toolTip += "\r\nRestricts highlighting of parts to only the part or parts selected in the Transfer Window.";
       //_toolTip += "\r\nRequires 'Enable Highlighting' to be On.";
-      _label = SmUtils.Localize("#smloc_settings_highlight_002");
-      _toolTip = SmUtils.Localize("#smloc_settings_highlight_tt_002");
+      _label = SmUtils.SmTags["#smloc_settings_highlight_002"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_002"];
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.OnlySourceTarget = GUILayout.Toggle(SMSettings.OnlySourceTarget, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
@@ -108,8 +108,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_toolTip += "\r\nHighlights the parts associated with livable/passable spaces on vessel.";
       //_toolTip += "\r\nRequires 'Enable Highlighting' to be On and is mutually exclusive with ";
       //_toolTip += "\r\n'Highlight Only Source / Target Parts'.";
-      _label = SmUtils.Localize("#smloc_settings_highlight_003");
-      _toolTip = SmUtils.Localize("#smloc_settings_highlight_tt_003");
+      _label = SmUtils.SmTags["#smloc_settings_highlight_003"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_003"];
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableClsHighlighting = GUILayout.Toggle(SMSettings.EnableClsHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
@@ -133,8 +133,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_toolTip = "Changes highlighting behavior when you mouseover a part button in Transfer Window.";
       //_toolTip += "\r\nCauses the edge of the part to glow, making it easier to see.";
       //_toolTip += "\r\nRequires Edge Highlighting to be enabled in the KSP Game settings.";
-      _label = SmUtils.Localize("#smloc_settings_highlight_004");
-      _toolTip = SmUtils.Localize("#smloc_settings_highlight_tt_004");
+      _label = SmUtils.SmTags["#smloc_settings_highlight_004"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_004"];
       _guiLabel = new GUIContent(_label, _toolTip);
       SMSettings.EnableEdgeHighlighting = GUILayout.Toggle(SMSettings.EnableEdgeHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();

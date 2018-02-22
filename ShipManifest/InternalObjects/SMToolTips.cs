@@ -120,6 +120,12 @@ namespace ShipManifest.InternalObjects
       }
 
       // Control Window Tab switches
+      if (!string.IsNullOrEmpty(TabVessel.ToolTip))
+      {
+        toolTip = TabVessel.ToolTip;
+        source = "TabVessel";
+        return toolTip;
+      }
       if (!string.IsNullOrEmpty(TabHatch.ToolTip))
       {
         toolTip = TabHatch.ToolTip;
@@ -196,6 +202,7 @@ namespace ShipManifest.InternalObjects
         case "WindowManifest":
         case "WindowTransfer":
         case "WindowControl":
+        case "TabVessel":
         case "TabHatch":
         case "TabSolarPanel":
         case "TabAntenna":

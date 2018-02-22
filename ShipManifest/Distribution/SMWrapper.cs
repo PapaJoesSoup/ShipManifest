@@ -32,14 +32,14 @@ namespace ShipManifest.Distribution
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static bool AssemblyExists { get { return (SmType != null && TransferCrewType != null); } }
+    public static bool AssemblyExists => SmType != null && TransferCrewType != null;
 
     /// <summary>
     /// Whether we managed to hook the running Instance from the assembly.
     ///
     /// SET AFTER INIT
     /// </summary>
-    public static bool InstanceExists { get { return (ShipManifestApi != null); } }
+    public static bool InstanceExists => ShipManifestApi != null;
 
     /// <summary>
     /// Whether we managed to wrap all the methods/functions from the instance.
@@ -51,7 +51,7 @@ namespace ShipManifest.Distribution
     /// <summary>
     /// Whether the object has been wrapped and the APIReady flag is set in the real ShipManifest
     /// </summary>
-    public static bool SmapiReady { get { return _smWrapped; } }
+    public static bool SmapiReady => _smWrapped;
 
     /// <summary>
     /// This method will set up the ShipManifest object and wrap all the methods/functions
@@ -204,7 +204,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private object _actualSmapi;
+      private readonly object _actualSmapi;
       private object _actualCrewTransfer;
 
       /// <summary>
@@ -212,29 +212,20 @@ namespace ShipManifest.Distribution
       /// </summary>
       public bool CrewProcessOn;
 
-      private MethodInfo _crewProcessOnMethod;
-      private bool GetCrewProcessOn
-      {
-        get { return (bool)_crewProcessOnMethod.Invoke(_actualSmapi, null); }
-      }
+      private readonly MethodInfo _crewProcessOnMethod;
+      private bool GetCrewProcessOn => (bool)_crewProcessOnMethod.Invoke(_actualSmapi, null);
 
-      private MethodInfo _transferCrewMethod;
+      private readonly MethodInfo _transferCrewMethod;
       /// <summary>
       /// Get the actual CrewTransfer object from the SMAddon Instance
       /// </summary>
       /// <returns>
       /// Object reference to the CrewTransfer Instance
       /// </returns>
-      public object GetCrewTransferProcess
-      {
-        get
-        {
-          return _transferCrewMethod?.Invoke(_actualSmapi, null);
-        }
-      }
+      public object GetCrewTransferProcess => _transferCrewMethod?.Invoke(_actualSmapi, null);
 
-      private MethodInfo _getCrewXferActiveMethod;
-      private MethodInfo _setCrewXferActiveMethod;
+      private readonly MethodInfo _getCrewXferActiveMethod;
+      private readonly MethodInfo _setCrewXferActiveMethod;
       /// <summary>
       /// True if a crewXfter on the Active Vessel is currently active
       /// If you set it to False whilst a Xfer is active it will cancel the current transfer
@@ -258,7 +249,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getIsStockXferMethod;
+      private readonly MethodInfo _getIsStockXferMethod;
       /// <summary>
       /// This flag indicates if the transfer was initiated by the Stock Crew Transfer interface. 
       /// It stays enabled during the Crew Transfer Process (just like CrewXferActive)
@@ -276,7 +267,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getOverrideStockCrewXferMethod;
+      private readonly MethodInfo _getOverrideStockCrewXferMethod;
       /// <summary>
       /// This flag indicates if SM is overriding the Stock Crew Transfer process.
       /// </summary> 
@@ -293,7 +284,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getCrewXferDelaySecMethod;
+      private readonly MethodInfo _getCrewXferDelaySecMethod;
       /// <summary>
       /// This is the number of seconds delay used for the transfer in progress
       /// </summary> 
@@ -310,7 +301,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getIsSeat2SeatXferMethod;
+      private readonly MethodInfo _getIsSeat2SeatXferMethod;
       /// <summary>
       /// This flag indicates if the transfer is Seat 2 seat, i.e. within the same part.
       /// </summary> 
@@ -327,7 +318,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getSeat2SeatXferDelaySecMethod;
+      private readonly MethodInfo _getSeat2SeatXferDelaySecMethod;
       /// <summary>
       /// This is the number of seconds used for Seat2seat transfer delays
       /// </summary> 
@@ -344,7 +335,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getFromSeatMethod;
+      private readonly MethodInfo _getFromSeatMethod;
       /// <summary>
       /// This is the part seat where the kerbal is being moved from. In the case of parts with no internal view, it can be null.
       /// </summary> 
@@ -361,7 +352,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getToSeatMethod;
+      private readonly MethodInfo _getToSeatMethod;
       /// <summary>
       /// This is the part seat where the kerbal is being moved to. In the case of parts with no internal view, it can be null.
       /// </summary> 
@@ -378,7 +369,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getXferVesselIdMethod;
+      private readonly MethodInfo _getXferVesselIdMethod;
       /// <summary>
       /// This is the vessel id for the transfer in question
       /// </summary> 
@@ -395,7 +386,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getIvaDelayActiveMethod;
+      private readonly MethodInfo _getIvaDelayActiveMethod;
       /// <summary>
       /// This flag indicates the IVA delay is active. This means that the transfer has occurred (kerbals have actually moved) and we are cleaning up portraits.
       /// </summary> 
@@ -412,7 +403,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getIvaPortraitDelayMethod;
+      private readonly MethodInfo _getIvaPortraitDelayMethod;
       /// <summary>
       /// This stores the number of frames that have passed since transfer has completed. 
       /// In order for the portraits to update properly, a wait period is needed to allow for unity/ksp async callbacks to complete after crew are moved. 
@@ -431,7 +422,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getFromPartMethod;
+      private readonly MethodInfo _getFromPartMethod;
       /// <summary>
       /// This is the part from which the kerbal is being transferred.
       /// </summary> 
@@ -448,7 +439,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getToPartMethod;
+      private readonly MethodInfo _getToPartMethod;
       /// <summary>
       /// This is the part to which the kerbal is being transferred. It can be the same as the source (Seat2Seat transfers).
       /// </summary> 
@@ -465,7 +456,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getFromCrewMemberMethod;
+      private readonly MethodInfo _getFromCrewMemberMethod;
       /// <summary>
       /// This is the crew member being transferred.
       /// </summary> 
@@ -482,7 +473,7 @@ namespace ShipManifest.Distribution
         }
       }
 
-      private MethodInfo _getToCrewMemberMethod;
+      private readonly MethodInfo _getToCrewMemberMethod;
       /// <summary>
       /// This is the crew member that would be swapped if the target seat is occupied. can be null.
       /// </summary>
@@ -521,7 +512,7 @@ namespace ShipManifest.Distribution
     internal static void LogFormatted(string message, params object[] strParams)
     {
       message = string.Format(message, strParams);
-      string callingMethod = MethodBase.GetCurrentMethod()?.DeclaringType?.Name;
+      string callingMethod = MethodBase.GetCurrentMethod().DeclaringType?.Name;
       string strMessageLine = $"{DateTime.Now},{Assembly.GetExecutingAssembly().GetName().Name}-{callingMethod},{message}";
       UnityEngine.Debug.Log(strMessageLine);
     }

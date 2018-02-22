@@ -7,11 +7,14 @@ namespace ShipManifest.Modules
   {
     private List<Part> _vesselParts;
 
+    // used during display in control window for selecting vessels to combine
+    internal bool Combine = false;
+
     private Part _rootPart;
     private Part _dockingPort;
     internal bool IsDocked;
     internal bool IsEditing = false;
-    internal string renameVessel = null;
+    internal string RenameVessel = null;
     internal ModDockedVessel()
     {
     }

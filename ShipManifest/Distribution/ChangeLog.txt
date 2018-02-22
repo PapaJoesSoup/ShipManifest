@@ -1,5 +1,12 @@
-﻿Version 5.2.0.0 - Release 17 Jul 2017 - Vessel to Vessel Edition
- - New: Added Docked vessel to vessel Crew and Science transfers!
+﻿Version 5.2.1.0 - Release TBD 2018 - Vessel to Vessel Edition
+ - New: Added Docked vessel to vessel Science transfers!
+ - New: Added ability to combine vessels in the vessels tab of the control window.  Now, you can combine multiple vessels into one space station.
+ - Fixed:  gain/loss of resource(s) in transfers (thanks to Arivald Ha'gel for the PR #48!)
+ - Fixed:  
+
+
+Version 5.2.0.0 - Release 17 Jul 2017 - Vessel to Vessel Edition
+ - New: Added Docked vessel to vessel Crew transfers!
  - New: Added Docked Vessels Control panel.  View your docked vessels, Rename a vessel, and undock a vessel with a click of a button.
  - New: Added option to vessel to vessel Crew transfers to limit crew xfr list to tourists only.  Space tourism awaits!
  - New: Added ability to create Tourists from Roster Window.

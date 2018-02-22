@@ -8,39 +8,21 @@ namespace ShipManifest.APIClients
 {
   internal class InstalledMods
   {
-    private const float guiWidth = 190;
+    private const float GuiWidth = 190;
     // Properties
     private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-    internal static bool IsDfApiReady
-    {
-      get { return DfWrapper.ApiReady; }
-    }
+    internal static bool IsDfApiReady => DfWrapper.ApiReady;
 
-    internal static bool IsDfInstalled
-    {
-      get { return IsModInstalled("DeepFreeze"); }
-    }
+    internal static bool IsDfInstalled => IsModInstalled("DeepFreeze");
 
-    internal static bool IsRtInstalled
-    {
-      get { return IsModInstalled("RemoteTech"); }
-    }
+    internal static bool IsRtInstalled => IsModInstalled("RemoteTech");
 
-    internal static bool IsSmInstalled
-    {
-      get { return IsModInstalled("ShipManifest"); }
-    }
+    internal static bool IsSmInstalled => IsModInstalled("ShipManifest");
 
-    internal static bool IsKisInstalled
-    {
-      get { return IsModInstalled("KIS"); }
-    }
+    internal static bool IsKisInstalled => IsModInstalled("KIS");
 
-    internal static bool IsClsInstalled
-    {
-      get { return IsModInstalled("ConnectedLivingSpace"); }
-    }
+    internal static bool IsClsInstalled => IsModInstalled("ConnectedLivingSpace");
 
     // Methods
     internal static void DisplayAssemblyList()
@@ -53,7 +35,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(guiWidth));
+        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }
@@ -67,14 +49,12 @@ namespace ShipManifest.APIClients
       List<Assembly>.Enumerator list = sortedAssemblies.GetEnumerator();
       while (list.MoveNext())
       {
-        if (list.Current != null)
-        {
-          string[] fullName = list.Current.FullName.Split(',');
-          GUILayout.BeginHorizontal();
-          GUILayout.Label(fullName[0], GUILayout.Width(guiWidth));
-          GUILayout.Label(fullName[1]);
-          GUILayout.EndHorizontal();
-        }
+        if (list.Current == null) continue;
+        string[] fullName = list.Current.FullName.Split(',');
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth));
+        GUILayout.Label(fullName[1]);
+        GUILayout.EndHorizontal();
       }
       list.Dispose();
     }

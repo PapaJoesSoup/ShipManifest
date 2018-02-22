@@ -20,7 +20,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = SmUtils.Localize("#smloc_control_001");
+      Title = SmUtils.SmTags["#smloc_control_001"];
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -29,7 +29,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", SmUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
+      if (GUI.Button(rect, new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]))) // "Close Window"
       {
         ShowWindow = false;
         ToolTip = "";
@@ -60,7 +60,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       GUIContent label;
       GUI.enabled = true;
-      label = new GUIContent(SmUtils.Localize("#smloc_control_017"), SmUtils.Localize("#smloc_control_tt_006"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_017"], SmUtils.SmTags["#smloc_control_tt_006"]);
       GUIStyle vesselsStyle = _selectedTab == Tab.Vessel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, vesselsStyle, GUILayout.Height(20))) // Vessels"
       {
@@ -81,7 +81,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       if (SMSettings.EnableCls)
       {
-        label = new GUIContent(SmUtils.Localize("#smloc_control_002"), SmUtils.Localize("#smloc_control_tt_001"));
+        label = new GUIContent(SmUtils.SmTags["#smloc_control_002"], SmUtils.SmTags["#smloc_control_tt_001"]);
         GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (GUILayout.Button(label, hatchesStyle, GUILayout.Height(20))) // "Hatches"
         {
@@ -103,7 +103,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       }
       GUI.enabled = true;
-      label = new GUIContent(SmUtils.Localize("#smloc_control_003"), SmUtils.Localize("#smloc_control_tt_002"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_003"], SmUtils.SmTags["#smloc_control_tt_002"]);
       GUIStyle panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, panelsStyle, GUILayout.Height(20))) // "Solar Panels"
       {
@@ -123,7 +123,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-      label = new GUIContent(SmUtils.Localize("#smloc_control_004"), SmUtils.Localize("#smloc_control_tt_003"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_004"], SmUtils.SmTags["#smloc_control_tt_003"]);
       GUIStyle antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, antennaStyle, GUILayout.Height(20))) // "Antennas"
       {
@@ -142,7 +142,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-      label = new GUIContent(SmUtils.Localize("#smloc_control_005"), SmUtils.Localize("#smloc_control_tt_004"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_005"], SmUtils.SmTags["#smloc_control_tt_004"]);
       GUIStyle lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, lightsStyle, GUILayout.Height(20))) // "Lights"
       {
@@ -161,7 +161,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-      label = new GUIContent(SmUtils.Localize("#smloc_control_006"), SmUtils.Localize("#smloc_control_tt_005"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_006"], SmUtils.SmTags["#smloc_control_tt_005"]);
       GUIStyle labsStyle = _selectedTab == Tab.Lab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, labsStyle, GUILayout.Height(20))) // "Labs"
       {
@@ -219,40 +219,46 @@ namespace ShipManifest.Windows
       {
         case Tab.Panel:
           GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_016"), GUILayout.Height(20))) // "Retract All Solar Panels"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_016"], GUILayout.Height(20))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_007"), GUILayout.Height(20))) // "Extend All Solar Panels"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_007"], GUILayout.Height(20))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Hatch:
           GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_008"), GUILayout.Height(20))) // "Close All Hatches"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_008"], GUILayout.Height(20))) // "Close All Hatches"
             TabHatch.CloseAllHatches();
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_009"), GUILayout.Height(20))) // "Open All Hatches"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_009"], GUILayout.Height(20))) // "Open All Hatches"
             TabHatch.OpenAllHatches();
           break;
         case Tab.Antenna:
           GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_010"), GUILayout.Height(20))) // "Retract All Antennas"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_010"], GUILayout.Height(20))) // "Retract All Antennas"
             TabAntenna.RetractAllAntennas();
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_011"), GUILayout.Height(20))) // "Extend All Antennas"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_011"], GUILayout.Height(20))) // "Extend All Antennas"
             TabAntenna.ExtendAllAntennas();
           break;
         case Tab.Light:
           GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_012"), GUILayout.Height(20))) // "Turn Off All Lights"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_012"], GUILayout.Height(20))) // "Turn Off All Lights"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_013"), GUILayout.Height(20))) // "Turn On All Lights"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_013"], GUILayout.Height(20))) // "Turn On All Lights"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Lab:
           GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_014"), GUILayout.Height(20))) // "Turn Off All Labs"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_014"], GUILayout.Height(20))) // "Turn Off All Labs"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(SmUtils.Localize("#smloc_control_015"), GUILayout.Height(20))) // "Turn On All Labs"
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_015"], GUILayout.Height(20))) // "Turn On All Labs"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Vessel:
+          GUI.enabled = TabVessel.CombineVesselCount > 0;
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_018"], GUILayout.Height(20))) // "Combine Selected Vessels"
+            TabVessel.CombineSelectedVessels();
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_019"], GUILayout.Height(20))) // "Clear Vessel Selections"
+            TabVessel.ClearVesselCount();
+          break;
         case Tab.None:
           break;
         default:

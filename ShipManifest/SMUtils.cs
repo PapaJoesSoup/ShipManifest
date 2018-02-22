@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Experience;
 using KSP.Localization;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
@@ -174,7 +173,7 @@ namespace ShipManifest
           break;
         }
         crew.Dispose();
-        if (results == true) break;
+        if (results) break;
       }
       part.Dispose();
       return results;
@@ -240,11 +239,6 @@ namespace ShipManifest
           SmTags.Add(tags.Current.ToString(), Localizer.GetStringByTag(tags.Current.ToString()).Replace("\\n", "\n"));
         }
       }
-    }
-
-    internal static string Localize(string tag)
-    {
-      return SmTags[tag];
     }
 
     internal enum LogType

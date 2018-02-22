@@ -26,7 +26,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.Localize("#smloc_control_panel_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_control_panel_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
@@ -42,7 +42,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.Localize("#smloc_module_004")}) - {iPanels.Current.Title}"; // "Broken"
+            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_004"]}) - {iPanels.Current.Title}"; // "Broken"
           }
           bool open =
             !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
@@ -53,7 +53,7 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = isEnabled;
           if (!iPanels.Current.CanBeRetracted)
           {
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.Localize("#smloc_module_005")}) - {iPanels.Current.Title}"; // "Locked"
+            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_005"]}) - {iPanels.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";

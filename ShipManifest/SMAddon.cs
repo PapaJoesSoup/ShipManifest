@@ -175,7 +175,7 @@ namespace ShipManifest
           SMSettings.SaveSettings();
           UpdateClsSpaces();
           _onClsVesselChangeEvent = GameEvents.FindEvent<EventData<Vessel>>("onCLSVesselChange");
-          if (_onClsVesselChangeEvent != null) _onClsVesselChangeEvent.Add(OnCLSVesselChange);
+          if (_onClsVesselChangeEvent != null) _onClsVesselChangeEvent.Add(OnClsVesselChange);
         }
         else
         {
@@ -565,7 +565,7 @@ namespace ShipManifest
       }
     }
 
-    private void OnCLSVesselChange(Vessel data)
+    private void OnClsVesselChange(Vessel data)
     {
       OnVesselChange(data);
     }

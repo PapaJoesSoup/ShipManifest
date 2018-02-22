@@ -19,7 +19,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = $"{SmUtils.Localize("#smloc_debug_000")}:  {SMSettings.CurVersion}";
+      Title = $"{SmUtils.SmTags["#smloc_debug_000"]}:  {SMSettings.CurVersion}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -28,7 +28,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", SmUtils.Localize("#smloc_window_tt_001")))) // "Close Window"
+      if (GUI.Button(rect, new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]))) // "Close Window"
       {
         ShowWindow = false;
         SMSettings.MemStoreTempSettings();
@@ -55,17 +55,17 @@ namespace ShipManifest.Windows
       GUILayout.EndScrollView();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_001"), GUILayout.Height(20))) //"Clear log"
+      if (GUILayout.Button(SmUtils.SmTags["#smloc_debug_001"], GUILayout.Height(20))) //"Clear log"
       {
         SmUtils.LogItemList.Clear();
         SmUtils.LogItemList.Add($"Info:  Log Cleared at {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC.");
       }
-      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_002"), GUILayout.Height(20))) // "Save Log"
+      if (GUILayout.Button(SmUtils.SmTags["#smloc_debug_002"], GUILayout.Height(20))) // "Save Log"
       {
         // Create log file and save.
         Savelog();
       }
-      if (GUILayout.Button(SmUtils.Localize("#smloc_debug_003"), GUILayout.Height(20))) // "Close"
+      if (GUILayout.Button(SmUtils.SmTags["#smloc_debug_003"], GUILayout.Height(20))) // "Close"
       {
         // Create log file and save.
         ShowWindow = false;

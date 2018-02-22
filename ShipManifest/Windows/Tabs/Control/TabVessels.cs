@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using ConnectedLivingSpace;
 using ShipManifest.InternalObjects;
 using ShipManifest.Modules;
+using UniLinq;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Control
@@ -13,10 +12,14 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
+    private static bool _canShowToolTips = true;
+    internal static Rect Position = WindowControl.Position;
 
     private const float guiRuleWidth = 350;
-    private const float guiLabelWidth = 230;
+    private const float guiLabelWidth = 200;
     private const float guiBtnWidth = 60;
+
+    internal static int CombineVesselCount = 0;
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -28,70 +31,124 @@ namespace ShipManifest.Windows.Tabs.Control
       // Reset Tooltip active flag...
       ToolTipActive = false;
       SMHighlighter.IsMouseOver = false;
+      // Reset Tooltip active flag...
+      ToolTipActive = false;
+      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
+
+      Position = WindowControl.Position;
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Vessel Control Center", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.Localize("#smloc_control_vessel_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_control_vessel_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
       try
       {
+        int combineVesselcount = 0;
         // Display all Vessels Docked together
         // ReSharper disable once ForCanBeConvertedToForeach
         for (int v = 0; v < SMAddon.SmVessel.DockedVessels.Count; v++)
         {
-          GUI.enabled = SMAddon.SmVessel.DockedVessels[v].IsDocked;
-
+          ModDockedVessel mdv = SMAddon.SmVessel.DockedVessels[v];
+          GUI.enabled = mdv.IsDocked;
+          
           GUILayout.BeginHorizontal();
-          if (GUILayout.Button("UnDock", GUILayout.Width(guiBtnWidth)))
-          {
-            // close hatches If CLS applies
-            if (SMConditions.IsClsEnabled()) CloseVesselHatches(SMAddon.SmVessel.DockedVessels[v]);
+          GUIContent content = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
 
-            // Decouple/undock selected vessel.
-            UndockSelectedVessel(SMAddon.SmVessel.DockedVessels[v]);
+          bool isChecked = mdv.Combine;
+          isChecked = GUILayout.Toggle(isChecked, content, GUILayout.Width(20));
+          if (isChecked) combineVesselcount += 1;
+          if (isChecked != mdv.Combine)
+          {
+            mdv.Combine = isChecked;
           }
           Rect rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && _canShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, SMAddon.SmVessel.DockedVessels[v], Event.current.mousePosition);
+          {
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+              Event.current.mousePosition);
+          }
+
+          content = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]);
+          if (GUILayout.Button(content, GUILayout.Width(guiBtnWidth))) //"UnDock"
+          {
+            // close hatches If CLS applies
+            if (SMConditions.IsClsEnabled()) CloseVesselHatches(mdv);
+
+            // Decouple/undock selected vessel.
+            UndockSelectedVessel(mdv);
+          }
+          rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && _canShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+          {
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+              Event.current.mousePosition);
+          }
+
           GUI.enabled = true;
-          if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
-            SMAddon.SmVessel.DockedVessels[v].renameVessel = GUILayout.TextField(SMAddon.SmVessel.DockedVessels[v].renameVessel, GUILayout.Width(guiLabelWidth - (guiBtnWidth + 5)));
-          else GUILayout.Label($"{SMAddon.SmVessel.DockedVessels[v].VesselInfo.name}", GUILayout.Width(guiLabelWidth));
+          if (mdv.IsEditing)
+            mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width(guiLabelWidth - (guiBtnWidth + 5)));
+          else GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, SMAddon.SmVessel.DockedVessels[v], Event.current.mousePosition);
+          {
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+              Event.current.mousePosition);
+          }
+
           // now editing buttons.
-          GUIContent content = SMAddon.SmVessel.DockedVessels[v].IsEditing ? new GUIContent("Save", "Saves the changes to the docked vessel name.") : new GUIContent("Edit", "Change the docked vessel name.");
+          content = mdv.IsEditing ? new GUIContent(SmUtils.SmTags["#smloc_control_vessel_002"], SmUtils.SmTags["#smloc_control_vessel_tt_002"]) : new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_003"]); // "Save" // "Saves the changes to the docked vessel name." // Edit // "Change the docked vessel name." 
           if (GUILayout.Button(content, GUILayout.Width(50)))
           {
             if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
             {
-              SMAddon.SmVessel.DockedVessels[v].VesselInfo.name = SMAddon.SmVessel.DockedVessels[v].renameVessel;
-              SMAddon.SmVessel.DockedVessels[v].renameVessel = null;
-              SMAddon.SmVessel.DockedVessels[v].IsEditing = false;
+              mdv.VesselInfo.name = mdv.RenameVessel;
+              mdv.RenameVessel = null;
+              mdv.IsEditing = false;
             }
             else
             {
-              SMAddon.SmVessel.DockedVessels[v].IsEditing = true;
-              SMAddon.SmVessel.DockedVessels[v].renameVessel = SMAddon.SmVessel.DockedVessels[v].VesselInfo.name;
+              mdv.IsEditing = true;
+              mdv.RenameVessel = SMAddon.SmVessel.DockedVessels[v].VesselInfo.name;
 
             }
           }
-          if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
+          rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && _canShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            GUIContent cancelContent = new GUIContent("Cancel","Cancel changes to docked vessel name");
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+              Event.current.mousePosition);
+          }
+
+          if (mdv.IsEditing)
+          {
+            GUIContent cancelContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_004"], SmUtils.SmTags["#smloc_control_vessel_tt_004"]); // "Cancel","Cancel changes to docked vessel name"
             if (GUILayout.Button(cancelContent, GUILayout.Width(guiBtnWidth)))
             {
-              SMAddon.SmVessel.DockedVessels[v].renameVessel = null;
-              SMAddon.SmVessel.DockedVessels[v].IsEditing = false;
+              mdv.RenameVessel = null;
+              mdv.IsEditing = false;
             }
+          }
+          rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && _canShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+          {
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+              Event.current.mousePosition);
           }
           GUILayout.EndHorizontal();
         }
-        
+        // update static count for control window action buttons.
+        CombineVesselCount = combineVesselcount;
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
       }
@@ -132,6 +189,94 @@ namespace ShipManifest.Windows.Tabs.Control
         dockingNodes.Dispose();
       }
       parts.Dispose();
+    }
+
+    internal static void CombineSelectedVessels()
+    {
+      List<ModDockedVessel>.Enumerator mdv = SMAddon.SmVessel.DockedVessels.GetEnumerator();
+      while (mdv.MoveNext())
+      {
+        if (mdv.Current == null) continue;
+        if (!mdv.Current.Combine) continue;
+        List<ModuleDockingNode>.Enumerator port;
+     
+        if (mdv.Current.Rootpart.FindModulesImplementing<ModuleDockingNode>().Any())
+        {
+          port = mdv.Current.Rootpart.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
+          while (port.MoveNext())
+          {
+            if (port.Current == null) continue;
+            if (port.Current.vesselInfo == null || port.Current.otherNode) continue;
+            port.Current.vesselInfo = null;
+            port.Current.otherNode.vesselInfo = null;
+            port.Current.otherNode = null;
+          }
+          port.Dispose();
+        }
+        else
+        {
+          // Since the root part is not a docking port, we need to locate the docking port that is currently docked.
+          List<Part>.Enumerator part = mdv.Current.VesselParts.GetEnumerator();
+          while (part.MoveNext())
+          {
+            if (part.Current == null) continue;
+            if (!part.Current.FindModulesImplementing<ModuleDockingNode>().Any()) continue;
+            port = part.Current.FindModulesImplementing<ModuleDockingNode>().GetEnumerator();
+            while (port.MoveNext())
+            {
+              if (port.Current == null) continue;
+              if (port.Current.vesselInfo == null || port.Current.otherNode == null) continue;
+              // TODO:  Sort out the coupling criteria.  with current setup, still have an undock on the tweakable.  and a null ref when clicking. 
+              //  That makes sense since the other node is now null.  So part/module state is still not correct after combining.
+              Part thisPart = port.Current.part;
+              Part otherPart = port.Current.otherNode.part;
+
+              thisPart.Couple(otherPart);
+              otherPart.Couple(thisPart);
+
+              port.Current.state = "PreAttached";
+              port.Current.dockedPartUId = 0;
+              port.Current.dockingNodeModuleIndex = 0;
+              port.Current.Events["Undock"].active = false;
+              port.Current.Events["Undock"].guiActive = false;
+              port.Current.Events["UndockSameVessel"].active = false;
+              port.Current.Events["Decouple"].active = true;
+              port.Current.Events["Decouple"].guiActive = true;
+
+              port.Current.otherNode.state = "PreAttached";
+              port.Current.otherNode.dockedPartUId = 0;
+              port.Current.otherNode.dockingNodeModuleIndex = 0;
+
+              port.Current.otherNode.Events["Undock"].active = false;
+              port.Current.Events["Undock"].guiActive = false;
+              port.Current.otherNode.Events["UndockSameVessel"].active = false;
+              port.Current.otherNode.Events["Decouple"].active = true;
+              port.Current.Events["Decouple"].guiActive = true;
+
+              port.Current.vesselInfo = (DockedVesselInfo)null;
+              port.Current.otherNode.vesselInfo = (DockedVesselInfo) null;
+              port.Current.otherNode.otherNode = (ModuleDockingNode) null;
+              port.Current.otherNode = (ModuleDockingNode) null;
+
+            }
+            port.Dispose();
+          }
+          part.Dispose();
+        } 
+      }
+      mdv.Dispose();
+      SMAddon.FireEventTriggers();
+    }
+
+    internal static void ClearVesselCount()
+    {
+      List<ModDockedVessel>.Enumerator mdv = SMAddon.SmVessel.DockedVessels.GetEnumerator();
+      while (mdv.MoveNext())
+      {
+        if (mdv.Current == null) continue;
+        mdv.Current.Combine = false;
+      }
+      mdv.Dispose();
     }
   }
 }

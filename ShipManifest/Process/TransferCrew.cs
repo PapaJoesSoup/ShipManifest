@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using ShipManifest.InternalObjects;
-using ShipManifest.Windows;
 
 namespace ShipManifest.Process
 {

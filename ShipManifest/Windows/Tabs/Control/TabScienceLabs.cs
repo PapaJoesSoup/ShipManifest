@@ -28,7 +28,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.Localize("#smloc_control_lab_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_control_lab_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";
@@ -42,7 +42,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = true;
-          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SmUtils.Localize("#smloc_control_lab_001") : SmUtils.Localize("#smloc_control_lab_002"))})"; // Operational, InOp
+          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SmUtils.SmTags["#smloc_control_lab_001"] : SmUtils.SmTags["#smloc_control_lab_002"])})"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(40));
 
           Rect rect = GUILayoutUtility.GetLastRect();

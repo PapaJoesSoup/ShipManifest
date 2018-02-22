@@ -57,7 +57,7 @@ namespace ShipManifest.Modules
         string title;
         try
         {
-          title = $"{SPart.partInfo.title}\r\n {SmUtils.Localize("#smloc_module_001")} {SPart.parent.partInfo.title}";
+          title = $"{SPart.partInfo.title}\r\n {SmUtils.SmTags["#smloc_module_001"]} {SPart.parent.partInfo.title}";
         }
         catch
         {

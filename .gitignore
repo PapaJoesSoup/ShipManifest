@@ -5,3 +5,5 @@ ShipManifest/obj/Debug/ShipManifest.csproj.FileListAbsolute.txt
 *.suo
 bin/
 obj/
+.vs/ShipManifest/v15/sqlite3/storage.ide
+.vs/

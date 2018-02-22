@@ -21,7 +21,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      Title = SmUtils.Localize("#smloc_settings_001");
+      Title = SmUtils.SmTags["#smloc_settings_001"];
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -30,7 +30,7 @@ namespace ShipManifest.Windows
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       // "Close Window.\r\nSettings will not be immediately saved,\r\n but will be remembered while in game.")))
-      if (GUI.Button(rect, new GUIContent("", SmUtils.Localize("#smloc_settings_tt_001"))))
+      if (GUI.Button(rect, new GUIContent("", SmUtils.SmTags["#smloc_settings_tt_001"])))
       {
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -70,7 +70,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       GUIStyle realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      GUIContent label = new GUIContent(SmUtils.Localize("#smloc_settings_004"), SmUtils.Localize("#smloc_settings_tt_004"));
+      GUIContent label = new GUIContent(SmUtils.SmTags["#smloc_settings_004"], SmUtils.SmTags["#smloc_settings_tt_004"]);
       if (GUILayout.Button(label, realismStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Realism;
@@ -82,7 +82,7 @@ namespace ShipManifest.Windows
 
       GUIStyle highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       //label = new GUIContent("Highlight", "This tab shows all settings related to highlighting.");
-      label = new GUIContent(SmUtils.Localize("#smloc_settings_005"), SmUtils.Localize("#smloc_settings_tt_005"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_settings_005"], SmUtils.SmTags["#smloc_settings_tt_005"]);
       if (GUILayout.Button(label, highlightStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Highlight;
@@ -93,7 +93,7 @@ namespace ShipManifest.Windows
 
       GUIStyle tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       //label = new GUIContent("ToolTip", "This tab shows all settings related to tooltip behavior.");
-      label = new GUIContent(SmUtils.Localize("#smloc_settings_006"), SmUtils.Localize("#smloc_settings_tt_006"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_settings_006"], SmUtils.SmTags["#smloc_settings_tt_006"]);
       if (GUILayout.Button(label, tooltipStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.ToolTips;
@@ -104,7 +104,7 @@ namespace ShipManifest.Windows
 
       GUIStyle soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       //label = new GUIContent("Sound", "This tab shows all settings related to sounds.");
-      label = new GUIContent(SmUtils.Localize("#smloc_settings_007"), SmUtils.Localize("#smloc_settings_tt_007"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_settings_007"], SmUtils.SmTags["#smloc_settings_tt_007"]);
       if (GUILayout.Button(label, soundStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Sounds;
@@ -115,7 +115,7 @@ namespace ShipManifest.Windows
 
       GUIStyle configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       //label = new GUIContent("Config", "This tab shows all settings related to sounds.");
-      label = new GUIContent(SmUtils.Localize("#smloc_settings_008"), SmUtils.Localize("#smloc_settings_tt_008"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_settings_008"], SmUtils.SmTags["#smloc_settings_tt_008"]);
       if (GUILayout.Button(label, configStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Config;
@@ -157,7 +157,7 @@ namespace ShipManifest.Windows
 
       // Save
       //GUIContent label = new GUIContent("Save", "Save the current settings to file.");
-      GUIContent label = new GUIContent(SmUtils.Localize("#smloc_settings_002"), SmUtils.Localize("#smloc_settings_tt_002"));
+      GUIContent label = new GUIContent(SmUtils.SmTags["#smloc_settings_002"], SmUtils.SmTags["#smloc_settings_tt_002"]);
       if (GUILayout.Button(label, GUILayout.Height(20)))
       {
         ToolTip = "";
@@ -181,7 +181,7 @@ namespace ShipManifest.Windows
 
       // Cancel
       //label = new GUIContent("Cancel", "Cancel the changes made.\nSettings will revert to before changes were made.");
-      label = new GUIContent(SmUtils.Localize("#smloc_settings_003"), SmUtils.Localize("#smloc_settings_tt_003"));
+      label = new GUIContent(SmUtils.SmTags["#smloc_settings_003"], SmUtils.SmTags["#smloc_settings_tt_003"]);
       if (GUILayout.Button(label, GUILayout.Height(20)))
       {
         ToolTip = "";

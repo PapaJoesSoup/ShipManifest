@@ -31,19 +31,19 @@ namespace ShipManifest.Windows.Tabs.Settings
       Position = WindowSettings.Position;
       int scrollX = 20;
 
-      GUILayout.Label(SmUtils.Localize("#smloc_settings_sounds_000"), SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_settings_sounds_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
-      GUILayout.Label($"{SmUtils.Localize("#smloc_settings_sounds_001")}:", GUILayout.Height(20)); //"Transfer Pump:"
+      GUILayout.Label($"{SmUtils.SmTags["#smloc_settings_sounds_001"]}:", GUILayout.Height(20)); //"Transfer Pump:"
 
       // Pump Start Sound
       GUILayout.BeginHorizontal();
       //_label = "Pump Starting: ";
       //_toolTip = "Folder location where Pump Starting sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_002")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_001");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_002"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_001"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -57,8 +57,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Running: ";
       //_toolTip = "Folder location where Pump Running sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_003")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_002");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_003"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_002"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -72,8 +72,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Stopping: ";
       //_toolTip = "Folder location where Pump Stopping sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_004")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_003");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_004"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_003"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -87,8 +87,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Pump Volume: ";
       //_toolTip = "How loud do you want it?";
       //_toolTip += "\r\nMove slider to change volume.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_005")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_004");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_005"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_004"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -97,12 +97,12 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Volume Slider Control
       //GUILayout.Label("Min", GUILayout.Width(40), GUILayout.Height(20));
-      GUILayout.Label(SmUtils.Localize("#smloc_settings_sounds_006"), GUILayout.Width(40),GUILayout.Height(20)); // "Min"
+      GUILayout.Label(SmUtils.SmTags["#smloc_settings_sounds_006"], GUILayout.Width(40),GUILayout.Height(20)); // "Min"
       SMSettings.PumpSoundVol = GUILayout.HorizontalSlider((float)SMSettings.PumpSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
       //_label = "Max";
       //_toolTip = "Slide control to change the volume above.";
-      _label = SmUtils.Localize("#smloc_settings_sounds_007");
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_004");
+      _label = SmUtils.SmTags["#smloc_settings_sounds_007"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_004"];
       GUILayout.Label(new GUIContent(_label, _toolTip), GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -111,14 +111,14 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUILayout.Label(" ", GUILayout.Height(10));
       //GUILayout.Label("Crew:", GUILayout.Height(20));
-      GUILayout.Label($"{SmUtils.Localize("#smloc_settings_sounds_008")}:", GUILayout.Height(20));
+      GUILayout.Label($"{SmUtils.SmTags["#smloc_settings_sounds_008"]}:", GUILayout.Height(20));
       // Crew Start Sound
       GUILayout.BeginHorizontal();
       //_label = "Crew Exiting: ";
       //_toolTip = "Folder location where Crew Exiting their seat sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_009")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_005");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_009"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_005"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -132,8 +132,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Xfering: ";
       //_toolTip = "Folder location where Crew transferring sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_010")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_006");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_010"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_006"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -147,8 +147,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Entering: ";
       //_toolTip = "Folder location where Crew Entering sound is stored.";
       //_toolTip += "\r\nChange to point to your own custom sounds if desired.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_011")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_007");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_011"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_007"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -162,8 +162,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       //_label = "Crew Volume: ";
       //_toolTip = "How loud do you want it?";
       //_toolTip += "\r\nMove slider to change volume.";
-      _label = $"{SmUtils.Localize("#smloc_settings_sounds_012")}:";
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_004");
+      _label = $"{SmUtils.SmTags["#smloc_settings_sounds_012"]}:";
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_004"];
       _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Label(_guiLabel, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
@@ -172,12 +172,12 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Volume Slider Control
       //GUILayout.Label("Min", GUILayout.Width(40), GUILayout.Height(20));
-      GUILayout.Label(SmUtils.Localize("#smloc_settings_sounds_006"), GUILayout.Width(40), GUILayout.Height(20)); // "Min"
+      GUILayout.Label(SmUtils.SmTags["#smloc_settings_sounds_006"], GUILayout.Width(40), GUILayout.Height(20)); // "Min"
       SMSettings.CrewSoundVol = GUILayout.HorizontalSlider((float)SMSettings.CrewSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
       //_label = "Max";
       //_toolTip = "Slide control to change the volume above.";
-      _label = SmUtils.Localize("#smloc_settings_sounds_007");
-      _toolTip = SmUtils.Localize("#smloc_settings_sounds_tt_004");
+      _label = SmUtils.SmTags["#smloc_settings_sounds_007"];
+      _toolTip = SmUtils.SmTags["#smloc_settings_sounds_tt_004"];
       GUILayout.Label(new GUIContent(_label, _toolTip), GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
