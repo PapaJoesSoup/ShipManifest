@@ -629,7 +629,7 @@ namespace ShipManifest
             }
           }
           pModules.Dispose();
-          if (pAntenna.AnimateModule != null) _antennas.Add(pAntenna);
+          if (pAntenna.AnimateModule != null || pAntenna.IsRtModule) _antennas.Add(pAntenna);
         }
         pParts.Dispose();
       }
