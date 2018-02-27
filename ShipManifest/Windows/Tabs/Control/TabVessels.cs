@@ -16,7 +16,9 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static Rect Position = WindowControl.Position;
 
     private const float guiRuleWidth = 350;
-    private const float guiLabelWidth = 200;
+    // Temporary change in label width to allow release.  Will work vessel combining in a later release.
+    //private const float guiLabelWidth = 200;
+    private const float guiLabelWidth = 230;
     private const float guiBtnWidth = 60;
 
     internal static int CombineVesselCount = 0;
@@ -58,20 +60,22 @@ namespace ShipManifest.Windows.Tabs.Control
           GUIContent content = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
 
           bool isChecked = mdv.Combine;
-          isChecked = GUILayout.Toggle(isChecked, content, GUILayout.Width(20));
+          // temporary commenting of comnbine code to allow release.  Will work for next version.
+          //isChecked = GUILayout.Toggle(isChecked, content, GUILayout.Width(20));
           if (isChecked) combineVesselcount += 1;
           if (isChecked != mdv.Combine)
           {
             mdv.Combine = isChecked;
           }
-          Rect rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type == EventType.Repaint && _canShowToolTips)
-            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
-          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-          {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
-              Event.current.mousePosition);
-          }
+          // temporary commenting to allow release.  Will work on comnbine code for next version.
+          //Rect rect = GUILayoutUtility.GetLastRect();
+          //if (Event.current.type == EventType.Repaint && _canShowToolTips)
+          //  ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
+          //if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+          //{
+          //  SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+          //    Event.current.mousePosition);
+          //}
 
           content = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]);
           if (GUILayout.Button(content, GUILayout.Width(guiBtnWidth))) //"UnDock"
@@ -82,7 +86,7 @@ namespace ShipManifest.Windows.Tabs.Control
             // Decouple/undock selected vessel.
             UndockSelectedVessel(mdv);
           }
-          rect = GUILayoutUtility.GetLastRect();
+          Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && _canShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
@@ -94,7 +98,8 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = true;
           if (mdv.IsEditing)
             mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width(guiLabelWidth - (guiBtnWidth + 5)));
-          else GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth));
+          else
+            GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {

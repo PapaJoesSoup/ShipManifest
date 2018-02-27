@@ -253,11 +253,12 @@ namespace ShipManifest.Windows
             TabLight.TurnOnAllLights();
           break;
         case Tab.Vessel:
-          GUI.enabled = TabVessel.CombineVesselCount > 0;
-          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_018"], GUILayout.Height(20))) // "Combine Selected Vessels"
-            TabVessel.CombineSelectedVessels();
-          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_019"], GUILayout.Height(20))) // "Clear Vessel Selections"
-            TabVessel.ClearVesselCount();
+          // Temporary commenting of code to allow release.  Will work Vessel combining in later release.
+          //GUI.enabled = TabVessel.CombineVesselCount > 0;
+          //if (GUILayout.Button(SmUtils.SmTags["#smloc_control_018"], GUILayout.Height(20))) // "Combine Selected Vessels"
+          //  TabVessel.CombineSelectedVessels();
+          //if (GUILayout.Button(SmUtils.SmTags["#smloc_control_019"], GUILayout.Height(20))) // "Clear Vessel Selections"
+          //  TabVessel.ClearVesselCount();
           break;
         case Tab.None:
           break;
