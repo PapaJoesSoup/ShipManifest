@@ -578,17 +578,15 @@ namespace ShipManifest
         while (pParts.MoveNext())
         {
           if (pParts.Current == null) continue;
-          List<PartModule>.Enumerator pModules = pParts.Current.Modules.GetEnumerator();
+          List<ModuleDeployableSolarPanel>.Enumerator pModules = pParts.Current.FindModulesImplementing<ModuleDeployableSolarPanel>().GetEnumerator();
           while (pModules.MoveNext())
           {
-            if (pModules.Current == null) continue;
-            PartModule pModule = (PartModule)pModules.Current;
-            if (pModule.moduleName != "ModuleDeployableSolarPanel") continue;
-            ModuleDeployableSolarPanel iModule = (ModuleDeployableSolarPanel)pModule;
-            if (!iModule.Events["Extend"].active && !iModule.Events["Retract"].active) continue;
+            ModuleDeployableSolarPanel solarPanel = pModules.Current;
+            if (solarPanel == null) continue;
+            if (!solarPanel.Events["Extend"].active && !solarPanel.Events["Retract"].active) continue;
             ModSolarPanel pPanel = new ModSolarPanel
             {
-              PanelModule = pModule,
+              PanelModule = solarPanel,
               SPart = pParts.Current
             };
             _solarPanels.Add(pPanel);
@@ -631,7 +629,7 @@ namespace ShipManifest
             }
           }
           pModules.Dispose();
-          if (pAntenna.AnimateModule != null) _antennas.Add(pAntenna);
+          if (pAntenna.AnimateModule != null || pAntenna.IsRtModule) _antennas.Add(pAntenna);
         }
         pParts.Dispose();
       }

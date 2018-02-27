@@ -139,6 +139,7 @@
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_Off_38.png" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_24.png" />
     <Content Include="Distribution\GameData\ShipManifest\Textures\IconS_On_38.png" />
+    <Content Include="Distribution\License.txt" />
     <Content Include="LocalDev\7za_dir.txt" />
     <Content Include="LocalDev\dist_dir.txt" />
     <Content Include="LocalDev\ksp_dir.txt" />
