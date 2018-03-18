@@ -15,6 +15,8 @@ namespace ShipManifest.Modules
     internal bool IsDocked;
     internal bool IsEditing = false;
     internal string RenameVessel = null;
+    internal VesselType ReClassifyVessel;
+
     internal ModDockedVessel()
     {
     }
@@ -47,11 +49,14 @@ namespace ShipManifest.Modules
 
     internal string VesselName
     {
-      get
-      {
-        return VesselInfo.name;
-      }
+      get { return VesselInfo.name; }
       set { VesselInfo.name = value; }
+    }
+
+    internal VesselType VesselClassification
+    {
+      get { return VesselInfo.vesselType; }
+      set { VesselInfo.vesselType = value; }
     }
 
     internal List<Part> VesselParts

@@ -111,11 +111,15 @@ namespace ShipManifest.InternalObjects
         PrevMouseOverParts = MouseOverParts;
         MouseOverParts = null;
       }
-      else if (MouseOverPart != null)
+      else if (MouseOverPart != null && MouseOverParts == null)
       {
         MouseOverHighlight(MouseOverPart);
         PrevMouseOverPart = MouseOverPart;
         MouseOverPart = null;
+      }
+      else
+      {
+        PrevMouseOverPart = MouseOverPart = null;
       }
     }
 
@@ -127,6 +131,7 @@ namespace ShipManifest.InternalObjects
         step = "inside box - Part Selection?";
         SetPartHighlight(part, SMSettings.Colors[SMSettings.MouseOverColor]);
         EdgeHighight(part, true);
+        if (!IsMouseOver) PrevMouseOverPart = null;
       }
       catch (Exception ex)
       {
@@ -180,7 +185,12 @@ namespace ShipManifest.InternalObjects
         if (SMAddon.SmVessel.SelectedPartsSource != null)
           SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor],true);
         if (SMAddon.SmVessel.SelectedPartsTarget != null)
-          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);
+        { 
+          if (SMConditions.IsClsEnabled() && SMConditions.GetTransferMode() == SMConditions.TransferMode.Crew)
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartCrewColor], true);
+          else
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);        
+        }
 
         if (!IsMouseOver) PrevMouseOverParts = null;
       }
@@ -212,11 +222,14 @@ namespace ShipManifest.InternalObjects
       //if (PrevMouseOverPart == MouseOverPart || PrevMouseOverPart == null) return strColor;
       if (SMAddon.SmVessel.SelectedPartsSource.Contains(PrevMouseOverPart))
         strColor = SMSettings.SourcePartColor;
-      else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart) && SMAddon.SmVessel.ClsPartTarget != null)
+      else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
       {
-        strColor = SMAddon.SmVessel.ClsPartTarget.Part == PrevMouseOverPart 
-          ? SMSettings.TargetPartCrewColor 
-          : SMSettings.TargetPartColor;
+        if (SMConditions.GetSelectedResourceType(SMAddon.SmVessel.SelectedResources) == SMConditions.ResourceType.Crew)
+        {
+          strColor = SMConditions.IsClsHighlightingEnabled()
+            ? SMSettings.TargetPartCrewColor
+            : SMSettings.TargetPartColor;
+        }
       }
       else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
       {

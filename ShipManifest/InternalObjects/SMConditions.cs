@@ -301,6 +301,12 @@ namespace ShipManifest.InternalObjects
              SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge");
     }
 
+    internal static ResourceType GetSelectedResourceType(List<string> resources)
+    {
+      if (resources[0] == ResourceType.Crew.ToString()) return ResourceType.Crew;
+      return resources[0] == ResourceType.Science.ToString() ? ResourceType.Science : ResourceType.Pump;
+    }
+
     internal static bool IsResourceTypeOther(string resourceName)
     {
       return !resourceName.Contains(ResourceType.Crew.ToString()) &&

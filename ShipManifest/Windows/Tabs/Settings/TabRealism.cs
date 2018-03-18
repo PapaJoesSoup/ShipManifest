@@ -349,7 +349,6 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.EndHorizontal();
 
       // Resource Xfer EC cost
-      float newCost;
       GUI.enabled = !SMSettings.LockSettings && SMSettings.EnableResources && SMSettings.EnableXferCost;
       GUILayout.BeginHorizontal();
       GUILayout.Space(35);
@@ -389,7 +388,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //update zero bool 
       SmUtils.SetStringZero(StrFlowCost);
 
-      if (float.TryParse(StrFlowCost, out newCost))
+      if (float.TryParse(StrFlowCost, out float newCost))
         SMSettings.FlowCost = newCost;
 
       // create xfer Flow Rate slider;
@@ -399,7 +398,6 @@ namespace ShipManifest.Windows.Tabs.Settings
       string strMaxFlowRate = SMSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
       string strMaxFlowTime = SMSettings.MaxFlowTimeSec.ToString();
 
-      float newRate;
 
       // Resource Flow Rate
       GUI.enabled = !SMSettings.LockSettings && SMSettings.EnableResources && SMSettings.RealXfers;
@@ -429,8 +427,9 @@ namespace ShipManifest.Windows.Tabs.Settings
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
-      if (float.TryParse(strFlowRate, out newRate))
-        SMSettings.FlowRate = (int) newRate;
+
+      if (float.TryParse(strFlowRate, out float newRate))
+        SMSettings.FlowRate = (int)newRate;
 
       // Resource Flow rate Slider
       GUILayout.BeginHorizontal();

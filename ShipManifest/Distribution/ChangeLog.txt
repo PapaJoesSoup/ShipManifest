@@ -1,11 +1,12 @@
-﻿Version 5.2.1.0 - Release TBD 2018 - Vessel to Vessel Edition
- - New: Added Docked vessel to vessel Science transfers!
- - Fixed:  gain/loss of resource(s) in transfers. (thanks to Arivald Ha'gel for the PR #48!)
- - Fixed:  RT antennas not appearing in the control window. PR #48
- - Fixed:  Kopernicus Solar panel detection problem (Git Issue #47) PR #48
- - Fixed:  Correct version file data to agree with release version. Git Issue #46
- - Fixed:  KIS kerbal inventory lost with kerbal moves.  Git Issue #21
-
+﻿Version 5.2.1.0 - Release 17 Mar 2018 - KSP 1.4.1 Edition
+ - New: Recompiled for KSP 1.4.x compatibility.
+ - Fixed: Bug in Selected Target Mouseover.  CLS Target Crew Part was incorrect color. Git Issue #53
+ - Fixed: Updated icon graphics to restore quality after Unity update in KSP. Increased image sizes to 128 x 128 px (Git Issue #52)
+ - Fixed: Sometimes the Manifest window will not appear. Git Issue #49
+ - Fixed: gain/loss of resource(s) in transfers. (thanks to Arivald Ha'gel for the PR #48!)
+ - Fixed: RT antennas not appearing in the control window. PR #48
+ - Fixed: Kopernicus Solar panel detection problem (Git Issue #47) PR #48
+ - Fixed: Correct version file data to agree with release version. Git Issue #46
 
 Version 5.2.0.0 - Release 17 Jul 2017 - Vessel to Vessel Edition
  - New: Added Docked vessel to vessel Crew transfers!

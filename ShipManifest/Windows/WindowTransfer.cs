@@ -755,7 +755,6 @@ namespace ShipManifest.Windows
 
     private static void FrozenCrewMemberDetails(float xOffset, DfWrapper.FrznCrewMbr frznCrew)
     {
-      Rect rect;
       GUILayout.BeginHorizontal();
       GUI.enabled = false;
       if (GUILayout.Button(new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]), SMStyle.ButtonStyle,
@@ -763,7 +762,7 @@ namespace ShipManifest.Windows
       {
         ToolTip = "";
       }
-      rect = GUILayoutUtility.GetLastRect();
+      Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
       string trait = "";
@@ -1336,7 +1335,7 @@ namespace ShipManifest.Windows
 
     private static void ScienceDetailsTarget()
     {
-      float xOffset = 30;
+      const float xOffset = 30;
       if (SMAddon.SmVessel.SelectedPartsTarget.Count <= 0) return;
       int count =
         SMAddon.SmVessel.SelectedPartsTarget[0].Modules.Cast<PartModule>()

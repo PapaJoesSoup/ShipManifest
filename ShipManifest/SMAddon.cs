@@ -537,6 +537,7 @@ namespace ShipManifest
 
     internal void OnVesselChange(Vessel newVessel)
     {
+      if (newVessel != FlightGlobals.ActiveVessel) return;
       try
       {
         SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
@@ -622,7 +623,7 @@ namespace ShipManifest
         // Setup SM Window button
         if (HighLogic.LoadedSceneIsFlight && _smButtonStock == null && !SMSettings.EnableBlizzyToolbar)
         {
-          string iconfile = "IconOff_38";
+          string iconfile = "IconOff_128";
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmButtonClicked,
             OnSmButtonClicked,
@@ -636,14 +637,14 @@ namespace ShipManifest
           if (WindowManifest.ShowWindow)
             _smButtonStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
+                WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_128" : $"{TextureFolder}IconOff_128", false));
         }
 
         // Setup Settings Button
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER && _smSettingsStock == null &&
             !SMSettings.EnableBlizzyToolbar)
         {
-          string iconfile = "IconS_Off_38";
+          string iconfile = "IconS_Off_128";
           _smSettingsStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmSettingsClicked,
             OnSmSettingsClicked,
@@ -657,14 +658,14 @@ namespace ShipManifest
           if (WindowSettings.ShowWindow)
             _smSettingsStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{TextureFolder}IconS_Off_38", false));
+                WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_128" : $"{TextureFolder}IconS_Off_128", false));
         }
 
         // Setup Roster Button
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER || _smRosterStock != null || SMSettings.EnableBlizzyToolbar)
           return;
         {
-          string iconfile = "IconR_Off_38";
+          string iconfile = "IconR_Off_128";
           _smRosterStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmRosterClicked,
             OnSmRosterClicked,
@@ -678,7 +679,7 @@ namespace ShipManifest
           if (WindowRoster.ShowWindow)
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_128" : $"{ TextureFolder}IconR_Off_128", false));
         }
       }
       catch (Exception ex)
@@ -715,9 +716,10 @@ namespace ShipManifest
     //Toolbar button click handlers
     internal static void OnSmButtonClicked()
     {
-      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle");
+      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Enter");
       try
       {
+        //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
         if (WindowManifest.ShowWindow)
         {
           // SM is showing.  Turn off.
@@ -735,11 +737,13 @@ namespace ShipManifest
         else
         {
           // SM is not showing. turn on if we can.
+          //Debug.Log("[ShipManifest]:  CanShowShipManifest:  " + SMConditions.CanShowShipManifest(true));
           if (SMConditions.CanShowShipManifest(true))
             WindowManifest.ShowWindow = !WindowManifest.ShowWindow;
           else
             return;
         }
+        //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
 
         if (SMSettings.EnableBlizzyToolbar)
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
@@ -748,12 +752,14 @@ namespace ShipManifest
         else
           _smButtonStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_38" : $"{TextureFolder}IconOff_38", false));
+              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_128" : $"{TextureFolder}IconOff_128", false));
       }
       catch (Exception ex)
       {
         SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
       }
+      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Exit");
+      //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
     }
 
     internal static void OnSmRosterClicked()
@@ -771,7 +777,7 @@ namespace ShipManifest
           else
             _smRosterStock.SetTexture(
               GameDatabase.Instance.GetTexture(
-                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_38" : $"{ TextureFolder}IconR_Off_38", false));
+                WindowRoster.ShowWindow ? $"{TextureFolder}IconR_On_128" : $"{ TextureFolder}IconR_Off_128", false));
           if (WindowRoster.ShowWindow) WindowRoster.GetRosterList();
         }
       }
@@ -796,7 +802,7 @@ namespace ShipManifest
         else
           _smSettingsStock.SetTexture(
             GameDatabase.Instance.GetTexture(
-              WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_38" : $"{ TextureFolder}IconS_Off_38", false));
+              WindowSettings.ShowWindow ? $"{TextureFolder}IconS_On_128" : $"{ TextureFolder}IconS_Off_128", false));
       }
       catch (Exception ex)
       {
@@ -837,18 +843,18 @@ namespace ShipManifest
               WindowRoster.Title, GUILayout.MinHeight(20));
           }
         }
-        if (HighLogic.LoadedScene == GameScenes.FLIGHT &&
-            (FlightGlobals.fetch == null ||
-             (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
-        {
-          step = "0a - Vessel Change";
-          SmVessel.SelectedPartsSource.Clear();
-          SmVessel.SelectedPartsTarget.Clear();
-          SmVessel.SelectedVesselsSource.Clear();
-          SmVessel.SelectedVesselsTarget.Clear();
-          SmVessel.SelectedResources.Clear();
-          return;
-        }
+        //if (HighLogic.LoadedScene == GameScenes.FLIGHT &&
+        //    (FlightGlobals.fetch == null ||
+        //     (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
+        //{
+        //  step = "0a - Vessel Change";
+        //  SmVessel.SelectedPartsSource.Clear();
+        //  SmVessel.SelectedPartsTarget.Clear();
+        //  SmVessel.SelectedVesselsSource.Clear();
+        //  SmVessel.SelectedVesselsTarget.Clear();
+        //  SmVessel.SelectedResources.Clear();
+        //  return;
+        //}
 
         step = "1 - Show Interface(s)";
         // Is the scene one we want to be visible in?
