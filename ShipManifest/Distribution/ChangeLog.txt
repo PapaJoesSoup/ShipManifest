@@ -1,4 +1,7 @@
-﻿Version 5.2.1.0 - Release 17 Mar 2018 - KSP 1.4.1 Edition
+﻿Version 6.0.0.1 - Release 24 Nov 2019 - KSP 1.8.x Edition
+- New: Recompiled for KSP 1.8.x compatibility (using DotNet 4.5)
+
+Version 5.2.1.0 - Release 17 Mar 2018 - KSP 1.4.1 Edition
  - New: Recompiled for KSP 1.4.x compatibility.
  - Fixed: Bug in Selected Target Mouseover.  CLS Target Crew Part was incorrect color. Git Issue #53
  - Fixed: Updated icon graphics to restore quality after Unity update in KSP. Increased image sizes to 128 x 128 px (Git Issue #52)
