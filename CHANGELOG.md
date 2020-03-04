@@ -1,9 +1,13 @@
-﻿Changelog for Ship Manifest
+Changelog for Ship Manifest
 ===========================================================
 
 Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
+-------------------------------------------------
+
+
+Version 6.0.0.2 - Release 04 Mar 2020 - KSP 1.9.1
 -------------------------------------------------
  - New: recompiled for KSP 1.9.1
  - Changed: new maintainer, *Micha*.
