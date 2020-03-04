@@ -1,9 +1,18 @@
+# Ignore Visual Studio files
+.vs
 *.cache
-*.force
-ShipManifest/obj/Debug/ShipManifest.csproj.FileListAbsolute.txt
-*.user
 *.suo
-bin/
-obj/
-.vs/ShipManifest/v15/sqlite3/storage.ide
-.vs/
+*.user
+*.orig
+*.dll
+*.swp
+
+# Ignore build artefacts in our repository
+Build/
+Release/
+*.User.props
+**/obj/
+**/bin/
+
+# Specifically allow build artefacts in the Distribution folder
+!Distribution/**
