@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Deploy" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.8">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="..\Source\ShipManifest.Common.props" />
+  </ImportGroup>
+
+  <!-- Variables (override in ShipManifest.User.props) -->
+  <PropertyGroup>
+    <!-- Release Folder -->
+    <!-- To change the output folder, use the following parameter: /p:ReleaseDir=C:\KSP\Mods\Releases\ShipManifest -->
+    <ReleaseDir Condition="'$(ReleaseDir)' == ''">$(MODDIR)\Release</ReleaseDir>
+
+    <!-- BuildDir Folder -->
+    <!-- This is the folder where the distribution will be built -->
+    <BuildDir>$(MODDIR)\Release\Build</BuildDir>
+
+    <!-- SourceDir Folder -->
+    <!-- This is the folder which contains the solution and source files -->
+    <SourceDir>$(MODDIR)\Source</SourceDir>
+
+    <!-- DistDir Folder -->
+    <!-- This is the folder where the static distribution files are kept -->
+    <DistDir Condition="'$(DistDir)'==''">$(MODDIR)\Distribution</DistDir>
+
+    <!-- SM_Build Folder -->
+    <!-- This is the folder where the ShipManifest project outputs its build artefacts -->
+    <SM_BuildDir>$(SourceDir)\$(MODNAME)\bin\Release</SM_BuildDir>
+
+    <!-- SMI_Build Folder -->
+    <!-- This is the folder where the SMInterface project outputs its build artefacts -->
+    <SMI_BuildDir>$(SourceDir)\SMInterface\bin\Release</SMI_BuildDir>
+  </PropertyGroup>
+
+  <!-- All top-level projects -->
+  <Target Name="ALL"
+          DependsOnTargets="Deploy;Release">
+  </Target>
+
+  <!-- "Autostart" This target deploys the build artefacts to the KSP Directory. -->
+  <Target Name="Deploy">
+    <CallTarget Targets="Compile"/>
+    <CallTarget Targets="DoDeploy"/>
+  </Target>
+
+  <!-- This target builds the release archive. -->
+  <Target Name="Release">
+    <CallTarget Targets="Compile"/>
+    <CallTarget Targets="MakeRelease"/>
+    <CallTarget Targets="ZipRelease"/>
+  </Target>
+
+  <!-- compile solution as release -->
+  <Target Name="Compile">
+    <MSBuild Projects="$(SourceDir)\$(MODNAME).sln" Properties="Configuration=Release"/>
+  </Target>
+
+  <Target Name="BuildDir">
+    <MakeDir Directories="$(BuildDir)" Condition="!Exists('$(BuildDir)')" />
+  </Target>
+
+  <!-- This target deploys the build artefacts to the KSP directory -->
+  <Target Name="DoDeploy"
+          DependsOnTargets="GenerateVersionFile">
+    <PropertyGroup>
+      <SourceFolder>$(DistDir)\GameData\$(MODNAME)</SourceFolder>
+      <DestFolder>$(KSPDIR)\GameData\$(MODNAME)</DestFolder>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(DestFolder)" Condition="!Exists('$(DestFolder)')" />
+    <ItemGroup>
+      <ReleaseFiles
+        Include="$(SourceFolder)\**\*.*"
+        Exclude="">
+      </ReleaseFiles>
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(ReleaseFiles)"
+      DestinationFolder="$(DestFolder)\%(RecursiveDir)"
+      SkipUnchangedFiles="true" >
+      <Output TaskParameter="CopiedFiles" ItemName="Copied" />
+    </Copy>
+    <ItemGroup>
+      <OutdatedFiles Include="$(DestFolder)\**" Exclude="@(Copied)" />
+    </ItemGroup>
+    <Delete Files="@(OutdatedFiles)"/>
+  </Target>
+
+  <!-- This target builds the release package -->
+  <Target Name="MakeRelease"
+          DependsOnTargets="BuildDir">
+    <!-- Copy main mod files -->
+    <ItemGroup>
+      <DistFiles
+        Include="$(DistDir)\**\*.*"
+        Exclude="*.pdb">
+      </DistFiles>
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(DistFiles)"
+      DestinationFolder="$(BuildDir)\%(RecursiveDir)"
+      SkipUnchangedFiles="true" >
+      <Output TaskParameter="CopiedFiles" ItemName="Copied" />
+    </Copy>
+    <ItemGroup>
+      <OutdatedFiles Include="$(BuildDir)\**" Exclude="@(Copied)" />
+    </ItemGroup>
+    <Delete Files="@(OutdatedFiles)"/>
+    <Copy
+      SourceFiles="$(MODDIR)\License.txt;$(MODDIR)\CONTRIBUTORS.md"
+      DestinationFolder="$(BuildDir)\" />
+
+    <!-- Copy dev files -->
+    <MakeDir Directories="$(BuildDir)\Dev" Condition="!Exists('$(BuildDir)\Dev')" />
+    <Copy
+      SourceFiles="$(SMI_BuildDir)\SMInterface.dll"
+      DestinationFolder="$(BuildDir)\Dev" />
+
+    <!-- Generate templated files -->
+    <CallTarget Targets="GenerateVersionFile"/>
+    <CallTarget Targets="GenerateChangelog"/>
+  </Target>
+
+  <!-- create zip file with content of release\bin folder -->
+  <Target Name="ZipRelease"
+          DependsOnTargets="getversion;gettime">
+    <MakeDir Directories="$(ReleaseDir)" Condition="!Exists('$(ReleaseDir)')" />
+    <Delete Files="$(ReleaseDir)\$(MODNAME)-$(DLLVersion)*.zip" />
+    <ZipDirectory Condition="Exists('$(BuildDir)')"
+                  SourceDirectory="$(BuildDir)"
+                  DestinationFile="$(ReleaseDir)\$(MODNAME)-$(DLLVersion)_$(CurrentDate).zip" />
+  </Target>
+
+  <Target Name="gettime">
+    <PropertyGroup>
+      <CurrentDate>$([System.DateTime]::Now.ToString(yyyyMMddHHmmss))</CurrentDate>
+    </PropertyGroup>
+    <Message Text="CurrentDate = $(CurrentDate)" Importance="high" />
+  </Target>
+
+  <Target Name="getversion"
+          DependsOnTargets="Compile">
+      <GetAssemblyIdentity AssemblyFiles="$(SM_BuildDir)\$(MODNAME).dll">
+          <Output TaskParameter="Assemblies" ItemName="myAssemblyInfo"/>
+      </GetAssemblyIdentity>
+      <PropertyGroup>
+          <DLLVersion>%(myAssemblyInfo.Version)</DLLVersion>
+      </PropertyGroup>
+  </Target>
+
+  <UsingTask TaskName="GrepInFile"  TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Path ParameterType="System.String" Required="true" />
+      <Expression ParameterType="System.String" Required="true" />
+      <Value ParameterType="System.String" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+      //Console.WriteLine("Searching in file " + Path);
+      //Console.WriteLine("Search expression is " + Expression);
+      var re = new Regex(Expression);
+      foreach(var line in File.ReadLines(Path))
+      {
+        var match = re.Match(line);
+        if(match.Success)
+        {
+          Value = match.Groups[1].Value;
+          //Console.WriteLine("KSP Version found - {0}!", Value);
+          break;
+        }
+      }
+]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="getkspversion">
+    <GrepInFile Path="$(KSPDIR)\readme.txt" Expression="Version\s+(\d+\.\d+(\.\d+)?)\s*">
+      <Output PropertyName="KSPVersion" TaskParameter="Value" />
+    </GrepInFile>
+    <Message Text="KSP Version is $(KSPVersion)" Importance="High" />
+  </Target>
+
+  <UsingTask  TaskName="ReplaceTagsInFile"
+              TaskFactory="CodeTaskFactory"
+              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <TemplateFile ParameterType="System.String" Required="true" />
+      <TargetFile ParameterType="System.String" Required="true" />
+      <Tokens ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+      var tokens = new Dictionary<string,string>();
+      foreach(var item in Tokens) {
+        tokens.Add(item.ItemSpec, item.GetMetadata("Value"));
+      }
+      string template = File.ReadAllText(TemplateFile);
+      string content = Regex.Replace(template, @"\{[A-Z0-9_]+\}", match => tokens[match.Value]);
+      File.WriteAllText(TargetFile, content);
+]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="GenerateChangelog"
+          Inputs="$(MODDIR)\CHANGELOG.md"
+          Outputs="$(BuildDir)\CHANGELOG.md"
+          DependsOnTargets="getversion;getkspversion;BuildDir">
+    <PropertyGroup>
+      <uc_Date>$([System.DateTime]::Now.ToString(dd MMM yyyy))</uc_Date>
+    </PropertyGroup>
+    <ItemGroup>
+      <Tokens Include="{VERSION}"><Value>$(DLLVersion)</Value></Tokens>
+      <Tokens Include="{KSPVERSION}"><Value>$(KSPVersion)</Value></Tokens>
+      <Tokens Include="{DATE}"><Value>$(uc_Date)</Value></Tokens>
+    </ItemGroup>
+    <ReplaceTagsInFile
+        TemplateFile="$(MODDIR)\CHANGELOG.md"
+        TargetFile="$(BuildDir)\CHANGELOG.md"
+        Tokens="@(Tokens)" />
+  </Target>
+
+  <Target Name="GenerateVersionFile"
+          Inputs="$(MODNAME).version.template"
+          Outputs="$(MODDIR)\$(MODNAME).version"
+          DependsOnTargets="Compile;getversion;getkspversion">
+    <ItemGroup>
+      <Tokens Include="{MAJOR}"><Value>$([System.Version]::Parse($(DLLVersion)).Major.ToString())</Value></Tokens>
+      <Tokens Include="{MINOR}"><Value>$([System.Version]::Parse($(DLLVersion)).Minor.ToString())</Value></Tokens>
+      <Tokens Include="{PATCH}"><Value>$([System.Version]::Parse($(DLLVersion)).Build.ToString())</Value></Tokens>
+      <Tokens Include="{BUILD}"><Value>$([System.Version]::Parse($(DLLVersion)).Revision.ToString())</Value></Tokens>
+      <Tokens Include="{KSP_MAJOR}"><Value>$([System.Version]::Parse($(KSPVersion)).Major.ToString())</Value></Tokens>
+      <Tokens Include="{KSP_MINOR}"><Value>$([System.Version]::Parse($(KSPVersion)).Minor.ToString())</Value></Tokens>
+      <Tokens Include="{KSP_PATCH}"><Value>$([System.Version]::Parse($(KSPVersion)).Build.ToString())</Value></Tokens>
+    </ItemGroup>
+    <ReplaceTagsInFile
+        TemplateFile="$(MODNAME).version.template"
+        TargetFile="$(DistDir)\GameData\$(MODNAME)\$(MODNAME).version"
+        Tokens="@(Tokens)" />
+  </Target>
+</Project>
