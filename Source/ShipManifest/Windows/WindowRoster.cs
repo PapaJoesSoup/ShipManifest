@@ -289,9 +289,9 @@ namespace ShipManifest.Windows
           GUIStyle labelStyle;
           if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
               kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
-            labelStyle = SMStyle.LabelStyleRed;
+              labelStyle = SMStyle.LabelStyleRed;
           else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
-            labelStyle = SMStyle.LabelStyleYellow;
+              labelStyle = SMStyle.LabelStyleYellow;
           else
             labelStyle = SMStyle.LabelStyle;
 
@@ -321,8 +321,8 @@ namespace ShipManifest.Windows
           else
           {
             // Since the kerbal has no vessel assignment, lets show what their status...
-            rosterDetails = kerbals.Current.rosterStatus.ToString();
-          }
+              rosterDetails = kerbals.Current.rosterStatus.ToString();
+            }
           string buttonText;
           string buttonToolTip;
           GUILayout.BeginHorizontal();
@@ -383,8 +383,10 @@ namespace ShipManifest.Windows
           ThawKerbal(actionKerbal.name);
         else if (actionText == SmUtils.SmTags["#smloc_roster_026"])// "Freeze"
           FreezeKerbal(actionKerbal);
-        //Refresh all lists... 
-        GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel.Vessel);
+        //Refresh all lists...
+        if (SMAddon.SmVessel?.Vessel != null) {
+          GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel?.Vessel);
+        }
       }
       catch (Exception ex)
       {
