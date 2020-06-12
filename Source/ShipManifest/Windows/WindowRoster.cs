@@ -141,7 +141,8 @@ namespace ShipManifest.Windows
             return true;
           break;
         case KerbalFilters.Available:
-          if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+          if ( (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available) &&
+               (kerbal.type != ProtoCrewMember.KerbalType.Applicant) )
             return true;
           break;
         case KerbalFilters.Dead:
@@ -163,6 +164,10 @@ namespace ShipManifest.Windows
           if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) ||
               (InstalledMods.IsDfInstalled &&
                GetFrozenKerbalDetails(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
+            return true;
+          break;
+        case KerbalFilters.Applicant:
+          if (kerbal.type == ProtoCrewMember.KerbalType.Applicant)
             return true;
           break;
       }
@@ -224,6 +229,27 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
+    private static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
+    {
+      GUILayout.BeginHorizontal();
+      GUILayout.Label(SmUtils.SmTags["#smloc_roster_036"], GUILayout.Width(85)); // "Suit:"
+
+      // Always available
+      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, SmUtils.SmTags["#smloc_roster_037"], GUILayout.Width(90)); // "Default"
+      if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
+
+      if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, SmUtils.SmTags["#smloc_roster_038"], GUILayout.Width(90)); // "Vintage"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
+      }
+      if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, SmUtils.SmTags["#smloc_roster_039"], GUILayout.Width(90)); // "Future"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
+      }
+
+      GUILayout.EndHorizontal();
+    }
+
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
@@ -252,6 +278,10 @@ namespace ShipManifest.Windows
         bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, SmUtils.SmTags["#smloc_roster_015"], GUILayout.Width(80)); // "Frozen"
         if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
       }
+
+      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilters.Applicant, SmUtils.SmTags["#smloc_roster_033"], GUILayout.Width(130)); // "Applicant"
+      if (isApplicant) CurrentFilter = KerbalFilters.Applicant;
+
       GUILayout.EndHorizontal();
     }
 
@@ -288,12 +318,16 @@ namespace ShipManifest.Windows
           if (!CanDisplayKerbal(kerbals.Current)) continue;
           GUIStyle labelStyle;
           if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
-              kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+              kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing) {
             labelStyle = SMStyle.LabelStyleRed;
-          else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+          } else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned) {
             labelStyle = SMStyle.LabelStyleYellow;
-          else
+          } else if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
             labelStyle = SMStyle.LabelStyle;
+          } else {
+            // What's left are Available kerbals which we can edit etc.
+            labelStyle = SMStyle.LabelStyleGreen;
+          }
 
           // What vessel is this Kerbal Assigned to?
           string rosterDetails = "";
@@ -321,7 +355,11 @@ namespace ShipManifest.Windows
           else
           {
             // Since the kerbal has no vessel assignment, lets show what their status...
-            rosterDetails = kerbals.Current.rosterStatus.ToString();
+            if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
+              rosterDetails = kerbals.Current.type.ToString();
+            } else {
+              rosterDetails = kerbals.Current.rosterStatus.ToString();
+            }
           }
           string buttonText;
           string buttonToolTip;
@@ -383,8 +421,12 @@ namespace ShipManifest.Windows
           ThawKerbal(actionKerbal.name);
         else if (actionText == SmUtils.SmTags["#smloc_roster_026"])// "Freeze"
           FreezeKerbal(actionKerbal);
-        //Refresh all lists... 
-        GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel.Vessel);
+        else if (actionText == SmUtils.SmTags["#smloc_roster_034"]) // "Hire"
+          HireKerbal(actionKerbal);
+        //Refresh all lists...
+        if (SMAddon.SmVessel?.Vessel != null) {
+          GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel?.Vessel);
+        }
       }
       catch (Exception ex)
       {
@@ -418,6 +460,12 @@ namespace ShipManifest.Windows
       {
         DisplaySelectProfession();
       }
+      if (Expansions.ExpansionsLoader.IsExpansionAnyKerbalSuitInstalled())
+      {
+        DisplaySelectSuit(ref SelectedKerbal.Suit);
+      }
+
+      // TODO: Realism setting to enable Kerbal Gender Change for existing Kerbals?
       bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
       GUILayout.Label(SmUtils.SmTags["#smloc_roster_017"], GUILayout.Width(85)); // "Gender"
@@ -432,7 +480,10 @@ namespace ShipManifest.Windows
       GUILayout.Label(SmUtils.SmTags["#smloc_roster_030"]); // "Stupidity"
       SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
 
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.SmTags["#smloc_roster_031"], GUILayout.Height(30)); // "Badass"
+      GUILayout.BeginHorizontal();
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.SmTags["#smloc_roster_031"], GUILayout.Width(90)); // "Badass"
+      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, SmUtils.SmTags["#smloc_roster_035"], GUILayout.Width(90)); // "Veteran"
+      GUILayout.EndHorizontal();
 
       GUILayout.BeginHorizontal();
       if (GUILayout.Button(SmUtils.SmTags["#smloc_roster_004"], GUILayout.MaxWidth(50))) // "Cancel"
@@ -467,11 +518,17 @@ namespace ShipManifest.Windows
       try
       {
         RosterList.Clear();
-        RosterList = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-        RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
-        // Support for DeepFreeze
-        if (InstalledMods.IsDfInstalled && DfWrapper.ApiReady)
-          RosterList.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+        var roster = HighLogic.CurrentGame.CrewRoster;
+        bool haveDeepFreeze = InstalledMods.IsDfInstalled && DfWrapper.ApiReady;
+        for( int c = 0; c < roster.Count; c++) {
+          // Filter out unowned kerbals if we don't have DeepFreeze
+          // TODO: Perhaps we should allow editing of these Kerbals anyway?
+          var kerbal = roster[c];
+          if( kerbal.type == ProtoCrewMember.KerbalType.Unowned && !haveDeepFreeze ) {
+            continue;
+          }
+          RosterList.Add(kerbal);
+        }
       }
       catch (Exception ex)
       {
@@ -577,6 +634,12 @@ namespace ShipManifest.Windows
         buttonToolTip = SMSettings.EnableCrewModify 
           ? SmUtils.SmTags["#smloc_roster_tt_020"] // "Brings a Kerbal back to life.\r\nWill then become available.";
           : SmUtils.SmTags["#smloc_roster_tt_019"]; // "Realistic Control is preventing this action.";
+      }
+      else if(kerbal.type == ProtoCrewMember.KerbalType.Applicant)
+      {
+        GUI.enabled = true;
+        buttonText = SmUtils.SmTags["#smloc_roster_034"];  // "Hire";
+        buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_024"]; // "Hire the Applicant and make them a member of your Crew.\nPlease note that this will cost you!"
       }
     }
 
@@ -705,6 +768,22 @@ namespace ShipManifest.Windows
       HighLogic.CurrentGame.CrewRoster.GetNextAvailableKerbal();
     }
 
+    internal static void HireKerbal(ProtoCrewMember kerbal)
+    {
+      try
+      {
+        if( kerbal.type != ProtoCrewMember.KerbalType.Applicant ) {
+          throw new Exception("Tried to hire a kerbal which isn't an Applicant: " + kerbal.ToString());
+        }
+        HighLogic.CurrentGame.CrewRoster.HireApplicant(kerbal);
+      }
+      catch (Exception ex)
+      {
+        SmUtils.LogMessage($" in HireKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
+      }
+    }
+
     #endregion Methods
 
     //Profession vars
@@ -726,7 +805,8 @@ namespace ShipManifest.Windows
       Dead,
       Frozen,
       Missing,
-      Vessel
+      Vessel,
+      Applicant
     }
   }
 }

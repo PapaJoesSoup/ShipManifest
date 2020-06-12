@@ -1,4 +1,4 @@
-﻿using ConnectedLivingSpace;
+using ConnectedLivingSpace;
 
 namespace ShipManifest.Modules
 {

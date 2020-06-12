@@ -1,4 +1,4 @@
-﻿namespace ShipManifest.InternalObjects
+namespace ShipManifest.InternalObjects
 {
   internal static class SMPart
   {

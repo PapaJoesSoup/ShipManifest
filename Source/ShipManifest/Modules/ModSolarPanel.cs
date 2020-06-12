@@ -1,4 +1,4 @@
-﻿namespace ShipManifest.Modules
+namespace ShipManifest.Modules
 {
   internal class ModSolarPanel
   {

@@ -716,13 +716,12 @@ namespace ShipManifest.Windows
 
       List<ProtoCrewMember>.Enumerator crewMember = SMAddon.SmVessel.GetCrewFromParts(selectedPartsFrom).GetEnumerator();
       // ReSharper disable once ForCanBeConvertedToForeach
-      while (crewMember.MoveNext())
+      while (crewMember.MoveNext() && GUI.enabled)
       {
         if (crewMember.Current == null) continue;
         if (isVesselMode && touristsOnly && crewMember.Current.type != ProtoCrewMember.KerbalType.Tourist) continue;
 
         CrewMemberDetails(selectedPartsFrom, selectedPartsTo, selectedCrewMembers, crewMember.Current, xOffset, isVesselMode, targetCapacity);
-        GUI.enabled = true;
       }
       crewMember.Dispose();
       // Cater for DeepFreeze Continued... parts - list frozen kerbals
@@ -757,7 +756,7 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       GUI.enabled = false;
-      if (GUILayout.Button(new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]), SMStyle.ButtonStyle,
+      if (GUILayout.Button(new GUIContent("Â»", SmUtils.SmTags["#smloc_transfer_tt_009"]), SMStyle.ButtonStyle,
         GUILayout.Width(15), GUILayout.Height(20))) // "Move Kerbal to another seat within Part"
       {
         ToolTip = "";
@@ -893,8 +892,8 @@ namespace ShipManifest.Windows
         GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })", GUILayout.Width(cmWidth), GUILayout.Height(20));
       }
       GUI.enabled = !SMConditions.IsTransferInProgress();
-      // GUIContent moveContent = new GUIContent("»", "Move Kerbal to another seat within Part");
-      GUIContent moveContent = new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
+      // GUIContent moveContent = new GUIContent("Â»", "Move Kerbal to another seat within Part");
+      GUIContent moveContent = new GUIContent("Â»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
       if (GUILayout.Button(moveContent, SMStyle.ButtonStyle, GUILayout.Width(cmMoveWidth), GUILayout.Height(20)))
       {
         ToolTip = "";
@@ -931,6 +930,7 @@ namespace ShipManifest.Windows
         {
           ToolTip = "";
           FlightEVA.SpawnEVA(crewMember.KerbalRef);
+          GUI.enabled = false;
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
