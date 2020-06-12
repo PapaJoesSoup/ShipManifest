@@ -499,12 +499,19 @@ namespace ShipManifest.Process
         {
           // Add Source Crewmember to target part
           if (FromCrewMember != null && ToPart.CrewCapacity > ToPart.protoModuleCrew.Count)
+          {
             AddCrewMember(FromCrewMember, ToPart, ToSeat);
+            SourceAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
+            FireSourceXferEvent = true;
+          }
 
           // Add Target Crewmember to source part
           if (ToCrewMember != null && FromPart.CrewCapacity > FromPart.protoModuleCrew.Count)
+          {
             AddCrewMember(ToCrewMember, FromPart, FromSeat);
-
+            TargetAction = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
+            FireTargetXferEvent = true;
+          }
         }
         catch (Exception ex)
         {
