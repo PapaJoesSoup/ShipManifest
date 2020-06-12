@@ -941,7 +941,6 @@ namespace ShipManifest.Windows
         if (GUILayout.Button(new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], XferToolTip),
           SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20))) // "Xfer"
         {
-          SMAddon.SmVessel.TransferCrewObj.FromCrewMember = crewMember;
           SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsTo[0]);
         }
         rect = GUILayoutUtility.GetLastRect();
@@ -953,8 +952,9 @@ namespace ShipManifest.Windows
     private static void CrewSelectedXferButton(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, float xOffset)
     {
       Rect rect;
-      if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMembers == crewMembers ||
-           SMAddon.SmVessel.TransferCrewObj.ToCrewMembers == crewMembers) && SMConditions.IsTransferInProgress())
+      //if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMembers == crewMembers ||
+      //     SMAddon.SmVessel.TransferCrewObj.ToCrewMembers == crewMembers) && SMConditions.IsTransferInProgress())
+      if (SMConditions.IsTransferInProgress())
       {
         GUI.enabled = true;
         //GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
@@ -966,7 +966,6 @@ namespace ShipManifest.Windows
           SMStyle.ButtonStyle, GUILayout.Width(90),
           GUILayout.Height(20))) // "Xfer Crew"
         {
-          SMAddon.SmVessel.TransferCrewObj.FromCrewMembers = crewMembers;
           SMAddon.SmVessel.TransferCrewObj.CrewTransfersBegin(crewMembers, selectedPartsFrom, selectedPartsTo);
         }
         rect = GUILayoutUtility.GetLastRect();

@@ -346,25 +346,13 @@ namespace ShipManifest
         // Realism Mode Crew transfer operation (real time)
         if (SmVessel.TransferCrewObj.CrewXferActive)
         {
-          if (SmVessel.TransferCrewObj.FromCrewMember != null) SmVessel.TransferCrewObj.CrewTransferProcess();
-          else if (SmVessel.TransferCrewObj.FromCrewMembers != null) SmVessel.TransferCrewObj.CrewTransferProcesses();
-          else SmVessel.TransferCrewObj.CrewXferActive = false;
+          SmVessel.TransferCrewObj.CrewTransferProcess();
         }
         else if (SmVessel.TransferCrewObj.IsStockXfer)
         {
           SmVessel.TransferCrewObj.CrewTransferBegin(SmVessel.TransferCrewObj.FromCrewMember,
             SmVessel.TransferCrewObj.FromPart, SmVessel.TransferCrewObj.ToPart);
         }
-
-        if (!SMSettings.EnableStockCrewXfer || !TransferCrew.FireSourceXferEvent) return;
-        // Now let's deal with third party mod support...
-        TransferCrew.FireSourceXferEvent = false;
-        GameEvents.onCrewTransferred.Fire(TransferCrew.SourceAction);
-
-        //If a swap, we need to handle that too...
-        if (!TransferCrew.FireTargetXferEvent) return;
-        TransferCrew.FireTargetXferEvent = false;
-        GameEvents.onCrewTransferred.Fire(TransferCrew.TargetAction);
       }
       catch (Exception ex)
       {
