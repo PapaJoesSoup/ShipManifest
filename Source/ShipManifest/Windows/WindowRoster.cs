@@ -229,6 +229,27 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
+    private static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
+    {
+      GUILayout.BeginHorizontal();
+      GUILayout.Label(SmUtils.SmTags["#smloc_roster_036"], GUILayout.Width(85)); // "Suit:"
+
+      // Always available
+      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, SmUtils.SmTags["#smloc_roster_037"], GUILayout.Width(90)); // "Default"
+      if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
+
+      if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, SmUtils.SmTags["#smloc_roster_038"], GUILayout.Width(90)); // "Vintage"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
+      }
+      if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, SmUtils.SmTags["#smloc_roster_039"], GUILayout.Width(90)); // "Future"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
+      }
+
+      GUILayout.EndHorizontal();
+    }
+
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
@@ -438,6 +459,10 @@ namespace ShipManifest.Windows
       if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
       {
         DisplaySelectProfession();
+      }
+      if (Expansions.ExpansionsLoader.IsExpansionAnyKerbalSuitInstalled())
+      {
+        DisplaySelectSuit(ref SelectedKerbal.Suit);
       }
 
       // TODO: Realism setting to enable Kerbal Gender Change for existing Kerbals?
