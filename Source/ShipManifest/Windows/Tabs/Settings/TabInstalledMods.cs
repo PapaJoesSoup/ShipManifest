@@ -1,4 +1,4 @@
-﻿using ShipManifest.APIClients;
+using ShipManifest.APIClients;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Settings

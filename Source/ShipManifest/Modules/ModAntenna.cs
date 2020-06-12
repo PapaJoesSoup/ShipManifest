@@ -1,4 +1,4 @@
-﻿using ShipManifest.APIClients;
+using ShipManifest.APIClients;
 
 namespace ShipManifest.Modules
 {

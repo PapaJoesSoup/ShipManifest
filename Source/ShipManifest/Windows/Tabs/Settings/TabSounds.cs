@@ -1,4 +1,4 @@
-﻿using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Settings

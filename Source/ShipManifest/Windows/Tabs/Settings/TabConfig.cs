@@ -1,4 +1,4 @@
-﻿using ShipManifest.APIClients;
+using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using UnityEngine;
 

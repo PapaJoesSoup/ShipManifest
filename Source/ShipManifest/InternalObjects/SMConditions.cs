@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
 using KSP.UI.Dialogs;

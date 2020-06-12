@@ -1,4 +1,4 @@
-﻿using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects;
 using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
