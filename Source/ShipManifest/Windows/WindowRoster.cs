@@ -455,7 +455,10 @@ namespace ShipManifest.Windows
       GUILayout.Label(SmUtils.SmTags["#smloc_roster_030"]); // "Stupidity"
       SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
 
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.SmTags["#smloc_roster_031"], GUILayout.Height(30)); // "Badass"
+      GUILayout.BeginHorizontal();
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.SmTags["#smloc_roster_031"], GUILayout.Width(90)); // "Badass"
+      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, SmUtils.SmTags["#smloc_roster_035"], GUILayout.Width(90)); // "Veteran"
+      GUILayout.EndHorizontal();
 
       GUILayout.BeginHorizontal();
       if (GUILayout.Button(SmUtils.SmTags["#smloc_roster_004"], GUILayout.MaxWidth(50))) // "Cancel"

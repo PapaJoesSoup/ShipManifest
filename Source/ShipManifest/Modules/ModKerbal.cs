@@ -3,6 +3,7 @@ namespace ShipManifest.Modules
   public class ModKerbal
   {
     public bool Badass;
+    public bool Veteran;
     public float Courage;
     public ProtoCrewMember.Gender Gender;
     public string Name;
@@ -16,6 +17,7 @@ namespace ShipManifest.Modules
       Stupidity = kerbal.stupidity;
       Courage = kerbal.courage;
       Badass = kerbal.isBadass;
+      Veteran = kerbal.veteran;
       Trait = kerbal.trait;
       Gender = kerbal.gender;
       IsNew = isNew;
@@ -60,6 +62,7 @@ namespace ShipManifest.Modules
       Kerbal.stupidity = Stupidity;
       Kerbal.courage = Courage;
       Kerbal.isBadass = Badass;
+      Kerbal.veteran = Veteran;
     }
 
     private bool NameExists()
