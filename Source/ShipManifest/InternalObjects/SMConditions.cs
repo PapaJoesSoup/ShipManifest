@@ -448,6 +448,12 @@ namespace ShipManifest.InternalObjects
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 
+    internal static bool KerbalIsBroken(ProtoCrewMember kerbal)
+    {
+      // TODO: Check whether any other conditions can exist which are invalid
+      return (kerbal.type == ProtoCrewMember.KerbalType.Applicant && kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available);
+    }
+
     internal static TransferMode GetTransferMode()
     {
       if (SMAddon.SmVessel.SelectedResources.Contains(TransferMode.Crew.ToString())) return TransferMode.Crew;
