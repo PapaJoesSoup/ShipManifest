@@ -29,14 +29,6 @@ namespace ShipManifest
       get { return _logItemList; }
     }
 
-    internal static void LoadTexture(ref Texture2D tex, string fileName)
-    {
-      LogMessage($"Loading Texture - file://{PlugInPath}{fileName}", LogType.Info,
-        SMSettings.VerboseLogging);
-      WWW img1 = new WWW($"file://{PlugInPath}{fileName}");
-      img1.LoadImageIntoTexture(tex);
-    }
-
     internal static string DisplayVesselResourceTotals(string selectedResource)
     {
       string displayAmount = "";
