@@ -170,6 +170,11 @@ namespace ShipManifest.Windows
           if (kerbal.type == ProtoCrewMember.KerbalType.Applicant)
             return true;
           break;
+
+        case KerbalFilters.Broken:
+          if (kerbal.type == ProtoCrewMember.KerbalType.Applicant && kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available)
+            return true;
+          break;
       }
       return false;
     }
@@ -282,6 +287,9 @@ namespace ShipManifest.Windows
       bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilters.Applicant, SmUtils.SmTags["#smloc_roster_033"], GUILayout.Width(130)); // "Applicant"
       if (isApplicant) CurrentFilter = KerbalFilters.Applicant;
 
+      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilters.Broken, SmUtils.SmTags["#smloc_roster_040"], GUILayout.Width(130)); // "Broken"
+      if (isBroken) CurrentFilter = KerbalFilters.Broken;
+
       GUILayout.EndHorizontal();
     }
 
@@ -321,7 +329,11 @@ namespace ShipManifest.Windows
               kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing) {
             labelStyle = SMStyle.LabelStyleRed;
           } else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned) {
-            labelStyle = SMStyle.LabelStyleYellow;
+            if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
+              labelStyle = SMStyle.LabelStyleRed;
+            } else {
+              labelStyle = SMStyle.LabelStyleYellow;
+            }
           } else if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
             labelStyle = SMStyle.LabelStyle;
           } else {
@@ -423,6 +435,8 @@ namespace ShipManifest.Windows
           FreezeKerbal(actionKerbal);
         else if (actionText == SmUtils.SmTags["#smloc_roster_034"]) // "Hire"
           HireKerbal(actionKerbal);
+        else if (actionText == SmUtils.SmTags["#smloc_roster_041"]) // "Fix"
+          RepairKerbal(actionKerbal);
         //Refresh all lists...
         if (SMAddon.SmVessel?.Vessel != null) {
           GameEvents.onVesselWasModified.Fire(SMAddon.SmVessel?.Vessel);
@@ -641,6 +655,12 @@ namespace ShipManifest.Windows
         buttonText = SmUtils.SmTags["#smloc_roster_034"];  // "Hire";
         buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_024"]; // "Hire the Applicant and make them a member of your Crew.\nPlease note that this will cost you!"
       }
+      else if(SMConditions.KerbalIsBroken(kerbal))
+      {
+        GUI.enabled = true;
+        buttonText = SmUtils.SmTags["#smloc_roster_041"];  // "Fix";
+        buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_025"]; // "Repairs a Kerbal whose internal state has become corrupted."
+      }
     }
 
     #endregion Gui Layout
@@ -784,6 +804,23 @@ namespace ShipManifest.Windows
       }
     }
 
+    internal static void RepairKerbal(ProtoCrewMember kerbal)
+    {
+      try
+      {
+        if( !SMConditions.KerbalIsBroken(kerbal) ) {
+          throw new Exception("Tried to repair an unbroken kerbal: " + kerbal.ToString());
+        }
+        // For now, the only broken Kerbals are "Assigned" but for some reason are still Applicants. So we convert them to Crew.
+        kerbal.type = ProtoCrewMember.KerbalType.Crew;
+      }
+      catch (Exception ex)
+      {
+        SmUtils.LogMessage($" in RepairKerbal.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          SmUtils.LogType.Error, true);
+      }
+    }
+
     #endregion Methods
 
     //Profession vars
@@ -806,7 +843,8 @@ namespace ShipManifest.Windows
       Frozen,
       Missing,
       Vessel,
-      Applicant
+      Applicant,
+      Broken
     }
   }
 }

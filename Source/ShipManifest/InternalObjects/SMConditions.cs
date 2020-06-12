@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
 using KSP.UI.Dialogs;
@@ -446,6 +446,12 @@ namespace ShipManifest.InternalObjects
     {
       return !SMSettings.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
+    }
+
+    internal static bool KerbalIsBroken(ProtoCrewMember kerbal)
+    {
+      // TODO: Check whether any other conditions can exist which are invalid
+      return (kerbal.type == ProtoCrewMember.KerbalType.Applicant && kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available);
     }
 
     internal static TransferMode GetTransferMode()
