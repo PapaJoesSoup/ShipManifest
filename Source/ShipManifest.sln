@@ -5,6 +5,12 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipManifest", "ShipManifest\ShipManifest.csproj", "{C6304C33-CCE5-496C-B11B-49F454CC2F79}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{62E4CAF8-30DD-47E1-A094-8536B197D5EB}"
+	ProjectSection(SolutionItems) = preProject
+		..\CHANGELOG.md = ..\CHANGELOG.md
+		..\CONTRIBUTORS.md = ..\CONTRIBUTORS.md
+		..\License.txt = ..\License.txt
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMInterface", "SMInterface\SMInterface.csproj", "{FE8E6894-3A15-472C-B229-E0BE7A827CA1}"
 EndProject
