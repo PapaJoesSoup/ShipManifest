@@ -224,11 +224,13 @@ namespace ShipManifest.InternalObjects
         strColor = SMSettings.SourcePartColor;
       else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
       {
-        if (SMConditions.GetSelectedResourceType(SMAddon.SmVessel.SelectedResources) == SMConditions.ResourceType.Crew)
+        if (SMConditions.GetSelectedResourceType(SMAddon.SmVessel.SelectedResources) == SMConditions.ResourceType.Crew && SMConditions.IsClsHighlightingEnabled())
         {
-          strColor = SMConditions.IsClsHighlightingEnabled()
-            ? SMSettings.TargetPartCrewColor
-            : SMSettings.TargetPartColor;
+          strColor = SMSettings.TargetPartCrewColor;
+        }
+        else
+        {
+          strColor = SMSettings.TargetPartColor;
         }
       }
       else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
