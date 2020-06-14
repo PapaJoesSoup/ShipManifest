@@ -8,7 +8,10 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
  - New: Show Applicants in Roster Window and allow editing/hiring them
  - New: added space-suit selection to Edit Kerbal
  - New: added veteran checkbox to Edit Kerbal
- - New: added (partial) german translation
+ - New: added a way to detect and fix broken Kerbals in the roster window (fixes #2)
+ - New: added german translation
+ - Fixed: KIS inventory transfers correctly again when moving a single crew member (partially fixes #21)
+ - Fixed: Refactored and fixed some of the parts highlighting. Target parts should be correctly highlighted again.
  - Fixed: several null reference exceptions
 
 Version 6.0.0.2 - Release 04 Mar 2020 - KSP 1.9.1
