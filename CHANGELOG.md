@@ -5,7 +5,10 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 -------------------------------------------------
- - New: Show Applicants in Roster Window and allow editing/hiring them
+
+
+Version 6.0.1.0 - Release 14 Jun 2020 - KSP 1.9.1
+------------------------------------------------- - New: Show Applicants in Roster Window and allow editing/hiring them
  - New: added space-suit selection to Edit Kerbal
  - New: added veteran checkbox to Edit Kerbal
  - New: added a way to detect and fix broken Kerbals in the roster window (fixes #2)
