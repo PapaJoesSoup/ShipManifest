@@ -328,42 +328,36 @@ namespace ShipManifest.InternalObjects
 
         if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
         {
-          // If Crew and cls, perform cls Highlighting
+          step = "Set non selected resource part color";
+          Color resourcePartColor = SMSettings.Colors[SMSettings.ResourcePartColor];
+          Color targetPartColor = SMSettings.Colors[SMSettings.TargetPartColor];
+
+          // If resource is Crew, and we the settings have enabled CLS highlighting support, use CLS colours
           if (SMConditions.IsClsHighlightingEnabled())
           {
             step = "Highlight CLS vessel";
             HighlightClsVessel(true, true);
 
             // Turn off the source and target cls highlighting.  We are going to replace it.
-            if (SMAddon.SmVessel.ClsPartSource != null)
-              SMAddon.SmVessel.ClsPartSource.Highlight(false, true);
-            if (SMAddon.SmVessel.ClsPartTarget != null)
-              SMAddon.SmVessel.ClsPartTarget.Highlight(false, true);
+            SMAddon.SmVessel.ClsPartSource?.Highlight(false, true);
+            SMAddon.SmVessel.ClsPartTarget?.Highlight(false, true);
+
+            // Override part colors to match CLS
+            resourcePartColor = SMSettings.Colors[SMSettings.ClsSpaceColor];
+            targetPartColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
           }
 
-          // Default is yellow
-          step = "Set non selected resource part color";
-          Color partColor = SMSettings.Colors[SMSettings.ResourcePartColor];
-
-          // match color used by CLS if active
-          if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-              SMSettings.EnableCls)
-            partColor = Color.green;
-
+          // Highlight all parts containing the resource
           step = "Set Resource Part Colors";
           if (!SMSettings.OnlySourceTarget)
           {
-            SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, partColor);
+            SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, resourcePartColor);
           }
 
+          // Highlight the Source and Target parts (if selected)
           step = "Set Selected Part Colors";
           SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor], true);
-          if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
-              SMSettings.EnableCls)
-            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget,
-              SMSettings.Colors[SMSettings.TargetPartCrewColor], true);
-          else
-            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, targetPartColor, true);
         }
       }
       catch (Exception ex)
