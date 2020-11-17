@@ -1,6 +1,6 @@
 {
   "NAME": "Ship Manifest",
-  "URL": "https://raw.githubusercontent.com/mwerle/ShipManifest/Distribution/GameData/ShipManifest/ShipManifest.version",
+  "URL": "https://raw.githubusercontent.com/mwerle/ShipManifest/master/Distribution/GameData/ShipManifest/ShipManifest.version",
   "CHANGE_LOG_URL":"https://raw.githubusercontent.com/mwerle/ShipManifest/CHANGELOG.md",
   "GITHUB":
   {
