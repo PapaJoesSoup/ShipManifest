@@ -923,7 +923,8 @@ namespace ShipManifest.Windows
       else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0],
         selectedPartsTo.Count > 0 ? selectedPartsTo[0] : null))
       {
-        GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist;
+        GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist &&
+          selectedPartsFrom[0].airlock != null;
         //GUIContent evaContent = new GUIContent("EVA", EvaToolTip);
         GUIContent evaContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_008"], EvaToolTip);
         if (GUILayout.Button(evaContent, SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20)))
