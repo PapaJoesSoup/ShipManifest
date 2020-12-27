@@ -929,7 +929,12 @@ namespace ShipManifest.Windows
         if (GUILayout.Button(evaContent, SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20)))
         {
           ToolTip = "";
-          FlightEVA.SpawnEVA(crewMember.KerbalRef);
+          // Bug #7 - KerbalRef can be null if the part has no IVA. This can only happen in a modded install.
+          if (crewMember.KerbalRef) {
+            FlightEVA.SpawnEVA(crewMember.KerbalRef);
+          } else {
+            FlightEVA.fetch.spawnEVA(crewMember, selectedPartsFrom[0], selectedPartsFrom[0].airlock);
+          }
           GUI.enabled = false;
         }
         rect = GUILayoutUtility.GetLastRect();
