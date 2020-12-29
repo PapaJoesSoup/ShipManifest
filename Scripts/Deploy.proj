@@ -1,34 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Deploy" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.8">
   <ImportGroup Label="PropertySheets">
-    <Import Project="..\Source\ShipManifest.Common.props" />
+    <Import Project="..\Source\common_settings.props" />
   </ImportGroup>
 
-  <!-- Variables (override in ShipManifest.User.props) -->
+  <!-- Variables (override in user_settings.props) -->
   <PropertyGroup>
+     <!-- Default build type - release -->
+     <BuildConfiguration Condition="'$(BuildConfiguration)' == ''">Release</BuildConfiguration>
+
+    <!-- Project root folder -->
+    <ProjectRoot Condition="'$(ProjectRoot)' == ''">$([System.IO.Path]::GetFullPath($(MODDIR)))</ProjectRoot>
+
     <!-- Release Folder -->
     <!-- To change the output folder, use the following parameter: /p:ReleaseDir=C:\KSP\Mods\Releases\ShipManifest -->
-    <ReleaseDir Condition="'$(ReleaseDir)' == ''">$(MODDIR)\Release</ReleaseDir>
+    <ReleaseDir Condition="'$(ReleaseDir)' == ''">$(ProjectRoot)\Release</ReleaseDir>
 
     <!-- BuildDir Folder -->
     <!-- This is the folder where the distribution will be built -->
-    <BuildDir>$(MODDIR)\Release\Build</BuildDir>
+    <BuildDir>$(ReleaseDir)\Build</BuildDir>
 
     <!-- SourceDir Folder -->
     <!-- This is the folder which contains the solution and source files -->
-    <SourceDir>$(MODDIR)\Source</SourceDir>
+    <SourceDir>$(ProjectRoot)\Source</SourceDir>
 
     <!-- DistDir Folder -->
     <!-- This is the folder where the static distribution files are kept -->
-    <DistDir Condition="'$(DistDir)'==''">$(MODDIR)\Distribution</DistDir>
+    <DistDir Condition="'$(DistDir)'==''">$(ProjectRoot)\Distribution</DistDir>
 
     <!-- SM_Build Folder -->
     <!-- This is the folder where the ShipManifest project outputs its build artefacts -->
-    <SM_BuildDir>$(SourceDir)\$(MODNAME)\bin\Release</SM_BuildDir>
+    <SM_BuildDir>$(SourceDir)\$(MODNAME)\bin</SM_BuildDir>
 
     <!-- SMI_Build Folder -->
     <!-- This is the folder where the SMInterface project outputs its build artefacts -->
-    <SMI_BuildDir>$(SourceDir)\SMInterface\bin\Release</SMI_BuildDir>
+    <SMI_BuildDir>$(SourceDir)\SMInterface\bin</SMI_BuildDir>
   </PropertyGroup>
 
   <!-- All top-level projects -->
@@ -51,7 +57,9 @@
 
   <!-- compile solution as release -->
   <Target Name="Compile">
-    <MSBuild Projects="$(SourceDir)\$(MODNAME).sln" Properties="Configuration=Release"/>
+    <MSBuild Projects="$(SourceDir)\$(MODNAME).sln"
+      Targets="Clean;Build"
+      Properties="Configuration=$(BuildConfiguration)"/>
   </Target>
 
   <Target Name="BuildDir">
@@ -83,6 +91,10 @@
       <OutdatedFiles Include="$(DestFolder)\**" Exclude="@(Copied)" />
     </ItemGroup>
     <Delete Files="@(OutdatedFiles)"/>
+    <ItemGroup>
+      <ReleaseFiles Remove="@(ReleaseFiles)" />
+      <OutdatedFiles Remove="@(OutdatedFiles)" />
+    </ItemGroup>
   </Target>
 
   <!-- This target builds the release package -->
@@ -105,19 +117,26 @@
       <OutdatedFiles Include="$(BuildDir)\**" Exclude="@(Copied)" />
     </ItemGroup>
     <Delete Files="@(OutdatedFiles)"/>
-    <Copy
-      SourceFiles="$(MODDIR)\License.txt;$(MODDIR)\CONTRIBUTORS.md"
-      DestinationFolder="$(BuildDir)\" />
 
     <!-- Copy dev files -->
     <MakeDir Directories="$(BuildDir)\Dev" Condition="!Exists('$(BuildDir)\Dev')" />
     <Copy
-      SourceFiles="$(SMI_BuildDir)\SMInterface.dll"
+      SourceFiles="$(SMI_BuildDir)\$(BuildConfiguration)\SMInterface.dll"
       DestinationFolder="$(BuildDir)\Dev" />
+
+    <!-- Copy static text files -->
+    <Copy
+      SourceFiles="$(ProjectRoot)\License.txt;$(ProjectRoot)\CONTRIBUTORS.md"
+      DestinationFolder="$(BuildDir)\" />
 
     <!-- Generate templated files -->
     <CallTarget Targets="GenerateVersionFile"/>
     <CallTarget Targets="GenerateChangelog"/>
+
+    <ItemGroup>
+      <DistFiles Remove="@(DistFiles)" />
+      <OutdatedFiles Remove="@(OutdatedFiles)" />
+    </ItemGroup>
   </Target>
 
   <!-- create zip file with content of release\bin folder -->
@@ -139,7 +158,9 @@
 
   <Target Name="getversion"
           DependsOnTargets="Compile">
-      <GetAssemblyIdentity AssemblyFiles="$(SM_BuildDir)\$(MODNAME).dll">
+    <Error Text="Can not find $(MODNAME).dll in '$(SM_BuildDir)\$(BuildConfiguration)'"
+           Condition="!Exists('$(SM_BuildDir)\$(BuildConfiguration)\$(MODNAME).dll')" />
+      <GetAssemblyIdentity AssemblyFiles="$(SM_BuildDir)\$(BuildConfiguration)\$(MODNAME).dll">
           <Output TaskParameter="Assemblies" ItemName="myAssemblyInfo"/>
       </GetAssemblyIdentity>
       <PropertyGroup>
@@ -174,6 +195,8 @@
   </UsingTask>
 
   <Target Name="getkspversion">
+    <Error Text="Can not find KSP readme.txt in '$(KSPDIR)'"
+           Condition="!Exists('$(KSPDIR)\readme.txt')" />
     <GrepInFile Path="$(KSPDIR)\readme.txt" Expression="Version\s+(\d+\.\d+(\.\d+)?)\s*">
       <Output PropertyName="KSPVersion" TaskParameter="Value" />
     </GrepInFile>
@@ -203,7 +226,7 @@
   </UsingTask>
 
   <Target Name="GenerateChangelog"
-          Inputs="$(MODDIR)\CHANGELOG.md"
+          Inputs="$(ProjectRoot)\CHANGELOG.md"
           Outputs="$(BuildDir)\CHANGELOG.md"
           DependsOnTargets="getversion;getkspversion;BuildDir">
     <PropertyGroup>
@@ -215,14 +238,17 @@
       <Tokens Include="{DATE}"><Value>$(uc_Date)</Value></Tokens>
     </ItemGroup>
     <ReplaceTagsInFile
-        TemplateFile="$(MODDIR)\CHANGELOG.md"
+        TemplateFile="$(ProjectRoot)\CHANGELOG.md"
         TargetFile="$(BuildDir)\CHANGELOG.md"
         Tokens="@(Tokens)" />
+    <ItemGroup>
+      <Tokens Remove="@(Tokens)" />
+    </ItemGroup>
   </Target>
 
   <Target Name="GenerateVersionFile"
-          Inputs="$(MODNAME).version.template"
-          Outputs="$(MODDIR)\$(MODNAME).version"
+          Inputs="Version.template;$(SM_BuildDir)\$(BuildConfiguration)\$(MODNAME).dll"
+          Outputs="$(DistDir)\GameData\$(MODNAME)\$(MODNAME).version"
           DependsOnTargets="Compile;getversion;getkspversion">
     <ItemGroup>
       <Tokens Include="{MAJOR}"><Value>$([System.Version]::Parse($(DLLVersion)).Major.ToString())</Value></Tokens>
@@ -234,8 +260,50 @@
       <Tokens Include="{KSP_PATCH}"><Value>$([System.Version]::Parse($(KSPVersion)).Build.ToString())</Value></Tokens>
     </ItemGroup>
     <ReplaceTagsInFile
-        TemplateFile="$(MODNAME).version.template"
+        TemplateFile="Version.template"
         TargetFile="$(DistDir)\GameData\$(MODNAME)\$(MODNAME).version"
         Tokens="@(Tokens)" />
+    <ItemGroup>
+      <Tokens Remove="@(Tokens)" />
+    </ItemGroup>
   </Target>
+
+  <!-- Sets up debug configuration; can't be inside "Deploy-DEBUG" due to a limitation of MSBuild -->
+  <Target Name="SetDebugConfiguration">
+    <CreateProperty Value="Debug">
+      <Output TaskParameter="Value" PropertyName="BuildConfiguration"/>
+    </CreateProperty>
+  </Target>
+
+  <!-- Builds and deploys the debug version of DPAI -->
+  <Target Name="Deploy-DEBUG">
+    <CallTarget Targets="SetDebugConfiguration"/>
+    <CallTarget Targets="Compile"/>
+    <CallTarget Targets="DoDeploy"/>
+    <CallTarget Targets="DoDeploy-DEBUG"/>
+  </Target>
+
+  <!-- This target deploys the debug-build artefacts over the top of the standard artifacts in the KSP directory -->
+  <Target Name="DoDeploy-DEBUG">
+    <PropertyGroup>
+      <SourceFolder>$(SM_BuildDir)\$(BuildConfiguration)</SourceFolder>
+      <DestFolder>$(KSPDIR)\GameData\$(MODNAME)\Plugins</DestFolder>
+    </PropertyGroup>
+    <MakeDir Directories="$(DestFolder)" Condition="!Exists('$(DestFolder)')" />
+    <ItemGroup>
+      <ReleaseFiles
+        Include="$(SourceFolder)\*.*"
+        Exclude="">
+      </ReleaseFiles>
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(ReleaseFiles)"
+      DestinationFolder="$(DestFolder)\"
+      SkipUnchangedFiles="true" >
+    </Copy>
+    <ItemGroup>
+      <ReleaseFiles Remove="@(ReleaseFiles)" />
+    </ItemGroup>
+  </Target>
+
 </Project>
