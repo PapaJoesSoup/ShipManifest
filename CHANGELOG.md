@@ -6,9 +6,16 @@ Major features are **bolded**, contributors are *emphasized*.
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 -------------------------------------------------
 
+Version 6.0.2.0 - Release 30 Dec 2020 - KSP 1.11.0
+-------------------------------------------------
+ - New: recompiled for KSP 1.11
+ - New: added chinese translation (thanks to Grassland-CN)
+ - Fixed: Kerbal EVA when part has no IVA (fixes #7)
+ - Changed: retargeted to DotNet 4.6.1
 
 Version 6.0.1.0 - Release 14 Jun 2020 - KSP 1.9.1
-------------------------------------------------- - New: Show Applicants in Roster Window and allow editing/hiring them
+-------------------------------------------------
+ - New: Show Applicants in Roster Window and allow editing/hiring them
  - New: added space-suit selection to Edit Kerbal
  - New: added veteran checkbox to Edit Kerbal
  - New: added a way to detect and fix broken Kerbals in the roster window (fixes #2)
