@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Deploy" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.8">
   <ImportGroup Label="PropertySheets">
     <Import Project="..\Source\common_settings.props" />
@@ -143,10 +143,19 @@
   <Target Name="ZipRelease"
           DependsOnTargets="getversion;gettime">
     <MakeDir Directories="$(ReleaseDir)" Condition="!Exists('$(ReleaseDir)')" />
-    <Delete Files="$(ReleaseDir)\$(MODNAME)-$(DLLVersion)*.zip" />
+    <!-- Remove existing ZIPs for same version -->
+    <ItemGroup>
+      <OutdatedFiles Include="$(ReleaseDir)\$(MODNAME)-$(DLLVersion)*.zip" />
+    </ItemGroup>
+    <Delete Files="@(OutdatedFiles)"/>
+
+    <!-- Create ZIP from build directory -->
     <ZipDirectory Condition="Exists('$(BuildDir)')"
                   SourceDirectory="$(BuildDir)"
                   DestinationFile="$(ReleaseDir)\$(MODNAME)-$(DLLVersion)_$(CurrentDate).zip" />
+    <ItemGroup>
+      <OutdatedFiles Remove="@(OutdatedFiles)" />
+    </ItemGroup>
   </Target>
 
   <Target Name="gettime">
