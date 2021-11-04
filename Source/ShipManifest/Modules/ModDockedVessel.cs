@@ -15,7 +15,7 @@ namespace ShipManifest.Modules
     internal bool IsDocked;
     internal bool IsEditing = false;
     internal string RenameVessel = null;
-    internal VesselType ReClassifyVessel;
+    //internal VesselType ReClassifyVessel;
 
     internal ModDockedVessel()
     {
