@@ -22,8 +22,8 @@ Extract the contents of the "GameData" directory in the ZIP into the KSP "GameDa
 ## Resources
 * Source Code on [GitHub][GitHub]
 * Wiki on [GitHub][GHWiki]
-* [Forum Thread][ForumThread] - information and download links
-  - Original ShipManifest [Forum Thread][OriginalFT] by **Papa Joe** - information and download links
+* [Forum Thread][OriginalFT] - information and download links
+  - Interim ShipManifest support [Forum Thread] by **Micha** - information and download links
 * ShipManifest project on [SpaceDock][SpaceDock]
 * ShipManifest project on [CurseForge][CurseForge]
 

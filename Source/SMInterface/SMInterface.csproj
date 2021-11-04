@@ -37,7 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Tools\KSP1.3.1Refs\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml.Linq" />

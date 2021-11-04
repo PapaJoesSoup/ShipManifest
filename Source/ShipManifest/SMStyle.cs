@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 namespace ShipManifest
 {
   // ReSharper disable once InconsistentNaming

@@ -37,10 +37,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
@@ -48,20 +48,29 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="KSPAssets">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.AnimationModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.AudioModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\..\..\KSP\Mods\Source\_LocalDev\KSPRefs\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
