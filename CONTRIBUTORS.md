@@ -14,10 +14,11 @@ Please contact the current maintainer if somoene has been left off this list.
  - **Matt Addison**
    - ToolbarWrapper integration
  - **@Micha**
-   - current maintainer
+   - maintainer during Papa_joe's absence'
  - **@Papa_Joe** aka **@PapaJoesSoup** aka **Joseph Korinek**
    - original author
    - original design, development, and release
+   - current maintainer
  - **@Sarbian*
    - contributions to "Crew Manifest" from which this mod was derived
  - **vXSovereignXv**

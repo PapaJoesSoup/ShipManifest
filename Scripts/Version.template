@@ -1,10 +1,10 @@
 {
   "NAME": "Ship Manifest",
-  "URL": "https://raw.githubusercontent.com/mwerle/ShipManifest/master/Distribution/GameData/ShipManifest/ShipManifest.version",
-  "CHANGE_LOG_URL":"https://raw.githubusercontent.com/mwerle/ShipManifest/CHANGELOG.md",
+  "URL": "https://raw.githubusercontent.com/papajoessoup/ShipManifest/master/Distribution/GameData/ShipManifest/ShipManifest.version",
+  "CHANGE_LOG_URL":"https://raw.githubusercontent.com/papajoessoup/ShipManifest/CHANGELOG.md",
   "GITHUB":
   {
-    "USERNAME":"mwerle",
+    "USERNAME":"papajoessoup",
     "REPOSITORY":"ShipManifest",
     "ALLOW_PRE_RELEASE":false
   },

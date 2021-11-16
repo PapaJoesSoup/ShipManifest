@@ -30,12 +30,12 @@ Extract the contents of the "GameData" directory in the ZIP into the KSP "GameDa
 [License]: https://creativecommons.org/licenses/by-sa/4.0/legalcode
 [ForumThread]: https://forum.kerbalspaceprogram.com/index.php?showtopic=192129
 [OriginalFT]: https://forum.kerbalspaceprogram.com/index.php?showtopic=56643
-[GitHub]: https://github.com/mwerle/ShipManifest/
+[GitHub]: https://github.com/papajoessoup/ShipManifest/
 [GHWiki]: https://github.com/PapaJoesSoup/ShipManifest/wiki
 [SpaceDock]: https://spacedock.info/mod/189/ShipManifest
 [CurseForge]: https://www.curseforge.com/kerbal/ksp-mods/shipmanifest
 
-[ReleaseShield]: https://img.shields.io/github/v/release/mwerle/ShipManifest?include_prereleases
+[ReleaseShield]: https://img.shields.io/github/v/release/papajoessoup/ShipManifest?include_prereleases
 [CKANShield]: https://img.shields.io/badge/CKAN-Indexed-brightgreen.svg
 [SourceShield]: https://img.shields.io/badge/source%20code-github-yellowgreen
 [LicenseShield]: https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey
