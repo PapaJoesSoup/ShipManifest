@@ -580,6 +580,38 @@ namespace ShipManifest
       }
     }
 
+    internal void GetRadiators()
+    {
+      _radiators.Clear();
+      try
+      {
+        List<Part>.Enumerator pParts = Vessel.Parts.GetEnumerator();
+        while (pParts.MoveNext())
+        {
+          if (pParts.Current == null) continue;
+          List<ModuleDeployableRadiator>.Enumerator pModules = pParts.Current.FindModulesImplementing<ModuleDeployableRadiator>().GetEnumerator();
+          while (pModules.MoveNext())
+          {
+            ModuleDeployableRadiator radiator = pModules.Current;
+            if (radiator == null) continue;
+            if (!radiator.Events["Extend"].active && !radiator.Events["Retract"].active) continue;
+            ModRadiator pPanel = new ModRadiator
+            {
+              PanelModule = radiator,
+              SPart = pParts.Current
+            };
+            _radiators.Add(pPanel);
+          }
+          pModules.Dispose();
+        }
+        pParts.Dispose();
+      }
+      catch (Exception ex)
+      {
+        SmUtils.LogMessage($"Error in GetRadiators().\r\nError:  {ex}", SmUtils.LogType.Error, true);
+      }
+    }
+
     internal void GetSolarPanels()
     {
       _solarPanels.Clear();

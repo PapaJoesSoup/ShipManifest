@@ -103,6 +103,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       }
       GUI.enabled = true;
+      // Solar Tab
       label = new GUIContent(SmUtils.SmTags["#smloc_control_003"], SmUtils.SmTags["#smloc_control_tt_002"]);
       GUIStyle panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, panelsStyle, GUILayout.Height(20))) // "Solar Panels"
@@ -123,6 +124,28 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
+      // Radiator Tab
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_003a"], SmUtils.SmTags["#smloc_control_tt_002a"]);
+      GUIStyle radiatorsStyle = _selectedTab == Tab.Radiator ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button(label, radiatorsStyle, GUILayout.Height(20))) // "Radiators"
+      {
+        try
+        {
+          SMAddon.SmVessel.GetRadiators();
+          _selectedTab = Tab.Radiator;
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $" opening Radiators Tab.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
+            true);
+        }
+      }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+      // Antenna Tab
       label = new GUIContent(SmUtils.SmTags["#smloc_control_004"], SmUtils.SmTags["#smloc_control_tt_003"]);
       GUIStyle antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, antennaStyle, GUILayout.Height(20))) // "Antennas"
@@ -142,6 +165,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
+      // Lights Tab
       label = new GUIContent(SmUtils.SmTags["#smloc_control_005"], SmUtils.SmTags["#smloc_control_tt_004"]);
       GUIStyle lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, lightsStyle, GUILayout.Height(20))) // "Lights"
@@ -161,6 +185,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
+      // Labs Tab
       label = new GUIContent(SmUtils.SmTags["#smloc_control_006"], SmUtils.SmTags["#smloc_control_tt_005"]);
       GUIStyle labsStyle = _selectedTab == Tab.Lab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, labsStyle, GUILayout.Height(20))) // "Labs"
@@ -195,6 +220,9 @@ namespace ShipManifest.Windows
           break;
         case Tab.Panel:
           TabSolarPanel.Display(displayViewerPosition);
+          break;
+        case Tab.Radiator:
+          TabRadiator.Display(displayViewerPosition);
           break;
         case Tab.Antenna:
           TabAntenna.Display(displayViewerPosition);
@@ -277,7 +305,8 @@ namespace ShipManifest.Windows
       Lab,
       Light,
       Panel,
-      Vessel
+      Vessel,
+      Radiator
     }
   }
 }
