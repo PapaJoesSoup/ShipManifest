@@ -69,6 +69,9 @@
     <Reference Include="UnityEngine.InputLegacyModule">
       <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\_LocalDev\KSPRefs\UnityEngine.UI.dll</HintPath>
     </Reference>
@@ -79,6 +82,7 @@
     <Compile Include="InternalObjects\SMPart.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
+    <Compile Include="Modules\ModRadiator.cs" />
     <Compile Include="Process\ProcessController.cs" />
     <Compile Include="InternalObjects\SMConditions.cs" />
     <Compile Include="SMPart.cs" />
@@ -93,6 +97,7 @@
     <Compile Include="InternalObjects\SMHighlighter.cs" />
     <Compile Include="APIClients\ToolbarWrapper.cs" />
     <Compile Include="Windows\Tabs\Control\TabAntenna.cs" />
+    <Compile Include="Windows\Tabs\Control\TabRadiator.cs" />
     <Compile Include="Windows\Tabs\Control\TabVessels.cs" />
     <Compile Include="Windows\Tabs\Settings\TabConfig.cs" />
     <Compile Include="Windows\Tabs\Settings\TabHighlight.cs" />

@@ -147,6 +147,17 @@ namespace ShipManifest
       }
     }
 
+    private List<ModRadiator> _radiators = new List<ModRadiator>();
+    internal List<ModRadiator> Radiators
+    {
+      get { return _radiators ?? (_radiators = new List<ModRadiator>()); }
+      set
+      {
+        _radiators.Clear();
+        _radiators = value;
+      }
+    }
+
     private List<ModSolarPanel> _solarPanels = new List<ModSolarPanel>();
     internal List<ModSolarPanel> SolarPanels
     {
