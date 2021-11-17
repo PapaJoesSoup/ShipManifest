@@ -9,6 +9,7 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.x
 -------------------------------------------------
  - Papa_Joe has resumed support.
+ - New: recompiled for .Net 4.8
  - New: recompiled for KSP 1.12.
  - New: added new deployable Radiators control panel tab.
  - Merge of Mwherle code base back to PapaJoesSoup in Git.
