@@ -26,7 +26,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Deployable Radiator Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.SmTags["#smloc_control_Radiator_000"], SMStyle.LabelTabHeader);
+      GUILayout.Label(SmUtils.SmTags["#smloc_control_radiator_000"], SMStyle.LabelTabHeader);
       GUILayout.Label("____________________________________________________________________________________________",
         SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
       string step = "start";

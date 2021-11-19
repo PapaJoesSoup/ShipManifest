@@ -1,10 +1,10 @@
 {
   "NAME": "Ship Manifest",
-  "URL": "https://raw.githubusercontent.com/mwerle/ShipManifest/master/Distribution/GameData/ShipManifest/ShipManifest.version",
-  "CHANGE_LOG_URL":"https://raw.githubusercontent.com/mwerle/ShipManifest/CHANGELOG.md",
+  "URL": "https://raw.githubusercontent.com/papajoessoup/ShipManifest/master/Distribution/GameData/ShipManifest/ShipManifest.version",
+  "CHANGE_LOG_URL":"https://raw.githubusercontent.com/papajoessoup/ShipManifest/CHANGELOG.md",
   "GITHUB":
   {
-    "USERNAME":"mwerle",
+    "USERNAME":"papajoessoup",
     "REPOSITORY":"ShipManifest",
     "ALLOW_PRE_RELEASE":false
   },
@@ -16,8 +16,8 @@
   },
   "KSP_VERSION": {
     "MAJOR": 1,
-    "MINOR": 11,
-    "PATCH": 0
+    "MINOR": 12,
+    "PATCH": 2
   },
   "KSP_VERSION_MIN": {
     "MAJOR": 1,
@@ -26,7 +26,7 @@
   },
   "KSP_VERSION_MAX": {
     "MAJOR": 1,
-    "MINOR": 11,
+    "MINOR": 12,
     "PATCH": 99
   }
 }
