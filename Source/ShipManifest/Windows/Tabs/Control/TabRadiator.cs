@@ -33,40 +33,40 @@ namespace ShipManifest.Windows.Tabs.Control
       try
       {
         // Display all Radiators
-        List<ModRadiator>.Enumerator iPanels = SMAddon.SmVessel.Radiators.GetEnumerator();
-        while (iPanels.MoveNext())
+        List<ModRadiator>.Enumerator iRadiators = SMAddon.SmVessel.Radiators.GetEnumerator();
+        while (iRadiators.MoveNext())
         {
-          if (iPanels.Current == null) continue;
+          if (iRadiators.Current == null) continue;
           bool isEnabled = true;
-          string label = $"{iPanels.Current.PanelStatus} - {iPanels.Current.Title}";
-          if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
+          string label = $"{iRadiators.Current.PanelStatus} - {iRadiators.Current.Title}";
+          if (iRadiators.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_004"]}) - {iPanels.Current.Title}"; // "Broken"
+            label = $"{iRadiators.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_004"]}) - {iRadiators.Current.Title}"; // "Broken"
           }
           bool open =
-            !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
-              iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTING ||
-              iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN);
+            !(iRadiators.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
+              iRadiators.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTING ||
+              iRadiators.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN);
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          if (!iPanels.Current.CanBeRetracted)
+          if (!iRadiators.Current.CanBeRetracted)
           {
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_005"]}) - {iPanels.Current.Title}"; // "Locked"
+            label = $"{iRadiators.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_005"]}) - {iRadiators.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";
           if (!open && newOpen)
-            iPanels.Current.ExtendPanel();
+            iRadiators.Current.ExtendPanel();
           else if (open && !newOpen)
-            iPanels.Current.RetractPanel();
+            iRadiators.Current.RetractPanel();
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iPanels.Current.SPart, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iRadiators.Current.SPart, Event.current.mousePosition);
         }
-        iPanels.Dispose();
+        iRadiators.Dispose();
 
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
@@ -83,27 +83,27 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static void ExtendAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      List<ModSolarPanel>.Enumerator iPanels = SMAddon.SmVessel.SolarPanels.GetEnumerator();
-      while (iPanels.MoveNext())
+      List<ModRadiator>.Enumerator iRadiators = SMAddon.SmVessel.Radiators.GetEnumerator();
+      while (iRadiators.MoveNext())
       {
-        if (iPanels.Current == null) continue;
-        if (((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.RETRACTED) continue;
-        ((ModuleDeployableSolarPanel)iPanels.Current.PanelModule).Extend();
+        if (iRadiators.Current == null) continue;
+        if (((ModuleDeployableRadiator)iRadiators.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.RETRACTED) continue;
+        ((ModuleDeployableRadiator)iRadiators.Current.PanelModule).Extend();
       }
-      iPanels.Dispose();
+      iRadiators.Dispose();
     }
 
     internal static void RetractAllPanels()
     {
       // TODO: for realism, add a closing/opening sound
-      List<ModRadiator>.Enumerator iPanels = SMAddon.SmVessel.Radiators.GetEnumerator();
-      while (iPanels.MoveNext())
+      List<ModRadiator>.Enumerator iRadiators = SMAddon.SmVessel.Radiators.GetEnumerator();
+      while (iRadiators.MoveNext())
       {
-        if (iPanels.Current == null) continue;
-        if (((ModuleDeployableRadiator)iPanels.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.EXTENDED) continue;
-        ((ModuleDeployableRadiator)iPanels.Current.PanelModule).Retract();
+        if (iRadiators.Current == null) continue;
+        if (((ModuleDeployableRadiator)iRadiators.Current.PanelModule).deployState != ModuleDeployablePart.DeployState.EXTENDED) continue;
+        ((ModuleDeployableRadiator)iRadiators.Current.PanelModule).Retract();
       }
-      iPanels.Dispose();
+      iRadiators.Dispose();
     }
   }
 }
