@@ -8,7 +8,7 @@ namespace ShipManifest.Windows
   internal static class WindowControl
   {
     internal static string Title = "Ship Manifest Part Control Center";
-    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect Position = SMSettings.DefaultPosition;
     internal static Rect TabBox = new Rect(5, 0, 440, 200);
     internal static bool ShowWindow;
     internal static string ToolTip = "";

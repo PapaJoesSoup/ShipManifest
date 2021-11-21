@@ -11,7 +11,7 @@ namespace ShipManifest.Windows
   internal static class WindowDebugger
   {
     internal static string Title = $" Ship Manifest -  Debug Console - Ver. {SMSettings.CurVersion}";
-    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect Position = SMSettings.DefaultPosition;
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;

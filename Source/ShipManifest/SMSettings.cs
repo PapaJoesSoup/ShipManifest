@@ -115,6 +115,7 @@ namespace ShipManifest
     internal static bool AutoSave;
     internal static int SaveIntervalSec = 60;
     internal static bool UseUnityStyle = true;
+    internal static Rect DefaultPosition = new Rect(40,40,0,0);
 
 
     // Options unmanaged by UI.
@@ -243,6 +244,7 @@ namespace ShipManifest
           : Settings.AddNode("SM_Hidden");
 
         // Lets get our rectangles...
+        DefaultPosition = GetRectangle(windowsNode, "DefaultPosition", DefaultPosition);
         WindowManifest.Position = GetRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
         WindowTransfer.Position = GetRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
         WindowDebugger.Position = GetRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
@@ -520,6 +522,7 @@ namespace ShipManifest
           : Settings.AddNode("SM_Hidden");
 
         // Write window positions
+        WriteRectangle(windowsNode, "DefaultPosition", DefaultPosition);
         WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
         WriteRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
         WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);

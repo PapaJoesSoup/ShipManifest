@@ -16,7 +16,7 @@ namespace ShipManifest.Windows
     internal static string Title = "Ship Manifest Roster";
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
-    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect Position = SMSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, 680, 230);
     internal static bool ShowWindow;
     internal static string ToolTip = "";

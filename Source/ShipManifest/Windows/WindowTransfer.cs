@@ -16,7 +16,7 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = "";
-    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect Position = SMSettings.DefaultPosition;
     internal static bool ShowWindow;
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;

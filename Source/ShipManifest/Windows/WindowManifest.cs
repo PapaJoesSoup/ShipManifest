@@ -13,7 +13,7 @@ namespace ShipManifest.Windows
     #region Manifest Window - Gui Layout Code
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
-    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect Position = SMSettings.DefaultPosition;
     private static bool _showWindow;
 
     internal static bool ShowWindow
