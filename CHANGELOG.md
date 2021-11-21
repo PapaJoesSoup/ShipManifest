@@ -6,14 +6,17 @@ Major features are **bolded**, contributors are *emphasized*.
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 -------------------------------------------------
 
-Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.x
+Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.2
 -------------------------------------------------
  - Papa_Joe has resumed support.
  - New: recompiled for .Net 4.8
  - New: recompiled for KSP 1.12.
  - New: added new deployable Radiators control panel tab.
+   (https://github.com/mwerle/ShipManifest/issues/8) 
+ - New: Added default window position node to settings file.
+ - Changed default window position to below the 
  - Merge of Mwherle code base back to PapaJoesSoup in Git.
-   Distribution now from PapaJoesSoup in Git
+ - Moved Distribution back to PapaJoesSoup
 
 Version 6.0.2.0 - Release 30 Dec 2020 - KSP 1.11.0
 -------------------------------------------------
