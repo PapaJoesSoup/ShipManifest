@@ -11,7 +11,6 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 325;
 
     internal static void Display(Rect tabBox)
@@ -29,8 +28,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       //GUILayout.Label("External Light Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.SmTags["#smloc_control_light_000"], SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {

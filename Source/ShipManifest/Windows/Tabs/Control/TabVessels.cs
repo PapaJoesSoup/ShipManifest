@@ -14,7 +14,6 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private static bool _canShowToolTips = true;
 
-    private const float guiRuleWidth = 350;
     // Temporary change in label width to allow release.  Will work vessel combining in a later release.
     //private const float guiLabelWidth = 200;
     private const float guiLabelWidth = 230;
@@ -40,8 +39,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       //GUILayout.Label("Vessel Control Center", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.SmTags["#smloc_control_vessel_000"], SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -118,7 +116,6 @@ namespace ShipManifest.Windows.Tabs.Control
             {
               mdv.IsEditing = true;
               mdv.RenameVessel = SMAddon.SmVessel.DockedVessels[v].VesselInfo.name;
-
             }
           }
           rect = GUILayoutUtility.GetLastRect();

@@ -9,12 +9,17 @@ namespace ShipManifest.Windows
   {
     internal static string Title = "Ship Manifest Part Control Center";
     internal static Rect Position = SMSettings.DefaultPosition;
-    internal static Rect TabBox = new Rect(5, 0, 440, 200);
+
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     private static Tab _selectedTab = Tab.None;
+
+    // Tab only vars, used in each tab
+    internal static Rect TabBox = new Rect(0, 0, 450, 200);
+    internal static string TabRule = new string('_', 120);
+    internal const float GuiRuleWidth = 420;
 
     internal static void Display(int _windowId)
     {
@@ -40,10 +45,7 @@ namespace ShipManifest.Windows
       DisplayWindowTabs();
 
       // This is a scroll panel (we are using it to make button lists...)
-      GUILayout.BeginScrollView(TabBox.position, SMStyle.ScrollStyle,
-        GUILayout.Height(TabBox.height), GUILayout.Width(TabBox.width));
       DisplaySelectedTab(TabBox);
-      GUILayout.EndScrollView();
 
       DisplayTabActions();
       GUILayout.EndVertical();
@@ -209,6 +211,8 @@ namespace ShipManifest.Windows
 
     internal static void DisplaySelectedTab(Rect tabBox)
     {
+      GUILayout.BeginScrollView(TabBox.position, SMStyle.ScrollStyle,
+       GUILayout.Height(TabBox.height), GUILayout.Width(TabBox.width));
       switch (_selectedTab)
       {
         case Tab.Vessel:
@@ -237,6 +241,7 @@ namespace ShipManifest.Windows
         default:
           throw new ArgumentOutOfRangeException();
       }
+      GUILayout.EndScrollView();
     }
 
     internal static void DisplayTabActions()
@@ -287,6 +292,7 @@ namespace ShipManifest.Windows
             TabLight.TurnOnAllLights();
           break;
         case Tab.Vessel:
+          GUILayout.Label("", GUILayout.Height(20));
           // Temporary commenting of code to allow release.  Will work Vessel combining in later release.
           //GUI.enabled = TabVessel.CombineVesselCount > 0;
           //if (GUILayout.Button(SmUtils.SmTags["#smloc_control_018"], GUILayout.Height(20))) // "Combine Selected Vessels"
@@ -295,6 +301,7 @@ namespace ShipManifest.Windows
           //  TabVessel.ClearVesselCount();
           break;
         case Tab.None:
+          GUILayout.Label("", GUILayout.Height(20));
           break;
         default:
           throw new ArgumentOutOfRangeException();

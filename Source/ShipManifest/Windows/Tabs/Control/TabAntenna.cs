@@ -13,7 +13,6 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static bool IsRtAntennas;
-    private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 325;
 
     internal static void Display(Rect tabBox)
@@ -33,8 +32,7 @@ namespace ShipManifest.Windows.Tabs.Control
         //InstalledMods.IsRtInstalled ? "Antenna Control Center  (RemoteTech detected)" : "Antenna Control Center ",
         InstalledMods.IsRtInstalled ? SmUtils.SmTags["#smloc_control_antenna_001"] : SmUtils.SmTags["#smloc_control_antenna_000"],
         SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {

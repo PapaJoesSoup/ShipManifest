@@ -9,7 +9,7 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.2
 -------------------------------------------------
  - Papa_Joe has resumed support.
- - New: recompiled for .Net 4.8
+ - New: retargeted for .Net 4.8
  - New: recompiled for KSP 1.12.
  - New: added new deployable Radiators control panel tab.
    (https://github.com/mwerle/ShipManifest/issues/8) 
@@ -17,6 +17,7 @@ Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.2
  - Changed default window position to below the 
  - Merge of Mwherle code base back to PapaJoesSoup in Git.
  - Moved Distribution back to PapaJoesSoup
+ - Fixed: Part Control window Content alignment changes when selecting different tabs.
 
 Version 6.0.2.0 - Release 30 Dec 2020 - KSP 1.11.0
 -------------------------------------------------

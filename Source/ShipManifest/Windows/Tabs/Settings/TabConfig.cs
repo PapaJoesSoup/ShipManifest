@@ -34,8 +34,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       //GUILayout.Label("Configuraton", SMStyle.LabelTabHeader);
       GUILayout.Label(SmUtils.SmTags["#smloc_settings_config_000"], SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       if (!ToolbarManager.ToolbarAvailable)
       {
