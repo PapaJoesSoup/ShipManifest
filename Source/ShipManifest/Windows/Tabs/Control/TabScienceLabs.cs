@@ -12,14 +12,13 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiRuleWidth = 350;
     private const float guiLabelWidth = 260;
-    private const float guiToggleWidth = 325;
 
-    internal static void Display(Vector2 displayViewerPosition)
+    internal static void Display(Rect tabBox)
     {
       //float scrollX = WindowControl.Position.x + 10;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 10;
-      float scrollY = 50 - displayViewerPosition.y;
+      float scrollY = 50 - tabBox.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -47,7 +46,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLabs.Current.part, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, iLabs.Current.part, Event.current.mousePosition);
         }
         iLabs.Dispose();
 
@@ -57,7 +56,7 @@ namespace ShipManifest.Windows.Tabs.Control
       catch (Exception ex)
       {
         SmUtils.LogMessage(
-          $" in Solar Panel Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
+          $" in Science Labs Tab at step {step}.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
           SmUtils.LogType.Error, true);
       }
       GUILayout.EndVertical();

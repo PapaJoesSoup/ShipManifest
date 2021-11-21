@@ -10,7 +10,7 @@ namespace ShipManifest.Windows
     #region Settings Window (GUI)
 
     internal static string Title = "Ship Manifest Settings";
-    internal static Rect Position = new Rect(0, 0, 0, 0);
+    internal static Rect Position = new Rect(30, 30, 0, 0);
     internal static bool ShowWindow;
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -19,7 +19,7 @@ namespace ShipManifest.Windows
 
     private static Vector2 _displayViewerPosition = Vector2.zero;
 
-    internal static void Display(int windowId)
+    internal static void Display(int _windowId)
     {
       Title = SmUtils.SmTags["#smloc_settings_001"];
       // set input locks when mouseover window...

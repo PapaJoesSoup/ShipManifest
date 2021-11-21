@@ -16,7 +16,7 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = "";
-    internal static Rect Position = new Rect(0, 0, 0, 0);
+    internal static Rect Position = new Rect(30, 30, 0, 0);
     internal static bool ShowWindow;
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -103,7 +103,7 @@ namespace ShipManifest.Windows
     // Resource Transfer Window
     // This window allows you some control over the selected resource on a selected source and target part
     // This window assumes that a resource has been selected on the Ship manifest window.
-    internal static void Display(int windowId)
+    internal static void Display(int _windowId)
     {
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -983,6 +983,7 @@ namespace ShipManifest.Windows
 
     #region Science Details Viewer
 
+    // TODO: This method is currntly unused.  Examine for relavence and need
     private static void ScienceVesselDetails(Dictionary<PartModule, bool> sourceModules, Dictionary<PartModule, bool> targetModules, bool isVesselMode)
     {
       if (sourceModules.Count <= 0 || targetModules.Count <= 0) return;

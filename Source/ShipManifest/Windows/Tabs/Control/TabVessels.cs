@@ -13,7 +13,6 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     private static bool _canShowToolTips = true;
-    internal static Rect Position = WindowControl.Position;
 
     private const float guiRuleWidth = 350;
     // Temporary change in label width to allow release.  Will work vessel combining in a later release.
@@ -23,12 +22,12 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static int CombineVesselCount = 0;
 
-    internal static void Display(Vector2 displayViewerPosition)
+    internal static void Display(Rect tabBox)
     {
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
-      float scrollY = displayViewerPosition.y;
+      float scrollY = tabBox.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -36,8 +35,6 @@ namespace ShipManifest.Windows.Tabs.Control
       // Reset Tooltip active flag...
       ToolTipActive = false;
       _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
-
-      Position = WindowControl.Position;
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
@@ -73,7 +70,7 @@ namespace ShipManifest.Windows.Tabs.Control
           //  ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           //if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           //{
-          //  SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+          //  SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
           //    Event.current.mousePosition);
           //}
 
@@ -91,7 +88,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -103,7 +100,7 @@ namespace ShipManifest.Windows.Tabs.Control
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -129,7 +126,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -147,7 +144,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
               Event.current.mousePosition);
           }
           GUILayout.EndHorizontal();

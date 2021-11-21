@@ -14,10 +14,10 @@ namespace ShipManifest.Windows.Tabs.Control
     private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 325;
 
-    internal static void Display(Vector2 displayViewerPosition)
+    internal static void Display(Rect tabBox)
     {
       float scrollX = 10;
-      float scrollY = displayViewerPosition.y;
+      float scrollY = tabBox.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -64,7 +64,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iRadiators.Current.SPart, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, iRadiators.Current.SPart, Event.current.mousePosition);
         }
         iRadiators.Dispose();
 
@@ -80,7 +80,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.EndVertical();
     }
 
-    internal static void ExtendAllPanels()
+    internal static void ExtendAllRadiators()
     {
       // TODO: for realism, add a closing/opening sound
       List<ModRadiator>.Enumerator iRadiators = SMAddon.SmVessel.Radiators.GetEnumerator();
@@ -93,7 +93,7 @@ namespace ShipManifest.Windows.Tabs.Control
       iRadiators.Dispose();
     }
 
-    internal static void RetractAllPanels()
+    internal static void RetractAllRadiators()
     {
       // TODO: for realism, add a closing/opening sound
       List<ModRadiator>.Enumerator iRadiators = SMAddon.SmVessel.Radiators.GetEnumerator();

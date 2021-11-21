@@ -595,12 +595,12 @@ namespace ShipManifest
             ModuleDeployableRadiator radiator = pModules.Current;
             if (radiator == null) continue;
             if (!radiator.Events["Extend"].active && !radiator.Events["Retract"].active) continue;
-            ModRadiator pPanel = new ModRadiator
+            ModRadiator pRadiator = new ModRadiator
             {
               PanelModule = radiator,
               SPart = pParts.Current
             };
-            _radiators.Add(pPanel);
+            _radiators.Add(pRadiator);
           }
           pModules.Dispose();
         }

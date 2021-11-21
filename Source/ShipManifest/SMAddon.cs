@@ -449,12 +449,13 @@ namespace ShipManifest
       StockTransferItem = xferPartItem;
     }
 
-    internal void OnAttemptTransfer(ProtoCrewMember pkerbal, Part part, CrewHatchController controller)
-    {
-      //if (!SMSettings.EnableCls || !SMSettings.RealismMode) return;
-      //if (SMConditions.IsClsInSameSpace(stockTransferItem.srcPart, part)) return;
-      //stockTransferItem.semiValidMessage = "Parts are not in the same internal Space.  You must EVA.";
-    }
+    //TODO:  Check to see if this is still needed.
+    //internal void OnAttemptTransfer(ProtoCrewMember pkerbal, Part part, CrewHatchController controller)
+    //{
+    //  if (!SMSettings.EnableCls || !SMSettings.RealismMode) return;
+    //  if (SMConditions.IsClsInSameSpace(stockTransferItem.srcPart, part)) return;
+    //  stockTransferItem.semiValidMessage = "Parts are not in the same internal Space.  You must EVA.";
+    //}
 
     /// <summary>
     /// OnCrewTransferSelected (GameEvent Handler)

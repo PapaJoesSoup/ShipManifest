@@ -8,17 +8,15 @@ namespace ShipManifest.Windows
   internal static class WindowControl
   {
     internal static string Title = "Ship Manifest Part Control Center";
-    internal static Rect Position = new Rect(0, 0, 0, 0);
-    internal static Rect TabBox = new Rect(0, 0, 380, 200);
+    internal static Rect Position = new Rect(30, 30, 0, 0);
+    internal static Rect TabBox = new Rect(5, 0, 440, 200);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     private static Tab _selectedTab = Tab.None;
 
-    private static Vector2 _displayViewerPosition = Vector2.zero;
-
-    internal static void Display(int windowId)
+    internal static void Display(int _windowId)
     {
       Title = SmUtils.SmTags["#smloc_control_001"];
 
@@ -42,9 +40,9 @@ namespace ShipManifest.Windows
       DisplayWindowTabs();
 
       // This is a scroll panel (we are using it to make button lists...)
-      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
+      GUILayout.BeginScrollView(TabBox.position, SMStyle.ScrollStyle,
         GUILayout.Height(TabBox.height), GUILayout.Width(TabBox.width));
-      DisplaySelectedTab(_displayViewerPosition);
+      DisplaySelectedTab(TabBox);
       GUILayout.EndScrollView();
 
       DisplayTabActions();
@@ -126,7 +124,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Radiator Tab
-      label = new GUIContent(SmUtils.SmTags["#smloc_control_003a"], SmUtils.SmTags["#smloc_control_tt_002a"]);
+      label = new GUIContent(SmUtils.SmTags["#smloc_control_020"], SmUtils.SmTags["#smloc_control_tt_007"]);
       GUIStyle radiatorsStyle = _selectedTab == Tab.Radiator ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(label, radiatorsStyle, GUILayout.Height(20))) // "Radiators"
       {
@@ -209,30 +207,30 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    internal static void DisplaySelectedTab(Vector2 displayViewerPosition)
+    internal static void DisplaySelectedTab(Rect tabBox)
     {
       switch (_selectedTab)
       {
         case Tab.Vessel:
-          TabVessel.Display(displayViewerPosition);
+          TabVessel.Display(tabBox);
           break;
         case Tab.Hatch:
-          TabHatch.Display(displayViewerPosition);
+          TabHatch.Display(tabBox);
           break;
         case Tab.Panel:
-          TabSolarPanel.Display(displayViewerPosition);
+          TabSolarPanel.Display(tabBox);
           break;
         case Tab.Radiator:
-          TabRadiator.Display(displayViewerPosition);
+          TabRadiator.Display(tabBox);
           break;
         case Tab.Antenna:
-          TabAntenna.Display(displayViewerPosition);
+          TabAntenna.Display(tabBox);
           break;
         case Tab.Light:
-          TabLight.Display(displayViewerPosition);
+          TabLight.Display(tabBox);
           break;
         case Tab.Lab:
-          TabScienceLab.Display(displayViewerPosition);
+          TabScienceLab.Display(tabBox);
           break;
         case Tab.None:
           break;
@@ -252,6 +250,13 @@ namespace ShipManifest.Windows
             TabSolarPanel.RetractAllPanels();
           if (GUILayout.Button(SmUtils.SmTags["#smloc_control_007"], GUILayout.Height(20))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
+          break;
+        case Tab.Radiator:
+          GUI.enabled = SMAddon.SmVessel.Radiators.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_022"], GUILayout.Height(20))) // "Retract All Radiators"
+            TabRadiator.RetractAllRadiators();
+          if (GUILayout.Button(SmUtils.SmTags["#smloc_control_021"], GUILayout.Height(20))) // "Extend All Radiators"
+            TabRadiator.ExtendAllRadiators();
           break;
         case Tab.Hatch:
           GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());

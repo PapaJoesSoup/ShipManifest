@@ -13,7 +13,7 @@ namespace ShipManifest.Windows
     #region Manifest Window - Gui Layout Code
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
-    internal static Rect Position = new Rect(0, 0, 0, 0);
+    internal static Rect Position = new Rect(30, 30, 0, 0);
     private static bool _showWindow;
 
     internal static bool ShowWindow
@@ -36,7 +36,7 @@ namespace ShipManifest.Windows
     private static Vector2 _smScrollViewerPosition = Vector2.zero;
     private static Vector2 _resourceScrollViewerPosition = Vector2.zero;
 
-    internal static void Display(int windowId)
+    internal static void Display(int _windowId)
     {
       Title =
         $"{SmUtils.SmTags["#smloc_manifest_002"]} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
@@ -339,12 +339,12 @@ namespace ShipManifest.Windows
               while (pModules.MoveNext())
               {
                 if (pModules.Current == null) continue;
-                PartModule pm = (PartModule)pModules.Current;
-                ModuleScienceContainer container = pm as ModuleScienceContainer;
+                ModuleScienceContainer container = (PartModule)pModules.Current as ModuleScienceContainer;
+                ModuleScienceExperiment experiment = (PartModule)pModules.Current as ModuleScienceExperiment;
                 if (container != null)
                   scienceCount += container.GetScienceCount();
-                else if (pm is ModuleScienceExperiment)
-                  scienceCount += ((ModuleScienceExperiment) pm).GetScienceCount();
+                else if (experiment != null)
+                  scienceCount += experiment.GetScienceCount();
               }
               GUILayout.BeginHorizontal();
               GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", GUILayout.Width(265));
