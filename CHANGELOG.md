@@ -5,9 +5,6 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 -------------------------------------------------
-
-Version 6.0.3.0 - Release XX Nov 2021 - KSP 1.12.2
--------------------------------------------------
  - Papa_Joe has resumed support.
  - New: retargeted for .Net 4.8
  - New: recompiled for KSP 1.12.
