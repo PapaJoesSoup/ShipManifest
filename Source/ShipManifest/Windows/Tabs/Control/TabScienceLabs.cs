@@ -12,12 +12,12 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiLabelWidth = 260;
 
-    internal static void Display(Rect tabBox)
+    internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 10;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 10;
-      float scrollY = 50 - tabBox.y;
+      float scrollY = WindowControl._displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -44,7 +44,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, iLabs.Current.part, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLabs.Current.part, Event.current.mousePosition);
         }
         iLabs.Dispose();
 

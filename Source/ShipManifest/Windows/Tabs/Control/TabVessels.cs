@@ -21,12 +21,12 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static int CombineVesselCount = 0;
 
-    internal static void Display(Rect tabBox)
+    internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
-      float scrollY = tabBox.y;
+      float scrollY = WindowControl._displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -86,7 +86,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -98,7 +98,7 @@ namespace ShipManifest.Windows.Tabs.Control
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -123,7 +123,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
               Event.current.mousePosition);
           }
 
@@ -141,7 +141,7 @@ namespace ShipManifest.Windows.Tabs.Control
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, mdv,
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
               Event.current.mousePosition);
           }
           GUILayout.EndHorizontal();

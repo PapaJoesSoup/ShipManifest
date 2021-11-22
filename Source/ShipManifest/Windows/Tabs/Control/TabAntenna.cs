@@ -15,12 +15,12 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool IsRtAntennas;
     private const float guiToggleWidth = 325;
 
-    internal static void Display(Rect tabBox)
+    internal static void Display()
     {
       //float scrollX = WindowControl.Position.x;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 0;
-      float scrollY = tabBox.y;
+      float scrollY = WindowControl._displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -54,7 +54,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, iAntennas.Current.SPart, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iAntennas.Current.SPart, Event.current.mousePosition);
         }
         iAntennas.Dispose();
 

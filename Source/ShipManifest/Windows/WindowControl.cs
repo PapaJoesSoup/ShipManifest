@@ -9,6 +9,7 @@ namespace ShipManifest.Windows
   {
     internal static string Title = "Ship Manifest Part Control Center";
     internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Vector2 _displayViewerPosition = Vector2.zero;
 
     internal static bool ShowWindow;
     internal static string ToolTip = "";
@@ -45,7 +46,7 @@ namespace ShipManifest.Windows
       DisplayWindowTabs();
 
       // This is a scroll panel (we are using it to make button lists...)
-      DisplaySelectedTab(TabBox);
+      DisplaySelectedTab();
 
       DisplayTabActions();
       GUILayout.EndVertical();
@@ -209,32 +210,32 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    internal static void DisplaySelectedTab(Rect tabBox)
+    internal static void DisplaySelectedTab()
     {
-      GUILayout.BeginScrollView(TabBox.position, SMStyle.ScrollStyle,
+      _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
        GUILayout.Height(TabBox.height), GUILayout.Width(TabBox.width));
       switch (_selectedTab)
       {
         case Tab.Vessel:
-          TabVessel.Display(tabBox);
+          TabVessel.Display();
           break;
         case Tab.Hatch:
-          TabHatch.Display(tabBox);
+          TabHatch.Display();
           break;
         case Tab.Panel:
-          TabSolarPanel.Display(tabBox);
+          TabSolarPanel.Display();
           break;
         case Tab.Radiator:
-          TabRadiator.Display(tabBox);
+          TabRadiator.Display();
           break;
         case Tab.Antenna:
-          TabAntenna.Display(tabBox);
+          TabAntenna.Display();
           break;
         case Tab.Light:
-          TabLight.Display(tabBox);
+          TabLight.Display();
           break;
         case Tab.Lab:
-          TabScienceLab.Display(tabBox);
+          TabScienceLab.Display();
           break;
         case Tab.None:
           break;

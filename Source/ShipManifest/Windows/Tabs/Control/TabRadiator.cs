@@ -13,10 +13,10 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiToggleWidth = 325;
 
-    internal static void Display(Rect tabBox)
+    internal static void Display()
     {
       float scrollX = 10;
-      float scrollY = tabBox.y;
+      float scrollY = WindowControl._displayViewerPosition.y;
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -62,7 +62,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, tabBox.height, iRadiators.Current.SPart, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iRadiators.Current.SPart, Event.current.mousePosition);
         }
         iRadiators.Dispose();
 
