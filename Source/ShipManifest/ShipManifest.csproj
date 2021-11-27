@@ -42,13 +42,11 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\_LocalDev\KSPRefs\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="CLSInterfaces, Version=1.0.0.0, Culture=neutral">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Distribution\GameData\ShipManifest\Plugins\CLSInterfaces.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="KSPAssets">
       <HintPath>..\..\..\_LocalDev\KSPRefs\KSPAssets.dll</HintPath>
+    </Reference>
+    <Reference Include="SM_CLSInterface">
+      <HintPath>..\..\Distribution\GameData\ShipManifest\Plugins\SM_CLSInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
