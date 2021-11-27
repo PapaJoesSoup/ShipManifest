@@ -5,6 +5,13 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 -------------------------------------------------
+ - New: Added support for changing vessel types in Vessel Control panel
+ - Changed:  Refactored Vessel Control Panel localization strings to improve performance.  This is the start of an application wide refactor to make all localization string usage static instead of instanced
+ - Fixed: Corrected potential dll conflict error with CLS. Changed name of CLSInterfaces.dll to SM_CLSInterface.dll. Do not remove this file, it is required.
+ - Updated SM_CLSInterface.dll to version 2.0.1.0 (latest CLS released version for KSP 1.12.x).
+
+Version 6.0.3.0 - Release 21 Nov 2021 - KSP 1.12.x
+-------------------------------------------------
  - Papa_Joe has resumed support.
  - New: retargeted for .Net 4.8
  - New: recompiled for KSP 1.12.

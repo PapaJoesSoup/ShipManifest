@@ -14,8 +14,8 @@ namespace ShipManifest.Modules
     private Part _dockingPort;
     internal bool IsDocked;
     internal bool IsEditing = false;
+    internal bool IsReTyping = false;
     internal string RenameVessel = null;
-    //internal VesselType ReClassifyVessel;
 
     internal ModDockedVessel()
     {
@@ -53,10 +53,19 @@ namespace ShipManifest.Modules
       set { VesselInfo.name = value; }
     }
 
-    internal VesselType VesselClassification
+    internal VesselType TypeVessel
     {
       get { return VesselInfo.vesselType; }
-      set { VesselInfo.vesselType = value; }
+      set
+      {
+        if (Rootpart)
+        {
+          Rootpart.vesselNaming.vesselType = value;
+          Rootpart.vesselType = value;
+          Rootpart.vessel.vesselType = value;
+        }
+        VesselInfo.vesselType = value;
+      }
     }
 
     internal List<Part> VesselParts

@@ -21,6 +21,17 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static int CombineVesselCount = 0;
 
+    //Content vars
+    private static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_000"]);
+    private static GUIContent addVesselContent = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
+    private static GUIContent renameVesselContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]); //Undock
+    private static GUIContent saveNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_002"], SmUtils.SmTags["#smloc_control_vessel_tt_002"]); // "Save" // "Saves the changes to the docked vessel name." 
+    private static GUIContent editNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_003"]);// Edit // "Change the docked vessel name."
+    private static GUIContent cancelNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_004"], SmUtils.SmTags["#smloc_control_vessel_tt_004"]); // "Cancel","Cancel changes to docked vessel name"
+
+    private static GUIContent editTypeContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_006"]); // "Edit","Change docked vessel type"
+    private static GUIContent exitTypeContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_005"], SmUtils.SmTags["#smloc_control_vessel_tt_007"]); // "Done","Exit changing vessel type"
+
     internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 20;
@@ -38,7 +49,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Vessel Control Center", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.SmTags["#smloc_control_vessel_000"], SMStyle.LabelTabHeader);
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
@@ -52,11 +63,11 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = mdv.IsDocked;
           
           GUILayout.BeginHorizontal();
-          GUIContent content = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
+          
 
           bool isChecked = mdv.Combine;
           // temporary commenting of comnbine code to allow release.  Will work for next version.
-          //isChecked = GUILayout.Toggle(isChecked, content, GUILayout.Width(20));
+          //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20));
           if (isChecked) combineVesselcount += 1;
           if (isChecked != mdv.Combine)
           {
@@ -72,8 +83,7 @@ namespace ShipManifest.Windows.Tabs.Control
           //    Event.current.mousePosition);
           //}
 
-          content = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]);
-          if (GUILayout.Button(content, GUILayout.Width(guiBtnWidth))) //"UnDock"
+          if (GUILayout.Button(renameVesselContent, GUILayout.Width(guiBtnWidth))) //"UnDock"
           {
             // close hatches If CLS applies
             if (SMConditions.IsClsEnabled()) CloseVesselHatches(mdv);
@@ -92,9 +102,9 @@ namespace ShipManifest.Windows.Tabs.Control
 
           GUI.enabled = true;
           if (mdv.IsEditing)
-            mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width(guiLabelWidth - (guiBtnWidth + 5)));
+            mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width((guiLabelWidth) - (guiBtnWidth + 5)));
           else
-            GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth));
+            GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth/2));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
@@ -103,7 +113,7 @@ namespace ShipManifest.Windows.Tabs.Control
           }
 
           // now editing buttons.
-          content = mdv.IsEditing ? new GUIContent(SmUtils.SmTags["#smloc_control_vessel_002"], SmUtils.SmTags["#smloc_control_vessel_tt_002"]) : new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_003"]); // "Save" // "Saves the changes to the docked vessel name." // Edit // "Change the docked vessel name." 
+          GUIContent content = mdv.IsEditing ? saveNameContent : editNameContent; 
           if (GUILayout.Button(content, GUILayout.Width(50)))
           {
             if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
@@ -129,11 +139,37 @@ namespace ShipManifest.Windows.Tabs.Control
 
           if (mdv.IsEditing)
           {
-            GUIContent cancelContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_004"], SmUtils.SmTags["#smloc_control_vessel_tt_004"]); // "Cancel","Cancel changes to docked vessel name"
-            if (GUILayout.Button(cancelContent, GUILayout.Width(guiBtnWidth)))
+            if (GUILayout.Button(cancelNameContent, GUILayout.Width(guiBtnWidth)))
             {
               mdv.RenameVessel = null;
               mdv.IsEditing = false;
+            }
+          }
+          else
+          {
+            // Vessel Type display/edit
+            GUILayout.Label($"{mdv.VesselInfo.vesselType.ToString()}", GUILayout.Width(guiLabelWidth / 3));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+            {
+              SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
+                Event.current.mousePosition);
+            }
+            if (mdv.IsReTyping)
+            {
+              if (GUILayout.Button("<<", GUILayout.Width(guiBtnWidth / 2)))
+              {
+                mdv.TypeVessel = mdv.TypeVessel.Back();
+              }
+              if (GUILayout.Button(">>", GUILayout.Width(guiBtnWidth / 2)))
+              {
+                mdv.TypeVessel = mdv.TypeVessel.Next();
+              }
+            }
+            content = mdv.IsReTyping ? exitTypeContent : editTypeContent; 
+            if (GUILayout.Button(content, GUILayout.Width(guiBtnWidth)))
+            {
+              mdv.IsReTyping = !mdv.IsReTyping;
             }
           }
           rect = GUILayoutUtility.GetLastRect();
@@ -144,6 +180,7 @@ namespace ShipManifest.Windows.Tabs.Control
             SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, mdv,
               Event.current.mousePosition);
           }
+
           GUILayout.EndHorizontal();
         }
         // update static count for control window action buttons.
