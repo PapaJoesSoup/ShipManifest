@@ -13,7 +13,6 @@ namespace ShipManifest.Windows
   {
     #region Properties
 
-    internal static string Title = "Ship Manifest Roster";
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
     internal static Rect Position = SMSettings.DefaultPosition;
@@ -39,6 +38,65 @@ namespace ShipManifest.Windows
     private static ModKerbal _selectedKerbal;
 
     private static Vector2 _scrollViewerPosition = Vector2.zero;
+
+    // Content strings
+    internal static string Title = $"{SmUtils.SmTags["#smloc_roster_001"]}:  {SMSettings.CurVersion}";
+    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static string addKerbalContent = SmUtils.SmTags["#smloc_roster_002"];
+    internal static string addKerbalOffContent =SmUtils.SmTags["#smloc_roster_tt_001"];
+    internal static string addKerbalEditContent = SmUtils.SmTags["#smloc_roster_tt_022"];
+    internal static GUIContent createContent = new GUIContent(SmUtils.SmTags["#smloc_roster_003"], SmUtils.SmTags["#smloc_roster_tt_002"]);
+    internal static GUIContent cancelContent = new GUIContent(SmUtils.SmTags["#smloc_roster_004"], SmUtils.SmTags["#smloc_roster_tt_003"]);
+    internal static string cnxEditContent = SmUtils.SmTags["#smloc_roster_004"];
+    internal static GUIContent profContent = new GUIContent(SmUtils.SmTags["#smloc_roster_005"]);
+    internal static string pilotContent = SmUtils.SmTags["#smloc_roster_006"];
+    internal static string engineerContent = SmUtils.SmTags["#smloc_roster_007"];
+    internal static string scientistContent = SmUtils.SmTags["#smloc_roster_008"];
+    internal static GUIContent filterContent = new GUIContent($"{SmUtils.SmTags["#smloc_roster_009"]}:");
+    internal static string allContent = SmUtils.SmTags["#smloc_roster_010"];
+    internal static string assignContent = SmUtils.SmTags["#smloc_roster_011"];
+    internal static string vesselContent = SmUtils.SmTags["#smloc_roster_012"];
+    internal static string availContent = SmUtils.SmTags["#smloc_roster_013"];
+    internal static string deadContent = SmUtils.SmTags["#smloc_roster_014"];
+    internal static string frozenContent = SmUtils.SmTags["#smloc_roster_015"];
+    internal static string nameContent = SmUtils.SmTags["#smloc_roster_016"];
+    internal static string genderContent = SmUtils.SmTags["#smloc_roster_017"];
+    internal static string skillContent = SmUtils.SmTags["#smloc_roster_018"];
+    internal static string statusContent = SmUtils.SmTags["#smloc_roster_019"];
+    internal static string editContent = SmUtils.SmTags["#smloc_roster_020"];
+    internal static string actionContent = SmUtils.SmTags["#smloc_roster_021"];
+    internal static string removeContent = SmUtils.SmTags["#smloc_roster_022"];
+    internal static string addContent = SmUtils.SmTags["#smloc_roster_023"];
+    internal static string respawnContent = SmUtils.SmTags["#smloc_roster_024"];
+    internal static string thawContent = SmUtils.SmTags["#smloc_roster_025"];
+    internal static string freezeContent = SmUtils.SmTags["#smloc_roster_026"];
+    internal static string editKerbalContent = SmUtils.SmTags["#smloc_roster_027"];
+    internal static GUIContent applyContent = new GUIContent(SmUtils.SmTags["#smloc_roster_028"], SmUtils.SmTags["#smloc_roster_tt_006"]);
+    internal static string courageContent = SmUtils.SmTags["#smloc_roster_029"];
+    internal static string stupidContent = SmUtils.SmTags["#smloc_roster_030"];
+    internal static string badassContent = SmUtils.SmTags["#smloc_roster_031"];
+    internal static string touristContent = SmUtils.SmTags["#smloc_roster_032"];
+    internal static string applicantContent = SmUtils.SmTags["#smloc_roster_033"];
+    internal static string hireContent = SmUtils.SmTags["#smloc_roster_034"];
+    internal static string veteranContent = SmUtils.SmTags["#smloc_roster_035"];
+    internal static GUIContent suitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_036"]);
+    internal static GUIContent defaultSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_037"]);
+    internal static GUIContent vintageSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_038"]);
+    internal static GUIContent futureSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_039"]);
+    internal static string brokenContent = SmUtils.SmTags["#smloc_roster_040"];
+    internal static string fixContent = SmUtils.SmTags["#smloc_roster_041"];
+
+
+    internal static string editKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_007"];
+    internal static string cnxEditKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_008"];
+    internal static string notAvailTtContent = SmUtils.SmTags["#smloc_roster_tt_009"];
+    internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
+
+    internal static GUIContent Content = new GUIContent(, );
+    internal static GUIContent Content = new GUIContent(, );
+    internal static GUIContent Content = new GUIContent(, );
+    internal static GUIContent Content = new GUIContent(, );
+
 
     internal static bool ResetRosterSize
     {
@@ -66,7 +124,6 @@ namespace ShipManifest.Windows
     #region Gui Layout
     internal static void Display(int _windowId)
     {
-      Title = SmUtils.SmTags["#smloc_roster_001"];
       
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -75,7 +132,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]))) // "Close Window"
+      if (GUI.Button(rect, closeContent)) // "Close Window"
       {
         OnCreate = false;
         SelectedKerbal = null;
@@ -105,9 +162,7 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           GUI.enabled = SMSettings.EnableCrewModify;
-          GUIContent guilabel = new GUIContent(SmUtils.SmTags["#smloc_roster_002"], GUI.enabled // "Create Kerbal"
-            ? SmUtils.SmTags["#smloc_roster_tt_001"] // Realistic Control is On.  Create a Kerbal is disabled.
-            : SmUtils.SmTags["#smloc_roster_tt_022"]); // "Opens the Kerbal creation editor."
+          GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
             OnCreate = true;
@@ -183,9 +238,8 @@ namespace ShipManifest.Windows
     {
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
-      // "Create", "Creates a Kerbal with profession selected above.\r\nAdds him/her to the Roster."
-      GUIContent guilabel = new GUIContent(SmUtils.SmTags["#smloc_roster_003"], SmUtils.SmTags["#smloc_roster_tt_002"]);
-      if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
+      // "Create"
+      if (GUILayout.Button(createContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         bool kerbalFound = false;
         ProtoCrewMember.KerbalType kerbalType = KerbalProfession == Professions.Tourist
@@ -202,9 +256,8 @@ namespace ShipManifest.Windows
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-      //guilabel = new GUIContent("Cancel", "Cancels current creation and exit editor.");
-      guilabel = new GUIContent(SmUtils.SmTags["#smloc_roster_004"], SmUtils.SmTags["#smloc_roster_tt_003"]);
-      if (GUILayout.Button(guilabel, GUILayout.MaxWidth(80), GUILayout.Height(20)))
+      // Cancel
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         OnCreate = false;
         SelectedKerbal = null;
@@ -218,17 +271,17 @@ namespace ShipManifest.Windows
     private static void DisplaySelectProfession()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SmUtils.SmTags["#smloc_roster_005"], GUILayout.Width(85)); // "Profession:"
-      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, SmUtils.SmTags["#smloc_roster_006"], GUILayout.Width(90)); // "Pilot"
+      GUILayout.Label(profContent, GUILayout.Width(85)); // "Profession:"
+      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, pilotContent, GUILayout.Width(90)); // "Pilot"
       if (isPilot) KerbalProfession = Professions.Pilot;
 
-      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, SmUtils.SmTags["#smloc_roster_007"], GUILayout.Width(90)); // "Engineer"
+      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, engineerContent, GUILayout.Width(90)); // "Engineer"
       if (isEngineer) KerbalProfession = Professions.Engineer;
 
-      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, SmUtils.SmTags["#smloc_roster_008"], GUILayout.Width(90)); // "Scientist"
+      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, scientistContent, GUILayout.Width(90)); // "Scientist"
       if (isScientist) KerbalProfession = Professions.Scientist;
 
-      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, SmUtils.SmTags["#smloc_roster_032"], GUILayout.Width(90)); // "Toruist"
+      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, touristContent, GUILayout.Width(90)); // "Toruist"
       if (isTourist) KerbalProfession = Professions.Tourist;
 
       GUILayout.EndHorizontal();
@@ -237,18 +290,18 @@ namespace ShipManifest.Windows
     private static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SmUtils.SmTags["#smloc_roster_036"], GUILayout.Width(85)); // "Suit:"
+      GUILayout.Label(suitContent, GUILayout.Width(85)); // "Suit:"
 
       // Always available
-      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, SmUtils.SmTags["#smloc_roster_037"], GUILayout.Width(90)); // "Default"
+      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, defaultSuitContent, GUILayout.Width(90)); // "Default"
       if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
 
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, SmUtils.SmTags["#smloc_roster_038"], GUILayout.Width(90)); // "Vintage"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, vintageSuitContent, GUILayout.Width(90)); // "Vintage"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
       }
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, SmUtils.SmTags["#smloc_roster_039"], GUILayout.Width(90)); // "Future"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futureSuitContent, GUILayout.Width(90)); // "Future"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
       }
 
@@ -258,36 +311,36 @@ namespace ShipManifest.Windows
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label($"{SmUtils.SmTags["#smloc_roster_009"]}:", GUILayout.Width(40)); // Filter
+      GUILayout.Label(filterContent, GUILayout.Width(40)); // Filter
 
-      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, SmUtils.SmTags["#smloc_roster_010"], GUILayout.Width(60)); // "All"
+      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, allContent, GUILayout.Width(60)); // "All"
       if (isAll) CurrentFilter = KerbalFilters.All;
 
-      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, SmUtils.SmTags["#smloc_roster_011"], GUILayout.Width(95)); // "Assigned"
+      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, assignContent, GUILayout.Width(95)); // "Assigned"
       if (isAssign) CurrentFilter = KerbalFilters.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, SmUtils.SmTags["#smloc_roster_012"], GUILayout.Width(80)); // "Vessel"
+        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, vesselContent, GUILayout.Width(80)); // "Vessel"
         if (isVessel) CurrentFilter = KerbalFilters.Vessel;
       }
 
-      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, SmUtils.SmTags["#smloc_roster_013"], GUILayout.Width(95)); // "Available"
+      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, availContent, GUILayout.Width(95)); // "Available"
       if (isAvail) CurrentFilter = KerbalFilters.Available;
 
-      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, SmUtils.SmTags["#smloc_roster_014"], GUILayout.Width(130)); // "Dead/Missing"
+      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, deadContent, GUILayout.Width(130)); // "Dead/Missing"
       if (isDead) CurrentFilter = KerbalFilters.Dead;
 
       if (InstalledMods.IsDfInstalled)
       {
-        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, SmUtils.SmTags["#smloc_roster_015"], GUILayout.Width(80)); // "Frozen"
+        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, frozenContent, GUILayout.Width(80)); // "Frozen"
         if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
       }
 
-      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilters.Applicant, SmUtils.SmTags["#smloc_roster_033"], GUILayout.Width(130)); // "Applicant"
+      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilters.Applicant, applicantContent, GUILayout.Width(130)); // "Applicant"
       if (isApplicant) CurrentFilter = KerbalFilters.Applicant;
 
-      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilters.Broken, SmUtils.SmTags["#smloc_roster_040"], GUILayout.Width(130)); // "Broken"
+      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilters.Broken, brokenContent, GUILayout.Width(130)); // "Broken"
       if (isBroken) CurrentFilter = KerbalFilters.Broken;
 
       GUILayout.EndHorizontal();
@@ -301,13 +354,13 @@ namespace ShipManifest.Windows
         // Roster List Header...
         GUILayout.BeginHorizontal();
         //GUILayout.Label("", GUILayout.Width(5));
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_016"], GUILayout.Width(140)); // "Name"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_017"], GUILayout.Width(50)); // "Gender"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_005"], GUILayout.Width(70)); // "Profession"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_018"], GUILayout.Width(30)); // "Skill"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_019"], GUILayout.Width(220)); // "Status"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_020"], GUILayout.Width(55)); // "Edit"
-        GUILayout.Label(SmUtils.SmTags["#smloc_roster_021"], GUILayout.Width(65)); // "Action"
+        GUILayout.Label(nameContent, GUILayout.Width(140)); // "Name"
+        GUILayout.Label(genderContent, GUILayout.Width(50)); // "Gender"
+        GUILayout.Label(profContent, GUILayout.Width(70)); // "Profession"
+        GUILayout.Label(skillContent, GUILayout.Width(30)); // "Skill"
+        GUILayout.Label(statusContent, GUILayout.Width(220)); // "Status"
+        GUILayout.Label(editContent, GUILayout.Width(55)); // "Edit"
+        GUILayout.Label(actionContent, GUILayout.Width(65)); // "Action"
         GUILayout.EndHorizontal();
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
@@ -353,7 +406,7 @@ namespace ShipManifest.Windows
               if (crew.Any(crewMember => crewMember == kerbals.Current))
               {
                 rosterDetails =
-                  $"{SmUtils.SmTags["#smloc_roster_011"]} - {theseVessels.Current.GetName().Replace("(unloaded)", "")}"; // "Assigned"
+                  $"{assignContent} - {theseVessels.Current.GetName().Replace("(unloaded)", "")}"; // "Assigned"
               }
             }
             theseVessels.Dispose();
@@ -408,7 +461,7 @@ namespace ShipManifest.Windows
             isAction = true;
             actionKerbal = kerbals.Current;
             actionText = buttonText;
-            if (actionText == SmUtils.SmTags["#smloc_roster_022"]) // "Remove"
+            if (actionText == removeContent) // "Remove"
               actionPart = SMAddon.SmVessel.FindPartByKerbal(kerbals.Current);
           }
           Rect rect2 = GUILayoutUtility.GetLastRect();
@@ -423,19 +476,19 @@ namespace ShipManifest.Windows
 
         // perform action from button press.
         if (!isAction) return;
-        if (actionText == SmUtils.SmTags["#smloc_roster_022"]) // "Remove"
+        if (actionText == removeContent) // "Remove"
           TransferCrew.RemoveCrewMember(actionKerbal, actionPart);
-        else if(actionText == SmUtils.SmTags["#smloc_roster_023"]) // "Add"
+        else if(actionText == addContent) // "Add"
           TransferCrew.AddCrewMember(actionKerbal, SMAddon.SmVessel.SelectedPartsSource[0]);
-        else if (actionText == SmUtils.SmTags["#smloc_roster_024"]) // "Respawn"
+        else if (actionText == thawContent) // "Respawn"
           RespawnKerbal(actionKerbal);
-        else if (actionText == SmUtils.SmTags["#smloc_roster_025"]) // "Thaw"
+        else if (actionText == thawContent) // "Thaw"
           ThawKerbal(actionKerbal.name);
-        else if (actionText == SmUtils.SmTags["#smloc_roster_026"])// "Freeze"
+        else if (actionText == freezeContent)// "Freeze"
           FreezeKerbal(actionKerbal);
-        else if (actionText == SmUtils.SmTags["#smloc_roster_034"]) // "Hire"
+        else if (actionText == hireContent) // "Hire"
           HireKerbal(actionKerbal);
-        else if (actionText == SmUtils.SmTags["#smloc_roster_041"]) // "Fix"
+        else if (actionText == fixContent) // "Fix"
           RepairKerbal(actionKerbal);
         //Refresh all lists...
         if (SMAddon.SmVessel?.Vessel != null) {
@@ -453,8 +506,7 @@ namespace ShipManifest.Windows
 
     private static void EditKerbalViewer()
     {
-      //GUILayout.Label(SelectedKerbal.IsNew ? "Create Kerbal" : "Edit Kerbal");
-      GUILayout.Label(SelectedKerbal.IsNew ? SmUtils.SmTags["#smloc_roster_002"] : SmUtils.SmTags["#smloc_roster_027"]);
+      GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
       if (SMSettings.EnableKerbalRename)
       {
         GUILayout.BeginHorizontal();
@@ -482,32 +534,29 @@ namespace ShipManifest.Windows
       // TODO: Realism setting to enable Kerbal Gender Change for existing Kerbals?
       bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(SmUtils.SmTags["#smloc_roster_017"], GUILayout.Width(85)); // "Gender"
+      GUILayout.Label(genderContent, GUILayout.Width(85)); // "Gender"
       isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
       isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
       SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(SmUtils.SmTags["#smloc_roster_029"]); // "Courage"
+      GUILayout.Label(courageContent); // "Courage"
       SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
 
-      GUILayout.Label(SmUtils.SmTags["#smloc_roster_030"]); // "Stupidity"
+      GUILayout.Label(stupidContent); // "Stupidity"
       SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
 
       GUILayout.BeginHorizontal();
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, SmUtils.SmTags["#smloc_roster_031"], GUILayout.Width(90)); // "Badass"
-      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, SmUtils.SmTags["#smloc_roster_035"], GUILayout.Width(90)); // "Veteran"
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, badassContent, GUILayout.Width(90)); // "Badass"
+      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, veteranContent, GUILayout.Width(90)); // "Veteran"
       GUILayout.EndHorizontal();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(SmUtils.SmTags["#smloc_roster_004"], GUILayout.MaxWidth(50))) // "Cancel"
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(50))) // "Cancel"
       {
         SelectedKerbal = null;
       }
-      string label = SmUtils.SmTags["#smloc_roster_028"]; // "Apply"
-      //string toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
-      string toolTip = SmUtils.SmTags["#smloc_roster_tt_006"];
-      if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
+      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
       {
         if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
         {
@@ -555,15 +604,15 @@ namespace ShipManifest.Windows
       GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
 
       //buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit" : "Cancel";
-      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? SmUtils.SmTags["#smloc_roster_020"] : SmUtils.SmTags["#smloc_roster_004"];
+      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? editContent : cnxEditContent;
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
-          ? SmUtils.SmTags["#smloc_roster_tt_007"] // "Edit this Kerbal's attributes"
-          : SmUtils.SmTags["#smloc_roster_tt_008"]; // "Cancel any changes to this Kerbal"
+          ? editKerbalTtContent // "Edit this Kerbal's attributes"
+          : cnxEditKerbalTtContent; // "Cancel any changes to this Kerbal"
       else
         buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
-          ? SmUtils.SmTags["#smloc_roster_tt_009"] // "Kerbal is not available at this time.\r\nEditing is disabled";
-          : SmUtils.SmTags["#smloc_roster_tt_021"]; // "Realistic Control is On.\r\nEditing is disabled";
+          ? notAvailTtContent // "Kerbal is not available at this time.\r\nEditing is disabled";
+          : realismOnTtContent; // "Realistic Control is On.\r\nEditing is disabled";
     }
 
     private static void SetupActionButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
