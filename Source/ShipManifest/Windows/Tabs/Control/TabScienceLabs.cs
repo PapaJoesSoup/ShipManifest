@@ -12,6 +12,12 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiLabelWidth = 260;
 
+    //Content vars
+    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
+    internal static GUIContent opContent = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
+    internal static GUIContent inopContent = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
+
+
     internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 10;
@@ -25,8 +31,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
-      //GUILayout.Label("Science Lab Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.SmTags["#smloc_control_lab_000"], SMStyle.LabelTabHeader);
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
@@ -39,7 +44,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = true;
-          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? SmUtils.SmTags["#smloc_control_lab_001"] : SmUtils.SmTags["#smloc_control_lab_002"])})"; // Operational, InOp
+          string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? opContent : inopContent)})"; // Operational, InOp
           GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(40));
 
           Rect rect = GUILayoutUtility.GetLastRect();

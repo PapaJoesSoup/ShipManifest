@@ -9,28 +9,39 @@ namespace ShipManifest.Windows
   {
     #region Settings Window (GUI)
 
-    internal static string Title = "Ship Manifest Settings";
     internal static Rect Position = SMSettings.DefaultPosition;
     internal static bool ShowWindow;
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static string ToolTip = "";
-    private static Tab _selectedTab = Tab.Realism;
+    internal static string TabRule = new string('_', 92);
 
+    private static Tab _selectedTab = Tab.Realism;
     private static Vector2 _displayViewerPosition = Vector2.zero;
+
+    // Content strings
+    internal static string Title                    = SmUtils.SmTags["#smloc_settings_001"];
+    internal static GUIContent closeContent         = new GUIContent("", SmUtils.SmTags["#smloc_settings_tt_001"]);
+    internal static GUIContent saveContent          = new GUIContent(SmUtils.SmTags["#smloc_settings_002"], SmUtils.SmTags["#smloc_settings_tt_002"]);
+    internal static GUIContent cancelContent        = new GUIContent(SmUtils.SmTags["#smloc_settings_003"], SmUtils.SmTags["#smloc_settings_tt_003"]);
+    internal static GUIContent tabRealismContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_004"], SmUtils.SmTags["#smloc_settings_tt_004"]);
+    internal static GUIContent tabHighlightContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_005"], SmUtils.SmTags["#smloc_settings_tt_005"]);
+    internal static GUIContent tabTooltipContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_006"], SmUtils.SmTags["#smloc_settings_tt_006"]);
+    internal static GUIContent tabSoundsContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_007"], SmUtils.SmTags["#smloc_settings_tt_007"]);
+    internal static GUIContent tabConfigContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_008"], SmUtils.SmTags["#smloc_settings_tt_008"]);
+
 
     internal static void Display(int _windowId)
     {
-      Title = SmUtils.SmTags["#smloc_settings_001"];
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
+      // Close Window
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      // "Close Window.\r\nSettings will not be immediately saved,\r\n but will be remembered while in game.")))
-      if (GUI.Button(rect, new GUIContent("", SmUtils.SmTags["#smloc_settings_tt_001"])))
+      if (GUI.Button(rect, closeContent))
       {
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -70,8 +81,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       GUIStyle realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      GUIContent label = new GUIContent(SmUtils.SmTags["#smloc_settings_004"], SmUtils.SmTags["#smloc_settings_tt_004"]);
-      if (GUILayout.Button(label, realismStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabRealismContent, realismStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Realism;
       }
@@ -81,9 +91,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      //label = new GUIContent("Highlight", "This tab shows all settings related to highlighting.");
-      label = new GUIContent(SmUtils.SmTags["#smloc_settings_005"], SmUtils.SmTags["#smloc_settings_tt_005"]);
-      if (GUILayout.Button(label, highlightStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabHighlightContent, highlightStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Highlight;
       }
@@ -92,9 +100,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      //label = new GUIContent("ToolTip", "This tab shows all settings related to tooltip behavior.");
-      label = new GUIContent(SmUtils.SmTags["#smloc_settings_006"], SmUtils.SmTags["#smloc_settings_tt_006"]);
-      if (GUILayout.Button(label, tooltipStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabTooltipContent, tooltipStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.ToolTips;
       }
@@ -103,9 +109,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      //label = new GUIContent("Sound", "This tab shows all settings related to sounds.");
-      label = new GUIContent(SmUtils.SmTags["#smloc_settings_007"], SmUtils.SmTags["#smloc_settings_tt_007"]);
-      if (GUILayout.Button(label, soundStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabSoundsContent, soundStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Sounds;
       }
@@ -114,9 +118,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      //label = new GUIContent("Config", "This tab shows all settings related to sounds.");
-      label = new GUIContent(SmUtils.SmTags["#smloc_settings_008"], SmUtils.SmTags["#smloc_settings_tt_008"]);
-      if (GUILayout.Button(label, configStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabConfigContent, configStyle, GUILayout.Height(20)))
       {
         _selectedTab = Tab.Config;
       }
@@ -156,9 +158,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       // Save
-      //GUIContent label = new GUIContent("Save", "Save the current settings to file.");
-      GUIContent label = new GUIContent(SmUtils.SmTags["#smloc_settings_002"], SmUtils.SmTags["#smloc_settings_tt_002"]);
-      if (GUILayout.Button(label, GUILayout.Height(20)))
+      if (GUILayout.Button(saveContent, GUILayout.Height(20)))
       {
         ToolTip = "";
         SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
@@ -180,9 +180,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Cancel
-      //label = new GUIContent("Cancel", "Cancel the changes made.\nSettings will revert to before changes were made.");
-      label = new GUIContent(SmUtils.SmTags["#smloc_settings_003"], SmUtils.SmTags["#smloc_settings_tt_003"]);
-      if (GUILayout.Button(label, GUILayout.Height(20)))
+      if (GUILayout.Button(cancelContent, GUILayout.Height(20)))
       {
         ToolTip = "";
         // We've canclled, so restore original settings.

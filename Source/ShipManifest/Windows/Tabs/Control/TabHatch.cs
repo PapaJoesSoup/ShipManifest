@@ -15,6 +15,10 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiToggleWidth = 325;
 
+    //Content vars
+    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_hatch_000"]);
+
+
     internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 20;
@@ -29,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       //GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.SmTags["#smloc_control_hatch_000"], SMStyle.LabelTabHeader);
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try

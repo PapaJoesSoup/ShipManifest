@@ -9,10 +9,7 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string StrFlowCost = "0";
 
     // GUI tooltip and label support
-    private static string _toolTip = "";
     private static Rect _rect;
-    private static string _label = "";
-    private static GUIContent _guiLabel;
     private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 300;
     private const float guiIndent = 20;
@@ -23,6 +20,28 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static bool ShowToolTips = true;
     private static bool _canShowToolTips = true;
     internal static Rect Position = WindowSettings.Position;
+
+    // Content strings
+    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_000"]);
+    internal static GUIContent allTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_001"], SmUtils.SmTags["#smloc_settings_tooltips_tt_001"]);
+    internal static GUIContent debugTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_002"], SmUtils.SmTags["#smloc_settings_tooltips_tt_002"]);
+    internal static GUIContent manifestTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_003"], SmUtils.SmTags["#smloc_settings_tooltips_tt_003"]);
+    internal static GUIContent transferTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_004"], SmUtils.SmTags["#smloc_settings_tooltips_tt_004"]);
+    internal static GUIContent settingsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_005"], SmUtils.SmTags["#smloc_settings_tooltips_tt_005"]);
+    internal static GUIContent realismTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_006"], SmUtils.SmTags["#smloc_settings_tooltips_tt_006"]);
+    internal static GUIContent highlightTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_007"], SmUtils.SmTags["#smloc_settings_tooltips_tt_007"]);
+    internal static GUIContent tooltipsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_008"], SmUtils.SmTags["#smloc_settings_tooltips_tt_008"]);
+    internal static GUIContent soundsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_009"], SmUtils.SmTags["#smloc_settings_tooltips_tt_009"]);
+    internal static GUIContent configTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_010"], SmUtils.SmTags["#smloc_settings_tooltips_tt_010"]);
+    internal static GUIContent rosterTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_011"], SmUtils.SmTags["#smloc_settings_tooltips_tt_011"]);
+    internal static GUIContent controlTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_012"], SmUtils.SmTags["#smloc_settings_tooltips_tt_012"]);
+    internal static GUIContent hatchTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_013"], SmUtils.SmTags["#smloc_settings_tooltips_tt_013"]);
+    internal static GUIContent solarTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_014"], SmUtils.SmTags["#smloc_settings_tooltips_tt_014"]);
+    internal static GUIContent antennaTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_015"], SmUtils.SmTags["#smloc_settings_tooltips_tt_015"]);
+    internal static GUIContent lightTTContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_016"], SmUtils.SmTags["#smloc_settings_tooltips_tt_016"]);
+    internal static GUIContent labsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_017"], SmUtils.SmTags["#smloc_settings_tooltips_tt_017"]);
+    internal static GUIContent lightTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
+
 
     internal static void Display(Vector2 displayViewerPosition)
     {
@@ -36,17 +55,10 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Enable Tool Tips
       GUI.enabled = true;
-      GUILayout.Label(SmUtils.SmTags["#smloc_settings_tooltips_000"], SMStyle.LabelTabHeader); //"ToolTips"
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader); //"ToolTips"
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
-      //_label = "Enable All Tool Tips";
-      //_toolTip = "Turns all tooltips On or Off.";
-      //_toolTip += "\r\nThis is a global setting for all windows/tabs";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_001"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_001"];
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, allTtContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -55,14 +67,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Debugger Window
       GUILayout.BeginHorizontal();
-      //_label = "Debugger Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Debugger Window only.";
-      //_toolTip += "\r\nRequires All ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_002"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_002"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, debugTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -70,14 +76,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Manifest Window
       GUILayout.BeginHorizontal();
-      //_label = "Manifest Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Manifest Window only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_003"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_003"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowManifest.ShowToolTips = GUILayout.Toggle(WindowManifest.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowManifest.ShowToolTips = GUILayout.Toggle(WindowManifest.ShowToolTips, manifestTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -85,14 +85,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Transfer Window
       GUILayout.BeginHorizontal();
-      //_label = "Transfer Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Manifest Window only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_004"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_004"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowTransfer.ShowToolTips = GUILayout.Toggle(WindowTransfer.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowTransfer.ShowToolTips = GUILayout.Toggle(WindowTransfer.ShowToolTips, transferTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -100,14 +94,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Setting Window
       GUILayout.BeginHorizontal();
-      //_label = "Settings Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_005"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_005"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, settingsTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -117,15 +105,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // SW - Realism Tab
       GUILayout.BeginHorizontal();
-      //_label = "Realism Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window's Realism Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_006"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_006"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabRealism.ShowToolTips = GUILayout.Toggle(TabRealism.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabRealism.ShowToolTips = GUILayout.Toggle(TabRealism.ShowToolTips, realismTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -133,15 +114,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // SW - Highlighting Tab
       GUILayout.BeginHorizontal();
-      //_label = "Highlghting Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window's Highlighting Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_007"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_007"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabHighlight.ShowToolTips = GUILayout.Toggle(TabHighlight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabHighlight.ShowToolTips = GUILayout.Toggle(TabHighlight.ShowToolTips, highlightTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -149,15 +123,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // SW - ToolTips Tab
       GUILayout.BeginHorizontal();
-      //_label = "ToolTips Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window's ToolTips Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_008"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_008"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      ShowToolTips = GUILayout.Toggle(ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      ShowToolTips = GUILayout.Toggle(ShowToolTips, tooltipsTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -165,15 +132,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // SW - Sounds Tab
       GUILayout.BeginHorizontal();
-      //_label = "Sounds Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window's Sounds Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_009"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_009"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, soundsTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -181,15 +141,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // SW - Config Tab
       GUILayout.BeginHorizontal();
-      //_label = "Config Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Settings Window's Config Tab only.";
-      //_toolTip += "Requires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Settings Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_010"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_010"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, configTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -199,14 +152,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Roster Window
       GUILayout.BeginHorizontal();
-      //_label = "Roster Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Roster Window only.";
-      //_toolTip += "Requires global ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_011"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_011"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, rosterTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -214,14 +161,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Control Window
       GUILayout.BeginHorizontal();
-      //_label = "Control Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_012"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_012"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(guiIndent);
-      WindowControl.ShowToolTips = GUILayout.Toggle(WindowControl.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      WindowControl.ShowToolTips = GUILayout.Toggle(WindowControl.ShowToolTips, controlTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -231,15 +172,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Light Tab
       GUILayout.BeginHorizontal();
-      //_label = "Vessle Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Vessels Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_018"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_018"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, lightTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -247,15 +181,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Hatch Tab
       GUILayout.BeginHorizontal();
-      //_label = "Hatch Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Hatch Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_013"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_013"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabHatch.ShowToolTips = GUILayout.Toggle(TabHatch.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabHatch.ShowToolTips = GUILayout.Toggle(TabHatch.ShowToolTips, hatchTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -263,15 +190,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Solar Tab
       GUILayout.BeginHorizontal();
-      //_label = "Solar Tab Window Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Solar Panels Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_014"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_014"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabSolarPanel.ShowToolTips = GUILayout.Toggle(TabSolarPanel.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabSolarPanel.ShowToolTips = GUILayout.Toggle(TabSolarPanel.ShowToolTips, solarTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -279,15 +199,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Antenna Tab
       GUILayout.BeginHorizontal();
-      //_label = "Antenna Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Antennas Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_015"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_015"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabAntenna.ShowToolTips = GUILayout.Toggle(TabAntenna.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabAntenna.ShowToolTips = GUILayout.Toggle(TabAntenna.ShowToolTips, antennaTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -295,15 +208,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Light Tab
       GUILayout.BeginHorizontal();
-      //_label = "Light Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Lights Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_016"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_016"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, lightTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -311,15 +217,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // CW - Labs Tab
       GUILayout.BeginHorizontal();
-      //_label = "Lab Tab Tool Tips";
-      //_toolTip = "Turns tooltips On or Off for the Control Window's Lab Tab only.";
-      //_toolTip += "\r\nRequires global ToolTips setting to be enabled.";
-      //_toolTip += "\r\nAlso requires Control Window tooltips to be enabled.";
-      _label = SmUtils.SmTags["#smloc_settings_tooltips_017"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_tooltips_tt_017"];
-      _guiLabel = new GUIContent(_label, _toolTip);
       GUILayout.Space(gui2xIndent);
-      TabScienceLab.ShowToolTips = GUILayout.Toggle(TabScienceLab.ShowToolTips, _guiLabel, GUILayout.Width(guiToggleWidth));
+      TabScienceLab.ShowToolTips = GUILayout.Toggle(TabScienceLab.ShowToolTips, labsTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)

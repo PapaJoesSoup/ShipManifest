@@ -13,6 +13,12 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ShowToolTips = true;
     private const float guiToggleWidth = 325;
 
+    //Content vars
+    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_panel_000"]);
+    internal static GUIContent brokenContent = new GUIContent(SmUtils.SmTags["#smloc_module_004"]);
+    internal static GUIContent lockedContent = new GUIContent(SmUtils.SmTags["#smloc_module_005"]);
+
+
     internal static void Display()
     {
       float scrollX = 10;
@@ -24,8 +30,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
       GUILayout.BeginVertical();
       GUI.enabled = true;
-      //GUILayout.Label("Deployable Solar Panel Control Center ", SMStyle.LabelTabHeader);
-      GUILayout.Label(SmUtils.SmTags["#smloc_control_panel_000"], SMStyle.LabelTabHeader);
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
@@ -40,7 +45,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iPanels.Current.PanelState == ModuleDeployablePart.DeployState.BROKEN)
           {
             isEnabled = false;
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_004"]}) - {iPanels.Current.Title}"; // "Broken"
+            label = $"{iPanels.Current.PanelStatus} - ({brokenContent}) - {iPanels.Current.Title}"; // "Broken"
           }
           bool open =
             !(iPanels.Current.PanelState == ModuleDeployablePart.DeployState.RETRACTED ||
@@ -51,7 +56,7 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = isEnabled;
           if (!iPanels.Current.CanBeRetracted)
           {
-            label = $"{iPanels.Current.PanelStatus} - ({SmUtils.SmTags["#smloc_module_005"]}) - {iPanels.Current.Title}"; // "Locked"
+            label = $"{iPanels.Current.PanelStatus} - ({lockedContent}) - {iPanels.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
           step = "button toggle check";

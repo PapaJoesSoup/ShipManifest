@@ -4,14 +4,24 @@ Changelog for Ship Manifest
 Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
--------------------------------------------------
+--------------------------------------------------
+ - Changed:  Refactored localization strings to improve performance and maintainability. Components affected:
+   - Control Window and remaining tabs
+   - Settings Window and all tabs
+   This is a continuation of an application wide refactor to make all localization string usage static instead of instanced.
+ - Fixed: Replaced hard coded string in Settings.Config Tab to use localization. "(lines)"
+   Updated localization files to include new reference.
+
+
+Version 6.0.3.0 - Release 21 Nov 2021 - KSP 1.12.x
+--------------------------------------------------
  - New: Added support for changing vessel types in Vessel Control panel
  - Changed:  Refactored Vessel Control Panel localization strings to improve performance.  This is the start of an application wide refactor to make all localization string usage static instead of instanced
  - Fixed: Corrected potential dll conflict error with CLS. Changed name of CLSInterfaces.dll to SM_CLSInterface.dll. Do not remove this file, it is required.
  - Updated SM_CLSInterface.dll to version 2.0.1.0 (latest CLS released version for KSP 1.12.x).
 
 Version 6.0.3.0 - Release 21 Nov 2021 - KSP 1.12.x
--------------------------------------------------
+--------------------------------------------------
  - Papa_Joe has resumed support.
  - New: retargeted for .Net 4.8
  - New: recompiled for KSP 1.12.
@@ -24,7 +34,7 @@ Version 6.0.3.0 - Release 21 Nov 2021 - KSP 1.12.x
  - Fixed: Part Control window Content alignment changes when selecting different tabs.
 
 Version 6.0.2.0 - Release 30 Dec 2020 - KSP 1.11.0
--------------------------------------------------
+--------------------------------------------------
  - New: recompiled for KSP 1.11
  - New: added chinese translation (thanks to Grassland-CN)
  - Fixed: Kerbal EVA when part has no IVA (fixes #7)

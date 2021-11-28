@@ -15,6 +15,11 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool IsRtAntennas;
     private const float guiToggleWidth = 325;
 
+    //Content vars
+    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_000"]);
+    internal static GUIContent titleRmContent = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_001"]);
+
+
     internal static void Display()
     {
       //float scrollX = WindowControl.Position.x;
@@ -29,9 +34,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(
-        //InstalledMods.IsRtInstalled ? "Antenna Control Center  (RemoteTech detected)" : "Antenna Control Center ",
-        InstalledMods.IsRtInstalled ? SmUtils.SmTags["#smloc_control_antenna_001"] : SmUtils.SmTags["#smloc_control_antenna_000"],
-        SMStyle.LabelTabHeader);
+        InstalledMods.IsRtInstalled ? titleRmContent : titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try

@@ -9,10 +9,7 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string StrFlowCost = "0";
 
     // GUI tooltip and label support
-    private static string _toolTip = "";
     private static Rect _rect;
-    private static string _label = "";
-    private static GUIContent _guiLabel;
     private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 300;
     private const float guiIndent = 20;
@@ -24,6 +21,14 @@ namespace ShipManifest.Windows.Tabs.Settings
 
     internal static Rect Position = WindowSettings.Position;
 
+    // Content strings
+    internal static GUIContent titleContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_config_000"]);
+    internal static GUIContent modeAllContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_001"], SmUtils.SmTags["#smloc_settings_highlight_tt_001"]);
+    internal static GUIContent modeSTContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_002"], SmUtils.SmTags["#smloc_settings_highlight_tt_002"]);
+    internal static GUIContent modeClsContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_003"], SmUtils.SmTags["#smloc_settings_highlight_tt_003"]);
+    internal static GUIContent modeEdgeContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_004"], SmUtils.SmTags["#smloc_settings_highlight_tt_004"]);
+
+
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
@@ -34,19 +39,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       int scrollX = 20;
 
       GUI.enabled = true;
-      GUILayout.Label(SmUtils.SmTags["#smloc_settings_highlight_000"], SMStyle.LabelTabHeader);
-      GUILayout.Label("____________________________________________________________________________________________",
-        SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      // Tab Title
+      GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       // EnableHighlighting Mode
       GUILayout.BeginHorizontal();
-      //_label = "Enable Highlighting";
-      //_toolTip = "Enables highlighting of all parts that contain the resource(s) selected in the Manifest Window.";
-      //_toolTip += "\r\nThis is a global setting.  Does not affect mouseover highlighting.";
-      _label = SmUtils.SmTags["#smloc_settings_highlight_001"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_001"];
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableHighlighting = GUILayout.Toggle(SMSettings.EnableHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
+      // Enable Highlighting
+      SMSettings.EnableHighlighting = GUILayout.Toggle(SMSettings.EnableHighlighting, modeAllContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -71,14 +71,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = SMSettings.EnableHighlighting;
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      //_label = "Highlight Only Source / Target Parts";
-      //_toolTip = "Disables general highlighting of parts for a selected Resource or resources.";
-      //_toolTip += "\r\nRestricts highlighting of parts to only the part or parts selected in the Transfer Window.";
-      //_toolTip += "\r\nRequires 'Enable Highlighting' to be On.";
-      _label = SmUtils.SmTags["#smloc_settings_highlight_002"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_002"];
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.OnlySourceTarget = GUILayout.Toggle(SMSettings.OnlySourceTarget, _guiLabel, GUILayout.Width(guiToggleWidth));
+      // Highlight Only Source / Target Parts";
+      SMSettings.OnlySourceTarget = GUILayout.Toggle(SMSettings.OnlySourceTarget, modeSTContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -103,15 +97,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         GUI.enabled = true;
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      //_label = "Enable CLS Highlighting";
-      //_toolTip = "Changes highlighting behavior if CLS is enabled & Crew selected in Manifest Window.";
-      //_toolTip += "\r\nHighlights the parts associated with livable/passable spaces on vessel.";
-      //_toolTip += "\r\nRequires 'Enable Highlighting' to be On and is mutually exclusive with ";
-      //_toolTip += "\r\n'Highlight Only Source / Target Parts'.";
-      _label = SmUtils.SmTags["#smloc_settings_highlight_003"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_003"];
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableClsHighlighting = GUILayout.Toggle(SMSettings.EnableClsHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
+      SMSettings.EnableClsHighlighting = GUILayout.Toggle(SMSettings.EnableClsHighlighting, modeClsContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -129,14 +115,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       // Enable Edge Highlighting Mode
       GUI.enabled = SMSettings.EnableHighlighting;
       GUILayout.BeginHorizontal();
-      //_label = "Enable Edge Highlighting (On Mouse Overs)";
-      //_toolTip = "Changes highlighting behavior when you mouseover a part button in Transfer Window.";
-      //_toolTip += "\r\nCauses the edge of the part to glow, making it easier to see.";
-      //_toolTip += "\r\nRequires Edge Highlighting to be enabled in the KSP Game settings.";
-      _label = SmUtils.SmTags["#smloc_settings_highlight_004"];
-      _toolTip = SmUtils.SmTags["#smloc_settings_highlight_tt_004"];
-      _guiLabel = new GUIContent(_label, _toolTip);
-      SMSettings.EnableEdgeHighlighting = GUILayout.Toggle(SMSettings.EnableEdgeHighlighting, _guiLabel, GUILayout.Width(guiToggleWidth));
+      // Enable Edge Highlighting (On Mouse Overs)
+      SMSettings.EnableEdgeHighlighting = GUILayout.Toggle(SMSettings.EnableEdgeHighlighting, modeEdgeContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
