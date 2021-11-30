@@ -86,16 +86,20 @@ namespace ShipManifest.Windows
     internal static string brokenContent = SmUtils.SmTags["#smloc_roster_040"];
     internal static string fixContent = SmUtils.SmTags["#smloc_roster_041"];
 
-
     internal static string editKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_007"];
     internal static string cnxEditKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_008"];
     internal static string notAvailTtContent = SmUtils.SmTags["#smloc_roster_tt_009"];
-    internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
+    internal static string addKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_010"];
+    internal static string thawNoTtContent = SmUtils.SmTags["#smloc_roster_tt_011"];
+    internal static string thawYesTtContent = SmUtils.SmTags["#smloc_roster_tt_012"];
+    internal static string freezeTtContent = SmUtils.SmTags["#smloc_roster_tt_013"];
+    internal static string removeYesTtContent = SmUtils.SmTags["#smloc_roster_tt_014"];
+    internal static string addNoSrcTtContent = SmUtils.SmTags["#smloc_roster_tt_015"];
+    internal static string addNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_016"];
+    internal static string notAvailKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_017"];
 
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
+    internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
+    internal static string removeNoTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
 
 
     internal static bool ResetRosterSize
@@ -622,62 +626,61 @@ namespace ShipManifest.Windows
         if (SMConditions.CanKerbalBeAdded(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SmUtils.SmTags["#smloc_roster_023"];  // "Add";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_010"];  
-          //buttonToolTip = "Adds a kerbal to the Selected Source Part,\r\nin the first available seat.";
+          buttonText = addContent;  // "Add";
+          buttonToolTip = addKerbalTtContent;  
         }
         else if (SMConditions.FrozenKerbalNotThawable(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SmUtils.SmTags["#smloc_roster_025"];  // "Thaw";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_011"];  
+          buttonText = thawContent;  // "Thaw";
+          buttonToolTip = thawNoTtContent;  
           // buttonToolTip = "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.FrozenKerbalIsThawable(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SmUtils.SmTags["#smloc_roster_025"];  // "Thaw";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_012"];
+          buttonText = thawContent;  // "Thaw";
+          buttonToolTip = thawYesTtContent;
           // buttonToolTip = "UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.CanKerbalBeFrozen(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SmUtils.SmTags["#smloc_roster_026"];  // "Freeze";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_013"];
+          buttonText = freezeContent;  // "Freeze";
+          buttonToolTip = freezeTtContent;
           // buttonToolTip = "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
         }
         else if (SMConditions.CanKerbalBeRemoved(kerbal))
         {
           GUI.enabled = true;
-          buttonText = SmUtils.SmTags["#smloc_roster_022"];  // "Remove";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_014"];  // "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+          buttonText = removeContent;  // "Remove";
+          buttonToolTip = removeYesTtContent;  // "Removes a Kerbal from the active vessel.\r\nWill then become available.";
         }
         else if (SMConditions.KerbalCannotBeRemovedRealism(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SmUtils.SmTags["#smloc_roster_022"];  // "Remove";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_023"];  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
+          buttonText = removeContent;  // "Remove";
+          buttonToolTip = removeNoTtContent;  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
         }
         else if (SMConditions.KerbalCannotBeAddedNoSource(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SmUtils.SmTags["#smloc_roster_023"];  // "Add";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_015"];
+          buttonText = addContent;  // "Add";
+          buttonToolTip = addNoSrcTtContent;
           // buttonToolTip = "Add Disabled.  No source part is selected.\r\nTo add a Kerbal, Select a Source Part with an available seat.";
         }
         else if (SMConditions.KerbalCannotBeAddedRealism(kerbal))
         {
           GUI.enabled = false;
-          buttonText = SmUtils.SmTags["#smloc_roster_023"];  // "Add";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_016"];
+          buttonText = addContent;  // "Add";
+          buttonToolTip = addNoModTtContent;
           // buttonToolTip = "Add Disabled.  Roster Modifications is preventing this action.\r\nTo add a Kerbal, Change your Roster Modifications Setting.";
         }
         else
         {
           GUI.enabled = false;
           buttonText = "--";
-          buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_017"];
+          buttonToolTip = notAvailKerbalTtContent;
           // buttonToolTip = "Kerbal is not available.\r\nCurrent status does not allow any action.";
         }
       }
