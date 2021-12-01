@@ -92,11 +92,6 @@ namespace ShipManifest.Windows
     internal static string notAvailTtContent = SmUtils.SmTags["#smloc_roster_tt_009"];
     internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
 
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
-    internal static GUIContent Content = new GUIContent(, );
-
 
     internal static bool ResetRosterSize
     {

@@ -7,7 +7,6 @@ namespace ShipManifest.Windows
 {
   internal static class WindowControl
   {
-    internal static GUIContent label;
     internal static Rect Position = SMSettings.DefaultPosition;
     internal static Vector2 _displayViewerPosition = Vector2.zero;
 
@@ -273,9 +272,9 @@ namespace ShipManifest.Windows
       {
         case Tab.Panel:
           GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(, GUILayout.Height(20))) // "Retract All Solar Panels"
+          if (GUILayout.Button(retSolarContent, GUILayout.Height(20))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
-          if (GUILayout.Button(, GUILayout.Height(20))) // "Extend All Solar Panels"
+          if (GUILayout.Button(extSolarContent, GUILayout.Height(20))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Radiator:
