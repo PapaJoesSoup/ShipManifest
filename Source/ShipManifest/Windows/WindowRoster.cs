@@ -43,7 +43,7 @@ namespace ShipManifest.Windows
     internal static string Title = $"{SmUtils.SmTags["#smloc_roster_001"]}:  {SMSettings.CurVersion}";
     internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
     internal static string addKerbalContent = SmUtils.SmTags["#smloc_roster_002"];
-    internal static string addKerbalOffContent =SmUtils.SmTags["#smloc_roster_tt_001"];
+    internal static string addKerbalOffContent = SmUtils.SmTags["#smloc_roster_tt_001"];
     internal static string addKerbalEditContent = SmUtils.SmTags["#smloc_roster_tt_022"];
     internal static GUIContent createContent = new GUIContent(SmUtils.SmTags["#smloc_roster_003"], SmUtils.SmTags["#smloc_roster_tt_002"]);
     internal static GUIContent cancelContent = new GUIContent(SmUtils.SmTags["#smloc_roster_004"], SmUtils.SmTags["#smloc_roster_tt_003"]);
@@ -97,11 +97,11 @@ namespace ShipManifest.Windows
     internal static string addNoSrcTtContent = SmUtils.SmTags["#smloc_roster_tt_015"];
     internal static string addNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_016"];
     internal static string notAvailKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_017"];
-    internal static string kerbalNotDeadContent = SmUtils.SmTags["#smloc_roster_tt_018"];
+    internal static string kerbalNotDeadTtContent = SmUtils.SmTags["#smloc_roster_tt_018"];
     internal static string respawnNoTtContent = SmUtils.SmTags["#smloc_roster_tt_019"];
     internal static string respwanYesTtContent = SmUtils.SmTags["#smloc_roster_020"];
     internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
-    internal static string removeNoTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
+    internal static string removeNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
     internal static string hireTtContent = SmUtils.SmTags["#smloc_roster_tt_024"];
     internal static string fixTtContent = SmUtils.SmTags["#smloc_roster_tt_025"];
 
@@ -660,7 +660,7 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = false;
           buttonText = removeContent;  // "Remove";
-          buttonToolTip = removeNoTtContent;  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
+          buttonToolTip = removeNoModTtContent;  // "Remove Disabled. Roster Modifications is preventing this action.\r\nTo Remove this Kerbal, Change your Roster Modifications Setting.";
         }
         else if (SMConditions.KerbalCannotBeAddedNoSource(kerbal))
         {
@@ -688,7 +688,7 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = false;
         buttonText = "--";
-        buttonToolTip = kerbalNotDeadContent;
+        buttonToolTip = kerbalNotDeadTtContent;
         // buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 
@@ -727,7 +727,7 @@ namespace ShipManifest.Windows
         if (DfWrapper.ApiReady)
         {
           rosterDetails = DfWrapper.DeepFreezeApi.FrozenKerbals.ContainsKey(kerbal.name) 
-            ? $"{SmUtils.SmTags["#smloc_roster_015"]} - {DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselName.Replace("(unloaded)", "")}" 
+            ? $"{frozenContent} - {DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselName.Replace("(unloaded)", "")}" 
             : SmUtils.SmTags["#smloc_roster_015"];
         }
         return rosterDetails;
