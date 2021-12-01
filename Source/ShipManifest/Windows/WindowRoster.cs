@@ -67,7 +67,7 @@ namespace ShipManifest.Windows
     internal static string actionContent = SmUtils.SmTags["#smloc_roster_021"];
     internal static string removeContent = SmUtils.SmTags["#smloc_roster_022"];
     internal static string addContent = SmUtils.SmTags["#smloc_roster_023"];
-    internal static string respawnContent = SmUtils.SmTags["#smloc_roster_024"];
+    internal static string respawnContent = SmUtils.SmTags["#smloc_roster_024"]; 
     internal static string thawContent = SmUtils.SmTags["#smloc_roster_025"];
     internal static string freezeContent = SmUtils.SmTags["#smloc_roster_026"];
     internal static string editKerbalContent = SmUtils.SmTags["#smloc_roster_027"];
@@ -97,9 +97,13 @@ namespace ShipManifest.Windows
     internal static string addNoSrcTtContent = SmUtils.SmTags["#smloc_roster_tt_015"];
     internal static string addNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_016"];
     internal static string notAvailKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_017"];
-
+    internal static string kerbalNotDeadContent = SmUtils.SmTags["#smloc_roster_tt_018"];
+    internal static string respawnNoTtContent = SmUtils.SmTags["#smloc_roster_tt_019"];
+    internal static string respwanYesTtContent = SmUtils.SmTags["#smloc_roster_020"];
     internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
     internal static string removeNoTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
+    internal static string hireTtContent = SmUtils.SmTags["#smloc_roster_tt_024"];
+    internal static string fixTtContent = SmUtils.SmTags["#smloc_roster_tt_025"];
 
 
     internal static bool ResetRosterSize
@@ -607,7 +611,6 @@ namespace ShipManifest.Windows
     {
       GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
 
-      //buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? "Edit" : "Cancel";
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? editContent : cnxEditContent;
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
@@ -634,21 +637,18 @@ namespace ShipManifest.Windows
           GUI.enabled = false;
           buttonText = thawContent;  // "Thaw";
           buttonToolTip = thawNoTtContent;  
-          // buttonToolTip = "Thaw disabled.  Vessel not active. UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.FrozenKerbalIsThawable(kerbal))
         {
           GUI.enabled = true;
           buttonText = thawContent;  // "Thaw";
           buttonToolTip = thawYesTtContent;
-          // buttonToolTip = "UnFreeze a Kerbal and Revive them.\r\nWill then become assigned to current vessel.";
         }
         else if (SMConditions.CanKerbalBeFrozen(kerbal))
         {
           GUI.enabled = true;
           buttonText = freezeContent;  // "Freeze";
           buttonToolTip = freezeTtContent;
-          // buttonToolTip = "Freezes a Kerbal in the DeepFreezer.\r\nWill then become Unowned and will not consume life support.";
         }
         else if (SMConditions.CanKerbalBeRemoved(kerbal))
         {
@@ -688,7 +688,7 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = false;
         buttonText = "--";
-        buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_018"];
+        buttonToolTip = kerbalNotDeadContent;
         // buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 
@@ -696,22 +696,22 @@ namespace ShipManifest.Windows
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
         GUI.enabled = SMSettings.EnableCrewModify;
-        buttonText = SmUtils.SmTags["#smloc_roster_024"];  // "Respawn";
+        buttonText = respawnContent;  // "Respawn";
         buttonToolTip = SMSettings.EnableCrewModify 
-          ? SmUtils.SmTags["#smloc_roster_tt_020"] // "Brings a Kerbal back to life.\r\nWill then become available.";
-          : SmUtils.SmTags["#smloc_roster_tt_019"]; // "Realistic Control is preventing this action.";
+          ? respwanYesTtContent // "Brings a Kerbal back to life.\r\nWill then become available.";
+          : respawnNoTtContent; // "Realistic Control is preventing this action.";
       }
       else if(kerbal.type == ProtoCrewMember.KerbalType.Applicant)
       {
         GUI.enabled = true;
-        buttonText = SmUtils.SmTags["#smloc_roster_034"];  // "Hire";
-        buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_024"]; // "Hire the Applicant and make them a member of your Crew.\nPlease note that this will cost you!"
+        buttonText = hireContent;  // "Hire";
+        buttonToolTip = hireTtContent; // "Hire the Applicant and make them a member of your Crew.\nPlease note that this will cost you!"
       }
       else if(SMConditions.KerbalIsBroken(kerbal))
       {
         GUI.enabled = true;
-        buttonText = SmUtils.SmTags["#smloc_roster_041"];  // "Fix";
-        buttonToolTip = SmUtils.SmTags["#smloc_roster_tt_025"]; // "Repairs a Kerbal whose internal state has become corrupted."
+        buttonText = fixContent;  // "Fix";
+        buttonToolTip = fixTtContent; // "Repairs a Kerbal whose internal state has become corrupted."
       }
     }
 
