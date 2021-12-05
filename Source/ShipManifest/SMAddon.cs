@@ -832,18 +832,6 @@ namespace ShipManifest
               WindowRoster.Title, GUILayout.MinHeight(20));
           }
         }
-        //if (HighLogic.LoadedScene == GameScenes.FLIGHT &&
-        //    (FlightGlobals.fetch == null ||
-        //     (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
-        //{
-        //  step = "0a - Vessel Change";
-        //  SmVessel.SelectedPartsSource.Clear();
-        //  SmVessel.SelectedPartsTarget.Clear();
-        //  SmVessel.SelectedVesselsSource.Clear();
-        //  SmVessel.SelectedVesselsTarget.Clear();
-        //  SmVessel.SelectedResources.Clear();
-        //  return;
-        //}
 
         step = "1 - Show Interface(s)";
         // Is the scene one we want to be visible in?
