@@ -100,15 +100,19 @@ namespace ShipManifest
       try
       {
         if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
+
+        // Cache Localization Strings
+        // (must occur first to allow static string var initializaion on static windows)
+        SmUtils.CacheSmLocalization();
+
+        //WindowDebugger.Initialize();
+
         SMSettings.LoadSettings();
 
         if (SMSettings.AutoSave)
           InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
 
         CreateAppIcons();
-
-        // Cache Localization Strings
-        SmUtils.CacheSmLocalization();
 
       }
       catch (Exception ex)
