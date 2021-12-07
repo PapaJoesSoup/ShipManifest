@@ -104,6 +104,8 @@ namespace ShipManifest.Windows
     internal static string removeNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
     internal static string hireTtContent = SmUtils.SmTags["#smloc_roster_tt_024"];
     internal static string fixTtContent = SmUtils.SmTags["#smloc_roster_tt_025"];
+    internal static string suitKerbalTtContent = "Change this Kerbal's Suit";
+    internal static string cnxSuitKerbalTtContent = "Cancel changes to this Kerbal'Suit";
 
 
     internal static bool ResetRosterSize
@@ -289,7 +291,7 @@ namespace ShipManifest.Windows
       bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, scientistContent, GUILayout.Width(90)); // "Scientist"
       if (isScientist) KerbalProfession = Professions.Scientist;
 
-      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, touristContent, GUILayout.Width(90)); // "Toruist"
+      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, touristContent, GUILayout.Width(90)); // "Tourist"
       if (isTourist) KerbalProfession = Professions.Tourist;
 
       GUILayout.EndHorizontal();
@@ -366,6 +368,7 @@ namespace ShipManifest.Windows
         GUILayout.Label(genderContent, GUILayout.Width(50)); // "Gender"
         GUILayout.Label(profContent, GUILayout.Width(70)); // "Profession"
         GUILayout.Label(skillContent, GUILayout.Width(30)); // "Skill"
+        GUILayout.Label(suitContent, GUILayout.Width(70)); // "Suit"
         GUILayout.Label(statusContent, GUILayout.Width(220)); // "Status"
         GUILayout.Label(editContent, GUILayout.Width(55)); // "Edit"
         GUILayout.Label(actionContent, GUILayout.Width(65)); // "Action"
@@ -441,7 +444,26 @@ namespace ShipManifest.Windows
           GUILayout.Label(kerbals.Current.gender.ToString(), labelStyle, GUILayout.Width(50));
           GUILayout.Label(kerbals.Current.experienceTrait.Title, labelStyle, GUILayout.Width(70));
           GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
+          GUILayout.Label(kerbals.Current.suit.ToString(), labelStyle, GUILayout.Width(70));
           GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
+
+          SetupSuitButton(kerbals.Current, out buttonText, out buttonToolTip);
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
+            GUILayout.Height(20)))
+          {
+            if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbals.Current)
+            {
+              SelectedKerbal = new ModKerbal(kerbals.Current, false);
+              SetKerbalSuit(SelectedKerbal);
+            }
+            else
+            {
+              SelectedKerbal = null;
+            }
+          }
+          Rect rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && ShowToolTips)
+            ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
 
           SetupEditButton(kerbals.Current, out buttonText, out buttonToolTip);
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
@@ -457,7 +479,7 @@ namespace ShipManifest.Windows
               SelectedKerbal = null;
             }
           }
-          Rect rect = GUILayoutUtility.GetLastRect();
+          rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
 
@@ -605,6 +627,22 @@ namespace ShipManifest.Windows
       {
         SmUtils.LogMessage($"Error in GetRosterList().\r\nError:  {ex}", SmUtils.LogType.Error, true);
       }
+    }
+
+    private static void SetupSuitButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
+    {
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && SMSettings.EnableCrewModify;
+
+      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.ToString() : cnxEditContent;
+      if (GUI.enabled)
+        buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
+          ? suitKerbalTtContent // "Change this Kerbal's Suit"
+          : cnxSuitKerbalTtContent; // "Cancel changes to this Kerbal's Suit"
+      else
+        buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
+          ? notAvailTtContent // "Kerbal is not available at this time.\r\nEditing is disabled";
+          : realismOnTtContent; // "Realistic Control is On.\r\nEditing is disabled";
+
     }
 
     private static void SetupEditButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
@@ -872,6 +910,12 @@ namespace ShipManifest.Windows
           SmUtils.LogType.Error, true);
       }
     }
+
+    private static void SetKerbalSuit(ModKerbal selectedKerbal)
+    {
+      DisplaySelectSuit(ref selectedKerbal.Suit);
+    }
+
 
     #endregion Methods
 

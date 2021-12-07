@@ -91,7 +91,7 @@ namespace ShipManifest
 
     private static void DummyHandler()
     {
-      // This is used for Stock Toolbars.  Some delagates are not needed.
+      // This is used for Stock Toolbars.  Some delegates are not needed.
     }
 
     // Addon state event handlers
