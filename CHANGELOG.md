@@ -8,12 +8,13 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
  - Changed:  Refactored localization strings to improve performance and maintainability. Components affected:
    - Control Window and remaining tabs
    - Settings Window and all tabs
+   - Roster Window
    This is a continuation of an application wide refactor to make all localization string usage static instead of instanced.
  - Fixed: Replaced hard coded string in Settings.Config Tab to use localization. "(lines)"
    Updated localization files to include new reference.
 
 
-Version 6.0.3.0 - Release 21 Nov 2021 - KSP 1.12.x
+Version 6.0.3.1 - Release 27 Nov 2021 - KSP 1.12.x
 --------------------------------------------------
  - New: Added support for changing vessel types in Vessel Control panel
  - Changed:  Refactored Vessel Control Panel localization strings to improve performance.  This is the start of an application wide refactor to make all localization string usage static instead of instanced

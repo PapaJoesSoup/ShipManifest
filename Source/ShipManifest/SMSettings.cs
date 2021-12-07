@@ -864,7 +864,7 @@ namespace ShipManifest
         {"red", XKCDColors.Red},
         {"white", XKCDColors.White},
         {"yellow", XKCDColors.Yellow},
-        {"burntorange", XKCDColors.BurntOrange },
+        {"burntorange", XKCDColors.BurntOrange},
         {"default", new Color(0.478f, 0.698f, 0.478f, 0.698f)}
       };
     }

@@ -100,15 +100,19 @@ namespace ShipManifest
       try
       {
         if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
+
+        // Cache Localization Strings
+        // (must occur first to allow static string var initializaion on static windows)
+        SmUtils.CacheSmLocalization();
+
+        //WindowDebugger.Initialize();
+
         SMSettings.LoadSettings();
 
         if (SMSettings.AutoSave)
           InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
 
         CreateAppIcons();
-
-        // Cache Localization Strings
-        SmUtils.CacheSmLocalization();
 
       }
       catch (Exception ex)
@@ -832,18 +836,6 @@ namespace ShipManifest
               WindowRoster.Title, GUILayout.MinHeight(20));
           }
         }
-        //if (HighLogic.LoadedScene == GameScenes.FLIGHT &&
-        //    (FlightGlobals.fetch == null ||
-        //     (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel != SmVessel.Vessel)))
-        //{
-        //  step = "0a - Vessel Change";
-        //  SmVessel.SelectedPartsSource.Clear();
-        //  SmVessel.SelectedPartsTarget.Clear();
-        //  SmVessel.SelectedVesselsSource.Clear();
-        //  SmVessel.SelectedVesselsTarget.Clear();
-        //  SmVessel.SelectedResources.Clear();
-        //  return;
-        //}
 
         step = "1 - Show Interface(s)";
         // Is the scene one we want to be visible in?
