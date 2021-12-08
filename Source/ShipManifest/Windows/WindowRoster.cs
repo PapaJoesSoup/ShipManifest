@@ -265,7 +265,7 @@ namespace ShipManifest.Windows
           if (SelectedKerbal.Trait == KerbalProfession.ToString())
             kerbalFound = true;
         }
-        editMode = EditMode.None;
+        editMode = EditMode.Edit;
       }
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -273,8 +273,8 @@ namespace ShipManifest.Windows
       // Cancel
       if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
-        editMode = EditMode.None;
         SelectedKerbal = null;
+        editMode = EditMode.None;
       }
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -442,8 +442,6 @@ namespace ShipManifest.Windows
               rosterDetails = kerbals.Current.rosterStatus.ToString();
             }
           }
-          string buttonText;
-          string buttonToolTip;
           GUILayout.BeginHorizontal();
           GUILayout.Label(kerbals.Current.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
           GUILayout.Label(kerbals.Current.gender.ToString(), labelStyle, GUILayout.Width(50));
@@ -451,7 +449,7 @@ namespace ShipManifest.Windows
           GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
           GUILayout.Label(kerbals.Current.suit.ToString(), labelStyle, GUILayout.Width(70));
 
-          SetupSuitButton(kerbals.Current, out buttonText, out buttonToolTip);
+          SetupSuitButton(kerbals.Current, out string buttonText, out string buttonToolTip);
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
             GUILayout.Height(20)))
           {
@@ -463,6 +461,7 @@ namespace ShipManifest.Windows
             else
             {
               SelectedKerbal = null;
+              editMode = EditMode.None;
             }
           }
           Rect rect = GUILayoutUtility.GetLastRect();
@@ -479,10 +478,12 @@ namespace ShipManifest.Windows
             {
               SelectedKerbal = new ModKerbal(kerbals.Current, false);
               SetProfessionFlag();
+              editMode = EditMode.Edit;
             }
             else
             {
               SelectedKerbal = null;
+              editMode = EditMode.None;
             }
           }
           rect = GUILayoutUtility.GetLastRect();
@@ -931,6 +932,7 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(50))) // "Cancel"
       {
         SelectedKerbal = null;
+        editMode = EditMode.None;
       }
 
       if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
@@ -940,7 +942,10 @@ namespace ShipManifest.Windows
           SMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
           GetRosterList();
           if (string.IsNullOrEmpty(SMAddon.SaveMessage))
+          {
             SelectedKerbal = null;
+          }
+          editMode = EditMode.None;
         }
       }
       Rect rect = GUILayoutUtility.GetLastRect();
