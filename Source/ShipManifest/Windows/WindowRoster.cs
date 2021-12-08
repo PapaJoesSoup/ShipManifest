@@ -13,10 +13,10 @@ namespace ShipManifest.Windows
   {
     #region Properties
 
-    internal static float WindowWidth = 700;
+    internal static float WindowWidth = 830;
     internal static float WindowHeight = 330;
     internal static Rect Position = SMSettings.DefaultPosition;
-    internal static Rect ViewBox = new Rect(0, 0, 680, 230);
+    internal static Rect ViewBox = new Rect(0, 0, 810, 230);
     internal static bool ShowWindow;
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
@@ -33,8 +33,8 @@ namespace ShipManifest.Windows
     internal static ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
     internal static KerbalFilters CurrentFilter = KerbalFilters.All;
 
-    internal static bool OnCreate;
 
+    internal static EditMode editMode;
     private static ModKerbal _selectedKerbal;
 
     private static Vector2 _scrollViewerPosition = Vector2.zero;
@@ -112,7 +112,7 @@ namespace ShipManifest.Windows
     {
       get
       {
-        return !OnCreate && SelectedKerbal == null;
+        return editMode != EditMode.Create && SelectedKerbal == null;
       }
     }
 
@@ -144,7 +144,7 @@ namespace ShipManifest.Windows
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, closeContent)) // "Close Window"
       {
-        OnCreate = false;
+        editMode = EditMode.None;
         SelectedKerbal = null;
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
@@ -162,11 +162,15 @@ namespace ShipManifest.Windows
 
         DisplayRosterListViewer();
 
-        if (OnCreate)
+        if (editMode == EditMode.Create)
           CreateKerbalViewer();
-        else if (SelectedKerbal != null)
+        else if (editMode == EditMode.Edit && SelectedKerbal != null)
         {
           EditKerbalViewer();
+        }
+        else if (editMode == EditMode.Suit)
+        {
+          EditSuitViewer();
         }
         else
         {
@@ -175,7 +179,7 @@ namespace ShipManifest.Windows
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
-            OnCreate = true;
+            editMode = EditMode.Create;
           }
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -261,7 +265,7 @@ namespace ShipManifest.Windows
           if (SelectedKerbal.Trait == KerbalProfession.ToString())
             kerbalFound = true;
         }
-        OnCreate = false;
+        editMode = EditMode.None;
       }
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -269,7 +273,7 @@ namespace ShipManifest.Windows
       // Cancel
       if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
-        OnCreate = false;
+        editMode = EditMode.None;
         SelectedKerbal = null;
       }
       rect = GUILayoutUtility.GetLastRect();
@@ -369,6 +373,7 @@ namespace ShipManifest.Windows
         GUILayout.Label(profContent, GUILayout.Width(70)); // "Profession"
         GUILayout.Label(skillContent, GUILayout.Width(30)); // "Skill"
         GUILayout.Label(suitContent, GUILayout.Width(70)); // "Suit"
+        GUILayout.Label(suitContent, GUILayout.Width(55)); // "Suit"
         GUILayout.Label(statusContent, GUILayout.Width(220)); // "Status"
         GUILayout.Label(editContent, GUILayout.Width(55)); // "Edit"
         GUILayout.Label(actionContent, GUILayout.Width(65)); // "Action"
@@ -445,7 +450,6 @@ namespace ShipManifest.Windows
           GUILayout.Label(kerbals.Current.experienceTrait.Title, labelStyle, GUILayout.Width(70));
           GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
           GUILayout.Label(kerbals.Current.suit.ToString(), labelStyle, GUILayout.Width(70));
-          GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
           SetupSuitButton(kerbals.Current, out buttonText, out buttonToolTip);
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
@@ -464,6 +468,8 @@ namespace ShipManifest.Windows
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
+
+          GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
 
           SetupEditButton(kerbals.Current, out buttonText, out buttonToolTip);
           if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
@@ -532,6 +538,12 @@ namespace ShipManifest.Windows
           SmUtils.LogMessage($" in RosterListViewer.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
         }
       }
+    }
+
+    private static void EditSuitViewer()
+    {
+      GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
+      SetKerbalSuit(SelectedKerbal);
     }
 
     private static void EditKerbalViewer()
@@ -633,7 +645,7 @@ namespace ShipManifest.Windows
     {
       GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && SMSettings.EnableCrewModify;
 
-      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.ToString() : cnxEditContent;
+      buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.text : cnxEditContent;
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
           ? suitKerbalTtContent // "Change this Kerbal's Suit"
@@ -913,11 +925,40 @@ namespace ShipManifest.Windows
 
     private static void SetKerbalSuit(ModKerbal selectedKerbal)
     {
+      editMode = EditMode.Suit;
       DisplaySelectSuit(ref selectedKerbal.Suit);
+      GUILayout.BeginHorizontal();
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(50))) // "Cancel"
+      {
+        SelectedKerbal = null;
+      }
+
+      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
+      {
+        if (SelectedKerbal != null)
+        {
+          SMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
+          GetRosterList();
+          if (string.IsNullOrEmpty(SMAddon.SaveMessage))
+            SelectedKerbal = null;
+        }
+      }
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+      GUILayout.EndHorizontal();
     }
 
 
     #endregion Methods
+
+    internal enum EditMode
+    {
+      None,
+      Edit,
+      Create,
+      Suit
+    }
 
     //Profession vars
     internal enum Professions

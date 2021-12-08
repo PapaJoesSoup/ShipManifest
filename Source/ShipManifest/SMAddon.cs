@@ -231,7 +231,7 @@ namespace ShipManifest
         DestroyAppIcons();
 
         //Reset Roster Window data
-        WindowRoster.OnCreate = false;
+        WindowRoster.editMode = WindowRoster.EditMode.None;
         WindowRoster.SelectedKerbal = null;
         WindowRoster.ToolTip = "";
         //WindowRoster.ShowWindow = false;
