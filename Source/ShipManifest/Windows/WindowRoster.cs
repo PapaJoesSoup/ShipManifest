@@ -27,11 +27,11 @@ namespace ShipManifest.Windows
     // RosterList must exist outside of the vessel.
     internal static List<ProtoCrewMember> RosterList = new List<ProtoCrewMember>();
 
-    internal static Professions KerbalProfession;
+    internal static Profession KerbalProfession;
 
     // Gender var
     internal static ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
-    internal static KerbalFilters CurrentFilter = KerbalFilters.All;
+    internal static KerbalFilter CurrentFilter = KerbalFilter.All;
 
 
     internal static EditMode editMode;
@@ -132,6 +132,7 @@ namespace ShipManifest.Windows
     #endregion Properties
 
     #region Gui Layout
+
     internal static void Display(int _windowId)
     {
       
@@ -203,44 +204,44 @@ namespace ShipManifest.Windows
     {
       switch (CurrentFilter)
       {
-        case KerbalFilters.All:
+        case KerbalFilter.All:
           return true;
-        case KerbalFilters.Assigned:
+        case KerbalFilter.Assigned:
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
             return true;
           break;
-        case KerbalFilters.Available:
+        case KerbalFilter.Available:
           if ( (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available) &&
                (kerbal.type != ProtoCrewMember.KerbalType.Applicant) )
             return true;
           break;
-        case KerbalFilters.Dead:
+        case KerbalFilter.Dead:
           if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
                kerbal.type != ProtoCrewMember.KerbalType.Unowned) ||
               kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
             return true;
           break;
-        case KerbalFilters.Frozen:
+        case KerbalFilter.Frozen:
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead &&
               kerbal.type == ProtoCrewMember.KerbalType.Unowned)
             return true;
           break;
-        case KerbalFilters.Missing:
+        case KerbalFilter.Missing:
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
             return true;
           break;
-        case KerbalFilters.Vessel:
+        case KerbalFilter.Vessel:
           if (FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal) ||
               (InstalledMods.IsDfInstalled &&
                GetFrozenKerbalDetails(kerbal).Contains(FlightGlobals.ActiveVessel.vesselName.Replace("(unloaded)", ""))))
             return true;
           break;
-        case KerbalFilters.Applicant:
+        case KerbalFilter.Applicant:
           if (kerbal.type == ProtoCrewMember.KerbalType.Applicant)
             return true;
           break;
 
-        case KerbalFilters.Broken:
+        case KerbalFilter.Broken:
           if (kerbal.type == ProtoCrewMember.KerbalType.Applicant && kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available)
             return true;
           break;
@@ -256,7 +257,7 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(createContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
       {
         bool kerbalFound = false;
-        ProtoCrewMember.KerbalType kerbalType = KerbalProfession == Professions.Tourist
+        ProtoCrewMember.KerbalType kerbalType = KerbalProfession == Profession.Tourist
           ? ProtoCrewMember.KerbalType.Tourist
           : ProtoCrewMember.KerbalType.Crew;
         while (!kerbalFound)
@@ -286,17 +287,17 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       GUILayout.Label(profContent, GUILayout.Width(85)); // "Profession:"
-      bool isPilot = GUILayout.Toggle(KerbalProfession == Professions.Pilot, pilotContent, GUILayout.Width(90)); // "Pilot"
-      if (isPilot) KerbalProfession = Professions.Pilot;
+      bool isPilot = GUILayout.Toggle(KerbalProfession == Profession.Pilot, pilotContent, GUILayout.Width(90)); // "Pilot"
+      if (isPilot) KerbalProfession = Profession.Pilot;
 
-      bool isEngineer = GUILayout.Toggle(KerbalProfession == Professions.Engineer, engineerContent, GUILayout.Width(90)); // "Engineer"
-      if (isEngineer) KerbalProfession = Professions.Engineer;
+      bool isEngineer = GUILayout.Toggle(KerbalProfession == Profession.Engineer, engineerContent, GUILayout.Width(90)); // "Engineer"
+      if (isEngineer) KerbalProfession = Profession.Engineer;
 
-      bool isScientist = GUILayout.Toggle(KerbalProfession == Professions.Scientist, scientistContent, GUILayout.Width(90)); // "Scientist"
-      if (isScientist) KerbalProfession = Professions.Scientist;
+      bool isScientist = GUILayout.Toggle(KerbalProfession == Profession.Scientist, scientistContent, GUILayout.Width(90)); // "Scientist"
+      if (isScientist) KerbalProfession = Profession.Scientist;
 
-      bool isTourist = GUILayout.Toggle(KerbalProfession == Professions.Tourist, touristContent, GUILayout.Width(90)); // "Tourist"
-      if (isTourist) KerbalProfession = Professions.Tourist;
+      bool isTourist = GUILayout.Toggle(KerbalProfession == Profession.Tourist, touristContent, GUILayout.Width(90)); // "Tourist"
+      if (isTourist) KerbalProfession = Profession.Tourist;
 
       GUILayout.EndHorizontal();
     }
@@ -327,35 +328,35 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       GUILayout.Label(filterContent, GUILayout.Width(40)); // Filter
 
-      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilters.All, allContent, GUILayout.Width(60)); // "All"
-      if (isAll) CurrentFilter = KerbalFilters.All;
+      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilter.All, allContent, GUILayout.Width(60)); // "All"
+      if (isAll) CurrentFilter = KerbalFilter.All;
 
-      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilters.Assigned, assignContent, GUILayout.Width(95)); // "Assigned"
-      if (isAssign) CurrentFilter = KerbalFilters.Assigned;
+      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilter.Assigned, assignContent, GUILayout.Width(95)); // "Assigned"
+      if (isAssign) CurrentFilter = KerbalFilter.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilters.Vessel, vesselContent, GUILayout.Width(80)); // "Vessel"
-        if (isVessel) CurrentFilter = KerbalFilters.Vessel;
+        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilter.Vessel, vesselContent, GUILayout.Width(80)); // "Vessel"
+        if (isVessel) CurrentFilter = KerbalFilter.Vessel;
       }
 
-      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilters.Available, availContent, GUILayout.Width(95)); // "Available"
-      if (isAvail) CurrentFilter = KerbalFilters.Available;
+      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilter.Available, availContent, GUILayout.Width(95)); // "Available"
+      if (isAvail) CurrentFilter = KerbalFilter.Available;
 
-      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilters.Dead, deadContent, GUILayout.Width(130)); // "Dead/Missing"
-      if (isDead) CurrentFilter = KerbalFilters.Dead;
+      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilter.Dead, deadContent, GUILayout.Width(130)); // "Dead/Missing"
+      if (isDead) CurrentFilter = KerbalFilter.Dead;
 
       if (InstalledMods.IsDfInstalled)
       {
-        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilters.Frozen, frozenContent, GUILayout.Width(80)); // "Frozen"
-        if (isFrozen) CurrentFilter = KerbalFilters.Frozen;
+        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilter.Frozen, frozenContent, GUILayout.Width(80)); // "Frozen"
+        if (isFrozen) CurrentFilter = KerbalFilter.Frozen;
       }
 
-      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilters.Applicant, applicantContent, GUILayout.Width(130)); // "Applicant"
-      if (isApplicant) CurrentFilter = KerbalFilters.Applicant;
+      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilter.Applicant, applicantContent, GUILayout.Width(130)); // "Applicant"
+      if (isApplicant) CurrentFilter = KerbalFilter.Applicant;
 
-      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilters.Broken, brokenContent, GUILayout.Width(130)); // "Broken"
-      if (isBroken) CurrentFilter = KerbalFilters.Broken;
+      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilter.Broken, brokenContent, GUILayout.Width(130)); // "Broken"
+      if (isBroken) CurrentFilter = KerbalFilter.Broken;
 
       GUILayout.EndHorizontal();
     }
@@ -769,6 +770,7 @@ namespace ShipManifest.Windows
     #endregion Gui Layout
 
     #region Action Methods
+
     private static string GetFrozenKerbalDetails(ProtoCrewMember kerbal)
     {
       try
@@ -810,16 +812,16 @@ namespace ShipManifest.Windows
       switch (SelectedKerbal.Trait)
       {
         case "Pilot":
-          KerbalProfession = Professions.Pilot;
+          KerbalProfession = Profession.Pilot;
           break;
         case "Engineer":
-          KerbalProfession = Professions.Engineer;
+          KerbalProfession = Profession.Engineer;
           break;
         case "Scientist":
-          KerbalProfession = Professions.Scientist;
+          KerbalProfession = Profession.Scientist;
           break;
         default:
-          KerbalProfession = Professions.Tourist;
+          KerbalProfession = Profession.Tourist;
           break;
       }
     }
@@ -954,9 +956,9 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-
     #endregion Methods
 
+    #region ENUMs
     internal enum EditMode
     {
       None,
@@ -966,7 +968,7 @@ namespace ShipManifest.Windows
     }
 
     //Profession vars
-    internal enum Professions
+    internal enum Profession
     {
       Pilot,
       Engineer,
@@ -976,7 +978,7 @@ namespace ShipManifest.Windows
     }
 
     //Filter vars
-    internal enum KerbalFilters
+    internal enum KerbalFilter
     {
       All,
       Assigned,
@@ -988,5 +990,6 @@ namespace ShipManifest.Windows
       Applicant,
       Broken
     }
+    #endregion ENUMs
   }
 }

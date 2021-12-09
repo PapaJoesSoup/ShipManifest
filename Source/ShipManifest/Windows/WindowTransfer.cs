@@ -44,6 +44,66 @@ namespace ShipManifest.Windows
     // These objects may be used to derive objects to be added to the transfer process queue.
     internal static List<TransferPump> DisplayPumps = new List<TransferPump>();
 
+    #region Localization Strings
+
+    // Localization strings
+    internal static string titleContent = SmUtils.SmTags["#smloc_transfer_000"];
+    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent noCloseContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
+    internal static string noPartContent = $"{SmUtils.SmTags["#smloc_transfer_002"]}";
+    internal static string multiPartContent = $"{SmUtils.SmTags["#smloc_transfer_001"]}";
+    internal static string vesselsContent = SmUtils.SmTags["#smloc_transfer_003"];
+    internal static GUIContent dumpPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_004"]);
+    internal static GUIContent stopPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_005"]);
+    internal static GUIContent fillVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_006"]);
+    internal static GUIContent dumpVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_001"]);
+    internal static GUIContent stopVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_002"]);
+    internal static GUIContent fillPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_003"]);
+    internal static GUIContent dumpCrewContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_007"]);
+    internal static GUIContent fillCrewContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_008"]);
+    internal static GUIContent moveKerbalContent = new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
+    internal static string movingContent = SmUtils.SmTags["#smloc_transfer_007"];
+    internal static string xferCrewContent = SmUtils.SmTags["#smloc_transfer_021"];
+    internal static GUIContent thawContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_010"], SmUtils.SmTags["#smloc_transfer_tt_010"]);
+    internal static GUIContent selectAllContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_033"]);
+    internal static GUIContent selectAllxContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_034"]);
+    internal static string fillCrewTtContent = SmUtils.SmTags[ "#smloc_conditions_tt_008"];
+    internal static string moveCrewTtContent = SmUtils.SmTags[ "#smloc_conditions_tt_009"];
+    internal static GUIContent touristOnlyContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_022"], SmUtils.SmTags["#smloc_transfer_tt_035"]);
+    internal static string evaContent = SmUtils.SmTags["#smloc_transfer_008"];
+    internal static string xferContent = SmUtils.SmTags["#smloc_transfer_009"];
+    internal static string expScienceContent = SmUtils.SmTags["#smloc_transfer_tt_011"];
+    internal static string disabledXferContent = SmUtils.SmTags["#smloc_transfer_tt_012"];
+    internal static string noXferRealismContent = SmUtils.SmTags["#smloc_transfer_tt_013"];
+    internal static string xferOnlyProcSciContent = SmUtils.SmTags["#smloc_transfer_tt_014"];
+    internal static string moveKerbalTtContent = SmUtils.SmTags["#smloc_transfer_tt_009"];
+    internal static GUIContent xferProcContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_011"], SmUtils.SmTags["#smloc_transfer_tt_014"]);
+    internal static GUIContent xferUnprocContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_012"], SmUtils.SmTags["#smloc_transfer_tt_015"]);
+    internal static string resultsTtContent = SmUtils.SmTags["#smloc_transfer_tt_016"];
+    internal static string dataAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_017"];
+    internal static string mitsTtContent = SmUtils.SmTags["#smloc_transfer_tt_018"];
+    internal static string xmitValTtContent = SmUtils.SmTags["#smloc_transfer_tt_019"];
+    internal static string labValTtContent = SmUtils.SmTags["#smloc_transfer_tt_020"];
+    internal static string xmitBonusTtContent = SmUtils.SmTags["#smloc_transfer_tt_021"];
+    internal static string noXferSciRealismTtContent = SmUtils.SmTags["#smloc_transfer_tt_022"];
+    internal static string xferSciTtContent = SmUtils.SmTags["#smloc_transfer_tt_023"];
+    internal static GUIContent recvSciContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_013"], SmUtils.SmTags["#smloc_transfer_tt_024"]);
+    internal static string xferRemainContent = SmUtils.SmTags["#smloc_transfer_014"];
+    internal static string xferAmtContent = SmUtils.SmTags["#smloc_transfer_015"];
+    internal static string xferAmtTtBothContent = SmUtils.SmTags["#smloc_transfer_tt_025"];
+    internal static string xferAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_026"];
+    internal static string resultsContent = SmUtils.SmTags["#smloc_transfer_016"];
+    internal static string smallXferAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_027"];
+    internal static string noteRatioTtContent = SmUtils.SmTags["#smloc_transfer_tt_028"];
+    internal static GUIContent xferSliderContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_029"]);
+    internal static GUIContent xferStartContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_030"]);
+    internal static GUIContent xferStopContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_031"]);
+    internal static string onContent = SmUtils.SmTags["#smloc_transfer_017"];
+    internal static string offContent = SmUtils.SmTags["#smloc_transfer_018"];
+    internal static GUIContent flowContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_019"], SmUtils.SmTags["#smloc_transfer_tt_032"]);
+
+    #endregion Localization Strings
+
     private static Dictionary<PartModule, bool> _scienceModulesSource;
     internal static Dictionary<PartModule, bool> ScienceModulesSource
     {
@@ -109,18 +169,18 @@ namespace ShipManifest.Windows
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       string displayAmounts = SmUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
-      Title = $"{SmUtils.SmTags["#smloc_transfer_000"]} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"
+      Title = $"{titleContent} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
       SMHighlighter.IsMouseOver = false;
 
-      //GUIContent label = new GUIContent("", "Close Window");
-      GUIContent label = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+      //"Close Window");
+      GUIContent label = closeContent;
       if (SMConditions.IsTransferInProgress())
       {
-        // label = new GUIContent("", "Action in progress.  Cannot close window");
-        label = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
+        //Cannot close window");
+        label = noCloseContent;
         GUI.enabled = false;
       }
 
@@ -264,17 +324,17 @@ namespace ShipManifest.Windows
 
       GUILayout.BeginHorizontal();
       if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : $"{SmUtils.SmTags["#smloc_transfer_002"]}";
+        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : noPartContent;
       else
       {
         if (selectedParts != null)
         {
           if (selectedParts.Count > 1)
-            labelText = $"{SmUtils.SmTags["#smloc_transfer_001"]}"; // "Multiple Parts Selected");
+            labelText = multiPartContent; // "Multiple Parts Selected");
           else if (selectedParts.Count == 1)
             labelText = $"{selectedParts[0].partInfo.title}";
           else
-            labelText = $"{SmUtils.SmTags["#smloc_transfer_002"]}"; // "No Part Selected");
+            labelText = noPartContent; // "No Part Selected");
         }
       }
       GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
@@ -283,8 +343,7 @@ namespace ShipManifest.Windows
         if (xferType == TransferPump.TypeXfer.SourceToTarget)
         {
           bool prevValue = ShowSourceVessels;
-          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, SmUtils.SmTags["#smloc_transfer_003"],
-            GUILayout.Width(toggleWidth)); // "Vessels"
+          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
           if (!prevValue && ShowSourceVessels)
             WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
         }
@@ -293,8 +352,7 @@ namespace ShipManifest.Windows
           if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
           {
             bool prevValue = ShowSourceVessels;
-            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, SmUtils.SmTags["#smloc_transfer_003"],
-              GUILayout.Width(toggleWidth)); // "Vessels"
+            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
             if (!prevValue && ShowSourceVessels)
               WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
           }
@@ -521,12 +579,8 @@ namespace ShipManifest.Windows
             uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
               modDockedVessels.Current.VesselParts.First(), modDockedVessels.Current.VesselParts.Last(), xferType,
               TransferPump.TriggerButton.Transfer);
-            //GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-            //  ? new GUIContent("Dump", "Dumps the selected resource in this Part")
-            //  : new GUIContent("Stop", "Halts the dumping of the selected resource in this part");
-            GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-              ? new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_004"])
-              : new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_005"]);
+
+            GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? dumpPContent : stopPContent;
             if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
             {
               SMPart.ToggleDumpResource(modDockedVessels.Current.VesselParts, selectedResources, pumpId);
@@ -543,9 +597,8 @@ namespace ShipManifest.Windows
                             TransferPump.CalcRemainingCapacity(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0;
             else
               GUI.enabled = TransferPump.CalcRemainingCapacity(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0;
-            //GUIContent fillContent = new GUIContent("Fill","Fills the Selected vessel with the selected resource(s)\r\n(Fill is from ground source, NOT from other parts in vessel)");
-            GUIContent fillContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_006"]);
-            if (GUILayout.Button(fillContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
+
+            if (GUILayout.Button(fillVContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
             {
               SMPart.FillResource(modDockedVessels.Current.VesselParts, selectedResources[0]);
               if (selectedResources.Count > 1)
@@ -575,18 +628,14 @@ namespace ShipManifest.Windows
     {
       uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part,
         xferType, TransferPump.TriggerButton.Transfer);
-      //GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-      //  ? new GUIContent("Dump", "Dumps the selected resource in this vessel")
-      //  : new GUIContent("Stop", "Halts the dumping of the selected resource in this vessel");
-      GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-        ? new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_001"])
-        : new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_002"]);
+
+      GUIContent dumpActionContent = !TransferPump.IsPumpInProgress(pumpId) ? dumpVContent : stopVContent;
       GUIStyle style1 = xferType == TransferPump.TypeXfer.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
       GUI.enabled = CanDumpPart(part);
 
-      if (GUILayout.Button(dumpContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
+      if (GUILayout.Button(dumpActionContent, style1, GUILayout.Width(45), GUILayout.Height(20)))
       {
         SMPart.ToggleDumpResource(part, selectedResources, pumpId);
       }
@@ -599,9 +648,6 @@ namespace ShipManifest.Windows
       GUIStyle style2 = xferType == TransferPump.TypeXfer.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
-      //GUIContent fillContent = new GUIContent("Fill", "Fills the Selected part with the selected resource(s)\r\n(Fill is from ground source, NOT from other parts in vessel)");
-      GUIContent fillContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_003"]);
-      // Fills should only be in Non Realism mode or if Preflight Resources are selected...
       if (selectedResources.Count > 1)
         GUI.enabled = part.Resources[selectedResources[0]].amount <
                       part.Resources[selectedResources[0]].maxAmount ||
@@ -610,7 +656,7 @@ namespace ShipManifest.Windows
       else
         GUI.enabled = part.Resources[selectedResources[0]].amount <
                       part.Resources[selectedResources[0]].maxAmount;
-      if (GUILayout.Button(fillContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
+      if (GUILayout.Button(fillPContent, style2, GUILayout.Width(30), GUILayout.Height(20)))
       {
         SMPart.FillResource(part, selectedResources[0]);
         if (selectedResources.Count > 1)
@@ -623,14 +669,10 @@ namespace ShipManifest.Windows
 
     private static void CrewFillDumpVesselButtons(ModDockedVessel vessel)
     {
-      //GUIContent dumpContent = new GUIContent("Dump", "Removes any crew members in this vessel");
-      //GUIContent fillContent = new GUIContent("Fill", "Fills this vessel with crew members");
-      GUIContent dumpContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_007"]);
-      GUIContent fillContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_008"]);
       int crewCapacity = SmUtils.GetPartsCrewCapacity(vessel.VesselParts);
       int crewCount = SmUtils.GetPartsCrewCount(vessel.VesselParts);
       GUI.enabled = SmUtils.GetPartsCrewCapacity(vessel.VesselParts) > 0;
-      if (GUILayout.Button(dumpContent, GUILayout.Width(45), GUILayout.Height(20)))
+      if (GUILayout.Button(dumpCrewContent, GUILayout.Width(45), GUILayout.Height(20)))
       {
         List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
         while (part.MoveNext())
@@ -645,7 +687,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUI.enabled = crewCount < crewCapacity;
-      if (GUILayout.Button(fillContent, GUILayout.Width(45), GUILayout.Height(20)))
+      if (GUILayout.Button(fillCrewContent, GUILayout.Width(45), GUILayout.Height(20)))
       {
         List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
         while (part.MoveNext())
@@ -662,13 +704,9 @@ namespace ShipManifest.Windows
 
     private static void CrewFillDumpPartButtons(Part part)
     {
-      //GUIContent dumpContent = new GUIContent("Dump", "Removes any crew members in this part");
-      //GUIContent fillContent = new GUIContent("Fill", "Fills this part with crew members");
-      GUIContent dumpContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_007"]);
-      GUIContent fillContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_008"]);
 
       GUI.enabled = part.protoModuleCrew.Count > 0;
-      if (GUILayout.Button(dumpContent, GUILayout.Width(45), GUILayout.Height(20)))
+      if (GUILayout.Button(dumpCrewContent, GUILayout.Width(45), GUILayout.Height(20)))
       {
         SMPart.DumpCrew(part);
       }
@@ -677,7 +715,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUI.enabled = part.protoModuleCrew.Count < part.CrewCapacity;
-      if (GUILayout.Button(fillContent, GUILayout.Width(45), GUILayout.Height(20)))
+      if (GUILayout.Button(fillCrewContent, GUILayout.Width(45), GUILayout.Height(20)))
       {
         SMPart.FillCrew(part);
       }
@@ -756,7 +794,7 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       GUI.enabled = false;
-      if (GUILayout.Button(new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]), SMStyle.ButtonStyle,
+      if (GUILayout.Button(moveKerbalContent, SMStyle.ButtonStyle,
         GUILayout.Width(15), GUILayout.Height(20))) // "Move Kerbal to another seat within Part"
       {
         ToolTip = "";
@@ -770,9 +808,7 @@ namespace ShipManifest.Windows
       GUI.enabled = true;
       GUILayout.Label($"  {frznCrew.CrewName} ({trait})", SMStyle.LabelStyleCyan, GUILayout.Width(190),
         GUILayout.Height(20));
-      //GUIContent thawContent = new GUIContent("Thaw", "This Kerbal is Frozen. Click to Revive kerbal");
-      GUIContent thawContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_010"],
-        SmUtils.SmTags["#smloc_transfer_tt_010"]);
+     
       if (GUILayout.Button(thawContent, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
       {
         WindowRoster.ThawKerbal(frznCrew.CrewName);
@@ -790,9 +826,7 @@ namespace ShipManifest.Windows
       Rect rect;
       GUILayout.BeginHorizontal();
       GUI.enabled = selectedPartsFrom.Count > 0 && selectedPartsTo.Count > 0 && sourceCrewCount > 0 && targetCapacity > 0;
-      GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"],
-        SmUtils.SmTags[GUI.enabled ? "#smloc_transfer_tt_033" : "#smloc_transfer_tt_034"]);
-      selectAll = GUILayout.Toggle(selectAll, content, GUILayout.Width(180));
+      selectAll = GUILayout.Toggle(selectAll, GUI.enabled ? selectAllContent : selectAllxContent, GUILayout.Width(180));
       if (selectAll != (isSourceView ? SelectAllFrom : SelectAllTo))
       {
         if (selectAll)
@@ -821,9 +855,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
       GUI.enabled = selectedCrewMembers.Count > 0 && SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
-      XferToolTip = SmUtils.SmTags[selectedCrewMembers.Count <= 0
-        ? "#smloc_conditions_tt_008"
-        : "#smloc_conditions_tt_009"];
+      XferToolTip = selectedCrewMembers.Count <= 0 ? fillCrewTtContent : moveCrewTtContent;
       CrewSelectedXferButton(selectedPartsFrom, selectedPartsTo, selectedCrewMembers, xOffset);
       GUILayout.EndHorizontal();
     }
@@ -833,9 +865,7 @@ namespace ShipManifest.Windows
       Rect rect;
       GUI.enabled = true;
       // check to see if crewmembers selected match criteria for a show Tourists only setting...
-      GUIContent tContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_022"],
-        SmUtils.SmTags["#smloc_transfer_tt_035"]); // Show tourists only
-      touristsOnly = GUILayout.Toggle(touristsOnly, tContent, GUILayout.Width(180));
+      touristsOnly = GUILayout.Toggle(touristsOnly, touristOnlyContent, GUILayout.Width(180));
       if (touristsOnly != (isSourceView ? TouristsOnlyFrom : TouristsOnlyTo))
       {
         if (isSourceView) TouristsOnlyFrom = touristsOnly;
@@ -892,9 +922,7 @@ namespace ShipManifest.Windows
         GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })", GUILayout.Width(cmWidth), GUILayout.Height(20));
       }
       GUI.enabled = !SMConditions.IsTransferInProgress();
-      // GUIContent moveContent = new GUIContent("»", "Move Kerbal to another seat within Part");
-      GUIContent moveContent = new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
-      if (GUILayout.Button(moveContent, SMStyle.ButtonStyle, GUILayout.Width(cmMoveWidth), GUILayout.Height(20)))
+      if (GUILayout.Button(moveKerbalContent, SMStyle.ButtonStyle, GUILayout.Width(cmMoveWidth), GUILayout.Height(20)))
       {
         ToolTip = "";
         SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsFrom[0]);
@@ -917,8 +945,7 @@ namespace ShipManifest.Windows
            SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
       {
         GUI.enabled = true;
-        //GUILayout.Label("Moving", GUILayout.Width(btnWidth), GUILayout.Height(20));
-        GUILayout.Label(SmUtils.SmTags["#smloc_transfer_007"], GUILayout.Width(btnWidth), GUILayout.Height(20));
+        GUILayout.Label(movingContent, GUILayout.Width(btnWidth), GUILayout.Height(20));
       }
       else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0],
         selectedPartsTo.Count > 0 ? selectedPartsTo[0] : null))
@@ -926,8 +953,8 @@ namespace ShipManifest.Windows
         GUI.enabled = crewMember.type != ProtoCrewMember.KerbalType.Tourist &&
           selectedPartsFrom[0].airlock != null;
         //GUIContent evaContent = new GUIContent("EVA", EvaToolTip);
-        GUIContent evaContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_008"], EvaToolTip);
-        if (GUILayout.Button(evaContent, SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20)))
+        GUIContent content = new GUIContent(evaContent, EvaToolTip);
+        if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20)))
         {
           ToolTip = "";
           // Bug #7 - KerbalRef can be null if the part has no IVA. This can only happen in a modded install.
@@ -944,7 +971,7 @@ namespace ShipManifest.Windows
       }
       else
       {
-        if (GUILayout.Button(new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], XferToolTip),
+        if (GUILayout.Button(new GUIContent(xferContent, XferToolTip),
           SMStyle.ButtonStyle, GUILayout.Width(btnWidth), GUILayout.Height(20))) // "Xfer"
         {
           SMAddon.SmVessel.TransferCrewObj.CrewTransferBegin(crewMember, selectedPartsFrom[0], selectedPartsTo[0]);
@@ -964,11 +991,11 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = true;
         //GUILayout.Label("Moving", GUILayout.Width(50), GUILayout.Height(20));
-        GUILayout.Label(SmUtils.SmTags["#smloc_transfer_007"], GUILayout.Width(50), GUILayout.Height(20));
+        GUILayout.Label(movingContent, GUILayout.Width(50), GUILayout.Height(20));
       }
       else
       {
-        if (GUILayout.Button(new GUIContent($"{SmUtils.SmTags["#smloc_transfer_021"]} ({crewMembers.Count})", XferToolTip),
+        if (GUILayout.Button(new GUIContent($"{xferCrewContent} ({crewMembers.Count})", XferToolTip),
           SMStyle.ButtonStyle, GUILayout.Width(90),
           GUILayout.Height(20))) // "Xfer Crew"
         {
@@ -1019,9 +1046,8 @@ namespace ShipManifest.Windows
         GUI.enabled = ((IScienceDataContainer)modules.Current).GetScienceCount() > 0;
 
         string label = "+";
-        // string toolTip = string.Format("{0} {1}", "Expand/Collapse Science detail.", GUI.enabled? "" : "(Disabled, nothing to xfer)");
-        string toolTip =
-          $"{SmUtils.SmTags["#smloc_transfer_tt_011"]} {(GUI.enabled ? "" : SmUtils.SmTags["#smloc_transfer_tt_012"])}";
+        // Expand/Collapse Science detail.
+        string toolTip = $"{expScienceContent} {(GUI.enabled ? "" : disabledXferContent)}";
         GUIStyle expandStyle = ScienceModulesSource[modules.Current] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (ScienceModulesSource[modules.Current]) label = "-";
         if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(15), GUILayout.Height(20)))
@@ -1042,17 +1068,14 @@ namespace ShipManifest.Windows
           if (SMSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
-            //toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is marked not transferable";
-            toolTip = SmUtils.SmTags["#smloc_transfer_tt_013"];
+            toolTip = noXferRealismContent;
           }
           else
           {
             GUI.enabled = true;
-            //toolTip = "Realism is off, or Experiment/data is transferable";
-            toolTip = SmUtils.SmTags["#smloc_transfer_tt_014"];
+            toolTip = xferOnlyProcSciContent;
           }
-          //GUIContent xferContent = new GUIContent("Xfer", toolTip);
-          GUIContent xferContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_tt_009"], toolTip);
+          GUIContent xferContent = new GUIContent(moveKerbalTtContent, toolTip);
           if (GUILayout.Button(xferContent, SMStyle.ButtonStyle, GUILayout.Width(40),
             GUILayout.Height(20)))
           {
@@ -1067,9 +1090,7 @@ namespace ShipManifest.Windows
 
           if (GUI.enabled && SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().Count > 0)
           {
-            //GUIContent content = new GUIContent("Proc", "Transfer only science that was already processed");
-            GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_011"], SmUtils.SmTags["#smloc_transfer_tt_014"]);
-            if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
+            if (GUILayout.Button(xferProcContent, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.SelectedModuleSource = modules.Current;
               ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
@@ -1080,9 +1101,7 @@ namespace ShipManifest.Windows
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-            //content = new GUIContent("Unproc", "Transfer only science that was not processed yet";
-            content = new GUIContent(SmUtils.SmTags["#smloc_transfer_012"], SmUtils.SmTags["#smloc_transfer_tt_015"]);
-            if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+            if (GUILayout.Button(xferUnprocContent, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.SelectedModuleSource = modules.Current;
               ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
@@ -1115,18 +1134,13 @@ namespace ShipManifest.Windows
 
             // Build Tooltip
             toolTip = ((ScienceData)items.Current).title;
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_016"]}:  {results}";
+            toolTip += $"\n-{resultsTtContent}:  {results}";
             toolTip +=
-              $"\n-{SmUtils.SmTags["#smloc_transfer_tt_017"]}:  {((ScienceData)items.Current).dataAmount} {SmUtils.SmTags["#smloc_transfer_tt_018"]}";
+              $"\n-{dataAmtTtContent}:  {((ScienceData)items.Current).dataAmount} {mitsTtContent}";
             toolTip +=
-              $"\n-{SmUtils.SmTags["#smloc_transfer_tt_019"]}:  {((ScienceData)items.Current).baseTransmitValue}"; // was transmitValue;
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_020"]}:  {((ScienceData)items.Current).labValue}";
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_021"]}:  {((ScienceData)items.Current).transmitBonus}";  // Was labBoost
-            //toolTip += "\r\n-Results:    " + results;
-            //toolTip += "\r\n-Data Amt:   " + ((ScienceData)items.Current).dataAmount + " Mits";
-            //toolTip += "\r\n-Xmit Value: " + ((ScienceData) items.Current).baseTransmitValue; // was transmitValue;
-            //toolTip += "\r\n-Lab Value:  " + ((ScienceData)items.Current).labValue;
-            //toolTip += "\r\n-Lab Boost:  " + ((ScienceData)items.Current).transmitBonus;  // Was labBoost
+              $"\n-{xmitValTtContent}:  {((ScienceData)items.Current).baseTransmitValue}"; // was transmitValue;
+            toolTip += $"\n-{labValTtContent}:  {((ScienceData)items.Current).labValue}";
+            toolTip += $"\n-{xmitBonusTtContent}:  {((ScienceData)items.Current).transmitBonus}";  // Was labBoost
 
             GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
             rect = GUILayoutUtility.GetLastRect();
@@ -1136,19 +1150,16 @@ namespace ShipManifest.Windows
             if (SMSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
-              //toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";
-              toolTip = SmUtils.SmTags["#smloc_transfer_tt_022"];
+              toolTip = noXferSciRealismTtContent;
             }
             else
             {
-              //toolTip = "Realistic Transfers is off, or Data is transferable";
-              toolTip = SmUtils.SmTags["#smloc_transfer_tt_023"];
+              toolTip = xferSciTtContent;
               GUI.enabled = true;
             }
             if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
             {
-              //GUIContent content = new GUIContent("Xfer", toolTip);
-              GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_tt_009"], toolTip);
+              GUIContent content = new GUIContent(xferContent, toolTip);
               if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
               {
                 if (((ModuleScienceContainer)SMAddon.SmVessel.SelectedModuleTarget).AddData(((ScienceData)items.Current)))
@@ -1194,7 +1205,7 @@ namespace ShipManifest.Windows
         string label = "+";
         // string toolTip = string.Format("{0} {1}", "Expand/Collapse Science detail.", GUI.enabled? "" : "(Disabled, nothing to xfer)");
         string toolTip =
-          $"{SmUtils.SmTags["#smloc_transfer_tt_011"]} {(GUI.enabled ? "" : SmUtils.SmTags["#smloc_transfer_tt_012"])}";
+          $"{expScienceContent} {(GUI.enabled ? "" : disabledXferContent)}";
         GUIStyle expandStyle = ScienceModulesSource[modules.Current] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (ScienceModulesSource[modules.Current]) label = "-";
         if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(15), GUILayout.Height(20)))
@@ -1215,18 +1226,15 @@ namespace ShipManifest.Windows
           if (SMSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
-            //toolTip = "Realism Mode is preventing transfer.\r\nExperiment/data is marked not transferable";
-            toolTip = SmUtils.SmTags["#smloc_transfer_tt_013"];
+            toolTip = noXferRealismContent;
           }
           else
           {
             GUI.enabled = true;
-            //toolTip = "Realism is off, or Experiment/data is transferable";
-            toolTip = SmUtils.SmTags["#smloc_transfer_tt_014"];
+            toolTip = xferOnlyProcSciContent;
           }
-          //GUIContent xferContent = new GUIContent("Xfer", toolTip);
-          GUIContent xferContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_tt_009"], toolTip);
-          if (GUILayout.Button(xferContent, SMStyle.ButtonStyle, GUILayout.Width(40),
+          GUIContent xferSciContent = new GUIContent(xferContent, toolTip);
+          if (GUILayout.Button(xferSciContent, SMStyle.ButtonStyle, GUILayout.Width(40),
             GUILayout.Height(20)))
           {
             SMAddon.SmVessel.SelectedModuleSource = modules.Current;
@@ -1240,9 +1248,7 @@ namespace ShipManifest.Windows
 
           if (GUI.enabled && SMAddon.SmVessel.Vessel.FindPartModulesImplementing<ModuleScienceLab>().Count > 0)
           {
-            //GUIContent content = new GUIContent("Proc", "Transfer only science that was already processed");
-            GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_011"], SmUtils.SmTags["#smloc_transfer_tt_014"]);
-            if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
+            if (GUILayout.Button(xferProcContent, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.SelectedModuleSource = modules.Current;
               ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
@@ -1254,8 +1260,7 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
             //content = new GUIContent("Unproc", "Transfer only science that was not processed yet";
-            content = new GUIContent(SmUtils.SmTags["#smloc_transfer_012"], SmUtils.SmTags["#smloc_transfer_tt_015"]);
-            if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
+            if (GUILayout.Button(xferUnprocContent, SMStyle.ButtonStyle, GUILayout.Width(50), GUILayout.Height(20)))
             {
               SMAddon.SmVessel.SelectedModuleSource = modules.Current;
               ProcessController.TransferScienceLab(SMAddon.SmVessel.SelectedModuleSource,
@@ -1288,18 +1293,13 @@ namespace ShipManifest.Windows
 
             // Build Tooltip
             toolTip = ((ScienceData)items.Current).title;
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_016"]}:  {results}";
+            toolTip += $"\n-{resultsTtContent}:  {results}";
             toolTip +=
-              $"\n-{SmUtils.SmTags["#smloc_transfer_tt_017"]}:  {((ScienceData) items.Current).dataAmount} {SmUtils.SmTags["#smloc_transfer_tt_018"]}";
+              $"\n-{dataAmtTtContent}:  {((ScienceData)items.Current).dataAmount} {mitsTtContent}";
             toolTip +=
-              $"\n-{SmUtils.SmTags["#smloc_transfer_tt_019"]}:  {((ScienceData) items.Current).baseTransmitValue}"; // was transmitValue;
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_020"]}:  {((ScienceData) items.Current).labValue}";
-            toolTip += $"\n-{SmUtils.SmTags["#smloc_transfer_tt_021"]}:  {((ScienceData) items.Current).transmitBonus}";  // Was labBoost
-            //toolTip += "\r\n-Results:    " + results;
-            //toolTip += "\r\n-Data Amt:   " + ((ScienceData)items.Current).dataAmount + " Mits";
-            //toolTip += "\r\n-Xmit Value: " + ((ScienceData) items.Current).baseTransmitValue; // was transmitValue;
-            //toolTip += "\r\n-Lab Value:  " + ((ScienceData)items.Current).labValue;
-            //toolTip += "\r\n-Lab Boost:  " + ((ScienceData)items.Current).transmitBonus;  // Was labBoost
+              $"\n-{xmitValTtContent}:  {((ScienceData)items.Current).baseTransmitValue}"; // was transmitValue;
+            toolTip += $"\n-{labValTtContent}:  {((ScienceData)items.Current).labValue}";
+            toolTip += $"\n-{xmitBonusTtContent}:  {((ScienceData)items.Current).transmitBonus}";  // Was labBoost
 
             GUILayout.Label(new GUIContent(se.experimentTitle, toolTip), SMStyle.LabelStyleNoWrap, GUILayout.Width(205), GUILayout.Height(20));
             rect = GUILayoutUtility.GetLastRect();
@@ -1310,18 +1310,18 @@ namespace ShipManifest.Windows
             {
               GUI.enabled = false;
               //toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";
-              toolTip = SmUtils.SmTags["#smloc_transfer_tt_022"];
+              toolTip = noXferSciRealismTtContent;
             }
             else
             {
               //toolTip = "Realistic Transfers is off, or Data is transferable";
-              toolTip = SmUtils.SmTags["#smloc_transfer_tt_023"];
+              toolTip = xferSciTtContent;
               GUI.enabled = true;
             }
             if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
             {
               //GUIContent content = new GUIContent("Xfer", toolTip);
-              GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_tt_009"], toolTip);
+              GUIContent content = new GUIContent(xferContent, toolTip);
               if (GUILayout.Button(content, SMStyle.ButtonStyle, GUILayout.Width(40), GUILayout.Height(20)))
               {
                 if (((ModuleScienceContainer)SMAddon.SmVessel.SelectedModuleTarget).AddData(((ScienceData)items.Current)))
@@ -1373,8 +1373,7 @@ namespace ShipManifest.Windows
         if (modules.Current.moduleName != "ModuleScienceExperiment")
         {
           //GUIContent content = new GUIContent("Recv", "Set this module as the receiving container");
-          GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_013"], SmUtils.SmTags["#smloc_transfer_tt_024"]);
-          if (GUILayout.Button(content, style, GUILayout.Width(40), GUILayout.Height(20)))
+          if (GUILayout.Button(recvSciContent, style, GUILayout.Width(40), GUILayout.Height(20)))
           {
             SMAddon.SmVessel.SelectedModuleTarget = modules.Current;
           }
@@ -1426,7 +1425,7 @@ namespace ShipManifest.Windows
         if (activePump.PumpType == pumpType)
         {
           //GUILayout.Label("Xfer Remaining:", GUILayout.Width(120));
-          GUILayout.Label($"{SmUtils.SmTags["#smloc_transfer_014"]}:", GUILayout.Width(120));
+          GUILayout.Label($"{xferRemainContent}:", GUILayout.Width(120));
           
           GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"));
           if (SMAddon.SmVessel.SelectedResources.Count > 1)
@@ -1437,21 +1436,13 @@ namespace ShipManifest.Windows
       {
         if (selectedResources.Count > 1)
         {
-          //label = "Xfer Amts:";
-          //toolTip = "Displays xfer amounts of both resourses selected.";
-          //toolTip += "\r\nAllows editing of part's larger capacity resourse xfer value.";
-          //toolTip += "\r\nIt then calculates the smaller xfer amount using a ratio";
-          //toolTip += "\r\n of the smaller capacity resource to the larger.";
-          label = $"{SmUtils.SmTags["#smloc_transfer_015"]}:";
-          toolTip = SmUtils.SmTags["#smloc_transfer_tt_025"];
+          label = $"{xferAmtContent}:";
+          toolTip = xferAmtTtBothContent;
         }
         else
         {
-          //label = "Xfer Amt:";
-          //toolTip += "Displays the Amount of selected resource to xfer.";
-          //toolTip += "\r\nAllows editing of the xfer value.";
-          label = $"{SmUtils.SmTags["#smloc_transfer_016"]}:";
-          toolTip = SmUtils.SmTags["#smloc_transfer_tt_026"];
+          label = $"{resultsContent}:";
+          toolTip = xferAmtTtContent;
         }
         GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(65));
         rect = GUILayoutUtility.GetLastRect();
@@ -1466,8 +1457,7 @@ namespace ShipManifest.Windows
         if (SMAddon.SmVessel.SelectedResources.Count > 1)
         {
           label = $" | {ratioXferAmt:#######0.##}";
-          //toolTip = "Smaller Tank xfer amount.  Calculated at " + ratioPump.PumpRatio + ".\r\n(Note: A value of 0.818181 = 0.9/1.1)";
-          toolTip = $"{SmUtils.SmTags["#smloc_transfer_tt_027"]}:  {ratioPump.PumpRatio}.\n{SmUtils.SmTags["#smloc_transfer_tt_028"]}";
+          toolTip = $"{smallXferAmtTtContent}:  {ratioPump.PumpRatio}.\n{noteRatioTtContent}";
           GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(80));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
@@ -1476,46 +1466,37 @@ namespace ShipManifest.Windows
       }
       GUILayout.EndHorizontal();
 
-      if (SMConditions.IsShipControllable() && (SMConditions.CanResourceBeXferred(pumpType, maxPumpAmount) || activePump.PumpType == pumpType && activePump.IsPumpOn))
+      if (!SMConditions.IsShipControllable() || (!SMConditions.CanResourceBeXferred(pumpType, maxPumpAmount) &&
+                                                 (activePump.PumpType != pumpType || !activePump.IsPumpOn))) return;
+      GUILayout.BeginHorizontal();
+      GUIStyle noPad = SMStyle.LabelStyleNoPad;
+      GUILayout.Label(xferSliderContent, noPad, GUILayout.Width(50), GUILayout.Height(20));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+      thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount,
+        GUILayout.Width(190));
+      activePump.EditSliderAmount = thisXferAmount.ToString(CultureInfo.InvariantCulture);
+
+      // set Xfer button style
+      GUIContent xferPumpContent = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && !activePump.IsPumpOn ? xferStartContent : xferStopContent;
+      GUI.enabled = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && activePump.IsPumpOn;
+      if (GUILayout.Button(xferPumpContent, GUILayout.Width(40), GUILayout.Height(18)))
       {
-        GUILayout.BeginHorizontal();
-        GUIStyle noPad = SMStyle.LabelStyleNoPad;
-        //label = "Xfer:";
-        //toolTip = "Xfer amount slider control.\r\nMove slider to select a different value.\r\nYou can use this instead of the text box above.";
-        label = $"{SmUtils.SmTags["#smloc_transfer_009"]}:";
-        toolTip = SmUtils.SmTags["#smloc_transfer_tt_029"];
-        GUILayout.Label(new GUIContent(label, toolTip), noPad, GUILayout.Width(50), GUILayout.Height(20));
-        rect = GUILayoutUtility.GetLastRect();
-        if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-        thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount,
-          GUILayout.Width(190));
-        activePump.EditSliderAmount = thisXferAmount.ToString(CultureInfo.InvariantCulture);
-        // set Xfer button style
-        //GUIContent xferContent = !TransferPump.PumpProcessOn
-        //  ? new GUIContent("Xfer", "Transfers the selected resource(s)\r\nto the selected Part(s)")
-        //  : new GUIContent("Stop", "Halts the Transfer of the selected resource(s)\r\nto the selected Part(s)");
-        GUIContent xferContent = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && !activePump.IsPumpOn
-          ? new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_030"]) // Xfer
-          : new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_031"]); // Stop
-        GUI.enabled = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && activePump.IsPumpOn;
-        if (GUILayout.Button(xferContent, GUILayout.Width(40), GUILayout.Height(18)))
+        uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
+          pumps[0].FromParts.First(), pumps[0].ToParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
+        if (!TransferPump.PumpProcessOn)
         {
-          uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
-            pumps[0].FromParts.First(), pumps[0].ToParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
-          if (!TransferPump.PumpProcessOn)
-          {
-            //Calc amounts and update xfer modules
-            TransferPump.AssignPumpAmounts(pumps, thisXferAmount, pumpId);
-            ProcessController.TransferResources(pumps);
-          }
-          else TransferPump.AbortAllPumpsInProcess(pumpId);
+          //Calc amounts and update xfer modules
+          TransferPump.AssignPumpAmounts(pumps, thisXferAmount, pumpId);
+          ProcessController.TransferResources(pumps);
         }
-        rect = GUILayoutUtility.GetLastRect();
-        if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-        GUILayout.EndHorizontal();
+        else TransferPump.AbortAllPumpsInProcess(pumpId);
       }
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
+      GUILayout.EndHorizontal();
     }
 
     private static void ResourceFlowButtons(TransferPump.TypeXfer pumpType, int scrollX)
@@ -1529,8 +1510,7 @@ namespace ShipManifest.Windows
           if (displayPumps.Current == null) continue;
           // this var is used for button state change management
           bool flowState = displayPumps.Current.FromParts.Any(part => part.Resources[displayPumps.Current.Resource].flowState);
-          //string flowtext = flowState ? "On" : "Off";
-          string flowtext = flowState ? SmUtils.SmTags["#smloc_transfer_017"] : SmUtils.SmTags["#smloc_transfer_018"];
+          string flowtext = flowState ? onContent : offContent;
 
           // Flow control Display
           step = "resource quantities labels";
@@ -1544,8 +1524,7 @@ namespace ShipManifest.Windows
           {
             step = "render flow button(s)";
             //GUIContent content = new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s).");
-            GUIContent content = new GUIContent(SmUtils.SmTags["#smloc_transfer_019"], SmUtils.SmTags["#smloc_transfer_tt_032"]);
-            if (GUILayout.Button(content, GUILayout.Width(40), GUILayout.Height(20)))
+            if (GUILayout.Button(flowContent, GUILayout.Width(40), GUILayout.Height(20)))
             {
               List<Part>.Enumerator parts = displayPumps.Current.FromParts.GetEnumerator();
               while (parts.MoveNext())
