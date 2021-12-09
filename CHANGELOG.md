@@ -5,13 +5,19 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
- - Changed:  Refactored localization strings to improve performance and maintainability. Components affected:
-   - Control Window and remaining tabs
-   - Settings Window and all tabs
+ - Changed:  Complete Refactoring of localization strings to improve performance and maintainability.
+   This completes the application wide refactor to make all localization string usage static
+   instead of instanced.
+   Components affected:
+   - Manifest Window
+   - Transfer Window
    - Roster Window
-   This is a continuation of an application wide refactor to make all localization string usage static instead of instanced.
+   - Settings Window and all tabs
+   - Control Window and remaining tabs
+ - New: Added support to the Roster Wndow for selecting spacesuits while in Space Center and in Flight for assigned Crew.
  - Fixed: Replaced hard coded string in Settings.Config Tab to use localization. "(lines)"
    Updated localization files to include new reference.
+
 
 
 Version 6.0.3.1 - Release 27 Nov 2021 - KSP 1.12.x
