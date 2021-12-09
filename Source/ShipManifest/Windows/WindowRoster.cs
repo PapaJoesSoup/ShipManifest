@@ -39,6 +39,7 @@ namespace ShipManifest.Windows
 
     private static Vector2 _scrollViewerPosition = Vector2.zero;
 
+    #region Localization Strings
     // Content strings
     internal static string Title = $"{SmUtils.SmTags["#smloc_roster_001"]}:  {SMSettings.CurVersion}";
     internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
@@ -106,6 +107,7 @@ namespace ShipManifest.Windows
     internal static string fixTtContent = SmUtils.SmTags["#smloc_roster_tt_025"];
     internal static string suitKerbalTtContent = "Change this Kerbal's Suit";
     internal static string cnxSuitKerbalTtContent = "Cancel changes to this Kerbal'Suit";
+    #endregion Localization Strings
 
 
     internal static bool ResetRosterSize
