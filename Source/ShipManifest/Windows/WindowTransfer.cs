@@ -155,9 +155,9 @@ namespace ShipManifest.Windows
         return _scienceModulesTarget;
       }
     }
-    #endregion
 
-
+    #endregion Properties
+    
     #region TransferWindow (GUI Layout)
 
     // Resource Transfer Window
@@ -248,6 +248,8 @@ namespace ShipManifest.Windows
       }
     }
 
+    #region Viewer Selections (Top Half)
+
     #region Source Viewers (GUI Layout)
 
     // Transfer Window components
@@ -314,52 +316,6 @@ namespace ShipManifest.Windows
     }
 
     #endregion
-
-    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypeXfer xferType)
-    {
-      GUI.enabled = true;
-      const float textWidth = 220;
-      const float toggleWidth = 65; 
-      string labelText = "";
-
-      GUILayout.BeginHorizontal();
-      if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : noPartContent;
-      else
-      {
-        if (selectedParts != null)
-        {
-          if (selectedParts.Count > 1)
-            labelText = multiPartContent; // "Multiple Parts Selected");
-          else if (selectedParts.Count == 1)
-            labelText = $"{selectedParts[0].partInfo.title}";
-          else
-            labelText = noPartContent; // "No Part Selected");
-        }
-      }
-      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
-      if (SMAddon.SmVessel.ModDockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
-      {
-        if (xferType == TransferPump.TypeXfer.SourceToTarget)
-        {
-          bool prevValue = ShowSourceVessels;
-          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
-          if (!prevValue && ShowSourceVessels)
-            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-        }
-        else
-        {
-          if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
-          {
-            bool prevValue = ShowSourceVessels;
-            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
-            if (!prevValue && ShowSourceVessels)
-              WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-          }
-        }
-      }
-      GUILayout.EndHorizontal();
-    }
 
     #region Target Viewers (GUI Layout)
 
@@ -434,7 +390,55 @@ namespace ShipManifest.Windows
 
     #endregion
 
-    #region Viewer Details (GUI Layout)
+    #endregion Viewer Selections (Top Half)
+
+    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypeXfer xferType)
+    {
+      GUI.enabled = true;
+      const float textWidth = 220;
+      const float toggleWidth = 65; 
+      string labelText = "";
+
+      GUILayout.BeginHorizontal();
+      if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : noPartContent;
+      else
+      {
+        if (selectedParts != null)
+        {
+          if (selectedParts.Count > 1)
+            labelText = multiPartContent; // "Multiple Parts Selected");
+          else if (selectedParts.Count == 1)
+            labelText = $"{selectedParts[0].partInfo.title}";
+          else
+            labelText = noPartContent; // "No Part Selected");
+        }
+      }
+      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
+      if (SMAddon.SmVessel.ModDockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
+      {
+        if (xferType == TransferPump.TypeXfer.SourceToTarget)
+        {
+          bool prevValue = ShowSourceVessels;
+          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
+          if (!prevValue && ShowSourceVessels)
+            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
+        }
+        else
+        {
+          if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
+          {
+            bool prevValue = ShowSourceVessels;
+            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
+            if (!prevValue && ShowSourceVessels)
+              WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
+          }
+        }
+      }
+      GUILayout.EndHorizontal();
+    }
+
+    #region Viewer Details (Bottom Half)
 
     #region Part/Vessel Buttons Viewer
     private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypeXfer xferType,
@@ -1554,7 +1558,7 @@ namespace ShipManifest.Windows
     }
     #endregion
 
-    #endregion
+    #endregion Viewer Details (Bottom Half)
 
     #endregion
 
