@@ -10,7 +10,8 @@ namespace ShipManifest.Windows
 {
   internal static class WindowManifest
   {
-    #region Manifest Window - Gui Layout Code
+
+    #region Properties
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
     internal static Rect Position = SMSettings.DefaultPosition;
@@ -31,6 +32,30 @@ namespace ShipManifest.Windows
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
 
+    #region Localization strings
+
+    internal static string titleContent = SmUtils.SmTags["#smloc_manifest_002"];
+    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent closeXContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
+    internal static string noResSelContent = SmUtils.SmTags["#smloc_manifest_003"];
+    internal static string multiResSelContent = SmUtils.SmTags["#smloc_manifest_004"];
+    internal static string fillCrewContent = SmUtils.SmTags["#smloc_manifest_005"];
+    internal static string emptyCrewContent = SmUtils.SmTags["#smloc_manifest_006"];
+    internal static string fillResContent = SmUtils.SmTags["#smloc_manifest_007"];
+    internal static string emptyResContent = SmUtils.SmTags["#smloc_manifest_008"];
+    internal static GUIContent dumpResContent = new GUIContent(SmUtils.SmTags["#smloc_manifest_009"], SmUtils.SmTags["#smloc_manifest_tt_001"]);
+    internal static GUIContent stopDumpResContent = new GUIContent(SmUtils.SmTags["#smloc_manifest_010"], SmUtils.SmTags["#smloc_manifest_tt_002"]);
+    internal static string fillContent = SmUtils.SmTags["#smloc_manifest_011"];
+    internal static string settingsContent = SmUtils.SmTags["#smloc_manifest_012"];
+    internal static string rosterContent = SmUtils.SmTags["#smloc_manifest_013"];
+    internal static string controlContent = SmUtils.SmTags["#smloc_manifest_014"];
+
+    #endregion Localization strings
+
+    #endregion Properties
+
+    #region Manifest Window - Gui Layout Code
+
     // Ship Manifest Window
     // This window displays options for managing crew, resources, and flight checklists for the focused vessel.
     private static Vector2 _smScrollViewerPosition = Vector2.zero;
@@ -39,7 +64,7 @@ namespace ShipManifest.Windows
     internal static void Display(int _windowId)
     {
       Title =
-        $"{SmUtils.SmTags["#smloc_manifest_002"]} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
+        $"{titleContent} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
 
       // set input locks when mouseover window...
       //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -47,16 +72,13 @@ namespace ShipManifest.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      //GUIContent label = new GUIContent("", "Close Window");
-      GUIContent label = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+      // "Close Window");
       if (SMConditions.IsTransferInProgress())
       {
-        //label = new GUIContent("", "Action in progress.  Cannot close window");
-        label = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
         GUI.enabled = false;
       }
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, label))
+      if (GUI.Button(rect, SMConditions.IsTransferInProgress() ? closeXContent : closeContent))
       {
         SMAddon.OnSmButtonClicked();
         ToolTip = "";
@@ -85,12 +107,16 @@ namespace ShipManifest.Windows
         GUILayout.EndScrollView();
 
         //string resLabel = "No Resource Selected";
-        string resLabel = SmUtils.SmTags["#smloc_manifest_003"];
-        if (SMAddon.SmVessel.SelectedResources.Count == 1)
-          resLabel = SMAddon.SmVessel.SelectedResources[0];
-        else if (SMAddon.SmVessel.SelectedResources.Count == 2)
-          //resLabel = "Multiple Resources selected";
-          resLabel = SmUtils.SmTags["#smloc_manifest_004"];
+        string resLabel = noResSelContent;
+        switch (SMAddon.SmVessel.SelectedResources.Count)
+        {
+          case 1:
+            resLabel = SMAddon.SmVessel.SelectedResources[0];
+            break;
+          case 2:
+            resLabel = multiResSelContent;
+            break;
+        }
         GUILayout.Label($"{resLabel}", GUILayout.Width(300), GUILayout.Height(20));
 
         // Resource Details List Viewer
@@ -127,11 +153,11 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
-          if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_005"], SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Crew"
+          if (GUILayout.Button(fillCrewContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Crew"
           {
             SMAddon.SmVessel.FillCrew();
           }
-          if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_006"], SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Crew"
+          if (GUILayout.Button(emptyCrewContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Crew"
           {
             SMAddon.SmVessel.EmptyCrew();
           }
@@ -140,11 +166,11 @@ namespace ShipManifest.Windows
 
         if (!SMSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_007"], SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
+        if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
         {
           SMAddon.SmVessel.FillResources();
         }
-        if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_008"], SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Resources"
+        if (GUILayout.Button(emptyResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Resources"
         {
           SMAddon.SmVessel.DumpAllResources();
         }
@@ -196,9 +222,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].First(),
               SMAddon.SmVessel.PartsByResource[keys.Current].Last(), TransferPump.TypeXfer.Dump,
               TransferPump.TriggerButton.Manifest);
-            GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId)
-              ? new GUIContent(SmUtils.SmTags["#smloc_manifest_009"], SmUtils.SmTags["#smloc_manifest_tt_001"]) // "Dump", "Dumps the selected resource in this vessel"
-              : new GUIContent(SmUtils.SmTags["#smloc_manifest_010"], SmUtils.SmTags["#smloc_manifest_tt_002"]); // "Stop", "Halts the dumping of the selected resource in this vessel"
+            GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? dumpResContent : stopDumpResContent;
             GUI.enabled = SMConditions.CanResourceBeDumped(keys.Current);
             if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
             {
@@ -211,7 +235,7 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
-            if (GUILayout.Button($"{SmUtils.SmTags["#smloc_manifest_011"]}", SMStyle.ButtonStyle, GUILayout.Width(35),
+            if (GUILayout.Button($"{fillContent}", SMStyle.ButtonStyle, GUILayout.Width(35),
               GUILayout.Height(20))) // "Fill"
             {
               SMAddon.SmVessel.FillResource(keys.Current);
@@ -282,7 +306,7 @@ namespace ShipManifest.Windows
 
         // Now, based on the resourceselection, do we show the Transfer window?
         WindowTransfer.ShowWindow = SMAddon.SmVessel.SelectedResources.Count > 0;
-        if (WindowTransfer.ShowWindow) WindowTransfer.DsiplayMode = SMConditions.GetTransferMode();
+        if (WindowTransfer.ShowWindow) WindowTransfer.DisplayMode = SMConditions.GetTransferMode();
       }
       catch (Exception ex)
       {
@@ -373,7 +397,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_012"], settingsStyle, GUILayout.Height(20))) // "Settings"
+      if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.Height(20))) // "Settings"
       {
         try
         {
@@ -393,7 +417,7 @@ namespace ShipManifest.Windows
       }
 
       GUIStyle rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_013"], rosterStyle, GUILayout.Height(20))) // "Roster"
+      if (GUILayout.Button(rosterContent, rosterStyle, GUILayout.Height(20))) // "Roster"
       {
         try
         {
@@ -417,7 +441,7 @@ namespace ShipManifest.Windows
       }
 
       GUIStyle controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(SmUtils.SmTags["#smloc_manifest_014"], controlStyle, GUILayout.Height(20))) // "Control"
+      if (GUILayout.Button(controlContent, controlStyle, GUILayout.Height(20))) // "Control"
       {
         try
         {

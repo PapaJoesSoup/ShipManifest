@@ -38,7 +38,7 @@ namespace ShipManifest.Windows
     internal static bool TouristsOnlyTo;
 
     // Display mode
-    internal static SMConditions.TransferMode DsiplayMode;
+    internal static SMConditions.TransferMode DisplayMode;
 
     // this list is for display use.  Transfers are executed against a separate list.  
     // These objects may be used to derive objects to be added to the transfer process queue.
