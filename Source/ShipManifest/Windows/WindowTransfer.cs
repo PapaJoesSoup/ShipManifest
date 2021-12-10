@@ -17,7 +17,22 @@ namespace ShipManifest.Windows
 
     internal static string Title = "";
     internal static Rect Position = SMSettings.DefaultPosition;
-    internal static bool ShowWindow;
+
+    internal static bool _inputLocked;
+    private static bool _showWindow;
+    internal static bool ShowWindow
+    {
+      get => _showWindow;
+      set
+      {
+        if (!value)
+        {
+          InputLockManager.RemoveControlLock("SM_Window");
+          _inputLocked = false;
+        }
+        _showWindow = value;
+      }
+    }
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
 
@@ -166,7 +181,7 @@ namespace ShipManifest.Windows
     internal static void Display(int _windowId)
     {
       // set input locks when mouseover window...
-      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+      _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       string displayAmounts = SmUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
       Title = $"{titleContent} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"

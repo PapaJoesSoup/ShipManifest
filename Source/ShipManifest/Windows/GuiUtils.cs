@@ -16,6 +16,7 @@ namespace ShipManifest.Windows
     internal static GUIContent whiteContent = new GUIContent("", "White");
     internal static GUIContent yellowContent = new GUIContent("", "Yellow");
 
+    private const ControlTypes BLOCK_ALL_CONTROLS = ControlTypes.UI | ControlTypes.All;
 
     internal static string ColorSelector(out string toolTip)
     {
@@ -104,15 +105,11 @@ namespace ShipManifest.Windows
     internal static bool PreventClickthrough(bool visible, Rect position, bool lockedInputs)
     {
       // Still in work.  Not behaving correctly in Flight.  Works fine in Editor and Space Center...
+      // Based on testing, it appears that Kerbals can still be accessed
       bool mouseOverWindow = MouseIsOverWindow(visible, position);
       if (!lockedInputs && mouseOverWindow)
       {
-        if(HighLogic.LoadedSceneIsFlight)
-          InputLockManager.SetControlLock(ControlTypes.UI | ControlTypes.UI_DIALOGS | ControlTypes.GUI, "SM_Window");
-        else
-        {
-          InputLockManager.SetControlLock(ControlTypes.All, "SM_Window");
-        }
+        InputLockManager.SetControlLock(BLOCK_ALL_CONTROLS, "SM_Window");
         lockedInputs = true;
       }
       if (!lockedInputs || mouseOverWindow) return lockedInputs;

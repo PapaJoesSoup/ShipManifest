@@ -17,7 +17,21 @@ namespace ShipManifest.Windows
     internal static float WindowHeight = 330;
     internal static Rect Position = SMSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, 810, 230);
-    internal static bool ShowWindow;
+    internal static bool _inputLocked;
+    private static bool _showWindow;
+    internal static bool ShowWindow
+    {
+      get => _showWindow;
+      set
+      {
+        if (!value)
+        {
+          InputLockManager.RemoveControlLock("SM_Window");
+          _inputLocked = false;
+        }
+        _showWindow = value;
+      }
+    }
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -139,7 +153,7 @@ namespace ShipManifest.Windows
     {
       
       // set input locks when mouseover window...
-      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+      _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       // Reset Tooltip active flag...
       ToolTipActive = false;

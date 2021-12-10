@@ -855,7 +855,7 @@ namespace ShipManifest
           }
 
           if (!WindowManifest.ShowWindow || !WindowControl.ShowWindow) return;
-          step = "7 - Show Control";
+           step = "7 - Show Control";
           WindowControl.Position = GUILayout.Window(398548, WindowControl.Position, WindowControl.Display,
             WindowControl.Title, GUILayout.MinWidth(350), GUILayout.MinHeight(20));
         }

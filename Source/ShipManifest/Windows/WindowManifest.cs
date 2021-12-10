@@ -15,15 +15,18 @@ namespace ShipManifest.Windows
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
     internal static Rect Position = SMSettings.DefaultPosition;
+    internal static bool _inputLocked;
     private static bool _showWindow;
-
     internal static bool ShowWindow
     {
-      get { return _showWindow; }
+      get => _showWindow;
       set
       {
-        if (!value && SMAddon.SmVessel != null)
-          SMHighlighter.ClearResourceHighlighting(SMAddon.SmVessel.SelectedResourcesParts);
+        if (!value)
+        {
+          InputLockManager.RemoveControlLock("SM_Window");
+          _inputLocked = false;
+        }
         _showWindow = value;
       }
     }
@@ -67,7 +70,7 @@ namespace ShipManifest.Windows
         $"{titleContent} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
 
       // set input locks when mouseover window...
-      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+      _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
