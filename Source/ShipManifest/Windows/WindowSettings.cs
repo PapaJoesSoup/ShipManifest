@@ -10,7 +10,7 @@ namespace ShipManifest.Windows
     #region Settings Window (GUI)
 
     internal static Rect Position = SMSettings.DefaultPosition;
-    internal static bool _inputLocked;
+    private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
     {

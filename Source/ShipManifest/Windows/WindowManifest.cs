@@ -15,7 +15,7 @@ namespace ShipManifest.Windows
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
     internal static Rect Position = SMSettings.DefaultPosition;
-    internal static bool _inputLocked;
+    private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
     {

@@ -17,7 +17,7 @@ namespace ShipManifest.Windows
     internal static float WindowHeight = 330;
     internal static Rect Position = SMSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, 810, 230);
-    internal static bool _inputLocked;
+    private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
     {

@@ -9,7 +9,7 @@ namespace ShipManifest.Windows
   {
     internal static Rect Position = SMSettings.DefaultPosition;
     internal static Vector2 _displayViewerPosition = Vector2.zero;
-    internal static bool _inputLocked;
+    private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
     {

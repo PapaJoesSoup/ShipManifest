@@ -5,6 +5,7 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+ - New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
  - Changed:  Complete Refactoring of localization strings to improve performance and maintainability.
    This completes the application wide refactor to make all localization string usage static
    instead of instanced.
@@ -14,10 +15,11 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
    - Roster Window
    - Settings Window and all tabs
    - Control Window and remaining tabs
- - New: Added support to the Roster Wndow for selecting spacesuits while in Space Center and in Flight for assigned Crew.
- - Fixed: Replaced hard coded string in Settings.Config Tab to use localization. "(lines)"
+ - Fixed: Replaced hard coded string in Settings.Config Tab to use localization "(lines)".
    Updated localization files to include new reference.
-
+ - Fixed: Restored Input UI screen locks.  Some UI elements cannot be blocked, such as the Crew Portraits, and the Control panel at the top of the screen.
+   Click thru will still occur in these areas.
+ - Fixed: incorrect localization string references in Science Tab.  Lab Boost should now read Xmit Bonus.  Some ToolTips were incorrect.
 
 
 Version 6.0.3.1 - Release 27 Nov 2021 - KSP 1.12.x
