@@ -16,7 +16,7 @@ namespace ShipManifest.Windows.Tabs.Control
     private const float guiToggleWidth = 325;
 
     //Content vars
-    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_000"]);
+    internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_000"]);
     internal static GUIContent titleRmContent = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_001"]);
 
 

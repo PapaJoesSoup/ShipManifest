@@ -14,8 +14,8 @@ namespace ShipManifest.Windows.Tabs.Control
 
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
-    internal static GUIContent opContent = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
-    internal static GUIContent inopContent = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
+    internal static GUIContent opContent    = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
+    internal static GUIContent inopContent  = new GUIContent(SmUtils.SmTags["#smloc_control_lab_001"]);
 
 
     internal static void Display()

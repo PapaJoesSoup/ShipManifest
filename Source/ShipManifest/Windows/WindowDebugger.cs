@@ -31,11 +31,11 @@ namespace ShipManifest.Windows
     internal static bool ShowToolTips = true;
 
     // Content strings
-    internal static string Title = $"{SmUtils.SmTags["#smloc_debug_000"]}:  {SMSettings.CurVersion}";
-    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static GUIContent clrLogContent = new GUIContent(SmUtils.SmTags["#smloc_debug_001"]);
-    internal static GUIContent saveLogContent = new GUIContent(SmUtils.SmTags["#smloc_debug_002"]);
-    internal static GUIContent closeLogContent = new GUIContent(SmUtils.SmTags["#smloc_debug_003"]);
+    internal static string Title                = $"{SmUtils.SmTags["#smloc_debug_000"]}:  {SMSettings.CurVersion}";
+    internal static GUIContent closeContent     = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent clrLogContent    = new GUIContent(SmUtils.SmTags["#smloc_debug_001"]);
+    internal static GUIContent saveLogContent   = new GUIContent(SmUtils.SmTags["#smloc_debug_002"]);
+    internal static GUIContent closeLogContent  = new GUIContent(SmUtils.SmTags["#smloc_debug_003"]);
 
 
     internal static void Display(int _windowId)

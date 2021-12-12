@@ -62,60 +62,60 @@ namespace ShipManifest.Windows
     #region Localization Strings
 
     // Localization strings
-    internal static string titleContent = SmUtils.SmTags["#smloc_transfer_000"];
-    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static GUIContent noCloseContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
-    internal static string noPartContent = $"{SmUtils.SmTags["#smloc_transfer_002"]}";
-    internal static string multiPartContent = $"{SmUtils.SmTags["#smloc_transfer_001"]}";
-    internal static string vesselsContent = SmUtils.SmTags["#smloc_transfer_003"];
-    internal static GUIContent dumpPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_004"]);
-    internal static GUIContent stopPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_005"]);
-    internal static GUIContent fillVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_006"]);
-    internal static GUIContent dumpVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_001"]);
-    internal static GUIContent stopVContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_002"]);
-    internal static GUIContent fillPContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_003"]);
-    internal static GUIContent dumpCrewContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_007"]);
-    internal static GUIContent fillCrewContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_008"]);
-    internal static GUIContent moveKerbalContent = new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
-    internal static string movingContent = SmUtils.SmTags["#smloc_transfer_007"];
-    internal static string xferCrewContent = SmUtils.SmTags["#smloc_transfer_021"];
-    internal static GUIContent thawContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_010"], SmUtils.SmTags["#smloc_transfer_tt_010"]);
-    internal static GUIContent selectAllContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_033"]);
-    internal static GUIContent selectAllxContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_034"]);
-    internal static string fillCrewTtContent = SmUtils.SmTags[ "#smloc_conditions_tt_008"];
-    internal static string moveCrewTtContent = SmUtils.SmTags[ "#smloc_conditions_tt_009"];
+    internal static string titleContent           = SmUtils.SmTags["#smloc_transfer_000"];
+    internal static GUIContent closeContent       = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent noCloseContent     = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
+    internal static string noPartContent          = $"{SmUtils.SmTags["#smloc_transfer_002"]}";
+    internal static string multiPartContent       = $"{SmUtils.SmTags["#smloc_transfer_001"]}";
+    internal static string vesselsContent         = SmUtils.SmTags["#smloc_transfer_003"];
+    internal static GUIContent dumpPContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_004"]);
+    internal static GUIContent stopPContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_005"]);
+    internal static GUIContent fillVContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_006"]);
+    internal static GUIContent dumpVContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_001"]);
+    internal static GUIContent stopVContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_002"]);
+    internal static GUIContent fillPContent       = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_003"]);
+    internal static GUIContent dumpCrewContent    = new GUIContent(SmUtils.SmTags["#smloc_transfer_004"], SmUtils.SmTags["#smloc_transfer_tt_007"]);
+    internal static GUIContent fillCrewContent    = new GUIContent(SmUtils.SmTags["#smloc_transfer_006"], SmUtils.SmTags["#smloc_transfer_tt_008"]);
+    internal static GUIContent moveKerbalContent  = new GUIContent("»", SmUtils.SmTags["#smloc_transfer_tt_009"]);
+    internal static string movingContent          = SmUtils.SmTags["#smloc_transfer_007"];
+    internal static string xferCrewContent        = SmUtils.SmTags["#smloc_transfer_021"];
+    internal static GUIContent thawContent        = new GUIContent(SmUtils.SmTags["#smloc_transfer_010"], SmUtils.SmTags["#smloc_transfer_tt_010"]);
+    internal static GUIContent selectAllContent   = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_033"]);
+    internal static GUIContent selectAllxContent  = new GUIContent(SmUtils.SmTags["#smloc_transfer_020"], SmUtils.SmTags["#smloc_transfer_tt_034"]);
+    internal static string fillCrewTtContent      = SmUtils.SmTags["#smloc_conditions_tt_008"];
+    internal static string moveCrewTtContent      = SmUtils.SmTags["#smloc_conditions_tt_009"];
     internal static GUIContent touristOnlyContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_022"], SmUtils.SmTags["#smloc_transfer_tt_035"]);
-    internal static string evaContent = SmUtils.SmTags["#smloc_transfer_008"];
-    internal static string xferContent = SmUtils.SmTags["#smloc_transfer_009"];
-    internal static string expScienceContent = SmUtils.SmTags["#smloc_transfer_tt_011"];
-    internal static string disabledXferContent = SmUtils.SmTags["#smloc_transfer_tt_012"];
-    internal static string noXferRealismContent = SmUtils.SmTags["#smloc_transfer_tt_013"];
+    internal static string evaContent             = SmUtils.SmTags["#smloc_transfer_008"];
+    internal static string xferContent            = SmUtils.SmTags["#smloc_transfer_009"];
+    internal static string expScienceContent      = SmUtils.SmTags["#smloc_transfer_tt_011"];
+    internal static string disabledXferContent    = SmUtils.SmTags["#smloc_transfer_tt_012"];
+    internal static string noXferRealismContent   = SmUtils.SmTags["#smloc_transfer_tt_013"];
     internal static string xferOnlyProcSciContent = SmUtils.SmTags["#smloc_transfer_tt_014"];
-    internal static string moveKerbalTtContent = SmUtils.SmTags["#smloc_transfer_tt_009"];
-    internal static GUIContent xferProcContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_011"], SmUtils.SmTags["#smloc_transfer_tt_014"]);
-    internal static GUIContent xferUnprocContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_012"], SmUtils.SmTags["#smloc_transfer_tt_015"]);
-    internal static string resultsTtContent = SmUtils.SmTags["#smloc_transfer_tt_016"];
-    internal static string dataAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_017"];
-    internal static string mitsTtContent = SmUtils.SmTags["#smloc_transfer_tt_018"];
-    internal static string xmitValTtContent = SmUtils.SmTags["#smloc_transfer_tt_019"];
-    internal static string labValTtContent = SmUtils.SmTags["#smloc_transfer_tt_020"];
-    internal static string xmitBonusTtContent = SmUtils.SmTags["#smloc_transfer_tt_021"];
-    internal static string noXferSciRealismTtContent = SmUtils.SmTags["#smloc_transfer_tt_022"];
-    internal static string xferSciTtContent = SmUtils.SmTags["#smloc_transfer_tt_023"];
-    internal static GUIContent recvSciContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_013"], SmUtils.SmTags["#smloc_transfer_tt_024"]);
-    internal static string xferRemainContent = SmUtils.SmTags["#smloc_transfer_014"];
-    internal static string xferAmtContent = SmUtils.SmTags["#smloc_transfer_015"];
-    internal static string xferAmtTtBothContent = SmUtils.SmTags["#smloc_transfer_tt_025"];
-    internal static string xferAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_026"];
-    internal static string resultsContent = SmUtils.SmTags["#smloc_transfer_016"];
-    internal static string smallXferAmtTtContent = SmUtils.SmTags["#smloc_transfer_tt_027"];
-    internal static string noteRatioTtContent = SmUtils.SmTags["#smloc_transfer_tt_028"];
-    internal static GUIContent xferSliderContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_029"]);
-    internal static GUIContent xferStartContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_030"]);
-    internal static GUIContent xferStopContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_031"]);
-    internal static string onContent = SmUtils.SmTags["#smloc_transfer_017"];
-    internal static string offContent = SmUtils.SmTags["#smloc_transfer_018"];
-    internal static GUIContent flowContent = new GUIContent(SmUtils.SmTags["#smloc_transfer_019"], SmUtils.SmTags["#smloc_transfer_tt_032"]);
+    internal static string moveKerbalTtContent    = SmUtils.SmTags["#smloc_transfer_tt_009"];
+    internal static GUIContent xferProcContent    = new GUIContent(SmUtils.SmTags["#smloc_transfer_011"], SmUtils.SmTags["#smloc_transfer_tt_014"]);
+    internal static GUIContent xferUnprocContent  = new GUIContent(SmUtils.SmTags["#smloc_transfer_012"], SmUtils.SmTags["#smloc_transfer_tt_015"]);
+    internal static string resultsTtContent       = SmUtils.SmTags["#smloc_transfer_tt_016"];
+    internal static string dataAmtTtContent       = SmUtils.SmTags["#smloc_transfer_tt_017"];
+    internal static string mitsTtContent          = SmUtils.SmTags["#smloc_transfer_tt_018"];
+    internal static string xmitValTtContent       = SmUtils.SmTags["#smloc_transfer_tt_019"];
+    internal static string labValTtContent        = SmUtils.SmTags["#smloc_transfer_tt_020"];
+    internal static string xmitBonusTtContent     = SmUtils.SmTags["#smloc_transfer_tt_021"];
+    internal static string noXferSciRlsmTtContent = SmUtils.SmTags["#smloc_transfer_tt_022"];
+    internal static string xferSciTtContent       = SmUtils.SmTags["#smloc_transfer_tt_023"];
+    internal static GUIContent recvSciContent     = new GUIContent(SmUtils.SmTags["#smloc_transfer_013"], SmUtils.SmTags["#smloc_transfer_tt_024"]);
+    internal static string xferRemainContent      = SmUtils.SmTags["#smloc_transfer_014"];
+    internal static string xferAmtContent         = SmUtils.SmTags["#smloc_transfer_015"];
+    internal static string xferAmtTtBothContent   = SmUtils.SmTags["#smloc_transfer_tt_025"];
+    internal static string xferAmtTtContent       = SmUtils.SmTags["#smloc_transfer_tt_026"];
+    internal static string resultsContent         = SmUtils.SmTags["#smloc_transfer_016"];
+    internal static string smallXferAmtTtContent  = SmUtils.SmTags["#smloc_transfer_tt_027"];
+    internal static string noteRatioTtContent     = SmUtils.SmTags["#smloc_transfer_tt_028"];
+    internal static GUIContent xferSliderContent  = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_029"]);
+    internal static GUIContent xferStartContent   = new GUIContent(SmUtils.SmTags["#smloc_transfer_009"], SmUtils.SmTags["#smloc_transfer_tt_030"]);
+    internal static GUIContent xferStopContent    = new GUIContent(SmUtils.SmTags["#smloc_transfer_005"], SmUtils.SmTags["#smloc_transfer_tt_031"]);
+    internal static string onContent              = SmUtils.SmTags["#smloc_transfer_017"];
+    internal static string offContent             = SmUtils.SmTags["#smloc_transfer_018"];
+    internal static GUIContent flowContent        = new GUIContent(SmUtils.SmTags["#smloc_transfer_019"], SmUtils.SmTags["#smloc_transfer_tt_032"]);
 
     #endregion Localization Strings
 
@@ -1169,7 +1169,7 @@ namespace ShipManifest.Windows
             if (SMSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
-              toolTip = noXferSciRealismTtContent;
+              toolTip = noXferSciRlsmTtContent;
             }
             else
             {
@@ -1329,7 +1329,7 @@ namespace ShipManifest.Windows
             {
               GUI.enabled = false;
               //toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";
-              toolTip = noXferSciRealismTtContent;
+              toolTip = noXferSciRlsmTtContent;
             }
             else
             {

@@ -22,14 +22,14 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static int CombineVesselCount = 0;
 
     //Content vars
-    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_000"]);
-    internal static GUIContent addVesselContent = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
-    internal static GUIContent renameVesselContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]); //Undock
-    internal static GUIContent saveNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_002"], SmUtils.SmTags["#smloc_control_vessel_tt_002"]); // "Save" // "Saves the changes to the docked vessel name." 
-    internal static GUIContent editNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_003"]);// Edit // "Change the docked vessel name."
-    internal static GUIContent cancelNameContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_004"], SmUtils.SmTags["#smloc_control_vessel_tt_004"]); // "Cancel","Cancel changes to docked vessel name"
-    internal static GUIContent editTypeContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_006"]); // "Edit","Change docked vessel type"
-    internal static GUIContent exitTypeContent = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_005"], SmUtils.SmTags["#smloc_control_vessel_tt_007"]); // "Done","Exit changing vessel type"
+    internal static GUIContent titleContent         = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_000"]);
+    internal static GUIContent addVesselContent     = new GUIContent("", SmUtils.SmTags["#smloc_control_vessel_tt_001"]); //"Include in list of vessels to combine into a single docked vessel"
+    internal static GUIContent renameVesselContent  = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_001"], SmUtils.SmTags["#smloc_control_vessel_tt_005"]); //Undock
+    internal static GUIContent saveNameContent      = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_002"], SmUtils.SmTags["#smloc_control_vessel_tt_002"]); // "Save" // "Saves the changes to the docked vessel name." 
+    internal static GUIContent editNameContent      = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_003"]);// Edit // "Change the docked vessel name."
+    internal static GUIContent cancelNameContent    = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_004"], SmUtils.SmTags["#smloc_control_vessel_tt_004"]); // "Cancel","Cancel changes to docked vessel name"
+    internal static GUIContent editTypeContent      = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_003"], SmUtils.SmTags["#smloc_control_vessel_tt_006"]); // "Edit","Change docked vessel type"
+    internal static GUIContent exitTypeContent      = new GUIContent(SmUtils.SmTags["#smloc_control_vessel_005"], SmUtils.SmTags["#smloc_control_vessel_tt_007"]); // "Done","Exit changing vessel type"
 
     internal static void Display()
     {
@@ -65,14 +65,14 @@ namespace ShipManifest.Windows.Tabs.Control
           
 
           bool isChecked = mdv.Combine;
-          // temporary commenting of comnbine code to allow release.  Will work for next version.
+          // temporary commenting of combine code to allow release.  Will work for next version.
           //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20));
           if (isChecked) combineVesselcount += 1;
           if (isChecked != mdv.Combine)
           {
             mdv.Combine = isChecked;
           }
-          // temporary commenting to allow release.  Will work on comnbine code for next version.
+          // temporary commenting to allow release.  Will work on combine code for next version.
           //Rect rect = GUILayoutUtility.GetLastRect();
           //if (Event.current.type == EventType.Repaint && _canShowToolTips)
           //  ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, scrollX);

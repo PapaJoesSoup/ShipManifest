@@ -37,21 +37,21 @@ namespace ShipManifest.Windows
 
     #region Localization strings
 
-    internal static string titleContent = SmUtils.SmTags["#smloc_manifest_002"];
-    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static GUIContent closeXContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
-    internal static string noResSelContent = SmUtils.SmTags["#smloc_manifest_003"];
-    internal static string multiResSelContent = SmUtils.SmTags["#smloc_manifest_004"];
-    internal static string fillCrewContent = SmUtils.SmTags["#smloc_manifest_005"];
-    internal static string emptyCrewContent = SmUtils.SmTags["#smloc_manifest_006"];
-    internal static string fillResContent = SmUtils.SmTags["#smloc_manifest_007"];
-    internal static string emptyResContent = SmUtils.SmTags["#smloc_manifest_008"];
-    internal static GUIContent dumpResContent = new GUIContent(SmUtils.SmTags["#smloc_manifest_009"], SmUtils.SmTags["#smloc_manifest_tt_001"]);
+    internal static string titleContent           = SmUtils.SmTags["#smloc_manifest_002"];
+    internal static GUIContent closeContent       = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent closeXContent      = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
+    internal static string noResSelContent        = SmUtils.SmTags["#smloc_manifest_003"];
+    internal static string multiResSelContent     = SmUtils.SmTags["#smloc_manifest_004"];
+    internal static string fillCrewContent        = SmUtils.SmTags["#smloc_manifest_005"];
+    internal static string emptyCrewContent       = SmUtils.SmTags["#smloc_manifest_006"];
+    internal static string fillResContent         = SmUtils.SmTags["#smloc_manifest_007"];
+    internal static string emptyResContent        = SmUtils.SmTags["#smloc_manifest_008"];
+    internal static GUIContent dumpResContent     = new GUIContent(SmUtils.SmTags["#smloc_manifest_009"], SmUtils.SmTags["#smloc_manifest_tt_001"]);
     internal static GUIContent stopDumpResContent = new GUIContent(SmUtils.SmTags["#smloc_manifest_010"], SmUtils.SmTags["#smloc_manifest_tt_002"]);
-    internal static string fillContent = SmUtils.SmTags["#smloc_manifest_011"];
-    internal static string settingsContent = SmUtils.SmTags["#smloc_manifest_012"];
-    internal static string rosterContent = SmUtils.SmTags["#smloc_manifest_013"];
-    internal static string controlContent = SmUtils.SmTags["#smloc_manifest_014"];
+    internal static string fillContent            = SmUtils.SmTags["#smloc_manifest_011"];
+    internal static string settingsContent        = SmUtils.SmTags["#smloc_manifest_012"];
+    internal static string rosterContent          = SmUtils.SmTags["#smloc_manifest_013"];
+    internal static string controlContent         = SmUtils.SmTags["#smloc_manifest_014"];
 
     #endregion Localization strings
 

@@ -22,25 +22,25 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static Rect Position = WindowSettings.Position;
 
     // Content strings
-    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_000"]);
-    internal static GUIContent allTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_001"], SmUtils.SmTags["#smloc_settings_tooltips_tt_001"]);
-    internal static GUIContent debugTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_002"], SmUtils.SmTags["#smloc_settings_tooltips_tt_002"]);
-    internal static GUIContent manifestTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_003"], SmUtils.SmTags["#smloc_settings_tooltips_tt_003"]);
-    internal static GUIContent transferTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_004"], SmUtils.SmTags["#smloc_settings_tooltips_tt_004"]);
-    internal static GUIContent settingsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_005"], SmUtils.SmTags["#smloc_settings_tooltips_tt_005"]);
-    internal static GUIContent realismTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_006"], SmUtils.SmTags["#smloc_settings_tooltips_tt_006"]);
+    internal static GUIContent titleContent       = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_000"]);
+    internal static GUIContent allTtContent       = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_001"], SmUtils.SmTags["#smloc_settings_tooltips_tt_001"]);
+    internal static GUIContent debugTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_002"], SmUtils.SmTags["#smloc_settings_tooltips_tt_002"]);
+    internal static GUIContent manifestTtContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_003"], SmUtils.SmTags["#smloc_settings_tooltips_tt_003"]);
+    internal static GUIContent transferTtContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_004"], SmUtils.SmTags["#smloc_settings_tooltips_tt_004"]);
+    internal static GUIContent settingsTtContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_005"], SmUtils.SmTags["#smloc_settings_tooltips_tt_005"]);
+    internal static GUIContent realismTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_006"], SmUtils.SmTags["#smloc_settings_tooltips_tt_006"]);
     internal static GUIContent highlightTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_007"], SmUtils.SmTags["#smloc_settings_tooltips_tt_007"]);
-    internal static GUIContent tooltipsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_008"], SmUtils.SmTags["#smloc_settings_tooltips_tt_008"]);
-    internal static GUIContent soundsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_009"], SmUtils.SmTags["#smloc_settings_tooltips_tt_009"]);
-    internal static GUIContent configTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_010"], SmUtils.SmTags["#smloc_settings_tooltips_tt_010"]);
-    internal static GUIContent rosterTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_011"], SmUtils.SmTags["#smloc_settings_tooltips_tt_011"]);
-    internal static GUIContent controlTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_012"], SmUtils.SmTags["#smloc_settings_tooltips_tt_012"]);
-    internal static GUIContent hatchTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_013"], SmUtils.SmTags["#smloc_settings_tooltips_tt_013"]);
-    internal static GUIContent solarTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_014"], SmUtils.SmTags["#smloc_settings_tooltips_tt_014"]);
-    internal static GUIContent antennaTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_015"], SmUtils.SmTags["#smloc_settings_tooltips_tt_015"]);
-    internal static GUIContent lightTTContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_016"], SmUtils.SmTags["#smloc_settings_tooltips_tt_016"]);
-    internal static GUIContent labsTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_017"], SmUtils.SmTags["#smloc_settings_tooltips_tt_017"]);
-    internal static GUIContent lightTtContent = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
+    internal static GUIContent tooltipsTtContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_008"], SmUtils.SmTags["#smloc_settings_tooltips_tt_008"]);
+    internal static GUIContent soundsTtContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_009"], SmUtils.SmTags["#smloc_settings_tooltips_tt_009"]);
+    internal static GUIContent configTtContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_010"], SmUtils.SmTags["#smloc_settings_tooltips_tt_010"]);
+    internal static GUIContent rosterTtContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_011"], SmUtils.SmTags["#smloc_settings_tooltips_tt_011"]);
+    internal static GUIContent controlTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_012"], SmUtils.SmTags["#smloc_settings_tooltips_tt_012"]);
+    internal static GUIContent hatchTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_013"], SmUtils.SmTags["#smloc_settings_tooltips_tt_013"]);
+    internal static GUIContent solarTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_014"], SmUtils.SmTags["#smloc_settings_tooltips_tt_014"]);
+    internal static GUIContent antennaTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_015"], SmUtils.SmTags["#smloc_settings_tooltips_tt_015"]);
+    internal static GUIContent lightTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_016"], SmUtils.SmTags["#smloc_settings_tooltips_tt_016"]);
+    internal static GUIContent labsTtContent      = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_017"], SmUtils.SmTags["#smloc_settings_tooltips_tt_017"]);
+    internal static GUIContent vesselTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
 
 
     internal static void Display(Vector2 displayViewerPosition)
@@ -170,10 +170,10 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUI.enabled = SMSettings.ShowToolTips && WindowControl.ShowToolTips;
 
-      // CW - Light Tab
+      // CW - Vessel Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, lightTtContent, GUILayout.Width(guiToggleWidth));
+      TabLight.ShowToolTips = GUILayout.Toggle(TabVessel.ShowToolTips, vesselTtContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)

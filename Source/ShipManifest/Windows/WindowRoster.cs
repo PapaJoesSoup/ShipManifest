@@ -55,72 +55,72 @@ namespace ShipManifest.Windows
 
     #region Localization Strings
     // Content strings
-    internal static string Title = $"{SmUtils.SmTags["#smloc_roster_001"]}:  {SMSettings.CurVersion}";
-    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static string addKerbalContent = SmUtils.SmTags["#smloc_roster_002"];
-    internal static string addKerbalOffContent = SmUtils.SmTags["#smloc_roster_tt_001"];
+    internal static string Title                = $"{SmUtils.SmTags["#smloc_roster_001"]}:  {SMSettings.CurVersion}";
+    internal static GUIContent closeContent     = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static string addKerbalContent     = SmUtils.SmTags["#smloc_roster_002"];
+    internal static string addKerbalOffContent  = SmUtils.SmTags["#smloc_roster_tt_001"];
     internal static string addKerbalEditContent = SmUtils.SmTags["#smloc_roster_tt_022"];
-    internal static GUIContent createContent = new GUIContent(SmUtils.SmTags["#smloc_roster_003"], SmUtils.SmTags["#smloc_roster_tt_002"]);
-    internal static GUIContent cancelContent = new GUIContent(SmUtils.SmTags["#smloc_roster_004"], SmUtils.SmTags["#smloc_roster_tt_003"]);
-    internal static string cnxEditContent = SmUtils.SmTags["#smloc_roster_004"];
-    internal static GUIContent profContent = new GUIContent(SmUtils.SmTags["#smloc_roster_005"]);
-    internal static string pilotContent = SmUtils.SmTags["#smloc_roster_006"];
-    internal static string engineerContent = SmUtils.SmTags["#smloc_roster_007"];
-    internal static string scientistContent = SmUtils.SmTags["#smloc_roster_008"];
-    internal static GUIContent filterContent = new GUIContent($"{SmUtils.SmTags["#smloc_roster_009"]}:");
-    internal static string allContent = SmUtils.SmTags["#smloc_roster_010"];
-    internal static string assignContent = SmUtils.SmTags["#smloc_roster_011"];
-    internal static string vesselContent = SmUtils.SmTags["#smloc_roster_012"];
-    internal static string availContent = SmUtils.SmTags["#smloc_roster_013"];
-    internal static string deadContent = SmUtils.SmTags["#smloc_roster_014"];
-    internal static string frozenContent = SmUtils.SmTags["#smloc_roster_015"];
-    internal static string nameContent = SmUtils.SmTags["#smloc_roster_016"];
-    internal static string genderContent = SmUtils.SmTags["#smloc_roster_017"];
-    internal static string skillContent = SmUtils.SmTags["#smloc_roster_018"];
-    internal static string statusContent = SmUtils.SmTags["#smloc_roster_019"];
-    internal static string editContent = SmUtils.SmTags["#smloc_roster_020"];
-    internal static string actionContent = SmUtils.SmTags["#smloc_roster_021"];
-    internal static string removeContent = SmUtils.SmTags["#smloc_roster_022"];
-    internal static string addContent = SmUtils.SmTags["#smloc_roster_023"];
-    internal static string respawnContent = SmUtils.SmTags["#smloc_roster_024"]; 
-    internal static string thawContent = SmUtils.SmTags["#smloc_roster_025"];
-    internal static string freezeContent = SmUtils.SmTags["#smloc_roster_026"];
-    internal static string editKerbalContent = SmUtils.SmTags["#smloc_roster_027"];
-    internal static GUIContent applyContent = new GUIContent(SmUtils.SmTags["#smloc_roster_028"], SmUtils.SmTags["#smloc_roster_tt_006"]);
-    internal static string courageContent = SmUtils.SmTags["#smloc_roster_029"];
-    internal static string stupidContent = SmUtils.SmTags["#smloc_roster_030"];
-    internal static string badassContent = SmUtils.SmTags["#smloc_roster_031"];
-    internal static string touristContent = SmUtils.SmTags["#smloc_roster_032"];
-    internal static string applicantContent = SmUtils.SmTags["#smloc_roster_033"];
-    internal static string hireContent = SmUtils.SmTags["#smloc_roster_034"];
-    internal static string veteranContent = SmUtils.SmTags["#smloc_roster_035"];
-    internal static GUIContent suitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_036"]);
-    internal static GUIContent defaultSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_037"]);
-    internal static GUIContent vintageSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_038"]);
-    internal static GUIContent futureSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_039"]);
-    internal static string brokenContent = SmUtils.SmTags["#smloc_roster_040"];
-    internal static string fixContent = SmUtils.SmTags["#smloc_roster_041"];
+    internal static GUIContent createContent    = new GUIContent(SmUtils.SmTags["#smloc_roster_003"], SmUtils.SmTags["#smloc_roster_tt_002"]);
+    internal static GUIContent cancelContent    = new GUIContent(SmUtils.SmTags["#smloc_roster_004"], SmUtils.SmTags["#smloc_roster_tt_003"]);
+    internal static string cnxEditContent       = SmUtils.SmTags["#smloc_roster_004"];
+    internal static GUIContent profContent      = new GUIContent(SmUtils.SmTags["#smloc_roster_005"]);
+    internal static string pilotContent         = SmUtils.SmTags["#smloc_roster_006"];
+    internal static string engineerContent      = SmUtils.SmTags["#smloc_roster_007"];
+    internal static string scientistContent     = SmUtils.SmTags["#smloc_roster_008"];
+    internal static GUIContent filterContent    = new GUIContent($"{SmUtils.SmTags["#smloc_roster_009"]}:");
+    internal static string allContent           = SmUtils.SmTags["#smloc_roster_010"];
+    internal static string assignContent        = SmUtils.SmTags["#smloc_roster_011"];
+    internal static string vesselContent        = SmUtils.SmTags["#smloc_roster_012"];
+    internal static string availContent         = SmUtils.SmTags["#smloc_roster_013"];
+    internal static string deadContent          = SmUtils.SmTags["#smloc_roster_014"];
+    internal static string frozenContent        = SmUtils.SmTags["#smloc_roster_015"];
+    internal static string nameContent          = SmUtils.SmTags["#smloc_roster_016"];
+    internal static string genderContent        = SmUtils.SmTags["#smloc_roster_017"];
+    internal static string skillContent         = SmUtils.SmTags["#smloc_roster_018"];
+    internal static string statusContent        = SmUtils.SmTags["#smloc_roster_019"];
+    internal static string editContent          = SmUtils.SmTags["#smloc_roster_020"];
+    internal static string actionContent        = SmUtils.SmTags["#smloc_roster_021"];
+    internal static string removeContent        = SmUtils.SmTags["#smloc_roster_022"];
+    internal static string addContent           = SmUtils.SmTags["#smloc_roster_023"];
+    internal static string respawnContent       = SmUtils.SmTags["#smloc_roster_024"]; 
+    internal static string thawContent          = SmUtils.SmTags["#smloc_roster_025"];
+    internal static string freezeContent        = SmUtils.SmTags["#smloc_roster_026"];
+    internal static string editKerbalContent    = SmUtils.SmTags["#smloc_roster_027"];
+    internal static GUIContent applyContent     = new GUIContent(SmUtils.SmTags["#smloc_roster_028"], SmUtils.SmTags["#smloc_roster_tt_006"]);
+    internal static string courageContent       = SmUtils.SmTags["#smloc_roster_029"];
+    internal static string stupidContent        = SmUtils.SmTags["#smloc_roster_030"];
+    internal static string badassContent        = SmUtils.SmTags["#smloc_roster_031"];
+    internal static string touristContent       = SmUtils.SmTags["#smloc_roster_032"];
+    internal static string applicantContent     = SmUtils.SmTags["#smloc_roster_033"];
+    internal static string hireContent          = SmUtils.SmTags["#smloc_roster_034"];
+    internal static string veteranContent       = SmUtils.SmTags["#smloc_roster_035"];
+    internal static GUIContent suitContent      = new GUIContent(SmUtils.SmTags["#smloc_roster_036"]);
+    internal static GUIContent dfltSuitContent  = new GUIContent(SmUtils.SmTags["#smloc_roster_037"]);
+    internal static GUIContent vntgeSuitContent = new GUIContent(SmUtils.SmTags["#smloc_roster_038"]);
+    internal static GUIContent futrSuitContent  = new GUIContent(SmUtils.SmTags["#smloc_roster_039"]);
+    internal static string brokenContent        = SmUtils.SmTags["#smloc_roster_040"];
+    internal static string fixContent           = SmUtils.SmTags["#smloc_roster_041"];
 
-    internal static string editKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_007"];
-    internal static string cnxEditKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_008"];
-    internal static string notAvailTtContent = SmUtils.SmTags["#smloc_roster_tt_009"];
-    internal static string addKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_010"];
-    internal static string thawNoTtContent = SmUtils.SmTags["#smloc_roster_tt_011"];
-    internal static string thawYesTtContent = SmUtils.SmTags["#smloc_roster_tt_012"];
-    internal static string freezeTtContent = SmUtils.SmTags["#smloc_roster_tt_013"];
-    internal static string removeYesTtContent = SmUtils.SmTags["#smloc_roster_tt_014"];
-    internal static string addNoSrcTtContent = SmUtils.SmTags["#smloc_roster_tt_015"];
-    internal static string addNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_016"];
-    internal static string notAvailKerbalTtContent = SmUtils.SmTags["#smloc_roster_tt_017"];
-    internal static string kerbalNotDeadTtContent = SmUtils.SmTags["#smloc_roster_tt_018"];
-    internal static string respawnNoTtContent = SmUtils.SmTags["#smloc_roster_tt_019"];
-    internal static string respwanYesTtContent = SmUtils.SmTags["#smloc_roster_020"];
-    internal static string realismOnTtContent = SmUtils.SmTags["#smloc_roster_tt_021"];
+    internal static string editKerbalTtContent  = SmUtils.SmTags["#smloc_roster_tt_007"];
+    internal static string cnxEditKrblTtContent = SmUtils.SmTags["#smloc_roster_tt_008"];
+    internal static string notAvailTtContent    = SmUtils.SmTags["#smloc_roster_tt_009"];
+    internal static string addKerbalTtContent   = SmUtils.SmTags["#smloc_roster_tt_010"];
+    internal static string thawNoTtContent      = SmUtils.SmTags["#smloc_roster_tt_011"];
+    internal static string thawYesTtContent     = SmUtils.SmTags["#smloc_roster_tt_012"];
+    internal static string freezeTtContent      = SmUtils.SmTags["#smloc_roster_tt_013"];
+    internal static string removeYesTtContent   = SmUtils.SmTags["#smloc_roster_tt_014"];
+    internal static string addNoSrcTtContent    = SmUtils.SmTags["#smloc_roster_tt_015"];
+    internal static string addNoModTtContent    = SmUtils.SmTags["#smloc_roster_tt_016"];
+    internal static string noAvlKrblTtContent   = SmUtils.SmTags["#smloc_roster_tt_017"];
+    internal static string krblNotDeadTtContent = SmUtils.SmTags["#smloc_roster_tt_018"];
+    internal static string respawnNoTtContent   = SmUtils.SmTags["#smloc_roster_tt_019"];
+    internal static string respwanYesTtContent  = SmUtils.SmTags["#smloc_roster_020"];
+    internal static string realismOnTtContent   = SmUtils.SmTags["#smloc_roster_tt_021"];
     internal static string removeNoModTtContent = SmUtils.SmTags["#smloc_roster_tt_023"];
-    internal static string hireTtContent = SmUtils.SmTags["#smloc_roster_tt_024"];
-    internal static string fixTtContent = SmUtils.SmTags["#smloc_roster_tt_025"];
-    internal static string suitKerbalTtContent = "Change this Kerbal's Suit";
-    internal static string cnxSuitKerbalTtContent = "Cancel changes to this Kerbal'Suit";
+    internal static string hireTtContent        = SmUtils.SmTags["#smloc_roster_tt_024"];
+    internal static string fixTtContent         = SmUtils.SmTags["#smloc_roster_tt_025"];
+    internal static string suitKerbalTtContent  = "Change this Kerbal's Suit";
+    internal static string cnxSuitKrblTtContent = "Cancel changes to this Kerbal'Suit";
     #endregion Localization Strings
 
 
@@ -324,15 +324,15 @@ namespace ShipManifest.Windows
       GUILayout.Label(suitContent, GUILayout.Width(85)); // "Suit:"
 
       // Always available
-      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, defaultSuitContent, GUILayout.Width(90)); // "Default"
+      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, dfltSuitContent, GUILayout.Width(90)); // "Default"
       if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
 
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, vintageSuitContent, GUILayout.Width(90)); // "Vintage"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, vntgeSuitContent, GUILayout.Width(90)); // "Vintage"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
       }
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futureSuitContent, GUILayout.Width(90)); // "Future"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futrSuitContent, GUILayout.Width(90)); // "Future"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
       }
 
@@ -667,7 +667,7 @@ namespace ShipManifest.Windows
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
           ? suitKerbalTtContent // "Change this Kerbal's Suit"
-          : cnxSuitKerbalTtContent; // "Cancel changes to this Kerbal's Suit"
+          : cnxSuitKrblTtContent; // "Cancel changes to this Kerbal's Suit"
       else
         buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
           ? notAvailTtContent // "Kerbal is not available at this time.\r\nEditing is disabled";
@@ -683,7 +683,7 @@ namespace ShipManifest.Windows
       if (GUI.enabled)
         buttonToolTip = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal
           ? editKerbalTtContent // "Edit this Kerbal's attributes"
-          : cnxEditKerbalTtContent; // "Cancel any changes to this Kerbal"
+          : cnxEditKrblTtContent; // "Cancel any changes to this Kerbal"
       else
         buttonToolTip = kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Available 
           ? notAvailTtContent // "Kerbal is not available at this time.\r\nEditing is disabled";
@@ -748,7 +748,7 @@ namespace ShipManifest.Windows
         {
           GUI.enabled = false;
           buttonText = "--";
-          buttonToolTip = notAvailKerbalTtContent;
+          buttonToolTip = noAvlKrblTtContent;
           // buttonToolTip = "Kerbal is not available.\r\nCurrent status does not allow any action.";
         }
       }
@@ -756,7 +756,7 @@ namespace ShipManifest.Windows
       {
         GUI.enabled = false;
         buttonText = "--";
-        buttonToolTip = kerbalNotDeadTtContent;
+        buttonToolTip = krblNotDeadTtContent;
         // buttonToolTip = "Kerbal is not dead or missing.\r\nCurrent status does not allow any action while in Space Center.";
       }
 

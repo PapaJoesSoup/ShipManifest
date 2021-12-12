@@ -36,29 +36,29 @@ namespace ShipManifest.Windows
     internal const float GuiRuleWidth = 420;
 
     // Content strings
-    internal static string Title = SmUtils.SmTags["#smloc_control_001"];
-    internal static GUIContent closeContent = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static GUIContent hatchContent = new GUIContent(SmUtils.SmTags["#smloc_control_002"], SmUtils.SmTags["#smloc_control_tt_001"]);
-    internal static GUIContent solarContent = new GUIContent(SmUtils.SmTags["#smloc_control_003"], SmUtils.SmTags["#smloc_control_tt_002"]);
-    internal static GUIContent antennaContent = new GUIContent(SmUtils.SmTags["#smloc_control_004"], SmUtils.SmTags["#smloc_control_tt_003"]);
-    internal static GUIContent lightContent = new GUIContent(SmUtils.SmTags["#smloc_control_005"], SmUtils.SmTags["#smloc_control_tt_004"]);
-    internal static GUIContent labsContent = new GUIContent(SmUtils.SmTags["#smloc_control_006"], SmUtils.SmTags["#smloc_control_tt_005"]);
-    internal static GUIContent vesselContent = new GUIContent(SmUtils.SmTags["#smloc_control_017"], SmUtils.SmTags["#smloc_control_tt_006"]);
-    internal static GUIContent radiatorContent = new GUIContent(SmUtils.SmTags["#smloc_control_020"], SmUtils.SmTags["#smloc_control_tt_007"]);
-    internal static GUIContent retSolarContent = new GUIContent(SmUtils.SmTags["#smloc_control_016"]);
-    internal static GUIContent extSolarContent = new GUIContent(SmUtils.SmTags["#smloc_control_007"]);
-    internal static GUIContent retRadiateContent = new GUIContent(SmUtils.SmTags["#smloc_control_022"]);
-    internal static GUIContent extRadiateContent = new GUIContent(SmUtils.SmTags["#smloc_control_021"]);
+    internal static string Title                  = SmUtils.SmTags["#smloc_control_001"];
+    internal static GUIContent closeContent       = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
+    internal static GUIContent hatchContent       = new GUIContent(SmUtils.SmTags["#smloc_control_002"], SmUtils.SmTags["#smloc_control_tt_001"]);
+    internal static GUIContent solarContent       = new GUIContent(SmUtils.SmTags["#smloc_control_003"], SmUtils.SmTags["#smloc_control_tt_002"]);
+    internal static GUIContent antennaContent     = new GUIContent(SmUtils.SmTags["#smloc_control_004"], SmUtils.SmTags["#smloc_control_tt_003"]);
+    internal static GUIContent lightContent       = new GUIContent(SmUtils.SmTags["#smloc_control_005"], SmUtils.SmTags["#smloc_control_tt_004"]);
+    internal static GUIContent labsContent        = new GUIContent(SmUtils.SmTags["#smloc_control_006"], SmUtils.SmTags["#smloc_control_tt_005"]);
+    internal static GUIContent vesselContent      = new GUIContent(SmUtils.SmTags["#smloc_control_017"], SmUtils.SmTags["#smloc_control_tt_006"]);
+    internal static GUIContent radiatorContent    = new GUIContent(SmUtils.SmTags["#smloc_control_020"], SmUtils.SmTags["#smloc_control_tt_007"]);
+    internal static GUIContent retSolarContent    = new GUIContent(SmUtils.SmTags["#smloc_control_016"]);
+    internal static GUIContent extSolarContent    = new GUIContent(SmUtils.SmTags["#smloc_control_007"]);
+    internal static GUIContent retRadiateContent  = new GUIContent(SmUtils.SmTags["#smloc_control_022"]);
+    internal static GUIContent extRadiateContent  = new GUIContent(SmUtils.SmTags["#smloc_control_021"]);
     internal static GUIContent closenHatchContent = new GUIContent(SmUtils.SmTags["#smloc_control_008"]);
-    internal static GUIContent openHatchContent = new GUIContent(SmUtils.SmTags["#smloc_control_009"]);
-    internal static GUIContent retAntennaContent = new GUIContent(SmUtils.SmTags["#smloc_control_010"]);
-    internal static GUIContent extAntennaContent = new GUIContent(SmUtils.SmTags["#smloc_control_011"]);
-    internal static GUIContent offLightContent = new GUIContent(SmUtils.SmTags["#smloc_control_012"]);
-    internal static GUIContent onLightContent = new GUIContent(SmUtils.SmTags["#smloc_control_013"]);
-    internal static GUIContent onLabsContent = new GUIContent(SmUtils.SmTags["#smloc_control_014"]);
-    internal static GUIContent offLabsContent = new GUIContent(SmUtils.SmTags["#smloc_control_015"]);
-    internal static GUIContent selVesselContent = new GUIContent(SmUtils.SmTags["#smloc_control_018"]);
-    internal static GUIContent clrVesselContent = new GUIContent(SmUtils.SmTags["#smloc_control_019"]);
+    internal static GUIContent openHatchContent   = new GUIContent(SmUtils.SmTags["#smloc_control_009"]);
+    internal static GUIContent retAntennaContent  = new GUIContent(SmUtils.SmTags["#smloc_control_010"]);
+    internal static GUIContent extAntennaContent  = new GUIContent(SmUtils.SmTags["#smloc_control_011"]);
+    internal static GUIContent offLightContent    = new GUIContent(SmUtils.SmTags["#smloc_control_012"]);
+    internal static GUIContent onLightContent     = new GUIContent(SmUtils.SmTags["#smloc_control_013"]);
+    internal static GUIContent onLabsContent      = new GUIContent(SmUtils.SmTags["#smloc_control_014"]);
+    internal static GUIContent offLabsContent     = new GUIContent(SmUtils.SmTags["#smloc_control_015"]);
+    internal static GUIContent selVesselContent   = new GUIContent(SmUtils.SmTags["#smloc_control_018"]);
+    internal static GUIContent clrVesselContent   = new GUIContent(SmUtils.SmTags["#smloc_control_019"]);
 
 
     internal static void Display(int _windowId)

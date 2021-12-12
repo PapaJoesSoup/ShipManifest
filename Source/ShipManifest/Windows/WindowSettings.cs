@@ -197,7 +197,7 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(cancelContent, GUILayout.Height(20)))
       {
         ToolTip = "";
-        // We've canclled, so restore original settings.
+        // We've cancelled, so restore original settings.
         SMSettings.MemRestoreTempSettings();
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)

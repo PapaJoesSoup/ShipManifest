@@ -5,16 +5,16 @@ namespace ShipManifest.Windows
   internal static class GuiUtils
   {
     // Color content strings
-    internal static GUIContent blueContent = new GUIContent("", "Blue");
-    internal static GUIContent blackContent = new GUIContent("", "Black");
-    internal static GUIContent clearContent = new GUIContent("", "Clear");
-    internal static GUIContent cyanContent = new GUIContent("", "Cyan");
-    internal static GUIContent grayContent = new GUIContent("", "Gray");
-    internal static GUIContent greenContent = new GUIContent("", "Green");
+    internal static GUIContent blueContent    = new GUIContent("", "Blue");
+    internal static GUIContent blackContent   = new GUIContent("", "Black");
+    internal static GUIContent clearContent   = new GUIContent("", "Clear");
+    internal static GUIContent cyanContent    = new GUIContent("", "Cyan");
+    internal static GUIContent grayContent    = new GUIContent("", "Gray");
+    internal static GUIContent greenContent   = new GUIContent("", "Green");
     internal static GUIContent magentaContent = new GUIContent("", "Magenta");
-    internal static GUIContent redContent = new GUIContent("", "Red");
-    internal static GUIContent whiteContent = new GUIContent("", "White");
-    internal static GUIContent yellowContent = new GUIContent("", "Yellow");
+    internal static GUIContent redContent     = new GUIContent("", "Red");
+    internal static GUIContent whiteContent   = new GUIContent("", "White");
+    internal static GUIContent yellowContent  = new GUIContent("", "Yellow");
 
     private const ControlTypes BLOCK_ALL_CONTROLS = ControlTypes.UI | ControlTypes.All;
 

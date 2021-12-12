@@ -14,9 +14,9 @@ namespace ShipManifest.Windows.Tabs.Control
     private const float guiToggleWidth = 325;
 
     //Content vars
-    internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_panel_000"]);
-    internal static GUIContent brokenContent = new GUIContent(SmUtils.SmTags["#smloc_module_004"]);
-    internal static GUIContent lockedContent = new GUIContent(SmUtils.SmTags["#smloc_module_005"]);
+    internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_panel_000"]);
+    internal static GUIContent brokenContent  = new GUIContent(SmUtils.SmTags["#smloc_module_004"]);
+    internal static GUIContent lockedContent  = new GUIContent(SmUtils.SmTags["#smloc_module_005"]);
 
 
     internal static void Display()
