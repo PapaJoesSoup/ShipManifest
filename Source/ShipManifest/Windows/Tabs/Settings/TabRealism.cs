@@ -58,6 +58,7 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent option3Content       = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_006"], SmUtils.SmTags["#smloc_settings_realism_tt_005"]);
     internal static GUIContent option4Content       = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_007"], SmUtils.SmTags["#smloc_settings_realism_tt_006"]);
     internal static GUIContent modeOptionContent    = new GUIContent($"{SmUtils.SmTags["#smloc_settings_realism_003"]}:", SmUtils.SmTags["#smloc_settings_realism_tt_002"]);
+    internal static GUIContent realCrewXferContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_032"], SmUtils.SmTags["#smloc_settings_realism_tt_029"]);
 
 
     internal static void Display(Vector2 displayViewerPosition)
@@ -166,6 +167,16 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Set Gui.enabled for child settings to resources...
       GUI.enabled = SMSettings.EnableCrew && isEnabled;
+
+      // Realistic Crew Xfer Mode
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      //Turns on/off Realistic Resource Transfers.
+      SMSettings.RealCrewXfers = GUILayout.Toggle(SMSettings.RealCrewXfers, realCrewXferContent, GUILayout.Width(guiToggleWidth));
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      GUILayout.EndHorizontal();
 
       // EnablePFResources Mode
       GUILayout.BeginHorizontal();

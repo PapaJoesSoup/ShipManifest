@@ -6,6 +6,9 @@ Major features are **bolded**, contributors are *emphasized*.
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
  - New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
+ - New: Added  a realism setting for Realistic Crew transfers. you can now disable sounds and delay from Crew Transfers. 
+   Previously, you had to disable Realistic Transfers to get similar behavior. Realistic Transfers has been renamed to Realistic Resource Transfers.
+   The Realistic Crew transfers option is found under "Enable SM Crew Transfers" in the Realism Tab of the Settings Window.
  - Changed:  Complete Refactoring of localization strings to improve performance and maintainability.
    This completes the application wide refactor to make all localization string usage static
    instead of instanced.

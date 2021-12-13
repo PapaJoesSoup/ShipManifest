@@ -34,6 +34,7 @@ namespace ShipManifest
     // Realism Tab Feature Options
     internal static int RealismMode = 2;
     internal static bool RealXfers = true;
+    internal static bool RealCrewXfers = true;
     internal static bool RealControl = true;
     internal static bool EnableCrew = true;
     internal static bool EnableCrewModify = true;
@@ -142,6 +143,7 @@ namespace ShipManifest
 
     internal static int PrevRealismMode = 3;
     internal static bool PrevRealXfers;
+    internal static bool PrevRealCrewXfers;
     internal static bool PrevRealControl;
     internal static bool PrevLockSettings;
 
@@ -259,6 +261,9 @@ namespace ShipManifest
           : RealismMode;
         RealXfers = realismNode.HasValue("RealXfers")
           ? bool.Parse(realismNode.GetValue("RealXfers"))
+          : RealXfers;
+        RealCrewXfers = realismNode.HasValue("RealCrewXfers")
+          ? bool.Parse(realismNode.GetValue("RealCrewXfers"))
           : RealXfers;
         RealControl = realismNode.HasValue("RealControl")
           ? bool.Parse(realismNode.GetValue("RealControl"))
@@ -534,6 +539,7 @@ namespace ShipManifest
         // Realism Settings
         WriteValue(realismNode, "RealismMode", RealismMode);
         WriteValue(realismNode, "RealXfers", RealXfers);
+        WriteValue(realismNode, "RealCrewXfers", RealCrewXfers);
         WriteValue(realismNode, "RealControl", RealControl);
         WriteValue(realismNode, "EnableCrew", EnableCrew);
         WriteValue(realismNode, "EnableCrewModify", EnableCrewModify);
@@ -623,6 +629,7 @@ namespace ShipManifest
       {
         case 0: // Full
           RealXfers = true;
+          RealCrewXfers = true;
           RealControl = true;
           EnableCrew = true;
           EnableKerbalRename = false;
@@ -647,6 +654,7 @@ namespace ShipManifest
           break;
         case 1: // None
           RealXfers = false;
+          RealCrewXfers = false;
           RealControl = false;
           EnableCrew = true;
           EnableCrewModify = true;
@@ -671,6 +679,7 @@ namespace ShipManifest
           break;
         case 2: // Default
           RealXfers = true;
+          RealCrewXfers = true;
           RealControl = true;
           EnableCrew = true;
           EnableCrewModify = true;
@@ -702,6 +711,7 @@ namespace ShipManifest
     {
       if ( // Full
           RealXfers
+          && RealCrewXfers
           && RealControl
           && EnableCrew
           && EnableKerbalRename == false
@@ -726,6 +736,7 @@ namespace ShipManifest
         return 0;
       if ( // None
           RealXfers == false
+          && RealCrewXfers == false
           && RealControl == false
           && EnableCrew
           && EnableCrewModify
@@ -744,6 +755,7 @@ namespace ShipManifest
         return 1;
       if ( // Default
           RealXfers
+          && RealCrewXfers
           && RealControl
           && EnableCrew
           && EnableCrewModify
@@ -873,6 +885,7 @@ namespace ShipManifest
     {
       PrevRealismMode = RealismMode;
       PrevRealXfers = RealXfers;
+      PrevRealCrewXfers = RealCrewXfers;
       PrevRealControl = RealControl;
       PrevShowDebugger = WindowDebugger.ShowWindow;
       PrevVerboseLogging = VerboseLogging;
@@ -937,6 +950,7 @@ namespace ShipManifest
     {
       RealismMode = PrevRealismMode;
       RealXfers = PrevRealXfers;
+      RealCrewXfers = PrevRealCrewXfers;
       RealControl = PrevRealControl;
       WindowDebugger.ShowWindow = PrevShowDebugger;
       VerboseLogging = PrevVerboseLogging;

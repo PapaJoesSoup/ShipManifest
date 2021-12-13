@@ -18,7 +18,7 @@ namespace ShipManifest.Process
 
     internal static XferState CrewXferState = XferState.Off;
 
-    // crew xfer inerface properties
+    // crew xfer interface properties
     private bool _crewXferActive;
     private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
 
@@ -115,10 +115,10 @@ namespace ShipManifest.Process
     {
       // Build our list of transfer crew members
       CrewMembersToTransfer = new List<TransferCrewMember>(crewMembers.Count);
-      foreach(var currentKerbal in crewMembers)
+      foreach(ProtoCrewMember currentKerbal in crewMembers)
       {
         TransferCrewMember tcm = new TransferCrewMember(currentKerbal);
-        foreach(var currentPart in fromParts)
+        foreach(Part currentPart in fromParts)
         {
           if (currentPart.protoModuleCrew.Contains(currentKerbal))
           {
@@ -190,7 +190,7 @@ namespace ShipManifest.Process
       }
       else // Xfer to another part
       {
-        // get target seat from target part's inernal model
+        // get target seat from target part's internal model
         bool isSeatAvailable = IsSeatAvailable(ToPart);
         List<InternalSeat>.Enumerator toSeats = ToPart.internalModel.seats.GetEnumerator();
         while (toSeats.MoveNext())
@@ -230,11 +230,14 @@ namespace ShipManifest.Process
         switch (CrewXferState)
         {
           case XferState.Off:
-            // We're just starting loop, so set some evnironment stuff.
+            // We're just starting loop, so set some environment stuff.
             // We want to run the start sound no matter what the realism settings are 
             // to give an audio indication to the player that the process is active
             Timestamp = DateTime.Now;
-            SMSound.SourceCrewStart.Play();
+            if (SMSettings.RealCrewXfers)
+            {
+              SMSound.SourceCrewStart.Play();
+            }
             CrewXferState = XferState.Start;
             break;
 
@@ -242,7 +245,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealXfers)
+            if (SMSettings.RealCrewXfers)
             {
               // Play run sound when start sound is nearly done. (repeats)
               if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
@@ -263,7 +266,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealXfers)
+            if (SMSettings.RealCrewXfers)
             {
               // wait for movement to end...
               if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
@@ -285,7 +288,7 @@ namespace ShipManifest.Process
           case XferState.Stop:
             if (SMConditions.ListsUpdating) break;
             // Spawn crew in parts and in vessel.
-            if (SMSettings.RealXfers)
+            if (SMSettings.RealCrewXfers)
             {
               // play crew sit.
               SMSound.SourceCrewRun.Stop();
@@ -374,7 +377,7 @@ namespace ShipManifest.Process
         // Must be multi-crew...
         try
         {
-          foreach( var xferCrew in CrewMembersToTransfer )
+          foreach( TransferCrewMember xferCrew in CrewMembersToTransfer )
           {
             //RemoveCrewMember(xferCrew.kerbal, xferCrew.partSource);
           }
@@ -434,7 +437,7 @@ namespace ShipManifest.Process
           // they came.  Perhaps in future they can evict kerbals already in
           // residence..
           int crewIdx = 0;
-          foreach (var toPart in ToParts )
+          foreach (Part toPart in ToParts )
           {
             // Add Source Crewmember(s) to target part
             int space = toPart.CrewCapacity - toPart.protoModuleCrew.Count;
@@ -464,7 +467,7 @@ namespace ShipManifest.Process
 
     internal void CrewTransferAbort()
     {
-      if (SMSettings.RealXfers)
+      if (SMSettings.RealCrewXfers)
       {
         SMSound.SourceCrewRun.Stop();
         SMSound.SourceCrewStop.Play();
