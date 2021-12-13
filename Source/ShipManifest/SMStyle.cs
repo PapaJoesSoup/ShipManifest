@@ -16,6 +16,7 @@ namespace ShipManifest
     internal static GUIStyle ButtonToggledStyle;
     internal static GUIStyle ButtonStyleLeft;
     internal static GUIStyle ButtonToggledStyleLeft;
+    internal static GUIStyle ButtonOptionStyle;
     internal static GUIStyle ToggleStyleHeader;
     internal static GUIStyle ErrorLabelRedStyle;
     internal static GUIStyle LabelStyle;
@@ -149,6 +150,23 @@ namespace ShipManifest
         hover = {textColor = Color.blue},
         fontStyle = FontStyle.Normal,
         alignment = TextAnchor.MiddleLeft,
+        clipping = TextClipping.Clip
+      };
+
+      ButtonOptionStyle = new GUIStyle(GUI.skin.button)
+      {
+        normal = {textColor = Color.white},
+        fontSize = 12,
+        fixedHeight = 20,
+        padding =
+        {
+          top = 0,
+          bottom = 0,
+          left = 0,
+          right = 0
+        },
+        fontStyle = FontStyle.Bold,
+        alignment = TextAnchor.MiddleCenter,
         clipping = TextClipping.Clip
       };
 
