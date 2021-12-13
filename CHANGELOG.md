@@ -5,10 +5,17 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+ - New: Added Resizing to Manifest and Transfer Windows.
+ - New: Added Kerbalism Support to Science transfers.
+
+
+ Version 6.0.4.0 - Release 12 Dec 2021 - KSP 1.12.2
+--------------------------------------------------
  - New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
  - New: Added  a realism setting for Realistic Crew transfers. you can now disable sounds and delay from Crew Transfers. 
    Previously, you had to disable Realistic Transfers to get similar behavior. Realistic Transfers has been renamed to Realistic Resource Transfers.
    The Realistic Crew transfers option is found under "Enable SM Crew Transfers" in the Realism Tab of the Settings Window.
+ - New: Added headers to the Vessels tab to improve readability as well as cleaning up the vessel types editing option buttons look and feel.
  - Changed:  Complete Refactoring of localization strings to improve performance and maintainability.
    This completes the application wide refactor to make all localization string usage static
    instead of instanced.
