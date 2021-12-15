@@ -404,7 +404,7 @@ namespace ShipManifest.Process
           if (FromCrewMember != null && ToPart.CrewCapacity > ToPart.protoModuleCrew.Count)
           {
             AddCrewMember(FromCrewMember, ToPart, ToSeat);
-            var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
+            GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
             GameEvents.onCrewTransferred.Fire(action);
           }
 
@@ -415,7 +415,7 @@ namespace ShipManifest.Process
             // MW - Not sure if we need this guard
             if(SMSettings.EnableStockCrewXfer)
             {
-              var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
+              GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
               GameEvents.onCrewTransferred.Fire(action);
             }
           }
@@ -449,7 +449,7 @@ namespace ShipManifest.Process
               // MW - Not sure if we need this guard
               if(SMSettings.EnableStockCrewXfer)
               {
-                var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(CrewMembersToTransfer[crewIdx].kerbal, CrewMembersToTransfer[crewIdx].partSource, toPart);
+                GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(CrewMembersToTransfer[crewIdx].kerbal, CrewMembersToTransfer[crewIdx].partSource, toPart);
                 GameEvents.onCrewTransferred.Fire(action);
               }
               crewIdx++;

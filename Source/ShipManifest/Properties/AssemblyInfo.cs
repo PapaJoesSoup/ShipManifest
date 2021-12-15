@@ -35,5 +35,10 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("6.0.4.0")]
+// This setting is also used during the deployment of the Mod.
+// the zip package, Change log and the Version file are automatically updated with the version data listed below.
+// Be sure to build and deploy on Master branch after all merges are complete
+// Push to master as the last step.
+
+[assembly: AssemblyVersion("6.0.5.0")]
 //[assembly: AssemblyFileVersion("5.2.1.0")]

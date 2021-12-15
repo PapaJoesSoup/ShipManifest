@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using ShipManifest.InternalObjects;
 using ShipManifest.Windows;
@@ -18,6 +19,13 @@ namespace ShipManifest
     internal static bool Loaded;
 
     internal static Dictionary<string, Color> Colors;
+
+    internal static ConfigNode suits;
+
+    internal static List<SuitCombo> SuitCombos;
+    private static readonly string suitsPath = 
+      $"{KSPUtil.ApplicationRootPath}GameData/Squad/Suits/Config/SUITCOMBOS.cfg";
+
 
     internal static ConfigNode Settings;
 
@@ -216,8 +224,14 @@ namespace ShipManifest
       return Settings ?? (Settings = ConfigNode.Load(SettingsFile) ?? new ConfigNode());
     }
 
+    internal static ConfigNode LoadSuitsFile()
+    {
+      return suits ?? (suits = ConfigNode.Load(suitsPath) ?? new ConfigNode());
+    }
+
     internal static void LoadSettings()
     {
+      LoadSuits();
       LoadColors();
 
       if (Settings == null) LoadSettingsFile();
@@ -881,6 +895,32 @@ namespace ShipManifest
       };
     }
 
+    internal static void LoadSuits()
+    {
+      SuitCombos = new List<SuitCombo>();
+      if (suits == null) LoadSuitsFile();
+      if (suits == null) return;
+
+      // we can have multiple suit combos.  parse the list.
+      ConfigNode[] suitComboNodes = suits.GetNodes("SUITCOMBO");
+      // Populate Suit list
+      foreach (ConfigNode suitComboNode in suitComboNodes)
+      {
+        SuitCombo suitCombo = new SuitCombo
+        {
+          displayName = suitComboNode.GetValue("displayName"),
+          suitType = suitComboNode.GetValue("suitType"),
+          gender = suitComboNode.GetValue("gender"),
+          name = suitComboNode.GetValue("name"),
+          suitTexture = suitComboNode.GetValue("suitTexture"),
+          sprite = suitComboNode.GetValue("sprite"),
+          primaryColor = suitComboNode.GetValue("primaryColor"),
+          secondaryColor = suitComboNode.GetValue("secondaryColor")
+        };
+        SuitCombos.Add(suitCombo);
+      }
+    }
+
     internal static void MemStoreTempSettings()
     {
       PrevRealismMode = RealismMode;
@@ -1012,5 +1052,19 @@ namespace ShipManifest
     }
 
     #endregion
+
+    internal class SuitCombo
+    {
+      public string displayName;     // =  Custom Suit 1
+      public string suitType;        // = Future;
+      public string gender;          // = Male;
+      public string name;            // = CustomSuit1;
+      public string suitTexture;     // = Squad/Suits/Textures/futureSuit_diffuse_redBlue;
+      public string sprite;          // = Squad/Suits/Icons/kerbalicon_suit_future;
+      public string primaryColor;    // = #012957;
+      public string secondaryColor;  // = #b3313a;
+    }
+
   }
+
 }
