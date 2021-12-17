@@ -231,7 +231,7 @@ namespace ShipManifest
 
     internal static void LoadSettings()
     {
-      LoadSuits();
+      LoadCustomSuits();
       LoadColors();
 
       if (Settings == null) LoadSettingsFile();
@@ -895,7 +895,7 @@ namespace ShipManifest
       };
     }
 
-    internal static void LoadSuits()
+    internal static void LoadCustomSuits()
     {
       SuitCombos = new List<SuitCombo>();
       if (suits == null) LoadSuitsFile();
@@ -1053,17 +1053,17 @@ namespace ShipManifest
 
     #endregion
 
-    internal class SuitCombo
-    {
-      public string displayName;     // =  Custom Suit 1
-      public string suitType;        // = Future;
-      public string gender;          // = Male;
-      public string name;            // = CustomSuit1;
-      public string suitTexture;     // = Squad/Suits/Textures/futureSuit_diffuse_redBlue;
-      public string sprite;          // = Squad/Suits/Icons/kerbalicon_suit_future;
-      public string primaryColor;    // = #012957;
-      public string secondaryColor;  // = #b3313a;
-    }
+    //internal class SuitCombo
+    //{
+    //  public string displayName;     // =  Custom Suit 1
+    //  public string suitType;        // = Future;
+    //  public string gender;          // = Male;
+    //  public string name;            // = CustomSuit1;
+    //  public string suitTexture;     // = Squad/Suits/Textures/futureSuit_diffuse_redBlue;
+    //  public string sprite;          // = Squad/Suits/Icons/kerbalicon_suit_future;
+    //  public string primaryColor;    // = #012957;
+    //  public string secondaryColor;  // = #b3313a;
+    //}
 
   }
 

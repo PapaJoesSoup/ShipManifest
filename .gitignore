@@ -11,6 +11,7 @@
 Build/
 Release/
 *.User.props
+*.local.props
 **/obj/
 **/bin/
 
