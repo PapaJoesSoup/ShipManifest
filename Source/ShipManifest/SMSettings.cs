@@ -20,12 +20,7 @@ namespace ShipManifest
 
     internal static Dictionary<string, Color> Colors;
 
-    internal static ConfigNode suits;
-
-    // THis will likely not be needed.  Use GameDatabase SuitCombos instead.
-    private static readonly string customSuitsPath = 
-      $"{KSPUtil.ApplicationRootPath}GameData/Squad/Suits/Config/SUITCOMBOS.cfg";
-
+    internal static List<SMSuit> SmSuits = new List<SMSuit>();
 
     internal static ConfigNode Settings;
 
@@ -224,14 +219,44 @@ namespace ShipManifest
       return Settings ?? (Settings = ConfigNode.Load(SettingsFile) ?? new ConfigNode());
     }
 
-    internal static ConfigNode LoadSuitsFile()
+    internal static void LoadSuitsFromDatabase()
     {
-      return suits ?? (suits = ConfigNode.Load(customSuitsPath) ?? new ConfigNode());
+      ConfigNode[] configNodes = GameDatabase.Instance.GetConfigNodes("SUITCOMBOS");
+      foreach (ConfigNode configNode in configNodes)
+      {
+        var suitNodes = configNode.GetNodes("SUITCOMBO");
+        foreach (ConfigNode suitNode in suitNodes)
+        {
+          // Load suit Node
+          ConfigNode smSuitNode = new ConfigNode();
+          if (suitNode.TryGetNode("IVA", ref smSuitNode))
+          {                   
+            SMSuit smSuit = new SMSuit();
+
+            smSuitNode.TryGetValue("suitTexture", ref smSuit.suitTexture);
+            smSuitNode.TryGetValue("normalTexture", ref smSuit.normalTexture);
+            suitNode.TryGetValue("suitType", ref smSuit.suitType);
+            suitNode.TryGetValue("gender", ref smSuit.gender);
+            suitNode.TryGetValue("suitTexture", ref smSuit.suitPath);
+
+            bool foundTexture = GameDatabase.Instance.ExistsTexture(smSuit.suitTexture);
+            bool foundNormal = GameDatabase.Instance.ExistsTexture(smSuit.normalTexture);
+
+            if (foundTexture && foundNormal)
+              SmSuits.Add(smSuit);
+            else if (!foundTexture && foundNormal)
+              Debug.LogWarning($"[ShipManifest]: Could not find texture '{smSuit.suitTexture}'");
+            else
+              Debug.LogWarning($"[ShipManifest]: Could not find normal map '{smSuit.normalTexture}'");
+          }
+          else continue;
+        } 
+      }
     }
 
     internal static void LoadSettings()
     {
-      LoadCustomSuits();
+      LoadSuitsFromDatabase();
       LoadColors();
 
       if (Settings == null) LoadSettingsFile();

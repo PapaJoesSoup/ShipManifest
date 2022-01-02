@@ -49,6 +49,7 @@
     <Compile Include="..\..\Distribution\Dev\SMWrapper.cs" />
     <Compile Include="InternalObjects\SMPart.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
+    <Compile Include="InternalObjects\SMSuit.cs" />
     <Compile Include="Modules\ModDockedVessel.cs" />
     <Compile Include="Modules\ModRadiator.cs" />
     <Compile Include="Process\ProcessController.cs" />
