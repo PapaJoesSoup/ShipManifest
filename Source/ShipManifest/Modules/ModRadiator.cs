@@ -1,3 +1,5 @@
+using ShipManifest.InternalObjects.Settings;
+
 namespace ShipManifest.Modules
 {
   internal class ModRadiator
@@ -35,7 +37,7 @@ namespace ShipManifest.Modules
     {
       get
       {
-        if (Curr.RealControl && !Retractable &&
+        if (CurrSettings.RealControl && !Retractable &&
             (PanelState == ModuleDeployablePart.DeployState.EXTENDED ||
              PanelState == ModuleDeployablePart.DeployState.EXTENDING))
           return false;

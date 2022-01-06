@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="APIClients\DFWrapper.cs" />
     <Compile Include="..\..\Distribution\Dev\SMWrapper.cs" />
+    <Compile Include="InternalObjects\Settings\CurrSettings.cs" />
+    <Compile Include="InternalObjects\Settings\OrigSettings.cs" />
     <Compile Include="InternalObjects\SMPart.cs" />
     <Compile Include="InternalObjects\SMSounds.cs" />
     <Compile Include="InternalObjects\SMSuit.cs" />
@@ -83,7 +85,7 @@
     <Compile Include="Modules\ModKerbal.cs" />
     <Compile Include="Windows\Tabs\Control\TabLight.cs" />
     <Compile Include="Windows\WindowRoster.cs" />
-    <Compile Include="SMSettings.cs" />
+    <Compile Include="InternalObjects\Settings\SMSettings.cs" />
     <Compile Include="Windows\WindowSettings.cs" />
     <Compile Include="SMAddon.cs" />
     <Compile Include="Windows\WindowManifest.cs" />
@@ -94,6 +96,7 @@
     <Compile Include="SMUtils.cs" />
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>

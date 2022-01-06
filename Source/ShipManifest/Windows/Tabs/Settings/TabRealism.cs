@@ -1,5 +1,6 @@
 using System.Globalization;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Settings
@@ -46,7 +47,7 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent ecUnitContent        = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_024"], SmUtils.SmTags["#smloc_settings_realism_tt_022"]);
     internal static GUIContent flowRateContent      = new GUIContent($"{SmUtils.SmTags["#smloc_settings_realism_025"]}:", SmUtils.SmTags["#smloc_settings_realism_tt_023"]);
     internal static GUIContent unitsSecContent      = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_026"], SmUtils.SmTags["#smloc_settings_realism_tt_023"]);
-    internal static GUIContent flowSliderContent    = new GUIContent(Curr.MaxFlowRate.ToString(CultureInfo.InvariantCulture), SmUtils.SmTags["#smloc_settings_realism_tt_024"]);
+    internal static GUIContent flowSliderContent    = new GUIContent(CurrSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture), SmUtils.SmTags["#smloc_settings_realism_tt_024"]);
     internal static GUIContent minRateContent       = new GUIContent($" - {SmUtils.SmTags["#smloc_settings_realism_027"]}:", SmUtils.SmTags["#smloc_settings_realism_tt_025"]);
     internal static GUIContent unitSecMinContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_026"], SmUtils.SmTags["#smloc_settings_realism_tt_025"]);
     internal static GUIContent maxRateContent       = new GUIContent($" - {SmUtils.SmTags["#smloc_settings_realism_028"]}:", SmUtils.SmTags["#smloc_settings_realism_tt_026"]);
@@ -71,7 +72,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       int scrollX = 20;
 
       GUI.enabled = true;
-      if (!Curr.LockSettings)
+      if (!CurrSettings.LockSettings)
       {
         // "Realism Settings / Options"
         GUILayout.Label(optionsContent, SMStyle.LabelTabHeader);        
@@ -83,7 +84,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
       GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
-      bool isEnabled = !Curr.LockSettings;
+      bool isEnabled = !CurrSettings.LockSettings;
       //RealismMode Buttons.
       DisplayRealismButtons();
 
@@ -93,7 +94,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       // RealXfers Mode
       GUI.enabled = isEnabled;
       // Realistic Transfers;
-      Curr.RealXfers = GUILayout.Toggle(Curr.RealXfers, realXferContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.RealXfers = GUILayout.Toggle(CurrSettings.RealXfers, realXferContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -101,7 +102,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       // RealControl Mode
       GUI.enabled = isEnabled;
       // Realistic Control
-      Curr.RealControl = GUILayout.Toggle(Curr.RealControl, realControlContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.RealControl = GUILayout.Toggle(CurrSettings.RealControl, realControlContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -110,7 +111,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
       // Enable Roster Modifications
-      Curr.EnableCrewModify = GUILayout.Toggle(Curr.EnableCrewModify, crewModifyContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableCrewModify = GUILayout.Toggle(CurrSettings.EnableCrewModify, crewModifyContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -118,14 +119,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.EndHorizontal();
 
       // Enable Kerbal Renaming
-      Curr.EnableKerbalRename = GUILayout.Toggle(Curr.EnableKerbalRename, crewRenameContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableKerbalRename = GUILayout.Toggle(CurrSettings.EnableKerbalRename, crewRenameContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUILayout.BeginHorizontal();
       //Enable Profession management
-      Curr.EnableChangeProfession = GUILayout.Toggle(Curr.EnableChangeProfession, professionContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableChangeProfession = GUILayout.Toggle(CurrSettings.EnableChangeProfession, professionContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -133,10 +134,10 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = true;
 
       // Enable stock Crew Xfers
-      GUI.enabled = Curr.EnableCrew && isEnabled;
+      GUI.enabled = CurrSettings.EnableCrew && isEnabled;
       GUILayout.BeginHorizontal();
       // Enable Stock Crew Xfers;
-      Curr.EnableStockCrewXfer = GUILayout.Toggle(Curr.EnableStockCrewXfer, stkCrewXferContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableStockCrewXfer = GUILayout.Toggle(CurrSettings.EnableStockCrewXfer, stkCrewXferContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -147,14 +148,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
       // Enable SM Crew Xfers
-      Curr.EnableCrew = GUILayout.Toggle(Curr.EnableCrew, smCrewXfersContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableCrew = GUILayout.Toggle(CurrSettings.EnableCrew, smCrewXfersContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUILayout.EndHorizontal();
 
-      if (!Curr.EnableCrew && HighLogic.LoadedSceneIsFlight)
+      if (!CurrSettings.EnableCrew && HighLogic.LoadedSceneIsFlight)
       {
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
@@ -166,13 +167,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
 
       // Set Gui.enabled for child settings to resources...
-      GUI.enabled = Curr.EnableCrew && isEnabled;
+      GUI.enabled = CurrSettings.EnableCrew && isEnabled;
 
       // Realistic Crew Xfer Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
       //Turns on/off Realistic Resource Transfers.
-      Curr.RealCrewXfers = GUILayout.Toggle(Curr.RealCrewXfers, realCrewXferContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.RealCrewXfers = GUILayout.Toggle(CurrSettings.RealCrewXfers, realCrewXferContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -182,18 +183,18 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
       //Enable Crew Fill and Empty Ops in Pre-Flight
-      Curr.EnablePfCrews = GUILayout.Toggle(Curr.EnablePfCrews, pfCrewContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnablePfCrews = GUILayout.Toggle(CurrSettings.EnablePfCrews, pfCrewContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
       // Enable stock Crew Xfer Override
-      GUI.enabled = Curr.EnableCrew && isEnabled && Curr.EnableStockCrewXfer;
+      GUI.enabled = CurrSettings.EnableCrew && isEnabled && CurrSettings.EnableStockCrewXfer;
       GUILayout.BeginHorizontal();
       //Override Stock Crew Xfers
       GUILayout.Space(20);
-      Curr.OverrideStockCrewXfer = GUILayout.Toggle(Curr.OverrideStockCrewXfer, orStkCrewXferContent, GUILayout.Width(300));
+      CurrSettings.OverrideStockCrewXfer = GUILayout.Toggle(CurrSettings.OverrideStockCrewXfer, orStkCrewXferContent, GUILayout.Width(300));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -203,20 +204,20 @@ namespace ShipManifest.Windows.Tabs.Settings
       // EnableCLS Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
-      if (!Curr.EnableCrew || !SMSettings.ClsInstalled)
+      if (!CurrSettings.EnableCrew || !SMSettings.ClsInstalled)
         GUI.enabled = false;
       else
         GUI.enabled = isEnabled;
       //Enable CLS  (Connected Living Spaces)";
-      Curr.EnableCls = GUILayout.Toggle(Curr.EnableCls, clsContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableCls = GUILayout.Toggle(CurrSettings.EnableCls, clsContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
-      if (Curr.EnableCls != Orig.EnableCls && HighLogic.LoadedSceneIsFlight)
+      if (CurrSettings.EnableCls != OrigSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
       {
-        if (!Curr.EnableCls)
+        if (!CurrSettings.EnableCls)
           SMHighlighter.HighlightClsVessel(false, true);
         else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
@@ -228,13 +229,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
 
       // Enable CLS stock Crew Xfer Override
-      if (!Curr.EnableCrew || !SMSettings.ClsInstalled)
+      if (!CurrSettings.EnableCrew || !SMSettings.ClsInstalled)
         GUI.enabled = false;
       else
         GUI.enabled = isEnabled;
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
-      Curr.EnableClsAllowTransfer = GUILayout.Toggle(Curr.EnableClsAllowTransfer, clsAllowXferContent,
+      CurrSettings.EnableClsAllowTransfer = GUILayout.Toggle(CurrSettings.EnableClsAllowTransfer, clsAllowXferContent,
         GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -246,13 +247,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUI.enabled = isEnabled;
       //Enable Science Xfers
-      Curr.EnableScience = GUILayout.Toggle(Curr.EnableScience, modeScienceContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableScience = GUILayout.Toggle(CurrSettings.EnableScience, modeScienceContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
-      if (!Curr.EnableScience && HighLogic.LoadedSceneIsFlight)
+      if (!CurrSettings.EnableScience && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
@@ -263,13 +264,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUI.enabled = isEnabled;
       //Enable Resource Xfers
-      Curr.EnableResources = GUILayout.Toggle(Curr.EnableResources, modeResourcesContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableResources = GUILayout.Toggle(CurrSettings.EnableResources, modeResourcesContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
-      if (!Curr.EnableResources && HighLogic.LoadedSceneIsFlight)
+      if (!CurrSettings.EnableResources && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
         if (SMAddon.SmVessel.SelectedResources.Count > 0 &&
@@ -279,13 +280,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
 
       // Set Gui.enabled for child settings to resources...
-      GUI.enabled = Curr.EnableResources && isEnabled;
+      GUI.enabled = CurrSettings.EnableResources && isEnabled;
 
       // EnablePFResources Mode
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
       //Enable Resources in Pre-Flight
-      Curr.EnablePfResources = GUILayout.Toggle(Curr.EnablePfResources, pfResourcesContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnablePfResources = GUILayout.Toggle(CurrSettings.EnablePfResources, pfResourcesContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -295,14 +296,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(20);
       // Resource Xfers Consume Power";
-      Curr.EnableXferCost = GUILayout.Toggle(Curr.EnableXferCost, xferCostOnContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableXferCost = GUILayout.Toggle(CurrSettings.EnableXferCost, xferCostOnContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
 
       // Resource Xfer EC cost
-      GUI.enabled = !Curr.LockSettings && Curr.EnableResources && Curr.EnableXferCost;
+      GUI.enabled = !CurrSettings.LockSettings && CurrSettings.EnableResources && CurrSettings.EnableXferCost;
       GUILayout.BeginHorizontal();
       GUILayout.Space(35);
       // Xfer Power Cost:
@@ -312,7 +313,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Lets parse the string to allow decimal points.
-      StrFlowCost = Curr.FlowCost.ToString(CultureInfo.InvariantCulture);
+      StrFlowCost = CurrSettings.FlowCost.ToString(CultureInfo.InvariantCulture);
       // add the decimal point if it was typed.
       StrFlowCost = SmUtils.GetStringDecimal(StrFlowCost);
       // add the zero if it was typed.
@@ -332,18 +333,18 @@ namespace ShipManifest.Windows.Tabs.Settings
       SmUtils.SetStringZero(StrFlowCost);
 
       if (float.TryParse(StrFlowCost, out float newCost))
-        Curr.FlowCost = newCost;
+        CurrSettings.FlowCost = newCost;
 
       // create xfer Flow Rate slider;
       // Lets parse the string to allow decimal points.
-      string strFlowRate = Curr.FlowRate.ToString(CultureInfo.InvariantCulture);
-      string strMinFlowRate = Curr.MinFlowRate.ToString(CultureInfo.InvariantCulture);
-      string strMaxFlowRate = Curr.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
-      string strMaxFlowTime = Curr.MaxFlowTimeSec.ToString();
+      string strFlowRate = CurrSettings.FlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMinFlowRate = CurrSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMaxFlowRate = CurrSettings.MaxFlowRate.ToString(CultureInfo.InvariantCulture);
+      string strMaxFlowTime = CurrSettings.MaxFlowTimeSec.ToString();
 
 
       // Resource Flow Rate
-      GUI.enabled = !Curr.LockSettings && Curr.EnableResources && Curr.RealXfers;
+      GUI.enabled = !CurrSettings.LockSettings && CurrSettings.EnableResources && CurrSettings.RealXfers;
       GUILayout.BeginHorizontal();
       GUILayout.Space(25);
       // Resource Flow Rate:
@@ -360,15 +361,15 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.EndHorizontal();
 
       if (float.TryParse(strFlowRate, out float newRate))
-        Curr.FlowRate = (int)newRate;
+        CurrSettings.FlowRate = (int)newRate;
 
       // Resource Flow rate Slider
       GUILayout.BeginHorizontal();
       GUILayout.Space(30);
-      GUILayout.Label(Curr.MinFlowRate.ToString(CultureInfo.InvariantCulture), GUILayout.Width(10),
+      GUILayout.Label(CurrSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture), GUILayout.Width(10),
         GUILayout.Height(20));
-      Curr.FlowRate = GUILayout.HorizontalSlider((float) Curr.FlowRate, (float) Curr.MinFlowRate,
-        (float) Curr.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
+      CurrSettings.FlowRate = GUILayout.HorizontalSlider((float) CurrSettings.FlowRate, (float) CurrSettings.MinFlowRate,
+        (float) CurrSettings.MaxFlowRate, GUILayout.Width(240), GUILayout.Height(20));
       GUILayout.Label(flowSliderContent, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -391,7 +392,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMinFlowRate, out newRate))
-        Curr.MinFlowRate = (int) newRate;
+        CurrSettings.MinFlowRate = (int) newRate;
 
       // Max Flow Rate for Slider
       GUILayout.BeginHorizontal();
@@ -409,7 +410,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowRate, out newRate))
-        Curr.MaxFlowRate = (int) newRate;
+        CurrSettings.MaxFlowRate = (int) newRate;
 
       // Max Flow Time 
       GUILayout.BeginHorizontal();
@@ -435,7 +436,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       GUILayout.EndHorizontal();
       if (float.TryParse(strMaxFlowTime, out newRate))
-        Curr.MaxFlowTimeSec = (int) newRate;
+        CurrSettings.MaxFlowTimeSec = (int) newRate;
 
       // reset gui.enabled to default
       GUI.enabled = true;
@@ -444,7 +445,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       // LockSettings Mode
       GUI.enabled = isEnabled;
       // Lock Realism Settings  (If set ON, disable in config file)
-      Curr.LockSettings = GUILayout.Toggle(Curr.LockSettings, lockSettingContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.LockSettings = GUILayout.Toggle(CurrSettings.LockSettings, lockSettingContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
@@ -464,10 +465,10 @@ namespace ShipManifest.Windows.Tabs.Settings
       };
       GUIStyle[] styles =
       {
-        Curr.RealismMode == 0 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
-        Curr.RealismMode == 1 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
-        Curr.RealismMode == 2 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
-        Curr.RealismMode == 3 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        CurrSettings.RealismMode == 0 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        CurrSettings.RealismMode == 1 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        CurrSettings.RealismMode == 2 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
+        CurrSettings.RealismMode == 3 ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle,
       };
 
       // Realism Mode Label
@@ -483,13 +484,13 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Build Option Buttons
-      Curr.RealismMode = SMSettings.GetRealismMode();
+      CurrSettings.RealismMode = SMSettings.GetRealismMode();
       for (int x = 0; x <= 3; x++)
       {
         if (x == 3) GUI.enabled = false;
         if (GUILayout.Button(options[x], styles[x], GUILayout.Height(20)))
         {
-          if (x != Curr.RealismMode) SMSettings.SetRealismMode(x);
+          if (x != CurrSettings.RealismMode) SMSettings.SetRealismMode(x);
         }
         _rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)

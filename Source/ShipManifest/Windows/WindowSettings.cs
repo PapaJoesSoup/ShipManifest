@@ -1,5 +1,6 @@
 using System;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows.Tabs.Settings;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace ShipManifest.Windows
   {
     #region Settings Window (GUI)
 
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
@@ -175,11 +176,11 @@ namespace ShipManifest.Windows
       if (GUILayout.Button(saveContent, GUILayout.Height(20)))
       {
         ToolTip = "";
-        SMSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
+        CurrSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
         SMSettings.SaveSettings();
 
         // Sync SM to CLS override settings with CLS
-        if (Curr.EnableCls && HighLogic.LoadedSceneIsFlight)
+        if (CurrSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
         {
           SMSettings.UpdateClsOverride();
         }

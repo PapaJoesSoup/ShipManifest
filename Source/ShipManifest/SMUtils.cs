@@ -5,6 +5,7 @@ using System.Linq;
 using KSP.Localization;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows;
 using UnityEngine;
 
@@ -289,10 +290,10 @@ namespace ShipManifest
       try
       {
         // Added rolling error list. This limits growth.  Configure with ErrorListLength
-        if (_logItemList.Count > int.Parse(SMSettings.ErrorLogLength) && int.Parse(SMSettings.ErrorLogLength) > 0)
-          _logItemList.RemoveRange(0, _logItemList.Count - int.Parse(SMSettings.ErrorLogLength));
+        if (_logItemList.Count > int.Parse(CurrSettings.ErrorLogLength) && int.Parse(CurrSettings.ErrorLogLength) > 0)
+          _logItemList.RemoveRange(0, _logItemList.Count - int.Parse(CurrSettings.ErrorLogLength));
         if (verbose) _logItemList.Add($"{type}: {msg}");
-        if (type == LogType.Error && SMSettings.AutoDebug)
+        if (type == LogType.Error && CurrSettings.AutoDebug)
           WindowDebugger.ShowWindow = true;
         Debug.Log($"[ShipManifest] - {type}:  {msg}");
       }

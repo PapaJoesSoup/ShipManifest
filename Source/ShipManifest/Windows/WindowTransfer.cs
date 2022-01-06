@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = "";
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
 
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -340,11 +341,11 @@ namespace ShipManifest.Windows
       try
       {
         // Adjust target style colors for part selectors when using/not using CLS highlighting
-        if (Curr.EnableClsHighlighting &&
+        if (CurrSettings.EnableClsHighlighting &&
             SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
+          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[CurrSettings.TargetPartCrewColor];
         else
-          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
+          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[CurrSettings.TargetPartColor];
 
         // This is a scroll panel (we are using it to make button lists...)
         _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition,
@@ -478,7 +479,7 @@ namespace ShipManifest.Windows
           // set the conditions for a button style change.
           int btnWidth = 273; // Start with full width button...
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = !Curr.RealXfers || (Curr.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
+            btnWidth = !CurrSettings.RealXfers || (CurrSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
           else if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMConditions.CanShowCrewFillDumpButtons())
             btnWidth = 173;
 
@@ -551,7 +552,7 @@ namespace ShipManifest.Windows
 
           // set the conditions for a button style change.
           int btnWidth = 273;
-          if (!Curr.RealXfers) btnWidth = 180;
+          if (!CurrSettings.RealXfers) btnWidth = 180;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -585,7 +586,7 @@ namespace ShipManifest.Windows
           // Science
 
           // Resources
-          else if (!Curr.RealXfers)
+          else if (!CurrSettings.RealXfers)
           {
             if (selectedResources.Count > 1)
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0 ||
@@ -663,7 +664,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
 
-      if (Curr.RealXfers || (!Curr.EnablePfResources || !SMConditions.IsInPreflight())) return;
+      if (CurrSettings.RealXfers || (!CurrSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
       GUIStyle style2 = xferType == TransferPump.TypeXfer.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
@@ -1084,7 +1085,7 @@ namespace ShipManifest.Windows
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
         {
-          if (Curr.RealXfers && !isCollectable)
+          if (CurrSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
             toolTip = noXferRealismContent;
@@ -1166,7 +1167,7 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
-            if (Curr.RealXfers && !isCollectable)
+            if (CurrSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
               toolTip = noXferSciRlsmTtContent;
@@ -1242,7 +1243,7 @@ namespace ShipManifest.Windows
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
         {
-          if (Curr.RealXfers && !isCollectable)
+          if (CurrSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
             toolTip = noXferRealismContent;
@@ -1325,7 +1326,7 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
-            if (Curr.RealXfers && !isCollectable)
+            if (CurrSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
               //toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";

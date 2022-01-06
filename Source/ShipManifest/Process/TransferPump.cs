@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows;
 
 namespace ShipManifest.Process
@@ -97,12 +98,12 @@ namespace ShipManifest.Process
 
     public bool FromIsFull
     {
-      get { return FromCapacity - FromRemaining < Curr.Tolerance; }
+      get { return FromCapacity - FromRemaining < CurrSettings.Tolerance; }
     }
 
     public bool FromIsEmpty
     {
-      get { return FromRemaining < Curr.Tolerance; }
+      get { return FromRemaining < CurrSettings.Tolerance; }
     }
 
     /// <summary>
@@ -145,12 +146,12 @@ namespace ShipManifest.Process
 
     public bool ToIsFull
     {
-      get { return ToCapacity - ToRemaining < Curr.Tolerance; }
+      get { return ToCapacity - ToRemaining < CurrSettings.Tolerance; }
     }
 
     public bool ToIsEmpty
     {
-      get { return ToRemaining < Curr.Tolerance; }
+      get { return ToRemaining < CurrSettings.Tolerance; }
     }
 
 
@@ -183,17 +184,17 @@ namespace ShipManifest.Process
     internal DateTime TimeStamp;
     internal double Elapsed;
 
-    internal double DefaultFlowRate = Curr.FlowRate;
-    internal int FlowTime = Curr.MaxFlowTimeSec;
+    internal double DefaultFlowRate = CurrSettings.FlowRate;
+    internal int FlowTime = CurrSettings.MaxFlowTimeSec;
 
     public double FlowRate
     {
       get
       {
         // Calculate the actual flow rate, based on source capacity and max flow time setting...
-        return FromCapacity/Curr.FlowRate > Curr.MaxFlowTimeSec
-          ? FromCapacity/Curr.MaxFlowTimeSec
-          : Curr.FlowRate;
+        return FromCapacity/CurrSettings.FlowRate > CurrSettings.MaxFlowTimeSec
+          ? FromCapacity/CurrSettings.MaxFlowTimeSec
+          : CurrSettings.FlowRate;
       }
     }
 
@@ -332,7 +333,7 @@ namespace ShipManifest.Process
       //Utilities.LogMessage("Entering:  TransferPump.Start", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // reset counters
       Elapsed = 0;
-      DefaultFlowRate = Curr.FlowRate;
+      DefaultFlowRate = CurrSettings.FlowRate;
       AmtPumped = 0;
       SMSound.SourcePumpStart.Play();
     }
@@ -365,9 +366,9 @@ namespace ShipManifest.Process
         deltaAmt = deltaAmt > ToCapacityRemaining ? ToCapacityRemaining : deltaAmt;
 
 
-      if (deltaAmt > Curr.Tolerance)
+      if (deltaAmt > CurrSettings.Tolerance)
       {
-        double deltaCharge = deltaAmt * Curr.FlowCost;
+        double deltaCharge = deltaAmt * CurrSettings.FlowCost;
         // 3.  Drain Charge
         if (ConsumeCharge(deltaCharge))
         {
@@ -433,10 +434,10 @@ namespace ShipManifest.Process
     {
       //Utilities.LogMessage("Entering:  TransferPump.FillParts", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // To parts.  Used only by Transfers
-      if (cycleAmount < Curr.Tolerance) return;
+      if (cycleAmount < CurrSettings.Tolerance) return;
 
       double cycleBalance = cycleAmount;
-      while (cycleBalance > Curr.Tolerance)
+      while (cycleBalance > CurrSettings.Tolerance)
       {
         // find minimum but positive remaining capacity or single tank!
         double minAmt = Double.MaxValue;
@@ -447,7 +448,7 @@ namespace ShipManifest.Process
           Part part = theseParts.Current;
           if (part == null) continue;
           double thisPartCap = PartRemainingCapacity(part, Resource);
-          if (thisPartCap <= Curr.Tolerance) continue;
+          if (thisPartCap <= CurrSettings.Tolerance) continue;
           if (thisPartCap < minAmt)
           {
             minAmt = thisPartCap;
@@ -477,7 +478,7 @@ namespace ShipManifest.Process
           toParts.Dispose();
         }
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.FillParts:  toPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", toPartAmt, minAmt[0], toPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
-        if (nonFullParts.Count == 0 && cycleBalance > Curr.Tolerance) cycleBalance = 0;
+        if (nonFullParts.Count == 0 && cycleBalance > CurrSettings.Tolerance) cycleBalance = 0;
       }
     }
 
@@ -486,10 +487,10 @@ namespace ShipManifest.Process
       //Utilities.LogMessage("Entering:  TransferPump.DrainParts.", Utilities.LogType.Info, SMSettings.VerboseLogging);
       // Lets account for any empty/full containers
       // now split up the xfer amount evenly across the number of tanks that can send/receive resources
-      if (cycleAmount < Curr.Tolerance) return;
+      if (cycleAmount < CurrSettings.Tolerance) return;
 
       double cycleBalance = cycleAmount;
-      while (cycleBalance > Curr.Tolerance)
+      while (cycleBalance > CurrSettings.Tolerance)
       {
         // find least but positive amount of resource in single tank!
         double minAmt = Double.MaxValue;
@@ -499,7 +500,7 @@ namespace ShipManifest.Process
         {
           Part part = theseParts.Current;
           if (part == null) continue;
-          if (part.Resources[Resource].amount <= Curr.Tolerance) continue;
+          if (part.Resources[Resource].amount <= CurrSettings.Tolerance) continue;
           if (part.Resources[Resource].amount < minAmt)
           {
             minAmt = part.Resources[Resource].amount;
@@ -522,11 +523,11 @@ namespace ShipManifest.Process
             AmtPumped += toTransfer;
 
             // Ensure part is empty and does not contain less than 0.
-            if (part.Resources[Resource].amount <= Curr.Tolerance) part.Resources[Resource].amount = 0;
+            if (part.Resources[Resource].amount <= CurrSettings.Tolerance) part.Resources[Resource].amount = 0;
           }
           fromParts.Dispose();
         }
-        if (nonEmptyParts.Count == 0 && cycleBalance > Curr.Tolerance) cycleBalance = 0;
+        if (nonEmptyParts.Count == 0 && cycleBalance > CurrSettings.Tolerance) cycleBalance = 0;
         //Utilities.LogMessage(string.Format("Inside:  TransferPump.DrainParts:  fromPartAmt = {0}, minAmt = {1}, PartsLeft = {2}, cycleBalance = {3}", fromPartAmt, minAmt, fromPartCount, cycleBalance), Utilities.LogType.Info, SMSettings.VerboseLogging);
       }
     }
@@ -534,7 +535,7 @@ namespace ShipManifest.Process
     internal static bool ConsumeCharge(double deltaCharge)
     {
       //Utilities.LogMessage("Entering:  TransferPump.ConsumeCharge", Utilities.LogType.Info, SMSettings.VerboseLogging);
-      if (SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge") || !Curr.EnableXferCost) return true;
+      if (SMAddon.SmVessel.SelectedResources.Contains("ElectricCharge") || !CurrSettings.EnableXferCost) return true;
       List<Part>.Enumerator iParts = SMAddon.SmVessel.PartsByResource["ElectricCharge"].GetEnumerator();
       while (iParts.MoveNext())
       {
@@ -732,13 +733,13 @@ namespace ShipManifest.Process
       toList.Dispose();
       maxPumpAmount = toCapacityRemaining - fromAmount;
       maxPumpAmount = maxPumpAmount > fromAmount ? fromAmount : maxPumpAmount;
-      maxPumpAmount = maxPumpAmount < Curr.Tolerance ? 0 : maxPumpAmount;
+      maxPumpAmount = maxPumpAmount < CurrSettings.Tolerance ? 0 : maxPumpAmount;
       return maxPumpAmount;
     }
 
     internal static double CalcMaxPumpAmt(List<Part> partsFrom, List<Part> partsTo, List<string> selectedResources)
     {
-      double maxPumpAmount = 0;
+      double maxPumpAmount;
       if (partsFrom == null || partsTo == null || partsFrom.Count == 0 || partsTo.Count == 0 ||
           selectedResources.Count == 0)
         maxPumpAmount = 0;
@@ -772,7 +773,7 @@ namespace ShipManifest.Process
         toParts.Dispose();
 
         maxPumpAmount = maxToAmount > maxFromAmount ? maxFromAmount : maxToAmount;
-        maxPumpAmount = maxPumpAmount < Curr.Tolerance ? 0 : maxPumpAmount;
+        maxPumpAmount = maxPumpAmount < CurrSettings.Tolerance ? 0 : maxPumpAmount;
       }
       return maxPumpAmount;
     }
@@ -784,10 +785,10 @@ namespace ShipManifest.Process
                     pump.FromIsEmpty ||
                     (pump.PumpType != TypeXfer.Dump && pump.ToIsFull) ||
                     pump.AmtPumped >= pump.PumpAmount ||
-                    pump.PumpAmount - pump.AmtPumped < Curr.Tolerance ||
+                    pump.PumpAmount - pump.AmtPumped < CurrSettings.Tolerance ||
                     (pump.PumpType != TypeXfer.Dump &&
                      CalcMaxPumpAmt(pump.FromParts, pump.ToParts, new List<string> {pump.Resource}) <
-                     Curr.Tolerance);
+                     CurrSettings.Tolerance);
       return results;
     }
 

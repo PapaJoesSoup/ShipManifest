@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
@@ -152,7 +153,7 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (Curr.EnablePfCrews)
+        if (CurrSettings.EnablePfCrews)
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
@@ -167,7 +168,7 @@ namespace ShipManifest.Windows
           GUILayout.EndHorizontal();
         }
 
-        if (!Curr.EnablePfResources) return;
+        if (!CurrSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
         if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
         {
@@ -204,7 +205,7 @@ namespace ShipManifest.Windows
 
           // Button Widths
           int width = 273;
-          if (!Curr.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
+          if (!CurrSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
@@ -234,7 +235,7 @@ namespace ShipManifest.Windows
           }
 
           // Fill Button
-          if (!Curr.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
+          if (!CurrSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);

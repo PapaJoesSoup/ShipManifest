@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ShipManifest.InternalObjects.Settings;
 using UniLinq;
 
 namespace ShipManifest.Process
@@ -59,7 +60,7 @@ namespace ShipManifest.Process
       }
       catch (Exception ex)
       {
-        SmUtils.LogMessage($" in ProcessController.TransferScienceLab:  Error:  {ex}", SmUtils.LogType.Info, SMSettings.VerboseLogging);
+        SmUtils.LogMessage($" in ProcessController.TransferScienceLab:  Error:  {ex}", SmUtils.LogType.Info, CurrSettings.VerboseLogging);
       }
     }
 
@@ -159,11 +160,11 @@ namespace ShipManifest.Process
           ((IScienceDataContainer) source).DumpData(data);
         }
 
-        if (!Curr.RealControl) ((ModuleScienceExperiment)source).ResetExperiment();
+        if (!CurrSettings.RealControl) ((ModuleScienceExperiment)source).ResetExperiment();
       }
       catch (Exception ex)
       {
-        SmUtils.LogMessage($" in ProcessController.TransferScience:  Error:  {ex}", SmUtils.LogType.Info, SMSettings.VerboseLogging);
+        SmUtils.LogMessage($" in ProcessController.TransferScience:  Error:  {ex}", SmUtils.LogType.Info, CurrSettings.VerboseLogging);
       }
     }
 
@@ -175,7 +176,7 @@ namespace ShipManifest.Process
     {
       try
       {
-        if (Curr.RealXfers)
+        if (CurrSettings.RealXfers)
         {
           List<TransferPump>.Enumerator pumps = xferPumps.GetEnumerator();
           while (pumps.MoveNext())
@@ -217,7 +218,7 @@ namespace ShipManifest.Process
       // This initiates the Dump process and with realism off, does the dump immediately; with realism on, initiates the real time process.
       try
       {
-        if (Curr.RealXfers)
+        if (CurrSettings.RealXfers)
         {
           // Turn on Pumps for timed process...
           List<TransferPump>.Enumerator epumps = pumps.GetEnumerator();

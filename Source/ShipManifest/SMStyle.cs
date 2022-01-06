@@ -1,3 +1,4 @@
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 
@@ -124,7 +125,7 @@ namespace ShipManifest
 
       ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button)
       {
-        normal = {textColor = SMSettings.Colors[SMSettings.SourcePartColor]},
+        normal = {textColor = SMSettings.Colors[CurrSettings.SourcePartColor]},
         fontSize = 12,
         padding =
         {
@@ -172,7 +173,7 @@ namespace ShipManifest
 
       ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button)
       {
-        normal = {textColor = SMSettings.Colors[SMSettings.TargetPartColor]},
+        normal = {textColor = SMSettings.Colors[CurrSettings.TargetPartColor]},
         fontSize = 12,
         padding =
         {
@@ -275,7 +276,7 @@ namespace ShipManifest
       };
       ToolTipStyle.hover.background = ToolTipStyle.normal.background;
 
-      if (!SMSettings.UseUnityStyle)
+      if (!CurrSettings.UseUnityStyle)
         GUI.skin = HighLogic.Skin;
     }
   }

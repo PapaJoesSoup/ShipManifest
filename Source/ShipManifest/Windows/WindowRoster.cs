@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace ShipManifest.Windows
 
     internal static float WindowWidth = 830;
     internal static float WindowHeight = 330;
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, 810, 230);
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -194,7 +195,7 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
-          GUI.enabled = Curr.EnableCrewModify;
+          GUI.enabled = CurrSettings.EnableCrewModify;
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
@@ -575,7 +576,7 @@ namespace ShipManifest.Windows
     private static void EditKerbalViewer()
     {
       GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
-      if (Curr.EnableKerbalRename)
+      if (CurrSettings.EnableKerbalRename)
       {
         GUILayout.BeginHorizontal();
         SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
@@ -590,7 +591,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
-      if (Curr.EnableKerbalRename && Curr.EnableChangeProfession)
+      if (CurrSettings.EnableKerbalRename && CurrSettings.EnableChangeProfession)
       {
         DisplaySelectProfession();
       }
@@ -626,7 +627,7 @@ namespace ShipManifest.Windows
       }
       if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
       {
-        if (Curr.EnableKerbalRename && Curr.EnableChangeProfession)
+        if (CurrSettings.EnableKerbalRename && CurrSettings.EnableChangeProfession)
         {
           if (SelectedKerbal != null) SelectedKerbal.Trait = KerbalProfession.ToString();
         }
@@ -669,7 +670,7 @@ namespace ShipManifest.Windows
 
     private static void SetupSuitButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && Curr.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && CurrSettings.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.text : cnxEditContent;
       if (GUI.enabled)
@@ -685,7 +686,7 @@ namespace ShipManifest.Windows
 
     private static void SetupEditButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && Curr.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && CurrSettings.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? editContent : cnxEditContent;
       if (GUI.enabled)
@@ -771,9 +772,9 @@ namespace ShipManifest.Windows
       // Applies to both scenes.
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
-        GUI.enabled = Curr.EnableCrewModify;
+        GUI.enabled = CurrSettings.EnableCrewModify;
         buttonText = respawnContent;  // "Respawn";
-        buttonToolTip = Curr.EnableCrewModify 
+        buttonToolTip = CurrSettings.EnableCrewModify 
           ? respwanYesTtContent // "Brings a Kerbal back to life.\r\nWill then become available.";
           : respawnNoTtContent; // "Realistic Control is preventing this action.";
       }

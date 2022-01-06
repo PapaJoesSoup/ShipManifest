@@ -5,6 +5,7 @@ using ConnectedLivingSpace;
 using KSP.UI.Screens;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using ShipManifest.Windows;
 using UnityEngine;
@@ -109,8 +110,8 @@ namespace ShipManifest
 
         SMSettings.LoadSettings();
 
-        if (SMSettings.AutoSave)
-          InvokeRepeating("RunSave", SMSettings.SaveIntervalSec, SMSettings.SaveIntervalSec);
+        if (CurrSettings.AutoSave)
+          InvokeRepeating("RunSave", CurrSettings.SaveIntervalSec, CurrSettings.SaveIntervalSec);
 
         CreateAppIcons();
 
@@ -130,7 +131,7 @@ namespace ShipManifest
           FrameErrTripped = false;
 
         if (WindowRoster.ResetRosterSize)
-          WindowRoster.Position.height = SMSettings.UseUnityStyle ? 330 : 350;
+          WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 : 350;
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
         {
@@ -140,11 +141,11 @@ namespace ShipManifest
           }
           else
           {
-            Curr.EnableCls = false;
+            CurrSettings.EnableCls = false;
             SMSettings.ClsInstalled = false;
           }
           // reset any hacked kerbal names in game save from old version of SM/KSP
-          if (Curr.EnableChangeProfession)
+          if (CurrSettings.EnableChangeProfession)
             WindowRoster.ResetKerbalNames();
 
           SMSettings.SaveSettings();
@@ -183,7 +184,7 @@ namespace ShipManifest
         }
         else
         {
-          Curr.EnableCls = false;
+          CurrSettings.EnableCls = false;
           SMSettings.ClsInstalled = false;
           SMSettings.SaveSettings();
         }
@@ -244,7 +245,7 @@ namespace ShipManifest
 
     internal void CreateAppIcons()
     {
-      if (SMSettings.EnableBlizzyToolbar)
+      if (CurrSettings.EnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
         if (ActivateBlizzyToolBar()) return;
@@ -301,7 +302,7 @@ namespace ShipManifest
     {
       try
       {
-        GUI.skin = SMSettings.UseUnityStyle ? null : HighLogic.Skin;
+        GUI.skin = CurrSettings.UseUnityStyle ? null : HighLogic.Skin;
 
         SMStyle.SetupGuiStyles();
         Display();
@@ -407,10 +408,10 @@ namespace ShipManifest
     internal void OnCrewTransferPartListCreated(GameEvents.HostedFromToAction<Part,List<Part>> eventData)
     {
       // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
-      if (Curr.EnableStockCrewXfer && !Curr.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
+      if (CurrSettings.EnableStockCrewXfer && !CurrSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // If override is off, then ignore.
-      if (!Curr.OverrideStockCrewXfer) return;
+      if (!CurrSettings.OverrideStockCrewXfer) return;
 
       // How can I tell if the parts are in the same space?... I need a starting point!  What part initiated the event?
       Part sourcePart = eventData.host;
@@ -448,7 +449,7 @@ namespace ShipManifest
 
     internal void OnItemTransferStarted(PartItemTransfer xferPartItem)
     {
-      if (Curr.EnableCls && Curr.RealXfers && xferPartItem.type == SMConditions.ResourceType.Crew.ToString())
+      if (CurrSettings.EnableCls && CurrSettings.RealXfers && xferPartItem.type == SMConditions.ResourceType.Crew.ToString())
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
       StockTransferItem = xferPartItem;
     }
@@ -469,19 +470,19 @@ namespace ShipManifest
     internal void OnCrewTransferSelected(CrewTransfer.CrewTransferData crewTransferData)
     {
       // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
-      if (Curr.EnableStockCrewXfer && !Curr.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
+      if (CurrSettings.EnableStockCrewXfer && !CurrSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // Disable the stock Transfer action if SM dictates.
-      if (!Curr.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
+      if (!CurrSettings.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
       {
-        if (!Curr.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
+        if (!CurrSettings.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
         if (TransferCrew.CrewXferState != TransferCrew.XferState.Off) DisplayScreenMsg("Stock Crew Transfer Disabled.  SM Crew Transfer in Progress.");
         crewTransferData.canTransfer = false;
         return;
       }
 
       // If override is off, then ignore.
-      if (!Curr.OverrideStockCrewXfer) return;
+      if (!CurrSettings.OverrideStockCrewXfer) return;
 
       //Check for DeepFreezer full. if full, abort handling Xfer.
       if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && crewTransferData.destPart.Modules.Contains("DeepFreezer"))
@@ -503,7 +504,7 @@ namespace ShipManifest
       }
 
       // If override is off, then ignore.
-      if (!Curr.OverrideStockCrewXfer) return;
+      if (!CurrSettings.OverrideStockCrewXfer) return;
 
       // store data from event.
       DisplayScreenMsg("SM is overriding Stock Transfers.  SM based Crew Transfer initiating...");
@@ -567,7 +568,7 @@ namespace ShipManifest
     // Stock vs Blizzy Toolbar switch handler
     private void CheckForToolbarTypeToggle()
     {
-      if (SMSettings.EnableBlizzyToolbar && !Orig.EnableBlizzyToolbar)
+      if (CurrSettings.EnableBlizzyToolbar && !OrigSettings.EnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
         if (!ActivateBlizzyToolBar())
@@ -576,14 +577,14 @@ namespace ShipManifest
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
 
-          SMSettings.EnableBlizzyToolbar = Orig.EnableBlizzyToolbar;
+          CurrSettings.EnableBlizzyToolbar = OrigSettings.EnableBlizzyToolbar;
         }
         else
         {
           OnGuiAppLauncherDestroyed();
           GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGuiAppLauncherDestroyed);
-          Orig.EnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
+          OrigSettings.EnableBlizzyToolbar = CurrSettings.EnableBlizzyToolbar;
           if (HighLogic.LoadedSceneIsFlight)
             _smButtonBlizzy.Visible = true;
           if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
@@ -591,7 +592,7 @@ namespace ShipManifest
           _smSettingsBlizzy.Visible = true;
         }
       }
-      else if (!SMSettings.EnableBlizzyToolbar && Orig.EnableBlizzyToolbar)
+      else if (!CurrSettings.EnableBlizzyToolbar && OrigSettings.EnableBlizzyToolbar)
       {
         // Use stock Toolbar
         if (HighLogic.LoadedSceneIsFlight)
@@ -604,7 +605,7 @@ namespace ShipManifest
         GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
         GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
         OnGuiAppLauncherReady();
-        Orig.EnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
+        OrigSettings.EnableBlizzyToolbar = CurrSettings.EnableBlizzyToolbar;
       }
     }
 
@@ -614,7 +615,7 @@ namespace ShipManifest
       try
       {
         // Setup SM Window button
-        if (HighLogic.LoadedSceneIsFlight && _smButtonStock == null && !SMSettings.EnableBlizzyToolbar)
+        if (HighLogic.LoadedSceneIsFlight && _smButtonStock == null && !CurrSettings.EnableBlizzyToolbar)
         {
           string iconfile = "IconOff_128";
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
@@ -635,7 +636,7 @@ namespace ShipManifest
 
         // Setup Settings Button
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER && _smSettingsStock == null &&
-            !SMSettings.EnableBlizzyToolbar)
+            !CurrSettings.EnableBlizzyToolbar)
         {
           string iconfile = "IconS_Off_128";
           _smSettingsStock = ApplicationLauncher.Instance.AddModApplication(
@@ -655,7 +656,7 @@ namespace ShipManifest
         }
 
         // Setup Roster Button
-        if (HighLogic.LoadedScene != GameScenes.SPACECENTER || _smRosterStock != null || SMSettings.EnableBlizzyToolbar)
+        if (HighLogic.LoadedScene != GameScenes.SPACECENTER || _smRosterStock != null || CurrSettings.EnableBlizzyToolbar)
           return;
         {
           string iconfile = "IconR_Off_128";
@@ -738,7 +739,7 @@ namespace ShipManifest
         }
         //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
 
-        if (SMSettings.EnableBlizzyToolbar)
+        if (CurrSettings.EnableBlizzyToolbar)
           _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
             ? $"{TextureFolder}IconOn_24"
             : $"{TextureFolder}IconOff_24";
@@ -763,7 +764,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
         {
           WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
-          if (SMSettings.EnableBlizzyToolbar)
+          if (CurrSettings.EnableBlizzyToolbar)
             _smRosterBlizzy.TexturePath = WindowRoster.ShowWindow
               ? $"{TextureFolder}IconR_On_24"
               : $"{TextureFolder}IconR_Off_24";
@@ -788,7 +789,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
         WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
         SMSettings.MemStoreTempSettings();
-        if (SMSettings.EnableBlizzyToolbar)
+        if (CurrSettings.EnableBlizzyToolbar)
           _smSettingsBlizzy.TexturePath = WindowSettings.ShowWindow
             ? $"{TextureFolder}IconS_On_24"
             : $"{TextureFolder}IconS_Off_24";
@@ -831,7 +832,7 @@ namespace ShipManifest
           {
             step = "6 - Show Roster";
             if (WindowRoster.ResetRosterSize)
-              WindowRoster.Position.height = SMSettings.UseUnityStyle ? 330 : 350;
+              WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 : 350;
             WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display,
               WindowRoster.Title, GUILayout.MinHeight(20));
           }
@@ -862,7 +863,7 @@ namespace ShipManifest
         else
         {
           step = "2 - Can Show Manifest = false";
-          if (!Curr.EnableCls || SmVessel == null) return;
+          if (!CurrSettings.EnableCls || SmVessel == null) return;
           if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             SMHighlighter.HighlightClsVessel(false, true);
         }
@@ -1016,7 +1017,7 @@ namespace ShipManifest
 
     internal static bool ActivateBlizzyToolBar()
     {
-      if (!SMSettings.EnableBlizzyToolbar) return false;
+      if (!CurrSettings.EnableBlizzyToolbar) return false;
       if (!ToolbarManager.ToolbarAvailable) return false;
       try
       {
@@ -1081,7 +1082,7 @@ namespace ShipManifest
       IEnumerator<ScreenMessage> smessagesToRemove =
         smessages.ActiveMessages.Where(
           x =>
-            Math.Abs(x.startTime - smessage.startTime) < Curr.Tolerance &&
+            Math.Abs(x.startTime - smessage.startTime) < CurrSettings.Tolerance &&
             x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
       while (smessagesToRemove.MoveNext())
       {

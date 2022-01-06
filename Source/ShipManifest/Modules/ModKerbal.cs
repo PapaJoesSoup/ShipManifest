@@ -1,3 +1,5 @@
+using ShipManifest.InternalObjects.Settings;
+
 namespace ShipManifest.Modules
 {
   public class ModKerbal
@@ -54,10 +56,10 @@ namespace ShipManifest.Modules
 
     public void SyncKerbal()
     {
-      if (Curr.EnableKerbalRename)
+      if (CurrSettings.EnableKerbalRename)
       {
         Kerbal.ChangeName(Name);
-        if (Curr.EnableChangeProfession)
+        if (CurrSettings.EnableChangeProfession)
           KerbalRoster.SetExperienceTrait(Kerbal, Trait);
       }
       Kerbal.gender = Gender;

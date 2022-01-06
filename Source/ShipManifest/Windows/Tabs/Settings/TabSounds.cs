@@ -1,4 +1,5 @@
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Settings
@@ -56,7 +57,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundStart = GUILayout.TextField(SMSettings.PumpSoundStart, GUILayout.Width(guiTextWidth));
+      CurrSettings.PumpSoundStart = GUILayout.TextField(CurrSettings.PumpSoundStart, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Run Sound
@@ -65,7 +66,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundRun = GUILayout.TextField(SMSettings.PumpSoundRun, GUILayout.Width(guiTextWidth));
+      CurrSettings.PumpSoundRun = GUILayout.TextField(CurrSettings.PumpSoundRun, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Stop Sound
@@ -74,7 +75,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.PumpSoundStop = GUILayout.TextField(SMSettings.PumpSoundStop, GUILayout.Width(guiTextWidth));
+      CurrSettings.PumpSoundStop = GUILayout.TextField(CurrSettings.PumpSoundStop, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Pump Sound Volume
@@ -86,7 +87,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Volume Slider Control
       GUILayout.Label(volMinContent, GUILayout.Width(40),GUILayout.Height(20)); // "Min"
-      SMSettings.PumpSoundVol = GUILayout.HorizontalSlider((float)SMSettings.PumpSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
+      CurrSettings.PumpSoundVol = GUILayout.HorizontalSlider((float)CurrSettings.PumpSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
       GUILayout.Label(volMaxContent, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
@@ -102,7 +103,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundStart = GUILayout.TextField(SMSettings.CrewSoundStart, GUILayout.Width(guiTextWidth));
+      CurrSettings.CrewSoundStart = GUILayout.TextField(CurrSettings.CrewSoundStart, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Run Sound
@@ -111,7 +112,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundRun = GUILayout.TextField(SMSettings.CrewSoundRun, GUILayout.Width(guiTextWidth));
+      CurrSettings.CrewSoundRun = GUILayout.TextField(CurrSettings.CrewSoundRun, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Stop Sound
@@ -120,7 +121,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      SMSettings.CrewSoundStop = GUILayout.TextField(SMSettings.CrewSoundStop, GUILayout.Width(guiTextWidth));
+      CurrSettings.CrewSoundStop = GUILayout.TextField(CurrSettings.CrewSoundStop, GUILayout.Width(guiTextWidth));
       GUILayout.EndHorizontal();
 
       // Crew Sound Volume
@@ -132,7 +133,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Volume Slider Control
       GUILayout.Label(volMinContent, GUILayout.Width(40), GUILayout.Height(20)); // "Min"
-      SMSettings.CrewSoundVol = GUILayout.HorizontalSlider((float)SMSettings.CrewSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
+      CurrSettings.CrewSoundVol = GUILayout.HorizontalSlider((float)CurrSettings.CrewSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
       GUILayout.Label(volMaxContent, GUILayout.Width(40), GUILayout.Height(20));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
