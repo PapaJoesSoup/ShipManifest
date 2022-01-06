@@ -69,7 +69,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      if (SMSettings.UseUnityStyle != SMSettings.PrevUseUnityStyle)
+      if (SMSettings.UseUnityStyle != Orig.UseUnityStyle)
         SMStyle.WindowStyle = null;
 
       // Enable Debug Window;

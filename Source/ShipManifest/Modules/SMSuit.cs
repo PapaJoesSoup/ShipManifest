@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShipManifest.InternalObjects
+namespace ShipManifest.Modules
 {
   internal class SMSuit
   {

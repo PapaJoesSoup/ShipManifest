@@ -59,7 +59,7 @@ namespace ShipManifest.InternalObjects
         ClearPartHighlight(list.Current);
       }
       list.Dispose();
-      if (!SMSettings.EnableCls || !SMSettings.EnableClsHighlighting || !SMAddon.GetClsVessel()) return;
+      if (!Curr.EnableCls || !Curr.EnableClsHighlighting || !SMAddon.GetClsVessel()) return;
       if (resourceParts.Count > 0 && resourceParts[0] != null)
         SMAddon.ClsAddon.Vessel.Highlight(false);
     }
@@ -180,7 +180,7 @@ namespace ShipManifest.InternalObjects
         EdgeHighight(PrevMouseOverParts, false);
 
         // now set selected part colors...
-        if (!SMSettings.OnlySourceTarget && SMAddon.SmVessel.SelectedResourcesParts != null)
+        if (!Curr.OnlySourceTarget && SMAddon.SmVessel.SelectedResourcesParts != null)
           SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, SMSettings.Colors[SMSettings.ResourcePartColor], true);
         if (SMAddon.SmVessel.SelectedPartsSource != null)
           SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor],true);
@@ -233,7 +233,7 @@ namespace ShipManifest.InternalObjects
           strColor = SMSettings.TargetPartColor;
         }
       }
-      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
+      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !Curr.OnlySourceTarget)
       {
         strColor = SMConditions.IsClsHighlightingEnabled() ? "green" : "yellow";
       }
@@ -242,7 +242,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void EdgeHighight(Part part, bool enable, string color = null)
     {
-      if (!SMSettings.EnableEdgeHighlighting) return;
+      if (!Curr.EnableEdgeHighlighting) return;
       if (enable)
       {
         if (string.IsNullOrEmpty(color))
@@ -259,7 +259,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void EdgeHighight(List<Part> parts, bool enable, string color = null)
     {
-      if (!SMSettings.EnableEdgeHighlighting) return;
+      if (!Curr.EnableEdgeHighlighting) return;
       List<Part>.Enumerator list = parts.GetEnumerator();
       while (list.MoveNext())
       {
@@ -318,7 +318,7 @@ namespace ShipManifest.InternalObjects
       try
       {
         // Do we even want to highlight?
-        if (!SMSettings.EnableHighlighting) return;
+        if (!Curr.EnableHighlighting) return;
         step = "Showhipmanifest = true";
         if (!SMConditions.CanShowShipManifest()) return;
         //step = "Clear old highlighting";
@@ -349,7 +349,7 @@ namespace ShipManifest.InternalObjects
 
           // Highlight all parts containing the resource
           step = "Set Resource Part Colors";
-          if (!SMSettings.OnlySourceTarget)
+          if (!Curr.OnlySourceTarget)
           {
             SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, resourcePartColor);
           }

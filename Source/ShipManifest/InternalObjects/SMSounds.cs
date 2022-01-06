@@ -109,12 +109,12 @@ namespace ShipManifest.InternalObjects
 
     internal static bool SoundSettingsChanged()
     {
-      return SMSettings.PumpSoundRun != SMSettings.PrevPumpSoundRun
-             || SMSettings.PumpSoundStart != SMSettings.PrevPumpSoundStart
-             || SMSettings.PumpSoundStop != SMSettings.PrevPumpSoundStop
-             || SMSettings.CrewSoundStart != SMSettings.PrevCrewSoundStart
-             || SMSettings.CrewSoundRun != SMSettings.PrevCrewSoundRun
-             || SMSettings.CrewSoundStop != SMSettings.PrevCrewSoundStop;
+      return SMSettings.PumpSoundRun != Orig.PumpSoundRun
+             || SMSettings.PumpSoundStart != Orig.PumpSoundStart
+             || SMSettings.PumpSoundStop != Orig.PumpSoundStop
+             || SMSettings.CrewSoundStart != Orig.CrewSoundStart
+             || SMSettings.CrewSoundRun != Orig.CrewSoundRun
+             || SMSettings.CrewSoundStop != Orig.CrewSoundStop;
     }
   }
 }

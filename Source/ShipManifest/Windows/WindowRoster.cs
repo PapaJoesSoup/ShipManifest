@@ -194,7 +194,7 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
-          GUI.enabled = SMSettings.EnableCrewModify;
+          GUI.enabled = Curr.EnableCrewModify;
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
@@ -575,7 +575,7 @@ namespace ShipManifest.Windows
     private static void EditKerbalViewer()
     {
       GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
-      if (SMSettings.EnableKerbalRename)
+      if (Curr.EnableKerbalRename)
       {
         GUILayout.BeginHorizontal();
         SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
@@ -590,7 +590,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
-      if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
+      if (Curr.EnableKerbalRename && Curr.EnableChangeProfession)
       {
         DisplaySelectProfession();
       }
@@ -626,7 +626,7 @@ namespace ShipManifest.Windows
       }
       if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
       {
-        if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
+        if (Curr.EnableKerbalRename && Curr.EnableChangeProfession)
         {
           if (SelectedKerbal != null) SelectedKerbal.Trait = KerbalProfession.ToString();
         }
@@ -669,7 +669,7 @@ namespace ShipManifest.Windows
 
     private static void SetupSuitButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && SMSettings.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && Curr.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.text : cnxEditContent;
       if (GUI.enabled)
@@ -685,7 +685,7 @@ namespace ShipManifest.Windows
 
     private static void SetupEditButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && Curr.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? editContent : cnxEditContent;
       if (GUI.enabled)
@@ -771,9 +771,9 @@ namespace ShipManifest.Windows
       // Applies to both scenes.
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
-        GUI.enabled = SMSettings.EnableCrewModify;
+        GUI.enabled = Curr.EnableCrewModify;
         buttonText = respawnContent;  // "Respawn";
-        buttonToolTip = SMSettings.EnableCrewModify 
+        buttonToolTip = Curr.EnableCrewModify 
           ? respwanYesTtContent // "Brings a Kerbal back to life.\r\nWill then become available.";
           : respawnNoTtContent; // "Realistic Control is preventing this action.";
       }

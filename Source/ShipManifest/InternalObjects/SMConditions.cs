@@ -25,7 +25,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsShipControllable()
     {
-      return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealControl) || !SMSettings.RealControl;
+      return (SMAddon.SmVessel.Vessel.IsControllable && Curr.RealControl) || !Curr.RealControl;
     }
 
     internal static bool IsInPreflight()
@@ -145,7 +145,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsClsInSameSpace(List<Part> source, List<Part> target)
     {
-      if (!SMSettings.EnableCls ||  !SMSettings.RealXfers) return true;
+      if (!Curr.EnableCls ||  !Curr.RealXfers) return true;
 
       bool result = false;
       List<Part>.Enumerator srcPart = source.GetEnumerator();
@@ -166,7 +166,7 @@ namespace ShipManifest.InternalObjects
     {
       bool results = false;
       if (source == null || target == null) return results;
-      if (SMSettings.EnableCls && SMSettings.RealXfers)
+      if (Curr.EnableCls && Curr.RealXfers)
       {
         if (SMAddon.ClsAddon.Vessel == null) return results;
         ICLSSpace sourceSpace = null;
@@ -269,17 +269,17 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return (!SMSettings.RealXfers ||
+      return (!Curr.RealXfers ||
               SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> {resourceName}))
              &&
              TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
-             SMSettings.Tolerance;
+             Curr.Tolerance;
     }
 
     internal static bool CanResourceBeDumped(string resourceName)
     {
       return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
-             SMSettings.Tolerance &&
+             Curr.Tolerance &&
              IsResourceTypeOther(resourceName);
     }
 
@@ -326,18 +326,18 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsClsEnabled()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null;
+      return Curr.EnableCls && SMAddon.ClsAddon.Vessel != null;
     }
 
     internal static bool IsClsActive()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null &&
+      return Curr.EnableCls && SMAddon.ClsAddon.Vessel != null &&
              SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool IsClsHighlightingEnabled()
     {
-      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null &&
+      return Curr.EnableCls && Curr.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null &&
              SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
@@ -350,8 +350,8 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanShowCrewFillDumpButtons()
     {
-      return !SMSettings.RealXfers ||
-             (SMAddon.SmVessel.IsRecoverable && SMSettings.EnablePfCrews);
+      return !Curr.RealXfers ||
+             (SMAddon.SmVessel.IsRecoverable && Curr.EnablePfCrews);
     }
 
     internal static bool IsUsiInflatable(Part part)
@@ -387,7 +387,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeAdded(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return Curr.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
         && SMAddon.SmVessel.SelectedPartsSource.Count > 0 
         && !ShipManifest.SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
@@ -423,28 +423,28 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return Curr.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned 
         && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeRemovedRealism(ProtoCrewMember kerbal)
     {
-      return !SMSettings.EnableCrewModify
+      return !Curr.EnableCrewModify
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
         && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeAddedNoSource(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return Curr.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
         && SMAddon.SmVessel.SelectedPartsSource.Count == 0;
     }
 
     internal static bool KerbalCannotBeAddedRealism(ProtoCrewMember kerbal)
     {
-      return !SMSettings.EnableCrewModify 
+      return !Curr.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 

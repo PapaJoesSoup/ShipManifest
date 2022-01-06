@@ -54,10 +54,10 @@ namespace ShipManifest.Modules
 
     public void SyncKerbal()
     {
-      if (SMSettings.EnableKerbalRename)
+      if (Curr.EnableKerbalRename)
       {
         Kerbal.ChangeName(Name);
-        if (SMSettings.EnableChangeProfession)
+        if (Curr.EnableChangeProfession)
           KerbalRoster.SetExperienceTrait(Kerbal, Trait);
       }
       Kerbal.gender = Gender;

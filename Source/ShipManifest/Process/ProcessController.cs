@@ -159,7 +159,7 @@ namespace ShipManifest.Process
           ((IScienceDataContainer) source).DumpData(data);
         }
 
-        if (!SMSettings.RealControl) ((ModuleScienceExperiment)source).ResetExperiment();
+        if (!Curr.RealControl) ((ModuleScienceExperiment)source).ResetExperiment();
       }
       catch (Exception ex)
       {
@@ -175,7 +175,7 @@ namespace ShipManifest.Process
     {
       try
       {
-        if (SMSettings.RealXfers)
+        if (Curr.RealXfers)
         {
           List<TransferPump>.Enumerator pumps = xferPumps.GetEnumerator();
           while (pumps.MoveNext())
@@ -217,7 +217,7 @@ namespace ShipManifest.Process
       // This initiates the Dump process and with realism off, does the dump immediately; with realism on, initiates the real time process.
       try
       {
-        if (SMSettings.RealXfers)
+        if (Curr.RealXfers)
         {
           // Turn on Pumps for timed process...
           List<TransferPump>.Enumerator epumps = pumps.GetEnumerator();

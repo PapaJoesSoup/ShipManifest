@@ -140,11 +140,11 @@ namespace ShipManifest
           }
           else
           {
-            SMSettings.EnableCls = false;
+            Curr.EnableCls = false;
             SMSettings.ClsInstalled = false;
           }
           // reset any hacked kerbal names in game save from old version of SM/KSP
-          if (SMSettings.EnableChangeProfession)
+          if (Curr.EnableChangeProfession)
             WindowRoster.ResetKerbalNames();
 
           SMSettings.SaveSettings();
@@ -183,7 +183,7 @@ namespace ShipManifest
         }
         else
         {
-          SMSettings.EnableCls = false;
+          Curr.EnableCls = false;
           SMSettings.ClsInstalled = false;
           SMSettings.SaveSettings();
         }
@@ -407,10 +407,10 @@ namespace ShipManifest
     internal void OnCrewTransferPartListCreated(GameEvents.HostedFromToAction<Part,List<Part>> eventData)
     {
       // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
-      if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
+      if (Curr.EnableStockCrewXfer && !Curr.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // If override is off, then ignore.
-      if (!SMSettings.OverrideStockCrewXfer) return;
+      if (!Curr.OverrideStockCrewXfer) return;
 
       // How can I tell if the parts are in the same space?... I need a starting point!  What part initiated the event?
       Part sourcePart = eventData.host;
@@ -448,7 +448,7 @@ namespace ShipManifest
 
     internal void OnItemTransferStarted(PartItemTransfer xferPartItem)
     {
-      if (SMSettings.EnableCls && SMSettings.RealXfers && xferPartItem.type == SMConditions.ResourceType.Crew.ToString())
+      if (Curr.EnableCls && Curr.RealXfers && xferPartItem.type == SMConditions.ResourceType.Crew.ToString())
         xferPartItem.semiValidMessage = "<color=orange>SM - This module is either full or internally unreachable.</color>";
       StockTransferItem = xferPartItem;
     }
@@ -469,19 +469,19 @@ namespace ShipManifest
     internal void OnCrewTransferSelected(CrewTransfer.CrewTransferData crewTransferData)
     {
       // We can skip this event if a stock CrewTransfer is enabled, Override is off & no SM Crew Transfers are active
-      if (SMSettings.EnableStockCrewXfer && !SMSettings.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
+      if (Curr.EnableStockCrewXfer && !Curr.OverrideStockCrewXfer && TransferCrew.CrewXferState == TransferCrew.XferState.Off) return;
 
       // Disable the stock Transfer action if SM dictates.
-      if (!SMSettings.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
+      if (!Curr.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
       {
-        if (!SMSettings.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
+        if (!Curr.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
         if (TransferCrew.CrewXferState != TransferCrew.XferState.Off) DisplayScreenMsg("Stock Crew Transfer Disabled.  SM Crew Transfer in Progress.");
         crewTransferData.canTransfer = false;
         return;
       }
 
       // If override is off, then ignore.
-      if (!SMSettings.OverrideStockCrewXfer) return;
+      if (!Curr.OverrideStockCrewXfer) return;
 
       //Check for DeepFreezer full. if full, abort handling Xfer.
       if (InstalledMods.IsDfInstalled && InstalledMods.IsDfApiReady && crewTransferData.destPart.Modules.Contains("DeepFreezer"))
@@ -503,7 +503,7 @@ namespace ShipManifest
       }
 
       // If override is off, then ignore.
-      if (!SMSettings.OverrideStockCrewXfer) return;
+      if (!Curr.OverrideStockCrewXfer) return;
 
       // store data from event.
       DisplayScreenMsg("SM is overriding Stock Transfers.  SM based Crew Transfer initiating...");
@@ -567,7 +567,7 @@ namespace ShipManifest
     // Stock vs Blizzy Toolbar switch handler
     private void CheckForToolbarTypeToggle()
     {
-      if (SMSettings.EnableBlizzyToolbar && !SMSettings.PrevEnableBlizzyToolbar)
+      if (SMSettings.EnableBlizzyToolbar && !Orig.EnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
         if (!ActivateBlizzyToolBar())
@@ -576,14 +576,14 @@ namespace ShipManifest
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
 
-          SMSettings.EnableBlizzyToolbar = SMSettings.PrevEnableBlizzyToolbar;
+          SMSettings.EnableBlizzyToolbar = Orig.EnableBlizzyToolbar;
         }
         else
         {
           OnGuiAppLauncherDestroyed();
           GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
           GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGuiAppLauncherDestroyed);
-          SMSettings.PrevEnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
+          Orig.EnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
           if (HighLogic.LoadedSceneIsFlight)
             _smButtonBlizzy.Visible = true;
           if (HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
@@ -591,7 +591,7 @@ namespace ShipManifest
           _smSettingsBlizzy.Visible = true;
         }
       }
-      else if (!SMSettings.EnableBlizzyToolbar && SMSettings.PrevEnableBlizzyToolbar)
+      else if (!SMSettings.EnableBlizzyToolbar && Orig.EnableBlizzyToolbar)
       {
         // Use stock Toolbar
         if (HighLogic.LoadedSceneIsFlight)
@@ -604,7 +604,7 @@ namespace ShipManifest
         GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
         GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
         OnGuiAppLauncherReady();
-        SMSettings.PrevEnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
+        Orig.EnableBlizzyToolbar = SMSettings.EnableBlizzyToolbar;
       }
     }
 
@@ -862,7 +862,7 @@ namespace ShipManifest
         else
         {
           step = "2 - Can Show Manifest = false";
-          if (!SMSettings.EnableCls || SmVessel == null) return;
+          if (!Curr.EnableCls || SmVessel == null) return;
           if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             SMHighlighter.HighlightClsVessel(false, true);
         }
@@ -1081,7 +1081,7 @@ namespace ShipManifest
       IEnumerator<ScreenMessage> smessagesToRemove =
         smessages.ActiveMessages.Where(
           x =>
-            Math.Abs(x.startTime - smessage.startTime) < SMSettings.Tolerance &&
+            Math.Abs(x.startTime - smessage.startTime) < Curr.Tolerance &&
             x.style == ScreenMessageStyle.UPPER_CENTER).GetEnumerator();
       while (smessagesToRemove.MoveNext())
       {

@@ -12,27 +12,71 @@ using UnityEngine.UIElements;
 namespace ShipManifest
 {
   // ReSharper disable once InconsistentNaming
-  internal static class SMSettings
+  internal static class Orig
   {
-    #region Properties
+    internal static bool VerboseLogging;
+    internal static bool ShowDebugger;
+    internal static string ErrorLogLength = "1000";
+    internal static bool SaveLogOnExit = true;
+    internal static bool AutoSave;
+    internal static bool UseUnityStyle = true;
+    internal static int SaveIntervalSec = 60;
+    internal static int RealismMode = 3;
+    internal static bool RealXfers;
+    internal static bool RealCrewXfers;
+    internal static bool RealControl;
+    internal static bool LockSettings;
+    internal static double FlowRate = 100;
+    internal static double FlowCost = 0.0015;
+    internal static double MaxFlowRate = 1000;
+    internal static double MinFlowRate;
+    internal static int MaxFlowTimeSec = 100;
+    internal static bool EnableXferCost = true;
+    internal static bool EnableHighlighting = true;
+    internal static bool OnlySourceTarget;
+    internal static bool EnableClsHighlighting = true;
+    internal static bool EnableEdgeHighlighting = true;
+    internal static bool EnableScience = true;
+    internal static bool EnableCrew = true;
+    internal static bool EnableCrewModify = true;
+    internal static bool EnablePfCrews;
+    internal static bool EnableStockCrewXfer = true;
+    internal static bool OverrideStockCrewXfer = true;
+    internal static bool EnableClsAllowTransfer = true;
+    internal static bool EnablePfResources = true;
+    internal static bool EnableCls = true;
+    internal static bool EnableBlizzyToolbar;
+    internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
+    internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
+    internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
+    internal static string CrewSoundStart = "ShipManifest/Sounds/14214-1";
+    internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
+    internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
+    internal static double PumpSoundVol = 1;
+    internal static double CrewSoundVol = 1;
+    internal static bool ShowToolTips = true;
+    internal static bool ManifestToolTips = true;
+    internal static bool TransferToolTips = true;
+    internal static bool SettingsToolTips = true;
+    internal static bool RosterToolTips = true;
+    internal static bool ControlToolTips = true;
+    internal static bool HatchToolTips = true;
+    internal static bool PanelToolTips = true;
+    internal static bool AntennaToolTips = true;
+    internal static bool LightToolTips = true;
+    internal static bool RealismToolTips = true;
+    internal static bool HighlightToolTips = true;
+    internal static bool SoundsToolTips = true;
+    internal static bool ToolTipsToolTips = true;
+    internal static bool ConfigToolTips = true;
+    internal static bool ModsToolTips = true;
+    internal static bool DebuggerToolTips = true;
+    internal static bool EnableKerbalRename = true;
+    internal static bool EnableChangeProfession = true;
+  }
 
-    internal static bool Loaded;
-
-    internal static Dictionary<string, Color> Colors;
-
-    internal static List<SMSuit> SmSuits = new List<SMSuit>();
-
-    internal static ConfigNode Settings;
-
-    private static readonly string SettingsPath =
-      $"{KSPUtil.ApplicationRootPath}GameData/ShipManifest/Plugins/PluginData";
-
-    private static readonly string SettingsFile = $"{SettingsPath}/SMSettings.dat";
-
-    // This value is assigned from AssemblyInfo.cs
-    internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-    // Persisted properties
+  internal static class Curr
+  {
     // UI Managed Settings
     // Realism Tab Feature Options
     internal static int RealismMode = 2;
@@ -68,6 +112,7 @@ namespace ShipManifest
 
     // Tooltip Options
     internal static bool ShowToolTips = true;
+    // Tooltip Options
     // These options are managed, but assign their values directly to the window property.
     // Shown here for clarity
     // prevManifestToolTips = WindowManifest.ShowToolTips;
@@ -88,17 +133,6 @@ namespace ShipManifest
     // prevDebuggerToolTips = WindowDebugger.ShowToolTips;
 
     // Sound Tab Options
-    // All Default sounds licensing is: CC-By-SA
-
-    // Pump motor sound
-    // http://www.freesound.org/people/vibe_crc/sounds/59328/
-
-    // Bumping and scraping sounds...
-    // http://www.freesound.org/people/adcbicycle/sounds/14214/
-
-    // Minion like kerbal sounds...
-    // http://www.freesound.org/people/yummie/sounds/
-
     internal static string PumpSoundStart = "ShipManifest/Sounds/59328-1";
     internal static string PumpSoundRun = "ShipManifest/Sounds/59328-2";
     internal static string PumpSoundStop = "ShipManifest/Sounds/59328-3";
@@ -108,7 +142,6 @@ namespace ShipManifest
     internal static string CrewSoundRun = "ShipManifest/Sounds/14214-2";
     internal static string CrewSoundStop = "ShipManifest/Sounds/14214-3";
     internal static double CrewSoundVol = 1; // Range = 0...1
-
 
     //Config Tab options
     internal static bool EnableBlizzyToolbar;
@@ -133,77 +166,51 @@ namespace ShipManifest
     internal static int IvaUpdateFrameDelay = 10;
 
 
+  }
+
+  internal static class SMSettings
+  {
+    #region Properties
+
+    internal static bool Loaded;
+
+    internal static Dictionary<string, Color> Colors;
+
+    internal static List<SMSuit> SmSuits = new List<SMSuit>();
+
+    internal static ConfigNode Settings;
+
+    private static readonly string SettingsPath =
+      $"{KSPUtil.ApplicationRootPath}GameData/ShipManifest/Plugins/PluginData";
+
+    private static readonly string SettingsFile = $"{SettingsPath}/SMSettings.dat";
+
+    // This value is assigned from AssemblyInfo.cs
+    internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+    // Persisted properties
+
+    // Sound Tab Options
+    // All Default sounds licensing is: CC-By-SA
+
+    // Pump motor sound
+    // http://www.freesound.org/people/vibe_crc/sounds/59328/
+
+    // Bumping and scraping sounds...
+    // http://www.freesound.org/people/adcbicycle/sounds/14214/
+
+    // Minion like kerbal sounds...
+    // http://www.freesound.org/people/yummie/sounds/
+
+
+
     // End Persisted Properties
 
     // Settings Window Option storage for Settings Window Cancel support
-    internal static bool PrevVerboseLogging;
-    internal static bool PrevShowDebugger;
-    internal static string PrevErrorLogLength = "1000";
-    internal static bool PrevSaveLogOnExit = true;
-    internal static bool PrevAutoSave;
-    internal static bool PrevUseUnityStyle = true;
-    internal static int PrevSaveIntervalSec = 60;
-
-    internal static int PrevRealismMode = 3;
-    internal static bool PrevRealXfers;
-    internal static bool PrevRealCrewXfers;
-    internal static bool PrevRealControl;
-    internal static bool PrevLockSettings;
-
-    internal static double PrevFlowRate = 100;
-    internal static double PrevFlowCost = 0.0015;
-    internal static double PrevMaxFlowRate = 1000;
-    internal static double PrevMinFlowRate;
-    internal static int PrevMaxFlowTimeSec = 100;
-    internal static bool PrevEnableXferCost = true;
-
-    internal static bool PrevEnableHighlighting = true;
-    internal static bool PrevOnlySourceTarget;
-    internal static bool PrevEnableClsHighlighting = true;
-    internal static bool PrevEnableEdgeHighlighting = true;
-    internal static bool PrevEnableScience = true;
-    internal static bool PrevEnableCrew = true;
-    internal static bool PrevEnableCrewModify = true;
-    internal static bool PrevEnablePfCrews;
-    internal static bool PrevEnableStockCrewXfer = true;
-    internal static bool PrevOverrideStockCrewXfer = true;
-    internal static bool PrevEnableClsAllowTransfer = true;
-    internal static bool PrevEnablePfResources = true;
-    internal static bool PrevEnableCls = true;
-    internal static bool PrevEnableBlizzyToolbar;
-
-    internal static string PrevPumpSoundStart = "ShipManifest/Sounds/59328-1";
-    internal static string PrevPumpSoundRun = "ShipManifest/Sounds/59328-2";
-    internal static string PrevPumpSoundStop = "ShipManifest/Sounds/59328-3";
-    internal static string PrevCrewSoundStart = "ShipManifest/Sounds/14214-1";
-    internal static string PrevCrewSoundRun = "ShipManifest/Sounds/14214-2";
-    internal static string PrevCrewSoundStop = "ShipManifest/Sounds/14214-3";
-    internal static double PrevPumpSoundVol = 1;
-    internal static double PrevCrewSoundVol = 1;
 
 
     // these values have no non prev counterpart.  Each window contains an EnableToolTip property 
     // that is directly assigned on load and directly retrieved on save
-    internal static bool PrevShowToolTips = true;
-    internal static bool PrevManifestToolTips = true;
-    internal static bool PrevTransferToolTips = true;
-    internal static bool PrevSettingsToolTips = true;
-    internal static bool PrevRosterToolTips = true;
-    internal static bool PrevControlToolTips = true;
-    internal static bool PrevHatchToolTips = true;
-    internal static bool PrevPanelToolTips = true;
-    internal static bool PrevAntennaToolTips = true;
-    internal static bool PrevLightToolTips = true;
-    internal static bool PrevRealismToolTips = true;
-    internal static bool PrevHighlightToolTips = true;
-    internal static bool PrevSoundsToolTips = true;
-    internal static bool PrevToolTipsToolTips = true;
-    internal static bool PrevConfigToolTips = true;
-    internal static bool PrevModsToolTips = true;
-    internal static bool PrevDebuggerToolTips = true;
-
-    internal static bool PrevEnableKerbalRename = true;
-    internal static bool PrevEnableChangeProfession = true;
 
     // Internal properties for plugin management.  Not persisted, not user managed.
 
@@ -285,7 +292,7 @@ namespace ShipManifest
           : Settings.AddNode("SM_Hidden");
 
         // Lets get our rectangles...
-        DefaultPosition = GetRectangle(windowsNode, "DefaultPosition", DefaultPosition);
+        Curr.DefaultPosition = GetRectangle(windowsNode, "DefaultPosition", Curr.DefaultPosition);
         WindowManifest.Position = GetRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
         WindowTransfer.Position = GetRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
         WindowDebugger.Position = GetRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
@@ -295,98 +302,98 @@ namespace ShipManifest
 
         // now the settings
         // Realism Settings
-        RealismMode = realismNode.HasValue("RealismMode")
+        Curr.RealismMode = realismNode.HasValue("RealismMode")
           ? int.Parse(realismNode.GetValue("RealismMode"))
-          : RealismMode;
-        RealXfers = realismNode.HasValue("RealXfers")
+          : Curr.RealismMode;
+        Curr.RealXfers = realismNode.HasValue("RealXfers")
           ? bool.Parse(realismNode.GetValue("RealXfers"))
-          : RealXfers;
-        RealCrewXfers = realismNode.HasValue("RealCrewXfers")
+          : Curr.RealXfers;
+        Curr.RealCrewXfers = realismNode.HasValue("RealCrewXfers")
           ? bool.Parse(realismNode.GetValue("RealCrewXfers"))
-          : RealXfers;
-        RealControl = realismNode.HasValue("RealControl")
+          : Curr.RealXfers;
+        Curr.RealControl = realismNode.HasValue("RealControl")
           ? bool.Parse(realismNode.GetValue("RealControl"))
-          : RealControl;
-        EnableCrew = realismNode.HasValue("EnableCrew") 
+          : Curr.RealControl;
+        Curr.EnableCrew = realismNode.HasValue("EnableCrew") 
           ? bool.Parse(realismNode.GetValue("EnableCrew")) 
-          : EnableCrew;
-        EnableKerbalRename = realismNode.HasValue("EnableKerbalRename")
+          : Curr.EnableCrew;
+        Curr.EnableKerbalRename = realismNode.HasValue("EnableKerbalRename")
           ? bool.Parse(realismNode.GetValue("EnableKerbalRename"))
-          : EnableKerbalRename;
-        EnableChangeProfession = realismNode.HasValue("EnableChangeProfession")
+          : Curr.EnableKerbalRename;
+        Curr.EnableChangeProfession = realismNode.HasValue("EnableChangeProfession")
           ? bool.Parse(realismNode.GetValue("EnableChangeProfession"))
-          : EnableChangeProfession;
-        EnableCrewModify = realismNode.HasValue("EnableCrewModify") 
+          : Curr.EnableChangeProfession;
+        Curr.EnableCrewModify = realismNode.HasValue("EnableCrewModify") 
           ? bool.Parse(realismNode.GetValue("EnableCrewModify")) 
-          : EnableCrewModify;
-        EnablePfCrews = realismNode.HasValue("EnablePfCrews") 
+          : Curr.EnableCrewModify;
+        Curr.EnablePfCrews = realismNode.HasValue("EnablePfCrews") 
           ? bool.Parse(realismNode.GetValue("EnablePfCrews")) 
-          : EnablePfCrews;
-        EnableStockCrewXfer = realismNode.HasValue("EnableStockCrewTransfer")
+          : Curr.EnablePfCrews;
+        Curr.EnableStockCrewXfer = realismNode.HasValue("EnableStockCrewTransfer")
           ? bool.Parse(realismNode.GetValue("EnableStockCrewTransfer"))
-          : EnableStockCrewXfer;
+          : Curr.EnableStockCrewXfer;
 
-        EnableScience = realismNode.HasValue("EnableScience")
+        Curr.EnableScience = realismNode.HasValue("EnableScience")
           ? bool.Parse(realismNode.GetValue("EnableScience"))
-          : EnableScience;
-        EnableResources = realismNode.HasValue("EnableResources")
+          : Curr.EnableScience;
+        Curr.EnableResources = realismNode.HasValue("EnableResources")
           ? bool.Parse(realismNode.GetValue("EnableResources"))
-          : EnableResources;
-        EnablePfResources = realismNode.HasValue("EnablePFResources")
+          : Curr.EnableResources;
+        Curr.EnablePfResources = realismNode.HasValue("EnablePFResources")
           ? bool.Parse(realismNode.GetValue("EnablePFResources"))
-          : EnablePfResources;
-        EnableCls = realismNode.HasValue("EnableCLS") 
+          : Curr.EnablePfResources;
+        Curr.EnableCls = realismNode.HasValue("EnableCLS") 
           ? bool.Parse(realismNode.GetValue("EnableCLS")) 
-          : EnableCls;
-        OverrideStockCrewXfer = realismNode.HasValue("OverrideStockCrewTransfer")
+          : Curr.EnableCls;
+        Curr.OverrideStockCrewXfer = realismNode.HasValue("OverrideStockCrewTransfer")
           ? bool.Parse(realismNode.GetValue("OverrideStockCrewTransfer"))
-          : OverrideStockCrewXfer;
-        EnableClsAllowTransfer = realismNode.HasValue("EnableClsAllowTransfer")
+          : Curr.OverrideStockCrewXfer;
+        Curr.EnableClsAllowTransfer = realismNode.HasValue("EnableClsAllowTransfer")
           ? bool.Parse(realismNode.GetValue("EnableClsAllowTransfer"))
-          : EnableClsAllowTransfer;
-        FlowRate = realismNode.HasValue("FlowRate") 
+          : Curr.EnableClsAllowTransfer;
+        Curr.FlowRate = realismNode.HasValue("FlowRate") 
           ? double.Parse(realismNode.GetValue("FlowRate")) 
-          : FlowRate;
-        FlowCost = realismNode.HasValue("FlowCost") 
+          : Curr.FlowRate;
+        Curr.FlowCost = realismNode.HasValue("FlowCost") 
           ? double.Parse(realismNode.GetValue("FlowCost")) 
-          : FlowCost;
-        MinFlowRate = realismNode.HasValue("MinFlowRate")
+          : Curr.FlowCost;
+        Curr.MinFlowRate = realismNode.HasValue("MinFlowRate")
           ? double.Parse(realismNode.GetValue("MinFlowRate"))
-          : MinFlowRate;
-        MaxFlowRate = realismNode.HasValue("MaxFlowRate")
+          : Curr.MinFlowRate;
+        Curr.MaxFlowRate = realismNode.HasValue("MaxFlowRate")
           ? double.Parse(realismNode.GetValue("MaxFlowRate"))
-          : MaxFlowRate;
-        MaxFlowTimeSec = realismNode.HasValue("MaxFlowTimeSec")
+          : Curr.MaxFlowRate;
+        Curr.MaxFlowTimeSec = realismNode.HasValue("MaxFlowTimeSec")
           ? int.Parse(realismNode.GetValue("MaxFlowTimeSec"))
-          : MaxFlowTimeSec;
-        EnableXferCost = realismNode.HasValue("EnableXferCost")
+          : Curr.MaxFlowTimeSec;
+        Curr.EnableXferCost = realismNode.HasValue("EnableXferCost")
           ? bool.Parse(realismNode.GetValue("EnableXferCost"))
-          : EnableXferCost;
-        LockSettings = realismNode.HasValue("LockSettings")
+          : Curr.EnableXferCost;
+        Curr.LockSettings = realismNode.HasValue("LockSettings")
           ? bool.Parse(realismNode.GetValue("LockSettings"))
-          : LockSettings;
+          : Curr.LockSettings;
 
         // Highlighting settings
-        EnableHighlighting = highlightNode.HasValue("EnableHighlighting")
+        Curr.EnableHighlighting = highlightNode.HasValue("EnableHighlighting")
           ? bool.Parse(highlightNode.GetValue("EnableHighlighting"))
-          : EnableHighlighting;
-        OnlySourceTarget = highlightNode.HasValue("OnlySourceTarget")
+          : Curr.EnableHighlighting;
+        Curr.OnlySourceTarget = highlightNode.HasValue("OnlySourceTarget")
           ? bool.Parse(highlightNode.GetValue("OnlySourceTarget"))
-          : OnlySourceTarget;
-        EnableClsHighlighting = highlightNode.HasValue("EnableCLSHighlighting")
+          : Curr.OnlySourceTarget;
+        Curr.EnableClsHighlighting = highlightNode.HasValue("EnableCLSHighlighting")
           ? bool.Parse(highlightNode.GetValue("EnableCLSHighlighting"))
-          : EnableClsHighlighting;
-        EnableEdgeHighlighting = highlightNode.HasValue("EnableEdgeHighlighting")
+          : Curr.EnableClsHighlighting;
+        Curr.EnableEdgeHighlighting = highlightNode.HasValue("EnableEdgeHighlighting")
           ? bool.Parse(highlightNode.GetValue("EnableEdgeHighlighting"))
-          : EnableClsHighlighting;
-        ResourcePartColor = hiddenNode.HasValue("ResourcePartColor")
+          : Curr.EnableClsHighlighting;
+        Curr.ResourcePartColor = hiddenNode.HasValue("ResourcePartColor")
           ? hiddenNode.GetValue("ResourcePartColor")
-          : ResourcePartColor;
+          : Curr.ResourcePartColor;
 
         // ToolTip Settings
-        ShowToolTips = toolTipsNode.HasValue("ShowToolTips")
+        Curr.ShowToolTips = toolTipsNode.HasValue("ShowToolTips")
           ? bool.Parse(toolTipsNode.GetValue("ShowToolTips"))
-          : ShowToolTips;
+          : Curr.ShowToolTips;
         WindowManifest.ShowToolTips = toolTipsNode.HasValue("ManifestToolTips")
           ? bool.Parse(toolTipsNode.GetValue("ManifestToolTips"))
           : WindowManifest.ShowToolTips;
@@ -434,86 +441,86 @@ namespace ShipManifest
           : WindowDebugger.ShowToolTips;
 
         // Sounds Settings
-        PumpSoundStart = soundsNode.HasValue("PumpSoundStart")
+        Curr.PumpSoundStart = soundsNode.HasValue("PumpSoundStart")
           ? soundsNode.GetValue("PumpSoundStart")
-          : PumpSoundStart;
-        PumpSoundRun = soundsNode.HasValue("PumpSoundRun") 
+          : Curr.PumpSoundStart;
+        Curr.PumpSoundRun = soundsNode.HasValue("PumpSoundRun") 
           ? soundsNode.GetValue("PumpSoundRun") 
-          : PumpSoundRun;
-        PumpSoundStop = soundsNode.HasValue("PumpSoundStop") 
+          : Curr.PumpSoundRun;
+        Curr.PumpSoundStop = soundsNode.HasValue("PumpSoundStop") 
           ? soundsNode.GetValue("PumpSoundStop") 
-          : PumpSoundStop;
-        CrewSoundStart = soundsNode.HasValue("CrewSoundStart")
+          : Curr.PumpSoundStop;
+        Curr.CrewSoundStart = soundsNode.HasValue("CrewSoundStart")
           ? soundsNode.GetValue("CrewSoundStart")
-          : CrewSoundStart;
-        CrewSoundRun = soundsNode.HasValue("CrewSoundRun") 
+          : Curr.CrewSoundStart;
+        Curr.CrewSoundRun = soundsNode.HasValue("CrewSoundRun") 
           ? soundsNode.GetValue("CrewSoundRun") 
-          : CrewSoundRun;
-        CrewSoundStop = soundsNode.HasValue("CrewSoundStop") 
+          : Curr.CrewSoundRun;
+        Curr.CrewSoundStop = soundsNode.HasValue("CrewSoundStop") 
           ? soundsNode.GetValue("CrewSoundStop") 
-          : CrewSoundStop;
+          : Curr.CrewSoundStop;
 
-        PumpSoundVol = soundsNode.HasValue("PumpSoundVol")
+        Curr.PumpSoundVol = soundsNode.HasValue("PumpSoundVol")
           ? double.Parse(soundsNode.GetValue("PumpSoundVol"))
-          : PumpSoundVol;
-        CrewSoundVol = soundsNode.HasValue("CrewSoundVol")
+          : Curr.PumpSoundVol;
+        Curr.CrewSoundVol = soundsNode.HasValue("CrewSoundVol")
           ? double.Parse(soundsNode.GetValue("CrewSoundVol"))
-          : CrewSoundVol;
+          : Curr.CrewSoundVol;
 
         // Config Settings
-        EnableBlizzyToolbar = configNode.HasValue("EnableBlizzyToolbar")
+        Curr.EnableBlizzyToolbar = configNode.HasValue("EnableBlizzyToolbar")
           ? bool.Parse(configNode.GetValue("EnableBlizzyToolbar"))
-          : EnableBlizzyToolbar;
+          : Curr.EnableBlizzyToolbar;
         WindowDebugger.ShowWindow = configNode.HasValue("ShowDebugger")
           ? bool.Parse(configNode.GetValue("ShowDebugger"))
           : WindowDebugger.ShowWindow;
-        VerboseLogging = configNode.HasValue("VerboseLogging")
+        Curr.VerboseLogging = configNode.HasValue("VerboseLogging")
           ? bool.Parse(configNode.GetValue("VerboseLogging"))
-          : VerboseLogging;
-        AutoSave = configNode.HasValue("AutoSave") 
+          : Curr.VerboseLogging;
+        Curr.AutoSave = configNode.HasValue("AutoSave") 
           ? bool.Parse(configNode.GetValue("AutoSave")) 
-          : AutoSave;
-        SaveIntervalSec = configNode.HasValue("SaveIntervalSec")
+          : Curr.AutoSave;
+        Curr.SaveIntervalSec = configNode.HasValue("SaveIntervalSec")
           ? int.Parse(configNode.GetValue("SaveIntervalSec"))
-          : SaveIntervalSec;
-        AutoDebug = configNode.HasValue("AutoDebug") 
+          : Curr.SaveIntervalSec;
+        Curr.AutoDebug = configNode.HasValue("AutoDebug") 
           ? bool.Parse(configNode.GetValue("AutoDebug")) 
-          : AutoDebug;
+          : Curr.AutoDebug;
         DebugLogPath = configNode.HasValue("DebugLogPath") 
           ? configNode.GetValue("DebugLogPath") 
           : DebugLogPath;
-        ErrorLogLength = configNode.HasValue("ErrorLogLength")
+        Curr.ErrorLogLength = configNode.HasValue("ErrorLogLength")
           ? configNode.GetValue("ErrorLogLength")
-          : ErrorLogLength;
-        SaveLogOnExit = configNode.HasValue("SaveLogOnExit")
+          : Curr.ErrorLogLength;
+        Curr.SaveLogOnExit = configNode.HasValue("SaveLogOnExit")
           ? bool.Parse(configNode.GetValue("SaveLogOnExit"))
-          : SaveLogOnExit;
-        UseUnityStyle = configNode.HasValue("UseUnityStyle")
+          : Curr.SaveLogOnExit;
+        Curr.UseUnityStyle = configNode.HasValue("UseUnityStyle")
           ? bool.Parse(configNode.GetValue("UseUnityStyle"))
-          : UseUnityStyle;
+          : Curr.UseUnityStyle;
 
         // Hidden Settings
         // Hidden Highlighting
-        SourcePartColor = hiddenNode.HasValue("SourcePartColor")
+        Curr.SourcePartColor = hiddenNode.HasValue("SourcePartColor")
           ? hiddenNode.GetValue("SourcePartColor")
-          : SourcePartColor;
-        TargetPartColor = hiddenNode.HasValue("TargetPartColor")
+          : Curr.SourcePartColor;
+        Curr.TargetPartColor = hiddenNode.HasValue("TargetPartColor")
           ? hiddenNode.GetValue("TargetPartColor")
-          : TargetPartColor;
-        TargetPartCrewColor = hiddenNode.HasValue("TargetPartCrewColor")
+          : Curr.TargetPartColor;
+        Curr.TargetPartCrewColor = hiddenNode.HasValue("TargetPartCrewColor")
           ? hiddenNode.GetValue("TargetPartCrewColor")
-          : TargetPartCrewColor;
-        MouseOverColor = hiddenNode.HasValue("MouseOverColor") 
+          : Curr.TargetPartCrewColor;
+        Curr.MouseOverColor = hiddenNode.HasValue("MouseOverColor") 
           ? hiddenNode.GetValue("MouseOverColor") 
-          : MouseOverColor;
+          : Curr.MouseOverColor;
 
         // Hidden config
-        CrewXferDelaySec = hiddenNode.HasValue("CrewXferDelaySec")
+        Curr.CrewXferDelaySec = hiddenNode.HasValue("CrewXferDelaySec")
           ? double.Parse(hiddenNode.GetValue("CrewXferDelaySec"))
-          : CrewXferDelaySec;
-        IvaUpdateFrameDelay = hiddenNode.HasValue("IvaUpdateFrameDelay")
+          : Curr.CrewXferDelaySec;
+        Curr.IvaUpdateFrameDelay = hiddenNode.HasValue("IvaUpdateFrameDelay")
           ? int.Parse(hiddenNode.GetValue("IvaUpdateFrameDelay"))
-          : IvaUpdateFrameDelay;
+          : Curr.IvaUpdateFrameDelay;
         // Okay, set the Settings loaded flag
         Loaded = true;
         MemStoreTempSettings();
@@ -533,7 +540,7 @@ namespace ShipManifest
     {
       if (Loaded && (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER))
       {
-        if (EnableStockCrewXfer != PrevEnableStockCrewXfer)
+        if (Curr.EnableStockCrewXfer != Orig.EnableStockCrewXfer)
         {
           SetStockCrewTransferState();
         }
@@ -566,7 +573,7 @@ namespace ShipManifest
           : Settings.AddNode("SM_Hidden");
 
         // Write window positions
-        WriteRectangle(windowsNode, "DefaultPosition", DefaultPosition);
+        WriteRectangle(windowsNode, "DefaultPosition", Curr.DefaultPosition);
         WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
         WriteRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
         WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
@@ -576,38 +583,38 @@ namespace ShipManifest
 
         //Write settings...
         // Realism Settings
-        WriteValue(realismNode, "RealismMode", RealismMode);
-        WriteValue(realismNode, "RealXfers", RealXfers);
-        WriteValue(realismNode, "RealCrewXfers", RealCrewXfers);
-        WriteValue(realismNode, "RealControl", RealControl);
-        WriteValue(realismNode, "EnableCrew", EnableCrew);
-        WriteValue(realismNode, "EnableCrewModify", EnableCrewModify);
-        WriteValue(realismNode, "EnableKerbalRename", EnableKerbalRename);
-        WriteValue(realismNode, "EnableChangeProfession", EnableChangeProfession);
-        WriteValue(realismNode, "EnablePfCrews", EnablePfCrews);
-        WriteValue(realismNode, "EnableStockCrewTransfer", EnableStockCrewXfer);
-        WriteValue(realismNode, "EnableScience", EnableScience);
-        WriteValue(realismNode, "EnableResources", EnableResources);
-        WriteValue(realismNode, "EnablePFResources", EnablePfResources);
-        WriteValue(realismNode, "EnableCLS", EnableCls);
-        WriteValue(realismNode, "OverrideStockCrewTransfer", OverrideStockCrewXfer);
-        WriteValue(realismNode, "EnableClsAllowTransfer", EnableClsAllowTransfer);
-        WriteValue(realismNode, "FlowRate", FlowRate);
-        WriteValue(realismNode, "FlowCost", FlowCost);
-        WriteValue(realismNode, "MinFlowRate", MinFlowRate);
-        WriteValue(realismNode, "MaxFlowRate", MaxFlowRate);
-        WriteValue(realismNode, "MaxFlowTimeSec", MaxFlowTimeSec);
-        WriteValue(realismNode, "EnableXferCost", EnableXferCost);
-        WriteValue(realismNode, "LockSettings", LockSettings);
+        WriteValue(realismNode, "RealismMode", Curr.RealismMode);
+        WriteValue(realismNode, "RealXfers", Curr.RealXfers);
+        WriteValue(realismNode, "RealCrewXfers", Curr.RealCrewXfers);
+        WriteValue(realismNode, "RealControl", Curr.RealControl);
+        WriteValue(realismNode, "EnableCrew", Curr.EnableCrew);
+        WriteValue(realismNode, "EnableCrewModify", Curr.EnableCrewModify);
+        WriteValue(realismNode, "EnableKerbalRename", Curr.EnableKerbalRename);
+        WriteValue(realismNode, "EnableChangeProfession", Curr.EnableChangeProfession);
+        WriteValue(realismNode, "EnablePfCrews", Curr.EnablePfCrews);
+        WriteValue(realismNode, "EnableStockCrewTransfer", Curr.EnableStockCrewXfer);
+        WriteValue(realismNode, "EnableScience", Curr.EnableScience);
+        WriteValue(realismNode, "EnableResources", Curr.EnableResources);
+        WriteValue(realismNode, "EnablePFResources", Curr.EnablePfResources);
+        WriteValue(realismNode, "EnableCLS", Curr.EnableCls);
+        WriteValue(realismNode, "OverrideStockCrewTransfer", Curr.OverrideStockCrewXfer);
+        WriteValue(realismNode, "EnableClsAllowTransfer", Curr.EnableClsAllowTransfer);
+        WriteValue(realismNode, "FlowRate", Curr.FlowRate);
+        WriteValue(realismNode, "FlowCost", Curr.FlowCost);
+        WriteValue(realismNode, "MinFlowRate", Curr.MinFlowRate);
+        WriteValue(realismNode, "MaxFlowRate", Curr.MaxFlowRate);
+        WriteValue(realismNode, "MaxFlowTimeSec", Curr.MaxFlowTimeSec);
+        WriteValue(realismNode, "EnableXferCost", Curr.EnableXferCost);
+        WriteValue(realismNode, "LockSettings", Curr.LockSettings);
 
         // Highlighting Settings
-        WriteValue(highlightNode, "EnableHighlighting", EnableHighlighting);
-        WriteValue(highlightNode, "OnlySourceTarget", OnlySourceTarget);
-        WriteValue(highlightNode, "EnableCLSHighlighting", EnableClsHighlighting);
-        WriteValue(highlightNode, "EnableEdgeHighlighting", EnableEdgeHighlighting);
+        WriteValue(highlightNode, "EnableHighlighting", Curr.EnableHighlighting);
+        WriteValue(highlightNode, "OnlySourceTarget", Curr.OnlySourceTarget);
+        WriteValue(highlightNode, "EnableCLSHighlighting", Curr.EnableClsHighlighting);
+        WriteValue(highlightNode, "EnableEdgeHighlighting", Curr.EnableEdgeHighlighting);
 
         // ToolTip Settings
-        WriteValue(toolTipsNode, "ShowToolTips", ShowToolTips);
+        WriteValue(toolTipsNode, "ShowToolTips", Curr.ShowToolTips);
         WriteValue(toolTipsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
         WriteValue(toolTipsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
         WriteValue(toolTipsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
@@ -625,35 +632,35 @@ namespace ShipManifest
         WriteValue(toolTipsNode, "LightToolTips", TabLight.ShowToolTips);
 
         // Sound Settings
-        WriteValue(soundsNode, "PumpSoundStart", PumpSoundStart);
-        WriteValue(soundsNode, "PumpSoundRun", PumpSoundRun);
-        WriteValue(soundsNode, "PumpSoundStop", PumpSoundStop);
-        WriteValue(soundsNode, "CrewSoundStart", CrewSoundStart);
-        WriteValue(soundsNode, "CrewSoundRun", CrewSoundRun);
-        WriteValue(soundsNode, "CrewSoundStop", CrewSoundStop);
-        WriteValue(soundsNode, "PumpSoundVol", PumpSoundVol);
-        WriteValue(soundsNode, "CrewSoundVol", CrewSoundVol);
+        WriteValue(soundsNode, "PumpSoundStart", Curr.PumpSoundStart);
+        WriteValue(soundsNode, "PumpSoundRun", Curr.PumpSoundRun);
+        WriteValue(soundsNode, "PumpSoundStop", Curr.PumpSoundStop);
+        WriteValue(soundsNode, "CrewSoundStart", Curr.CrewSoundStart);
+        WriteValue(soundsNode, "CrewSoundRun", Curr.CrewSoundRun);
+        WriteValue(soundsNode, "CrewSoundStop", Curr.CrewSoundStop);
+        WriteValue(soundsNode, "PumpSoundVol", Curr.PumpSoundVol);
+        WriteValue(soundsNode, "CrewSoundVol", Curr.CrewSoundVol);
 
         // Config Settings
         WriteValue(configNode, "ShowDebugger", WindowDebugger.ShowWindow);
-        WriteValue(configNode, "EnableBlizzyToolbar", EnableBlizzyToolbar);
-        WriteValue(configNode, "VerboseLogging", VerboseLogging);
-        WriteValue(configNode, "AutoSave", AutoSave);
-        WriteValue(configNode, "SaveIntervalSec", SaveIntervalSec);
-        WriteValue(configNode, "AutoDebug", AutoDebug);
+        WriteValue(configNode, "EnableBlizzyToolbar", Curr.EnableBlizzyToolbar);
+        WriteValue(configNode, "VerboseLogging", Curr.VerboseLogging);
+        WriteValue(configNode, "AutoSave", Curr.AutoSave);
+        WriteValue(configNode, "SaveIntervalSec", Curr.SaveIntervalSec);
+        WriteValue(configNode, "AutoDebug", Curr.AutoDebug);
         WriteValue(configNode, "DebugLogPath", DebugLogPath);
-        WriteValue(configNode, "ErrorLogLength", ErrorLogLength);
-        WriteValue(configNode, "SaveLogOnExit", SaveLogOnExit);
-        WriteValue(configNode, "UseUnityStyle", UseUnityStyle);
+        WriteValue(configNode, "ErrorLogLength", Curr.ErrorLogLength);
+        WriteValue(configNode, "SaveLogOnExit", Curr.SaveLogOnExit);
+        WriteValue(configNode, "UseUnityStyle", Curr.UseUnityStyle);
 
         // Hidden Settings
-        WriteValue(hiddenNode, "ResourcePartColor", ResourcePartColor);
-        WriteValue(hiddenNode, "SourcePartColor", SourcePartColor);
-        WriteValue(hiddenNode, "TargetPartColor", TargetPartColor);
-        WriteValue(hiddenNode, "TargetPartCrewColor", TargetPartCrewColor);
-        WriteValue(hiddenNode, "MouseOverColor", MouseOverColor);
-        WriteValue(hiddenNode, "CrewXferDelaySec", CrewXferDelaySec);
-        WriteValue(hiddenNode, "IvaUpdateFrameDelay", IvaUpdateFrameDelay);
+        WriteValue(hiddenNode, "ResourcePartColor", Curr.ResourcePartColor);
+        WriteValue(hiddenNode, "SourcePartColor", Curr.SourcePartColor);
+        WriteValue(hiddenNode, "TargetPartColor", Curr.TargetPartColor);
+        WriteValue(hiddenNode, "TargetPartCrewColor", Curr.TargetPartCrewColor);
+        WriteValue(hiddenNode, "MouseOverColor", Curr.MouseOverColor);
+        WriteValue(hiddenNode, "CrewXferDelaySec", Curr.CrewXferDelaySec);
+        WriteValue(hiddenNode, "IvaUpdateFrameDelay", Curr.IvaUpdateFrameDelay);
 
         if (!Directory.Exists(SettingsPath))
           Directory.CreateDirectory(SettingsPath);
@@ -663,83 +670,83 @@ namespace ShipManifest
 
     internal static void SetRealismMode(int mode)
     {
-      if (mode < 3) RealismMode = mode;
+      if (mode < 3) Curr.RealismMode = mode;
       switch (mode)
       {
         case 0: // Full
-          RealXfers = true;
-          RealCrewXfers = true;
-          RealControl = true;
-          EnableCrew = true;
-          EnableKerbalRename = false;
-          EnableChangeProfession = false;
-          EnableCrewModify = false;
-          EnableStockCrewXfer = true;
-          OverrideStockCrewXfer = true;
-          EnableClsAllowTransfer = true;
-          EnableCls = ClsInstalled;
-          EnableScience = true;
-          EnableResources = true;
-          EnablePfCrews = false;
-          EnablePfResources = false;
-          EnableXferCost = true;
-          FlowCost = 0.0015;
-          FlowRate = 100;
-          MinFlowRate = 0;
-          MaxFlowRate = 1000;
-          Tolerance = 0.000001;
-          MaxFlowTimeSec = 180;
-          LockSettings = false;
+          Curr.RealXfers = true;
+          Curr.RealCrewXfers = true;
+          Curr.RealControl = true;
+          Curr.EnableCrew = true;
+          Curr.EnableKerbalRename = false;
+          Curr.EnableChangeProfession = false;
+          Curr.EnableCrewModify = false;
+          Curr.EnableStockCrewXfer = true;
+          Curr.OverrideStockCrewXfer = true;
+          Curr.EnableClsAllowTransfer = true;
+          Curr.EnableCls = ClsInstalled;
+          Curr.EnableScience = true;
+          Curr.EnableResources = true;
+          Curr.EnablePfCrews = false;
+          Curr.EnablePfResources = false;
+          Curr.EnableXferCost = true;
+          Curr.FlowCost = 0.0015;
+          Curr.FlowRate = 100;
+          Curr.MinFlowRate = 0;
+          Curr.MaxFlowRate = 1000;
+          Curr.Tolerance = 0.000001;
+          Curr.MaxFlowTimeSec = 180;
+          Curr.LockSettings = false;
           break;
         case 1: // None
-          RealXfers = false;
-          RealCrewXfers = false;
-          RealControl = false;
-          EnableCrew = true;
-          EnableCrewModify = true;
-          EnableKerbalRename = true;
-          EnableChangeProfession = true;
-          EnableStockCrewXfer = true;
-          OverrideStockCrewXfer = false;
-          EnableClsAllowTransfer = true;
-          EnableCls = false;
-          EnableScience = true;
-          EnableResources = true;
-          EnablePfCrews = false;
-          EnablePfResources = true;
-          EnableXferCost = false;
-          FlowCost = 0.0015;
-          FlowRate = 100;
-          MinFlowRate = 0;
-          MaxFlowRate = 1000;
-          Tolerance = 0.000001;
-          MaxFlowTimeSec = 180;
-          LockSettings = false;
+          Curr.RealXfers = false;
+          Curr.RealCrewXfers = false;
+          Curr.RealControl = false;
+          Curr.EnableCrew = true;
+          Curr.EnableCrewModify = true;
+          Curr.EnableKerbalRename = true;
+          Curr.EnableChangeProfession = true;
+          Curr.EnableStockCrewXfer = true;
+          Curr.OverrideStockCrewXfer = false;
+          Curr.EnableClsAllowTransfer = true;
+          Curr.EnableCls = false;
+          Curr.EnableScience = true;
+          Curr.EnableResources = true;
+          Curr.EnablePfCrews = false;
+          Curr.EnablePfResources = true;
+          Curr.EnableXferCost = false;
+          Curr.FlowCost = 0.0015;
+          Curr.FlowRate = 100;
+          Curr.MinFlowRate = 0;
+          Curr.MaxFlowRate = 1000;
+          Curr.Tolerance = 0.000001;
+          Curr.MaxFlowTimeSec = 180;
+          Curr.LockSettings = false;
           break;
         case 2: // Default
-          RealXfers = true;
-          RealCrewXfers = true;
-          RealControl = true;
-          EnableCrew = true;
-          EnableCrewModify = true;
-          EnableKerbalRename = true;
-          EnableChangeProfession = true;
-          EnableStockCrewXfer = true;
-          OverrideStockCrewXfer = true;
-          EnableClsAllowTransfer = true;
-          EnableCls = ClsInstalled;
-          EnableScience = true;
-          EnableResources = true;
-          EnablePfCrews = false;
-          EnablePfResources = true;
-          EnableXferCost = true;
-          FlowCost = 0.0015;
-          FlowRate = 100;
-          MinFlowRate = 0;
-          MaxFlowRate = 1000;
-          Tolerance = 0.000001;
-          MaxFlowTimeSec = 180;
-          LockSettings = false;
+          Curr.RealXfers = true;
+          Curr.RealCrewXfers = true;
+          Curr.RealControl = true;
+          Curr.EnableCrew = true;
+          Curr.EnableCrewModify = true;
+          Curr.EnableKerbalRename = true;
+          Curr.EnableChangeProfession = true;
+          Curr.EnableStockCrewXfer = true;
+          Curr.OverrideStockCrewXfer = true;
+          Curr.EnableClsAllowTransfer = true;
+          Curr.EnableCls = ClsInstalled;
+          Curr.EnableScience = true;
+          Curr.EnableResources = true;
+          Curr.EnablePfCrews = false;
+          Curr.EnablePfResources = true;
+          Curr.EnableXferCost = true;
+          Curr.FlowCost = 0.0015;
+          Curr.FlowRate = 100;
+          Curr.MinFlowRate = 0;
+          Curr.MaxFlowRate = 1000;
+          Curr.Tolerance = 0.000001;
+          Curr.MaxFlowTimeSec = 180;
+          Curr.LockSettings = false;
           break;
         case 3: // Custom  Do nothing.
           break;
@@ -749,73 +756,73 @@ namespace ShipManifest
     internal static int GetRealismMode()
     {
       if ( // Full
-          RealXfers
-          && RealCrewXfers
-          && RealControl
-          && EnableCrew
-          && EnableKerbalRename == false
-          && EnableChangeProfession == false
-          && EnableCrewModify == false
-          && EnableStockCrewXfer
-          && OverrideStockCrewXfer
-          && EnableClsAllowTransfer
-          && EnableCls == ClsInstalled
-          && EnableScience
-          && EnableResources
-          && EnablePfCrews == false
-          && EnablePfResources == false
-          && EnableXferCost
-          && Math.Abs(FlowCost - 0.0015) < 0.0001f
-          && Math.Abs(FlowRate - 100) < 0.0001f
-          && Math.Abs(MinFlowRate) < 0.0001f
-          && Math.Abs(MaxFlowRate - 1000) < 0.0001f
-          && Math.Abs(Tolerance - 0.000001) < 0.0001f
-          && MaxFlowTimeSec == 180
-          && LockSettings == false)
+          Curr.RealXfers
+          && Curr.RealCrewXfers
+          && Curr.RealControl
+          && Curr.EnableCrew
+          && Curr.EnableKerbalRename == false
+          && Curr.EnableChangeProfession == false
+          && Curr.EnableCrewModify == false
+          && Curr.EnableStockCrewXfer
+          && Curr.OverrideStockCrewXfer
+          && Curr.EnableClsAllowTransfer
+          && Curr.EnableCls == ClsInstalled
+          && Curr.EnableScience
+          && Curr.EnableResources
+          && Curr.EnablePfCrews == false
+          && Curr.EnablePfResources == false
+          && Curr.EnableXferCost
+          && Math.Abs(Curr.FlowCost - 0.0015) < 0.0001f
+          && Math.Abs(Curr.FlowRate - 100) < 0.0001f
+          && Math.Abs(Curr.MinFlowRate) < 0.0001f
+          && Math.Abs(Curr.MaxFlowRate - 1000) < 0.0001f
+          && Math.Abs(Curr.Tolerance - 0.000001) < 0.0001f
+          && Curr.MaxFlowTimeSec == 180
+          && Curr.LockSettings == false)
         return 0;
       if ( // None
-          RealXfers == false
-          && RealCrewXfers == false
-          && RealControl == false
-          && EnableCrew
-          && EnableCrewModify
-          && EnableKerbalRename
-          && EnableChangeProfession
-          && EnableStockCrewXfer
-          && OverrideStockCrewXfer == false
-          && EnableClsAllowTransfer
-          && EnableCls == false
-          && EnableScience
-          && EnableResources
-          && EnablePfCrews == false
-          && EnablePfResources
-          && EnableXferCost == false
-          && LockSettings == false)
+          Curr.RealXfers == false
+          && Curr.RealCrewXfers == false
+          && Curr.RealControl == false
+          && Curr.EnableCrew
+          && Curr.EnableCrewModify
+          && Curr.EnableKerbalRename
+          && Curr.EnableChangeProfession
+          && Curr.EnableStockCrewXfer
+          && Curr.OverrideStockCrewXfer == false
+          && Curr.EnableClsAllowTransfer
+          && Curr.EnableCls == false
+          && Curr.EnableScience
+          && Curr.EnableResources
+          && Curr.EnablePfCrews == false
+          && Curr.EnablePfResources
+          && Curr.EnableXferCost == false
+          && Curr.LockSettings == false)
         return 1;
       if ( // Default
-          RealXfers
-          && RealCrewXfers
-          && RealControl
-          && EnableCrew
-          && EnableCrewModify
-          && EnableKerbalRename
-          && EnableChangeProfession
-          && EnableStockCrewXfer
-          && OverrideStockCrewXfer
-          && EnableClsAllowTransfer
-          && EnableCls == ClsInstalled
-          && EnableScience
-          && EnableResources
-          && EnablePfCrews == false
-          && EnablePfResources
-          && EnableXferCost
-          && Math.Abs(FlowCost - 0.0015) < 0.0001f
-          && Math.Abs(FlowRate - 100) < 0.0001f
-          && Math.Abs(MinFlowRate) < 0.0001f
-          && Math.Abs(MaxFlowRate - 1000) < 0.0001f
-          && Math.Abs(Tolerance - 0.000001) < 0.000001f
-          && MaxFlowTimeSec == 180
-          && LockSettings == false)
+          Curr.RealXfers
+          && Curr.RealCrewXfers
+          && Curr.RealControl
+          && Curr.EnableCrew
+          && Curr.EnableCrewModify
+          && Curr.EnableKerbalRename
+          && Curr.EnableChangeProfession
+          && Curr.EnableStockCrewXfer
+          && Curr.OverrideStockCrewXfer
+          && Curr.EnableClsAllowTransfer
+          && Curr.EnableCls == ClsInstalled
+          && Curr.EnableScience
+          && Curr.EnableResources
+          && Curr.EnablePfCrews == false
+          && Curr.EnablePfResources
+          && Curr.EnableXferCost
+          && Math.Abs(Curr.FlowCost - 0.0015) < 0.0001f
+          && Math.Abs(Curr.FlowRate - 100) < 0.0001f
+          && Math.Abs(Curr.MinFlowRate) < 0.0001f
+          && Math.Abs(Curr.MaxFlowRate - 1000) < 0.0001f
+          && Math.Abs(Curr.Tolerance - 0.000001) < 0.000001f
+          && Curr.MaxFlowTimeSec == 180
+          && Curr.LockSettings == false)
         return 2;
 
         return 3;
@@ -831,7 +838,7 @@ namespace ShipManifest
         {
           if (parts.Current == null) continue;
           Part part = parts.Current;
-          part.crewTransferAvailable = EnableStockCrewXfer;
+          part.crewTransferAvailable = Curr.EnableStockCrewXfer;
           //TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
           //if (EnableStockCrewXfer)
           //{
@@ -854,15 +861,15 @@ namespace ShipManifest
 
     internal static void SetClsOverride()
     {
-      if (!EnableCls || !HighLogic.LoadedSceneIsFlight || !EnableClsAllowTransfer) return;
+      if (!Curr.EnableCls || !HighLogic.LoadedSceneIsFlight || !Curr.EnableClsAllowTransfer) return;
       SMAddon.OrigClsAllowCrewXferSetting = SMAddon.ClsAddon.AllowUnrestrictedTransfers;
       SMAddon.ClsAddon.AllowUnrestrictedTransfers = true;
     }
 
     internal static void UpdateClsOverride()
     {
-      if (!EnableCls || !HighLogic.LoadedSceneIsFlight) return;
-      SMAddon.ClsAddon.AllowUnrestrictedTransfers = EnableClsAllowTransfer;
+      if (!Curr.EnableCls || !HighLogic.LoadedSceneIsFlight) return;
+      SMAddon.ClsAddon.AllowUnrestrictedTransfers = Curr.EnableClsAllowTransfer;
     }
 
     private static Rect GetRectangle(ConfigNode windowsNode, string rectName, Rect defaultvalue)
@@ -932,132 +939,132 @@ namespace ShipManifest
 
     internal static void MemStoreTempSettings()
     {
-      PrevRealismMode = RealismMode;
-      PrevRealXfers = RealXfers;
-      PrevRealCrewXfers = RealCrewXfers;
-      PrevRealControl = RealControl;
-      PrevShowDebugger = WindowDebugger.ShowWindow;
-      PrevVerboseLogging = VerboseLogging;
-      PrevAutoSave = AutoSave;
-      PrevSaveIntervalSec = SaveIntervalSec;
-      PrevFlowRate = FlowRate;
-      PrevFlowCost = FlowCost;
-      PrevMinFlowRate = MinFlowRate;
-      PrevMaxFlowRate = MaxFlowRate;
-      PrevMaxFlowTimeSec = MaxFlowTimeSec;
-      PrevEnableXferCost = EnableXferCost;
-      PrevPumpSoundStart = PumpSoundStart;
-      PrevPumpSoundRun = PumpSoundRun;
-      PrevPumpSoundStop = PumpSoundStop;
-      PrevCrewSoundStart = CrewSoundStart;
-      PrevCrewSoundRun = CrewSoundRun;
-      PrevCrewSoundStop = CrewSoundStop;
-      PrevCrewSoundVol = CrewSoundVol;
-      PrevPumpSoundVol = PumpSoundVol;
+      Orig.RealismMode = Curr.RealismMode;
+      Orig.RealXfers = Curr.RealXfers;
+      Orig.RealCrewXfers = Curr.RealCrewXfers;
+      Orig.RealControl = Curr.RealControl;
+      Orig.ShowDebugger = WindowDebugger.ShowWindow;
+      Orig.VerboseLogging = Curr.VerboseLogging;
+      Orig.AutoSave = Curr.AutoSave;
+      Orig.SaveIntervalSec = Curr.SaveIntervalSec;
+      Orig.FlowRate = Curr.FlowRate;
+      Orig.FlowCost = Curr.FlowCost;
+      Orig.MinFlowRate = Curr.MinFlowRate;
+      Orig.MaxFlowRate = Curr.MaxFlowRate;
+      Orig.MaxFlowTimeSec = Curr.MaxFlowTimeSec;
+      Orig.EnableXferCost = Curr.EnableXferCost;
+      Orig.PumpSoundStart = Curr.PumpSoundStart;
+      Orig.PumpSoundRun = Curr.PumpSoundRun;
+      Orig.PumpSoundStop = Curr.PumpSoundStop;
+      Orig.CrewSoundStart = Curr.CrewSoundStart;
+      Orig.CrewSoundRun = Curr.CrewSoundRun;
+      Orig.CrewSoundStop = Curr.CrewSoundStop;
+      Orig.CrewSoundVol = Curr.CrewSoundVol;
+      Orig.PumpSoundVol = Curr.PumpSoundVol;
 
-      PrevEnableScience = EnableScience;
-      PrevEnableHighlighting = EnableHighlighting;
-      PrevOnlySourceTarget = OnlySourceTarget;
-      PrevEnableClsHighlighting = EnableClsHighlighting;
-      PrevEnableCrew = EnableCrew;
-      PrevEnableCrewModify = EnableCrewModify;
-      PrevEnablePfCrews = EnablePfCrews;
-      PrevEnablePfResources = EnablePfResources;
-      PrevEnableCls = EnableCls;
-      PrevEnableStockCrewXfer = EnableStockCrewXfer;
-      PrevOverrideStockCrewXfer = OverrideStockCrewXfer;
-      PrevEnableClsAllowTransfer = EnableClsAllowTransfer;
-      PrevEnableKerbalRename = EnableKerbalRename;
-      PrevEnableChangeProfession = EnableChangeProfession;
-      PrevUseUnityStyle = UseUnityStyle;
-      PrevLockSettings = LockSettings;
-      PrevEnableBlizzyToolbar = EnableBlizzyToolbar;
-      PrevSaveLogOnExit = SaveLogOnExit;
-      PrevShowToolTips = ShowToolTips;
-      PrevDebuggerToolTips = WindowDebugger.ShowToolTips;
-      PrevManifestToolTips = WindowManifest.ShowToolTips;
-      PrevTransferToolTips = WindowTransfer.ShowToolTips;
-      PrevSettingsToolTips = WindowSettings.ShowToolTips;
-      PrevRosterToolTips = WindowRoster.ShowToolTips;
-      PrevControlToolTips = WindowControl.ShowToolTips;
-      PrevHatchToolTips = TabHatch.ShowToolTips;
-      PrevPanelToolTips = TabSolarPanel.ShowToolTips;
-      PrevAntennaToolTips = TabAntenna.ShowToolTips;
-      PrevLightToolTips = TabLight.ShowToolTips;
+      Orig.EnableScience = Curr.EnableScience;
+      Orig.EnableHighlighting = Curr.EnableHighlighting;
+      Orig.OnlySourceTarget = Curr.OnlySourceTarget;
+      Orig.EnableClsHighlighting = Curr.EnableClsHighlighting;
+      Orig.EnableCrew = Curr.EnableCrew;
+      Orig.EnableCrewModify = Curr.EnableCrewModify;
+      Orig.EnablePfCrews = Curr.EnablePfCrews;
+      Orig.EnablePfResources = Curr.EnablePfResources;
+      Orig.EnableCls = Curr.EnableCls;
+      Orig.EnableStockCrewXfer = Curr.EnableStockCrewXfer;
+      Orig.OverrideStockCrewXfer = Curr.OverrideStockCrewXfer;
+      Orig.EnableClsAllowTransfer = Curr.EnableClsAllowTransfer;
+      Orig.EnableKerbalRename = Curr.EnableKerbalRename;
+      Orig.EnableChangeProfession = Curr.EnableChangeProfession;
+      Orig.UseUnityStyle = Curr.UseUnityStyle;
+      Orig.LockSettings = Curr.LockSettings;
+      Orig.EnableBlizzyToolbar = Curr.EnableBlizzyToolbar;
+      Orig.SaveLogOnExit = Curr.SaveLogOnExit;
+      Orig.ShowToolTips = Curr.ShowToolTips;
+      Orig.DebuggerToolTips = WindowDebugger.ShowToolTips;
+      Orig.ManifestToolTips = WindowManifest.ShowToolTips;
+      Orig.TransferToolTips = WindowTransfer.ShowToolTips;
+      Orig.SettingsToolTips = WindowSettings.ShowToolTips;
+      Orig.RosterToolTips = WindowRoster.ShowToolTips;
+      Orig.ControlToolTips = WindowControl.ShowToolTips;
+      Orig.HatchToolTips = TabHatch.ShowToolTips;
+      Orig.PanelToolTips = TabSolarPanel.ShowToolTips;
+      Orig.AntennaToolTips = TabAntenna.ShowToolTips;
+      Orig.LightToolTips = TabLight.ShowToolTips;
 
-      PrevRealismToolTips = TabRealism.ShowToolTips;
-      PrevToolTipsToolTips = TabToolTips.ShowToolTips;
-      PrevSoundsToolTips = TabSounds.ShowToolTips;
-      PrevHighlightToolTips = TabHighlight.ShowToolTips;
-      PrevConfigToolTips = TabConfig.ShowToolTips;
+      Orig.RealismToolTips = TabRealism.ShowToolTips;
+      Orig.ToolTipsToolTips = TabToolTips.ShowToolTips;
+      Orig.SoundsToolTips = TabSounds.ShowToolTips;
+      Orig.HighlightToolTips = TabHighlight.ShowToolTips;
+      Orig.ConfigToolTips = TabConfig.ShowToolTips;
 
       //debugger Settings
-      PrevErrorLogLength = ErrorLogLength;
+      Orig.ErrorLogLength = Curr.ErrorLogLength;
     }
 
     internal static void MemRestoreTempSettings()
     {
-      RealismMode = PrevRealismMode;
-      RealXfers = PrevRealXfers;
-      RealCrewXfers = PrevRealCrewXfers;
-      RealControl = PrevRealControl;
-      WindowDebugger.ShowWindow = PrevShowDebugger;
-      VerboseLogging = PrevVerboseLogging;
-      AutoSave = PrevAutoSave;
-      SaveIntervalSec = PrevSaveIntervalSec;
-      FlowRate = PrevFlowRate;
-      FlowCost = PrevFlowCost;
-      MinFlowRate = PrevMinFlowRate;
-      MaxFlowRate = PrevMaxFlowRate;
-      MaxFlowTimeSec = PrevMaxFlowTimeSec;
-      EnableXferCost = PrevEnableXferCost;
-      PumpSoundStart = PrevPumpSoundStart;
-      PumpSoundRun = PrevPumpSoundRun;
-      PumpSoundStop = PrevPumpSoundStop;
-      CrewSoundStart = PrevCrewSoundStart;
-      CrewSoundRun = PrevCrewSoundRun;
-      CrewSoundStop = PrevCrewSoundStop;
-      CrewSoundVol = PrevCrewSoundVol;
-      PumpSoundVol = PrevPumpSoundVol;
-      EnableScience = PrevEnableScience;
-      EnableHighlighting = PrevEnableHighlighting;
-      OnlySourceTarget = PrevOnlySourceTarget;
-      EnableClsHighlighting = PrevEnableClsHighlighting;
-      EnableCrew = PrevEnableCrew;
-      EnableCrewModify = PrevEnableCrewModify;
-      EnablePfCrews = PrevEnablePfCrews;
-      EnablePfResources = PrevEnablePfResources;
-      EnableCls = PrevEnableCls;
-      EnableStockCrewXfer = PrevEnableStockCrewXfer;
-      OverrideStockCrewXfer = PrevOverrideStockCrewXfer;
-      EnableClsAllowTransfer = PrevEnableClsAllowTransfer;
-      EnableKerbalRename = PrevEnableKerbalRename;
-      EnableChangeProfession = PrevEnableChangeProfession;
-      UseUnityStyle = PrevUseUnityStyle;
-      LockSettings = PrevLockSettings;
-      EnableBlizzyToolbar = PrevEnableBlizzyToolbar;
-      SaveLogOnExit = PrevSaveLogOnExit;
-      ShowToolTips = PrevShowToolTips;
-      WindowDebugger.ShowToolTips = PrevDebuggerToolTips;
-      WindowManifest.ShowToolTips = PrevManifestToolTips;
-      WindowTransfer.ShowToolTips = PrevTransferToolTips;
-      WindowSettings.ShowToolTips = PrevSettingsToolTips;
-      WindowRoster.ShowToolTips = PrevRosterToolTips;
-      WindowControl.ShowToolTips = PrevControlToolTips;
-      TabHatch.ShowToolTips = PrevHatchToolTips;
-      TabSolarPanel.ShowToolTips = PrevPanelToolTips;
-      TabAntenna.ShowToolTips = PrevAntennaToolTips;
-      TabLight.ShowToolTips = PrevLightToolTips;
+      Curr.RealismMode = Orig.RealismMode;
+      Curr.RealXfers = Orig.RealXfers;
+      Curr.RealCrewXfers = Orig.RealCrewXfers;
+      Curr.RealControl = Orig.RealControl;
+      WindowDebugger.ShowWindow = Orig.ShowDebugger;
+      Curr.VerboseLogging = Orig.VerboseLogging;
+      Curr.AutoSave = Orig.AutoSave;
+      Curr.SaveIntervalSec = Orig.SaveIntervalSec;
+      Curr.FlowRate = Orig.FlowRate;
+      Curr.FlowCost = Orig.FlowCost;
+      Curr.MinFlowRate = Orig.MinFlowRate;
+      Curr.MaxFlowRate = Orig.MaxFlowRate;
+      Curr.MaxFlowTimeSec = Orig.MaxFlowTimeSec;
+      Curr.EnableXferCost = Orig.EnableXferCost;
+      Curr.PumpSoundStart = Orig.PumpSoundStart;
+      Curr.PumpSoundRun = Orig.PumpSoundRun;
+      Curr.PumpSoundStop = Orig.PumpSoundStop;
+      Curr.CrewSoundStart = Orig.CrewSoundStart;
+      Curr.CrewSoundRun = Orig.CrewSoundRun;
+      Curr.CrewSoundStop = Orig.CrewSoundStop;
+      Curr.CrewSoundVol = Orig.CrewSoundVol;
+      Curr.PumpSoundVol = Orig.PumpSoundVol;
+      Curr.EnableScience = Orig.EnableScience;
+      Curr.EnableHighlighting = Orig.EnableHighlighting;
+      Curr.OnlySourceTarget = Orig.OnlySourceTarget;
+      Curr.EnableClsHighlighting = Orig.EnableClsHighlighting;
+      Curr.EnableCrew = Orig.EnableCrew;
+      Curr.EnableCrewModify = Orig.EnableCrewModify;
+      Curr.EnablePfCrews = Orig.EnablePfCrews;
+      Curr.EnablePfResources = Orig.EnablePfResources;
+      Curr.EnableCls = Orig.EnableCls;
+      Curr.EnableStockCrewXfer = Orig.EnableStockCrewXfer;
+      Curr.OverrideStockCrewXfer = Orig.OverrideStockCrewXfer;
+      Curr.EnableClsAllowTransfer = Orig.EnableClsAllowTransfer;
+      Curr.EnableKerbalRename = Orig.EnableKerbalRename;
+      Curr.EnableChangeProfession = Orig.EnableChangeProfession;
+      Curr.UseUnityStyle = Orig.UseUnityStyle;
+      Curr.LockSettings = Orig.LockSettings;
+      Curr.EnableBlizzyToolbar = Orig.EnableBlizzyToolbar;
+      Curr.SaveLogOnExit = Orig.SaveLogOnExit;
+      Curr.ShowToolTips = Orig.ShowToolTips;
+      WindowDebugger.ShowToolTips = Orig.DebuggerToolTips;
+      WindowManifest.ShowToolTips = Orig.ManifestToolTips;
+      WindowTransfer.ShowToolTips = Orig.TransferToolTips;
+      WindowSettings.ShowToolTips = Orig.SettingsToolTips;
+      WindowRoster.ShowToolTips = Orig.RosterToolTips;
+      WindowControl.ShowToolTips = Orig.ControlToolTips;
+      TabHatch.ShowToolTips = Orig.HatchToolTips;
+      TabSolarPanel.ShowToolTips = Orig.PanelToolTips;
+      TabAntenna.ShowToolTips = Orig.AntennaToolTips;
+      TabLight.ShowToolTips = Orig.LightToolTips;
 
-      TabRealism.ShowToolTips = PrevRealismToolTips;
-      TabHighlight.ShowToolTips = PrevHighlightToolTips;
-      TabToolTips.ShowToolTips = PrevToolTipsToolTips;
-      TabSounds.ShowToolTips = PrevSoundsToolTips;
-      TabConfig.ShowToolTips = PrevConfigToolTips;
+      TabRealism.ShowToolTips = Orig.RealismToolTips;
+      TabHighlight.ShowToolTips = Orig.HighlightToolTips;
+      TabToolTips.ShowToolTips = Orig.ToolTipsToolTips;
+      TabSounds.ShowToolTips = Orig.SoundsToolTips;
+      TabConfig.ShowToolTips = Orig.ConfigToolTips;
       //TabInstalledMods.ShowToolTips = PrevModsToolTips;
 
       //debugger Settings
-      PrevErrorLogLength = ErrorLogLength;
+      Orig.ErrorLogLength = Curr.ErrorLogLength;
     }
 
     #endregion

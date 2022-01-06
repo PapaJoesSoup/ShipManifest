@@ -152,7 +152,7 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (SMSettings.EnablePfCrews)
+        if (Curr.EnablePfCrews)
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
@@ -167,7 +167,7 @@ namespace ShipManifest.Windows
           GUILayout.EndHorizontal();
         }
 
-        if (!SMSettings.EnablePfResources) return;
+        if (!Curr.EnablePfResources) return;
         GUILayout.BeginHorizontal();
         if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
         {
@@ -204,7 +204,7 @@ namespace ShipManifest.Windows
 
           // Button Widths
           int width = 273;
-          if (!SMSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
+          if (!Curr.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
@@ -234,7 +234,7 @@ namespace ShipManifest.Windows
           }
 
           // Fill Button
-          if (!SMSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
+          if (!Curr.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);

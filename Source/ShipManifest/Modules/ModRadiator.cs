@@ -35,7 +35,7 @@ namespace ShipManifest.Modules
     {
       get
       {
-        if (SMSettings.RealControl && !Retractable &&
+        if (Curr.RealControl && !Retractable &&
             (PanelState == ModuleDeployablePart.DeployState.EXTENDED ||
              PanelState == ModuleDeployablePart.DeployState.EXTENDING))
           return false;

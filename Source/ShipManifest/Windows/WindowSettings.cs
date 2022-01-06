@@ -179,7 +179,7 @@ namespace ShipManifest.Windows
         SMSettings.SaveSettings();
 
         // Sync SM to CLS override settings with CLS
-        if (SMSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
+        if (Curr.EnableCls && HighLogic.LoadedSceneIsFlight)
         {
           SMSettings.UpdateClsOverride();
         }

@@ -9,6 +9,7 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
  - New: Added Kerbalism Support to Science transfers.
  - New: Added support for Custom Suits in Roster Window.
  - Fixed: Correct tool tip for Realistic Crew Transfer option in Realism Settings.
+ - Changed:  Refactored persistant settings into Separate classes for cleaner code
 
 
  Version 6.0.4.0 - Release 12 Dec 2021 - KSP 1.12.2
