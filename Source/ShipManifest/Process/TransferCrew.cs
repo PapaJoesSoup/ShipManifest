@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 
 namespace ShipManifest.Process
 {
@@ -20,7 +21,7 @@ namespace ShipManifest.Process
 
     // crew xfer interface properties
     private bool _crewXferActive;
-    private double _crewXferDelaysec = SMSettings.CrewXferDelaySec;
+    private double _crewXferDelaysec = CurrSettings.CrewXferDelaySec;
 
     private double _seat2SeatXferDelaySec = 2;
 
@@ -76,7 +77,7 @@ namespace ShipManifest.Process
 
     public bool OverrideStockCrewXfer
     {
-      get { return SMSettings.OverrideStockCrewXfer; }
+      get { return CurrSettings.OverrideStockCrewXfer; }
     }
 
     public double CrewXferDelaySec
@@ -234,7 +235,7 @@ namespace ShipManifest.Process
             // We want to run the start sound no matter what the realism settings are 
             // to give an audio indication to the player that the process is active
             Timestamp = DateTime.Now;
-            if (SMSettings.RealCrewXfers)
+            if (CurrSettings.RealCrewXfers)
             {
               SMSound.SourceCrewStart.Play();
             }
@@ -245,7 +246,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealCrewXfers)
+            if (CurrSettings.RealCrewXfers)
             {
               // Play run sound when start sound is nearly done. (repeats)
               if (SMAddon.Elapsed >= SMSound.ClipPumpStart.length - 0.25)
@@ -266,7 +267,7 @@ namespace ShipManifest.Process
 
             SMAddon.Elapsed += (DateTime.Now - Timestamp).TotalSeconds;
 
-            if (SMSettings.RealCrewXfers)
+            if (CurrSettings.RealCrewXfers)
             {
               // wait for movement to end...
               if (SMAddon.Elapsed >= CrewXferDelaySec || (IsSeat2SeatXfer && SMAddon.Elapsed > Seat2SeatXferDelaySec))
@@ -288,7 +289,7 @@ namespace ShipManifest.Process
           case XferState.Stop:
             if (SMConditions.ListsUpdating) break;
             // Spawn crew in parts and in vessel.
-            if (SMSettings.RealCrewXfers)
+            if (CurrSettings.RealCrewXfers)
             {
               // play crew sit.
               SMSound.SourceCrewRun.Stop();
@@ -303,11 +304,11 @@ namespace ShipManifest.Process
           case XferState.Portraits:
 
             // Account for crew move callbacks by adding a frame delay for portrait updates after crew move...
-            if (IvaDelayActive && IvaPortraitDelay < SMSettings.IvaUpdateFrameDelay)
+            if (IvaDelayActive && IvaPortraitDelay < CurrSettings.IvaUpdateFrameDelay)
             {
               IvaPortraitDelay += 1;
             }
-            else if ((IvaDelayActive && IvaPortraitDelay >= SMSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
+            else if ((IvaDelayActive && IvaPortraitDelay >= CurrSettings.IvaUpdateFrameDelay) || !IvaDelayActive)
             {
               if (IsStockXfer)
                 ScreenMessages.PostScreenMessage(
@@ -404,7 +405,7 @@ namespace ShipManifest.Process
           if (FromCrewMember != null && ToPart.CrewCapacity > ToPart.protoModuleCrew.Count)
           {
             AddCrewMember(FromCrewMember, ToPart, ToSeat);
-            var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
+            GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(FromCrewMember, FromPart, ToPart);
             GameEvents.onCrewTransferred.Fire(action);
           }
 
@@ -413,9 +414,9 @@ namespace ShipManifest.Process
           {
             AddCrewMember(ToCrewMember, FromPart, FromSeat);
             // MW - Not sure if we need this guard
-            if(SMSettings.EnableStockCrewXfer)
+            if(CurrSettings.EnableStockCrewXfer)
             {
-              var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
+              GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(ToCrewMember, ToPart, FromPart);
               GameEvents.onCrewTransferred.Fire(action);
             }
           }
@@ -447,9 +448,9 @@ namespace ShipManifest.Process
               RemoveCrewMember(CrewMembersToTransfer[crewIdx].kerbal, CrewMembersToTransfer[crewIdx].partSource);
               AddCrewMember(CrewMembersToTransfer[crewIdx].kerbal, toPart);
               // MW - Not sure if we need this guard
-              if(SMSettings.EnableStockCrewXfer)
+              if(CurrSettings.EnableStockCrewXfer)
               {
-                var action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(CrewMembersToTransfer[crewIdx].kerbal, CrewMembersToTransfer[crewIdx].partSource, toPart);
+                GameEvents.HostedFromToAction<ProtoCrewMember, Part> action = new GameEvents.HostedFromToAction<ProtoCrewMember, Part>(CrewMembersToTransfer[crewIdx].kerbal, CrewMembersToTransfer[crewIdx].partSource, toPart);
                 GameEvents.onCrewTransferred.Fire(action);
               }
               crewIdx++;
@@ -467,7 +468,7 @@ namespace ShipManifest.Process
 
     internal void CrewTransferAbort()
     {
-      if (SMSettings.RealCrewXfers)
+      if (CurrSettings.RealCrewXfers)
       {
         SMSound.SourceCrewRun.Stop();
         SMSound.SourceCrewStop.Play();

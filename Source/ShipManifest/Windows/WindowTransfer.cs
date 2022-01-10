@@ -5,9 +5,11 @@ using System.Globalization;
 using System.Linq;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
+using VehiclePhysics;
 
 namespace ShipManifest.Windows
 {
@@ -16,7 +18,14 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = "";
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
+    internal static float HeightScale = 1f;
+    internal static float ViewerHieght = 100;
+    internal static float MinHeight = 50;
+    internal static float WindowHeight = 279;
+    internal static bool ResizingWindow = false;
+    internal static Rect SelectBox = new Rect(0, 0, 300, ViewerHieght);
+    internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -43,8 +52,6 @@ namespace ShipManifest.Windows
     // Switches for List Viewers
     internal static bool ShowSourceVessels;
     internal static bool ShowTargetVessels;
-    internal static Rect SelectBox = new Rect(0, 0, 300, 100);
-    internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
     // vessel mode crew selection vars.
     internal static bool SelectAllFrom;
@@ -180,6 +187,7 @@ namespace ShipManifest.Windows
     // This window assumes that a resource has been selected on the Ship manifest window.
     internal static void Display(int _windowId)
     {
+
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -253,7 +261,26 @@ namespace ShipManifest.Windows
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
 
+        //resizing
+        Rect resizeRect =
+          new Rect(Position.width - 18, Position.height - 18, 16, 16);
+        GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+        if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+        {
+          ResizingWindow = true;
+        }
+
+        if (Event.current.type == EventType.Repaint && ResizingWindow)
+        {
+          if (Mouse.delta.y != 0)
+          {
+            float diff = Mouse.delta.y;
+            UpdateScale(diff);
+          }
+        }
+
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        Position.height = WindowHeight + HeightScale;
         SMAddon.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -275,7 +302,7 @@ namespace ShipManifest.Windows
       {
         // This is a scroll panel (we are using it to make button lists...)
         _sourceTransferViewerScrollPosition = GUILayout.BeginScrollView(_sourceTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
         if (ShowSourceVessels)
@@ -340,15 +367,15 @@ namespace ShipManifest.Windows
       try
       {
         // Adjust target style colors for part selectors when using/not using CLS highlighting
-        if (SMSettings.EnableClsHighlighting &&
+        if (CurrSettings.EnableClsHighlighting &&
             SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
+          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[CurrSettings.TargetPartCrewColor];
         else
-          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[SMSettings.TargetPartColor];
+          SMStyle.ButtonToggledTargetStyle.normal.textColor = SMSettings.Colors[CurrSettings.TargetPartColor];
 
         // This is a scroll panel (we are using it to make button lists...)
         _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
         if (ShowTargetVessels)
@@ -478,7 +505,7 @@ namespace ShipManifest.Windows
           // set the conditions for a button style change.
           int btnWidth = 273; // Start with full width button...
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
-            btnWidth = !SMSettings.RealXfers || (SMSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
+            btnWidth = !CurrSettings.RealXfers || (CurrSettings.EnablePfResources && SMConditions.IsInPreflight()) ? 173 : 223;
           else if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) && SMConditions.CanShowCrewFillDumpButtons())
             btnWidth = 173;
 
@@ -551,7 +578,7 @@ namespace ShipManifest.Windows
 
           // set the conditions for a button style change.
           int btnWidth = 273;
-          if (!SMSettings.RealXfers) btnWidth = 180;
+          if (!CurrSettings.RealXfers) btnWidth = 180;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -585,7 +612,7 @@ namespace ShipManifest.Windows
           // Science
 
           // Resources
-          else if (!SMSettings.RealXfers)
+          else if (!CurrSettings.RealXfers)
           {
             if (selectedResources.Count > 1)
               GUI.enabled = TransferPump.CalcRemainingResource(modDockedVessels.Current.VesselParts, selectedResources[0]) > 0 ||
@@ -663,7 +690,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
 
-      if (SMSettings.RealXfers || (!SMSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
+      if (CurrSettings.RealXfers || (!CurrSettings.EnablePfResources || !SMConditions.IsInPreflight())) return;
       GUIStyle style2 = xferType == TransferPump.TypeXfer.SourceToTarget
         ? SMStyle.ButtonSourceStyle
         : SMStyle.ButtonTargetStyle;
@@ -1084,7 +1111,7 @@ namespace ShipManifest.Windows
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
         {
-          if (SMSettings.RealXfers && !isCollectable)
+          if (CurrSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
             toolTip = noXferRealismContent;
@@ -1166,7 +1193,7 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
-            if (SMSettings.RealXfers && !isCollectable)
+            if (CurrSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
               toolTip = noXferSciRlsmTtContent;
@@ -1242,7 +1269,7 @@ namespace ShipManifest.Windows
         // If we have target selected, it is not the same as the source, there is science to xfer.
         if (SMAddon.SmVessel.SelectedModuleTarget != null && scienceCount > 0)
         {
-          if (SMSettings.RealXfers && !isCollectable)
+          if (CurrSettings.RealXfers && !isCollectable)
           {
             GUI.enabled = false;
             toolTip = noXferRealismContent;
@@ -1325,7 +1352,7 @@ namespace ShipManifest.Windows
             if (Event.current.type == EventType.Repaint && ShowToolTips)
               ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
-            if (SMSettings.RealXfers && !isCollectable)
+            if (CurrSettings.RealXfers && !isCollectable)
             {
               GUI.enabled = false;
               //toolTip = "Realistic Transfers is preventing transfer.\r\nData is marked not transferable";
@@ -1895,6 +1922,17 @@ namespace ShipManifest.Windows
       part.Dispose();
       return results;
     }
+
+    internal static void UpdateScale(float diff)
+    {
+      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
+      if (ViewerHieght + HeightScale < MinHeight)
+      {
+        HeightScale = MinHeight - ViewerHieght;
+      }
+    }
+
+
     #endregion
   }
 }

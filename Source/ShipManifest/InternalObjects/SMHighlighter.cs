@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ConnectedLivingSpace;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
@@ -59,7 +60,7 @@ namespace ShipManifest.InternalObjects
         ClearPartHighlight(list.Current);
       }
       list.Dispose();
-      if (!SMSettings.EnableCls || !SMSettings.EnableClsHighlighting || !SMAddon.GetClsVessel()) return;
+      if (!CurrSettings.EnableCls || !CurrSettings.EnableClsHighlighting || !SMAddon.GetClsVessel()) return;
       if (resourceParts.Count > 0 && resourceParts[0] != null)
         SMAddon.ClsAddon.Vessel.Highlight(false);
     }
@@ -129,7 +130,7 @@ namespace ShipManifest.InternalObjects
       try
       {
         step = "inside box - Part Selection?";
-        SetPartHighlight(part, SMSettings.Colors[SMSettings.MouseOverColor]);
+        SetPartHighlight(part, SMSettings.Colors[CurrSettings.MouseOverColor]);
         EdgeHighight(part, true);
         if (!IsMouseOver) PrevMouseOverPart = null;
       }
@@ -142,7 +143,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void MouseOverHighlight(List<Part> parts)
     {
-        SetPartsHighlight(parts, SMSettings.Colors[SMSettings.MouseOverColor]);
+        SetPartsHighlight(parts, SMSettings.Colors[CurrSettings.MouseOverColor]);
         EdgeHighight(parts, true);
     }
 
@@ -180,16 +181,16 @@ namespace ShipManifest.InternalObjects
         EdgeHighight(PrevMouseOverParts, false);
 
         // now set selected part colors...
-        if (!SMSettings.OnlySourceTarget && SMAddon.SmVessel.SelectedResourcesParts != null)
-          SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, SMSettings.Colors[SMSettings.ResourcePartColor], true);
+        if (!CurrSettings.OnlySourceTarget && SMAddon.SmVessel.SelectedResourcesParts != null)
+          SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, SMSettings.Colors[CurrSettings.ResourcePartColor], true);
         if (SMAddon.SmVessel.SelectedPartsSource != null)
-          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor],true);
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[CurrSettings.SourcePartColor],true);
         if (SMAddon.SmVessel.SelectedPartsTarget != null)
         { 
           if (SMConditions.IsClsEnabled() && SMConditions.GetTransferMode() == SMConditions.TransferMode.Crew)
-            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartCrewColor], true);
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[CurrSettings.TargetPartCrewColor], true);
           else
-            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[SMSettings.TargetPartColor], true);        
+            SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, SMSettings.Colors[CurrSettings.TargetPartColor], true);        
         }
 
         if (!IsMouseOver) PrevMouseOverParts = null;
@@ -221,19 +222,19 @@ namespace ShipManifest.InternalObjects
       // so we can have a part revert to nothing...
       //if (PrevMouseOverPart == MouseOverPart || PrevMouseOverPart == null) return strColor;
       if (SMAddon.SmVessel.SelectedPartsSource.Contains(PrevMouseOverPart))
-        strColor = SMSettings.SourcePartColor;
+        strColor = CurrSettings.SourcePartColor;
       else if (SMAddon.SmVessel.SelectedPartsTarget.Contains(PrevMouseOverPart))
       {
         if (SMConditions.GetSelectedResourceType(SMAddon.SmVessel.SelectedResources) == SMConditions.ResourceType.Crew && SMConditions.IsClsHighlightingEnabled())
         {
-          strColor = SMSettings.TargetPartCrewColor;
+          strColor = CurrSettings.TargetPartCrewColor;
         }
         else
         {
-          strColor = SMSettings.TargetPartColor;
+          strColor = CurrSettings.TargetPartColor;
         }
       }
-      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !SMSettings.OnlySourceTarget)
+      else if (SMAddon.SmVessel.SelectedResourcesParts.Contains(PrevMouseOverPart) && !CurrSettings.OnlySourceTarget)
       {
         strColor = SMConditions.IsClsHighlightingEnabled() ? "green" : "yellow";
       }
@@ -242,11 +243,11 @@ namespace ShipManifest.InternalObjects
 
     internal static void EdgeHighight(Part part, bool enable, string color = null)
     {
-      if (!SMSettings.EnableEdgeHighlighting) return;
+      if (!CurrSettings.EnableEdgeHighlighting) return;
       if (enable)
       {
         if (string.IsNullOrEmpty(color))
-          color = SMSettings.MouseOverColor;
+          color = CurrSettings.MouseOverColor;
         part.highlighter.SeeThroughOn();
         part.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
       }
@@ -259,7 +260,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void EdgeHighight(List<Part> parts, bool enable, string color = null)
     {
-      if (!SMSettings.EnableEdgeHighlighting) return;
+      if (!CurrSettings.EnableEdgeHighlighting) return;
       List<Part>.Enumerator list = parts.GetEnumerator();
       while (list.MoveNext())
       {
@@ -267,7 +268,7 @@ namespace ShipManifest.InternalObjects
         if (enable)
         {
           if (string.IsNullOrEmpty(color))
-            color = SMSettings.MouseOverColor;
+            color = CurrSettings.MouseOverColor;
           list.Current.highlighter.SeeThroughOn();
           list.Current.highlighter.ConstantOnImmediate(SMSettings.Colors[color]);
         }
@@ -318,7 +319,7 @@ namespace ShipManifest.InternalObjects
       try
       {
         // Do we even want to highlight?
-        if (!SMSettings.EnableHighlighting) return;
+        if (!CurrSettings.EnableHighlighting) return;
         step = "Showhipmanifest = true";
         if (!SMConditions.CanShowShipManifest()) return;
         //step = "Clear old highlighting";
@@ -329,8 +330,8 @@ namespace ShipManifest.InternalObjects
         if (SMAddon.SmVessel.SelectedResources != null && SMAddon.SmVessel.SelectedResources.Count > 0)
         {
           step = "Set non selected resource part color";
-          Color resourcePartColor = SMSettings.Colors[SMSettings.ResourcePartColor];
-          Color targetPartColor = SMSettings.Colors[SMSettings.TargetPartColor];
+          Color resourcePartColor = SMSettings.Colors[CurrSettings.ResourcePartColor];
+          Color targetPartColor = SMSettings.Colors[CurrSettings.TargetPartColor];
 
           // If resource is Crew, and we the settings have enabled CLS highlighting support, use CLS colours
           if (SMConditions.IsClsHighlightingEnabled())
@@ -343,20 +344,20 @@ namespace ShipManifest.InternalObjects
             SMAddon.SmVessel.ClsPartTarget?.Highlight(false, true);
 
             // Override part colors to match CLS
-            resourcePartColor = SMSettings.Colors[SMSettings.ClsSpaceColor];
-            targetPartColor = SMSettings.Colors[SMSettings.TargetPartCrewColor];
+            resourcePartColor = SMSettings.Colors[CurrSettings.ClsSpaceColor];
+            targetPartColor = SMSettings.Colors[CurrSettings.TargetPartCrewColor];
           }
 
           // Highlight all parts containing the resource
           step = "Set Resource Part Colors";
-          if (!SMSettings.OnlySourceTarget)
+          if (!CurrSettings.OnlySourceTarget)
           {
             SetPartsHighlight(SMAddon.SmVessel.SelectedResourcesParts, resourcePartColor);
           }
 
           // Highlight the Source and Target parts (if selected)
           step = "Set Selected Part Colors";
-          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[SMSettings.SourcePartColor], true);
+          SetPartsHighlight(SMAddon.SmVessel.SelectedPartsSource, SMSettings.Colors[CurrSettings.SourcePartColor], true);
           SetPartsHighlight(SMAddon.SmVessel.SelectedPartsTarget, targetPartColor, true);
         }
       }
@@ -374,11 +375,11 @@ namespace ShipManifest.InternalObjects
     internal static Color GetHighlightColor(Part part, out string colorstring)
     {
       colorstring = "clear";
-      if (SMPart.IsSource(part)) colorstring = SMSettings.SourcePartColor;
+      if (SMPart.IsSource(part)) colorstring = CurrSettings.SourcePartColor;
       else if (SMPart.IsTarget(part)) colorstring = SMPart.IsCrew(part)
-        ? SMPart.IsClsTarget(part) ? SMSettings.TargetPartCrewColor : SMSettings.TargetPartColor
-        : SMSettings.TargetPartColor;
-      else if (SMPart.IsSelected(part)) colorstring = SMSettings.ResourcePartColor;
+        ? SMPart.IsClsTarget(part) ? CurrSettings.TargetPartCrewColor : CurrSettings.TargetPartColor
+        : CurrSettings.TargetPartColor;
+      else if (SMPart.IsSelected(part)) colorstring = CurrSettings.ResourcePartColor;
       return SMSettings.Colors[colorstring];
     }
 

@@ -40,8 +40,8 @@ namespace ShipManifest
       {
         if (_smChecked) return _smInstalled;
         const string assemblyName = "ShipManifest";
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-        var assembly = (from a in assemblies
+        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        Assembly assembly = (from a in assemblies
                         where a.FullName.Contains(assemblyName)
                         select a).SingleOrDefault();
         _smInstalled = assembly != null;
@@ -52,9 +52,9 @@ namespace ShipManifest
 
     public static ICrewTransfer GetCrewTransfer()
     {
-      var smAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest..Process.TransferCrew");
+      Type smAddonType = AssemblyLoader.loadedAssemblies.SelectMany(a => a.assembly.GetExportedTypes()).SingleOrDefault(t => t.FullName == "ShipManifest..Process.TransferCrew");
       if (smAddonType == null) return null;
-      var crewTransferObj = smAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
+      object crewTransferObj = smAddonType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static).GetValue(null, null);
       return (ICrewTransfer)crewTransferObj;
     }
   }

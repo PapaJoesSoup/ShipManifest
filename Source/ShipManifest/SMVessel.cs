@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows;
@@ -222,7 +223,7 @@ namespace ShipManifest
       TransferPump.UpdateDisplayPumps();
 
       // now SM settings / hatches.
-      if (SMSettings.EnableCls && SMConditions.CanShowShipManifest())
+      if (CurrSettings.EnableCls && SMConditions.CanShowShipManifest())
       {
         if (SMAddon.GetClsAddon())
         {
@@ -258,7 +259,7 @@ namespace ShipManifest
         if (parts.Current == null) continue;
         Part part = parts.Current;
         // First let's Get any Crew, if desired...
-        if (SMSettings.EnableCrew && (part.CrewCapacity > 0 || SMConditions.IsUsiInflatable(part)) && part.partInfo.name != "kerbalEVA")
+        if (CurrSettings.EnableCrew && (part.CrewCapacity > 0 || SMConditions.IsUsiInflatable(part)) && part.partInfo.name != "kerbalEVA")
         {
           bool vResourceFound = false;
           // is resource in the list yet?.
@@ -267,7 +268,7 @@ namespace ShipManifest
             // found resource.  lets add part to its list.
             vResourceFound = true;
             List<Part> eParts = _partsByResource[SMConditions.ResourceType.Crew.ToString()];
-            part.crewTransferAvailable = SMSettings.EnableStockCrewXfer;
+            part.crewTransferAvailable = CurrSettings.EnableStockCrewXfer;
             eParts.Add(part);
           }
           if (!vResourceFound)
@@ -278,7 +279,7 @@ namespace ShipManifest
           }
         }
         // Let's Get any Science...
-        if (SMSettings.EnableScience)
+        if (CurrSettings.EnableScience)
         {
           IScienceDataContainer[] sciModules = part.FindModulesImplementing<IScienceDataContainer>().ToArray();
           if (sciModules.Length > 0)
@@ -299,7 +300,7 @@ namespace ShipManifest
         }
 
         // Now, let's get flight Resources.
-        if (!SMSettings.EnableResources) continue;
+        if (!CurrSettings.EnableResources) continue;
         {
           IEnumerator resources = part.Resources.GetEnumerator();
           while (resources.MoveNext())
@@ -307,7 +308,7 @@ namespace ShipManifest
             if (resources.Current == null) continue;
             PartResource resource = (PartResource)resources.Current;
             // Realism Mode.  we want to exclude Resources with TransferMode = NONE...
-            if (SMSettings.RealXfers &&
+            if (CurrSettings.RealXfers &&
                 (!resource.info.isVisible || resource.info.resourceTransferMode == ResourceTransferMode.NONE))
               continue;
             bool vResourceFound = false;
@@ -549,7 +550,7 @@ namespace ShipManifest
       _hatches.Clear();
       try
       {
-        if (!SMSettings.EnableCls || !SMConditions.CanShowShipManifest()) return;
+        if (!CurrSettings.EnableCls || !SMConditions.CanShowShipManifest()) return;
         if (!SMAddon.GetClsAddon()) return;
         SMAddon.UpdateClsSpaces();
         if (!SMAddon.GetClsVessel()) return;

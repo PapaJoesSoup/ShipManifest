@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
@@ -13,9 +14,10 @@ namespace ShipManifest.Windows
   {
     #region Properties
 
+
     internal static float WindowWidth = 830;
     internal static float WindowHeight = 330;
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, 810, 230);
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -100,6 +102,7 @@ namespace ShipManifest.Windows
     internal static GUIContent futrSuitContent  = new GUIContent(SmUtils.SmTags["#smloc_roster_039"]);
     internal static string brokenContent        = SmUtils.SmTags["#smloc_roster_040"];
     internal static string fixContent           = SmUtils.SmTags["#smloc_roster_041"];
+    internal static GUIContent slimSuitContent  = new GUIContent(SmUtils.SmTags["#smloc_roster_042"]);
 
     internal static string editKerbalTtContent  = SmUtils.SmTags["#smloc_roster_tt_007"];
     internal static string cnxEditKrblTtContent = SmUtils.SmTags["#smloc_roster_tt_008"];
@@ -121,6 +124,7 @@ namespace ShipManifest.Windows
     internal static string fixTtContent         = SmUtils.SmTags["#smloc_roster_tt_025"];
     internal static string suitKerbalTtContent  = "Change this Kerbal's Suit";
     internal static string cnxSuitKrblTtContent = "Cancel changes to this Kerbal'Suit";
+    internal static string displayErrorContent  = SmUtils.SmTags["#smloc_error_001"];
     #endregion Localization Strings
 
 
@@ -192,7 +196,7 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
-          GUI.enabled = SMSettings.EnableCrewModify;
+          GUI.enabled = CurrSettings.EnableCrewModify;
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
           {
@@ -335,8 +339,21 @@ namespace ShipManifest.Windows
         isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futrSuitContent, GUILayout.Width(90)); // "Future"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
       }
+      if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Slim)) {
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Slim, slimSuitContent, GUILayout.Width(90)); // "Slim"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Slim;
+      }
 
       GUILayout.EndHorizontal();
+      //DisplaySuitColor();
+    }
+
+    private static void DisplaySuitColor()
+    {
+      //if (SMAddon.Instance.suitCombos)
+      //{
+      //  SMAddon.Instance.suitCombos.helmetSuitPickerWindow.crew = SelectedKerbal.Kerbal;
+      //}
     }
 
     private static void DisplayRosterFilter()
@@ -411,20 +428,21 @@ namespace ShipManifest.Windows
           if (kerbals.Current == null) continue;
           if (!CanDisplayKerbal(kerbals.Current)) continue;
           GUIStyle labelStyle;
-          if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Dead ||
-              kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Missing) {
-            labelStyle = SMStyle.LabelStyleRed;
-          } else if (kerbals.Current.rosterStatus == ProtoCrewMember.RosterStatus.Assigned) {
-            if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
+          switch (kerbals.Current.rosterStatus)
+          {
+            case ProtoCrewMember.RosterStatus.Dead:
+            case ProtoCrewMember.RosterStatus.Missing:
+            case ProtoCrewMember.RosterStatus.Assigned when kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant:
               labelStyle = SMStyle.LabelStyleRed;
-            } else {
+              break;
+            case ProtoCrewMember.RosterStatus.Assigned:
               labelStyle = SMStyle.LabelStyleYellow;
+              break;
+            default:
+            {
+              labelStyle = kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant ? SMStyle.LabelStyle : SMStyle.LabelStyleGreen;
+              break;
             }
-          } else if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
-            labelStyle = SMStyle.LabelStyle;
-          } else {
-            // What's left are Available kerbals which we can edit etc.
-            labelStyle = SMStyle.LabelStyleGreen;
           }
 
           // What vessel is this Kerbal Assigned to?
@@ -453,11 +471,7 @@ namespace ShipManifest.Windows
           else
           {
             // Since the kerbal has no vessel assignment, lets show what their status...
-            if (kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant) {
-              rosterDetails = kerbals.Current.type.ToString();
-            } else {
-              rosterDetails = kerbals.Current.rosterStatus.ToString();
-            }
+            rosterDetails = kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant ? kerbals.Current.type.ToString() : kerbals.Current.rosterStatus.ToString();
           }
           GUILayout.BeginHorizontal();
           GUILayout.Label(kerbals.Current.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
@@ -567,7 +581,7 @@ namespace ShipManifest.Windows
     private static void EditKerbalViewer()
     {
       GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
-      if (SMSettings.EnableKerbalRename)
+      if (CurrSettings.EnableKerbalRename)
       {
         GUILayout.BeginHorizontal();
         SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
@@ -582,7 +596,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.Label(SMAddon.SaveMessage, SMStyle.ErrorLabelRedStyle);
       }
-      if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
+      if (CurrSettings.EnableKerbalRename && CurrSettings.EnableChangeProfession)
       {
         DisplaySelectProfession();
       }
@@ -618,7 +632,7 @@ namespace ShipManifest.Windows
       }
       if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
       {
-        if (SMSettings.EnableKerbalRename && SMSettings.EnableChangeProfession)
+        if (CurrSettings.EnableKerbalRename && CurrSettings.EnableChangeProfession)
         {
           if (SelectedKerbal != null) SelectedKerbal.Trait = KerbalProfession.ToString();
         }
@@ -641,12 +655,12 @@ namespace ShipManifest.Windows
       try
       {
         RosterList.Clear();
-        var roster = HighLogic.CurrentGame.CrewRoster;
+        KerbalRoster roster = HighLogic.CurrentGame.CrewRoster;
         bool haveDeepFreeze = InstalledMods.IsDfInstalled && DfWrapper.ApiReady;
         for( int c = 0; c < roster.Count; c++) {
           // Filter out unowned kerbals if we don't have DeepFreeze
           // TODO: Perhaps we should allow editing of these Kerbals anyway?
-          var kerbal = roster[c];
+          ProtoCrewMember kerbal = roster[c];
           if( kerbal.type == ProtoCrewMember.KerbalType.Unowned && !haveDeepFreeze ) {
             continue;
           }
@@ -661,7 +675,7 @@ namespace ShipManifest.Windows
 
     private static void SetupSuitButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && SMSettings.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && CurrSettings.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? suitContent.text : cnxEditContent;
       if (GUI.enabled)
@@ -677,7 +691,7 @@ namespace ShipManifest.Windows
 
     private static void SetupEditButton(ProtoCrewMember kerbal, out string buttonText, out string buttonToolTip)
     {
-      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && SMSettings.EnableCrewModify;
+      GUI.enabled = kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && CurrSettings.EnableCrewModify;
 
       buttonText = SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal ? editContent : cnxEditContent;
       if (GUI.enabled)
@@ -763,9 +777,9 @@ namespace ShipManifest.Windows
       // Applies to both scenes.
       if (SMConditions.CanKerbalBeReSpawned(kerbal))
       {
-        GUI.enabled = SMSettings.EnableCrewModify;
+        GUI.enabled = CurrSettings.EnableCrewModify;
         buttonText = respawnContent;  // "Respawn";
-        buttonToolTip = SMSettings.EnableCrewModify 
+        buttonToolTip = CurrSettings.EnableCrewModify 
           ? respwanYesTtContent // "Brings a Kerbal back to life.\r\nWill then become available.";
           : respawnNoTtContent; // "Realistic Control is preventing this action.";
       }
@@ -797,7 +811,7 @@ namespace ShipManifest.Windows
         {
           rosterDetails = DfWrapper.DeepFreezeApi.FrozenKerbals.ContainsKey(kerbal.name) 
             ? $"{frozenContent} - {DfWrapper.DeepFreezeApi.FrozenKerbals[kerbal.name].VesselName.Replace("(unloaded)", "")}" 
-            : SmUtils.SmTags["#smloc_roster_015"];
+            : frozenContent;
         }
         return rosterDetails;
       }
@@ -807,7 +821,7 @@ namespace ShipManifest.Windows
         {
           SmUtils.LogMessage($" in GetRosterList().\r\nError:  {ex}", SmUtils.LogType.Error, true);
         }
-        return $"{SmUtils.SmTags["#smloc_error_001"]}:"; // "Display Error"
+        return $"{displayErrorContent}:"; // "Display Error"
       }
     }
 

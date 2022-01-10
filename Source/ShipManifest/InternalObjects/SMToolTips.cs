@@ -1,3 +1,4 @@
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows;
 using ShipManifest.Windows.Tabs.Control;
 using ShipManifest.Windows.Tabs.Settings;
@@ -30,7 +31,7 @@ namespace ShipManifest.InternalObjects
 
     internal static void ShowToolTip(Vector2 toolTipPos, string toolTip)
     {
-      if (!SMSettings.ShowToolTips || (toolTip == null) || (toolTip.Trim().Length <= 0)) return;
+      if (!CurrSettings.ShowToolTips || (toolTip == null) || (toolTip.Trim().Length <= 0)) return;
       Vector2 size = SMStyle.ToolTipStyle.CalcSize(new GUIContent(toolTip));
       Position = new Rect(toolTipPos.x, toolTipPos.y, size.x, size.y);
       RepositionToolTip();

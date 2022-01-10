@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ConnectedLivingSpace;
 using KSP.UI.Dialogs;
 using ShipManifest.APIClients;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows;
@@ -25,7 +26,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsShipControllable()
     {
-      return (SMAddon.SmVessel.Vessel.IsControllable && SMSettings.RealControl) || !SMSettings.RealControl;
+      return (SMAddon.SmVessel.Vessel.IsControllable && CurrSettings.RealControl) || !CurrSettings.RealControl;
     }
 
     internal static bool IsInPreflight()
@@ -145,7 +146,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsClsInSameSpace(List<Part> source, List<Part> target)
     {
-      if (!SMSettings.EnableCls ||  !SMSettings.RealXfers) return true;
+      if (!CurrSettings.EnableCls ||  !CurrSettings.RealXfers) return true;
 
       bool result = false;
       List<Part>.Enumerator srcPart = source.GetEnumerator();
@@ -166,7 +167,7 @@ namespace ShipManifest.InternalObjects
     {
       bool results = false;
       if (source == null || target == null) return results;
-      if (SMSettings.EnableCls && SMSettings.RealXfers)
+      if (CurrSettings.EnableCls && CurrSettings.RealXfers)
       {
         if (SMAddon.ClsAddon.Vessel == null) return results;
         ICLSSpace sourceSpace = null;
@@ -269,17 +270,17 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanResourceBeFilled(string resourceName)
     {
-      return (!SMSettings.RealXfers ||
+      return (!CurrSettings.RealXfers ||
               SMAddon.SmVessel.IsRecoverable && AreSelectedResourcesTypeOther(new List<string> {resourceName}))
              &&
              TransferPump.CalcRemainingCapacity(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
-             SMSettings.Tolerance;
+             CurrSettings.Tolerance;
     }
 
     internal static bool CanResourceBeDumped(string resourceName)
     {
       return TransferPump.CalcRemainingResource(SMAddon.SmVessel.PartsByResource[resourceName], resourceName) >
-             SMSettings.Tolerance &&
+             CurrSettings.Tolerance &&
              IsResourceTypeOther(resourceName);
     }
 
@@ -326,18 +327,18 @@ namespace ShipManifest.InternalObjects
 
     internal static bool IsClsEnabled()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null;
+      return CurrSettings.EnableCls && SMAddon.ClsAddon.Vessel != null;
     }
 
     internal static bool IsClsActive()
     {
-      return SMSettings.EnableCls && SMAddon.ClsAddon.Vessel != null &&
+      return CurrSettings.EnableCls && SMAddon.ClsAddon.Vessel != null &&
              SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
     internal static bool IsClsHighlightingEnabled()
     {
-      return SMSettings.EnableCls && SMSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null &&
+      return CurrSettings.EnableCls && CurrSettings.EnableClsHighlighting && SMAddon.ClsAddon.Vessel != null &&
              SMAddon.SmVessel.SelectedResources.Contains(ResourceType.Crew.ToString());
     }
 
@@ -350,8 +351,8 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanShowCrewFillDumpButtons()
     {
-      return !SMSettings.RealXfers ||
-             (SMAddon.SmVessel.IsRecoverable && SMSettings.EnablePfCrews);
+      return !CurrSettings.RealXfers ||
+             (SMAddon.SmVessel.IsRecoverable && CurrSettings.EnablePfCrews);
     }
 
     internal static bool IsUsiInflatable(Part part)
@@ -387,7 +388,7 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeAdded(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return CurrSettings.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
         && SMAddon.SmVessel.SelectedPartsSource.Count > 0 
         && !ShipManifest.SMPart.IsCrewFull(SMAddon.SmVessel.SelectedPartsSource[0]);
@@ -423,28 +424,28 @@ namespace ShipManifest.InternalObjects
 
     internal static bool CanKerbalBeRemoved(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return CurrSettings.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned 
         && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeRemovedRealism(ProtoCrewMember kerbal)
     {
-      return !SMSettings.EnableCrewModify
+      return !CurrSettings.EnableCrewModify
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
         && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal);
     }
 
     internal static bool KerbalCannotBeAddedNoSource(ProtoCrewMember kerbal)
     {
-      return SMSettings.EnableCrewModify 
+      return CurrSettings.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available 
         && SMAddon.SmVessel.SelectedPartsSource.Count == 0;
     }
 
     internal static bool KerbalCannotBeAddedRealism(ProtoCrewMember kerbal)
     {
-      return !SMSettings.EnableCrewModify 
+      return !CurrSettings.EnableCrewModify 
         && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available;
     }
 

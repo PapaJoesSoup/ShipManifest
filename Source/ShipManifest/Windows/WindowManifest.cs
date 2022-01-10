@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using UnityEngine;
 
@@ -14,7 +15,13 @@ namespace ShipManifest.Windows
     #region Properties
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
+    internal static float HeightScale = 1f;
+    internal static float ViewerHeight = 100;
+    internal static float MinHeight = 50;
+    internal static float WindowHeight = 282;
+    internal static bool ResizingWindow = false;
+
     private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
@@ -94,7 +101,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.BeginVertical();
         _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(100), GUILayout.Width(300));
+          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(300));
         GUILayout.BeginVertical();
 
         // Prelaunch (landed) Gui
@@ -129,7 +136,27 @@ namespace ShipManifest.Windows
         WindowToggleButtons();
 
         GUILayout.EndVertical();
+
+        //resizing
+        Rect resizeRect =
+          new Rect(Position.width - 18, Position.height - 18, 16, 16);
+        GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+        if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+        {
+          ResizingWindow = true;
+        }
+
+        if (Event.current.type == EventType.Repaint && ResizingWindow)
+        {
+          if (Mouse.delta.y != 0)
+          {
+            float diff = Mouse.delta.y;
+            UpdateScale(diff);
+          }
+        }
+        //ResetZoomKeys();
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        Position.height = WindowHeight + HeightScale;
         SMAddon.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -152,7 +179,7 @@ namespace ShipManifest.Windows
     {
       try
       {
-        if (SMSettings.EnablePfCrews)
+        if (CurrSettings.EnablePfCrews)
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
@@ -167,7 +194,7 @@ namespace ShipManifest.Windows
           GUILayout.EndHorizontal();
         }
 
-        if (!SMSettings.EnablePfResources) return;
+        if (!CurrSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
         if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
         {
@@ -204,7 +231,7 @@ namespace ShipManifest.Windows
 
           // Button Widths
           int width = 273;
-          if (!SMSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
+          if (!CurrSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current)) width = 185;
           else if (SMConditions.IsResourceTypeOther(keys.Current)) width = 223;
 
           // Resource Button
@@ -234,7 +261,7 @@ namespace ShipManifest.Windows
           }
 
           // Fill Button
-          if (!SMSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
+          if (!CurrSettings.RealXfers && SMConditions.IsResourceTypeOther(keys.Current) &&
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
@@ -572,6 +599,15 @@ namespace ShipManifest.Windows
         SmUtils.LogMessage(
           $" in WindowManifest.ReconcileSelectedXferParts.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}",
             SmUtils.LogType.Error, true); // in, Error
+      }
+    }
+
+    internal static void UpdateScale(float diff)
+    {
+      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
+      if (ViewerHeight + HeightScale < MinHeight)
+      {
+        HeightScale = MinHeight - ViewerHeight;
       }
     }
   }

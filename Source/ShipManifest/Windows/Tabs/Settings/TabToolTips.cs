@@ -1,4 +1,5 @@
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
@@ -58,12 +59,12 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader); //"ToolTips"
       GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
-      SMSettings.ShowToolTips = GUILayout.Toggle(SMSettings.ShowToolTips, allTtContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.ShowToolTips = GUILayout.Toggle(CurrSettings.ShowToolTips, allTtContent, GUILayout.Width(guiToggleWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      GUI.enabled = SMSettings.ShowToolTips;
+      GUI.enabled = CurrSettings.ShowToolTips;
 
       // Debugger Window
       GUILayout.BeginHorizontal();
@@ -101,7 +102,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      GUI.enabled = SMSettings.ShowToolTips && WindowSettings.ShowToolTips;
+      GUI.enabled = CurrSettings.ShowToolTips && WindowSettings.ShowToolTips;
 
       // SW - Realism Tab
       GUILayout.BeginHorizontal();
@@ -148,7 +149,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      GUI.enabled = SMSettings.ShowToolTips;
+      GUI.enabled = CurrSettings.ShowToolTips;
 
       // Roster Window
       GUILayout.BeginHorizontal();
@@ -168,7 +169,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
-      GUI.enabled = SMSettings.ShowToolTips && WindowControl.ShowToolTips;
+      GUI.enabled = CurrSettings.ShowToolTips && WindowControl.ShowToolTips;
 
       // CW - Vessel Tab
       GUILayout.BeginHorizontal();

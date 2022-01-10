@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Deploy" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.8">
   <ImportGroup Label="PropertySheets">
-    <Import Project="..\Source\common_settings.props" />
+    <!-- Copy common_settings.props in project and rename to common_settings.local.props.
+         This allows for maintaining local settings in a multi developer environment...
+    -->
+    <Import Project="..\Source\common_settings.local.props" />
   </ImportGroup>
 
   <!-- Variables (override in user_settings.props) -->

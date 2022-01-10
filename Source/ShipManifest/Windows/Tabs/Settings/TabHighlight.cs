@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Settings
@@ -46,19 +47,19 @@ namespace ShipManifest.Windows.Tabs.Settings
       // EnableHighlighting Mode
       GUILayout.BeginHorizontal();
       // Enable Highlighting
-      SMSettings.EnableHighlighting = GUILayout.Toggle(SMSettings.EnableHighlighting, modeAllContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableHighlighting = GUILayout.Toggle(CurrSettings.EnableHighlighting, modeAllContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      if (SMSettings.EnableHighlighting != SMSettings.PrevEnableHighlighting && HighLogic.LoadedSceneIsFlight)
+      if (CurrSettings.EnableHighlighting != OrigSettings.EnableHighlighting && HighLogic.LoadedSceneIsFlight)
       {
-        if (SMSettings.EnableCls)
+        if (CurrSettings.EnableCls)
         {
           if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
             // Update spaces and reassign the resource to observe new settings.
-            SMHighlighter.HighlightClsVessel(SMSettings.EnableHighlighting, true);
+            SMHighlighter.HighlightClsVessel(CurrSettings.EnableHighlighting, true);
             SMAddon.UpdateClsSpaces();
             SMAddon.SmVessel.SelectedResources.Clear();
             SMAddon.SmVessel.SelectedResources.Add(SMConditions.ResourceType.Crew.ToString());
@@ -68,19 +69,19 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // OnlySourceTarget Mode
       GUI.enabled = true;
-      GUI.enabled = SMSettings.EnableHighlighting;
+      GUI.enabled = CurrSettings.EnableHighlighting;
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
       // Highlight Only Source / Target Parts";
-      SMSettings.OnlySourceTarget = GUILayout.Toggle(SMSettings.OnlySourceTarget, modeSTContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.OnlySourceTarget = GUILayout.Toggle(CurrSettings.OnlySourceTarget, modeSTContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      if (SMSettings.OnlySourceTarget && (!SMSettings.PrevOnlySourceTarget || SMSettings.EnableClsHighlighting))
+      if (CurrSettings.OnlySourceTarget && (!OrigSettings.OnlySourceTarget || CurrSettings.EnableClsHighlighting))
       {
-        SMSettings.EnableClsHighlighting = false;
-        if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls &&
+        CurrSettings.EnableClsHighlighting = false;
+        if (HighLogic.LoadedSceneIsFlight && CurrSettings.EnableCls &&
             SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
         {
           // Update spaces and reassign the resource to observe new settings.
@@ -91,39 +92,39 @@ namespace ShipManifest.Windows.Tabs.Settings
         }
       }
       // Enable CLS Highlighting Mode
-      if (!SMSettings.EnableHighlighting || !SMSettings.EnableCls)
+      if (!CurrSettings.EnableHighlighting || !CurrSettings.EnableCls)
         GUI.enabled = false;
       else
         GUI.enabled = true;
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      SMSettings.EnableClsHighlighting = GUILayout.Toggle(SMSettings.EnableClsHighlighting, modeClsContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableClsHighlighting = GUILayout.Toggle(CurrSettings.EnableClsHighlighting, modeClsContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      if (SMSettings.EnableClsHighlighting && (!SMSettings.PrevEnableClsHighlighting || SMSettings.OnlySourceTarget))
-        SMSettings.OnlySourceTarget = false;
-      if (HighLogic.LoadedSceneIsFlight && SMSettings.EnableCls &&
+      if (CurrSettings.EnableClsHighlighting && (!OrigSettings.EnableClsHighlighting || CurrSettings.OnlySourceTarget))
+        CurrSettings.OnlySourceTarget = false;
+      if (HighLogic.LoadedSceneIsFlight && CurrSettings.EnableCls &&
           SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()) &&
           WindowTransfer.ShowWindow)
       {
-        if (SMSettings.EnableClsHighlighting != SMSettings.PrevEnableClsHighlighting)
-          SMHighlighter.HighlightClsVessel(SMSettings.EnableClsHighlighting);
+        if (CurrSettings.EnableClsHighlighting != OrigSettings.EnableClsHighlighting)
+          SMHighlighter.HighlightClsVessel(CurrSettings.EnableClsHighlighting);
       }
 
       // Enable Edge Highlighting Mode
-      GUI.enabled = SMSettings.EnableHighlighting;
+      GUI.enabled = CurrSettings.EnableHighlighting;
       GUILayout.BeginHorizontal();
       // Enable Edge Highlighting (On Mouse Overs)
-      SMSettings.EnableEdgeHighlighting = GUILayout.Toggle(SMSettings.EnableEdgeHighlighting, modeEdgeContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableEdgeHighlighting = GUILayout.Toggle(CurrSettings.EnableEdgeHighlighting, modeEdgeContent, GUILayout.Width(guiToggleWidth));
       GUILayout.EndHorizontal();
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && _canShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      if (SMSettings.EnableEdgeHighlighting != SMSettings.PrevEnableEdgeHighlighting && HighLogic.LoadedSceneIsFlight)
+      if (CurrSettings.EnableEdgeHighlighting != OrigSettings.EnableEdgeHighlighting && HighLogic.LoadedSceneIsFlight)
       {
-        if (SMSettings.EnableEdgeHighlighting == false)
+        if (CurrSettings.EnableEdgeHighlighting == false)
         {
           if (SMAddon.SmVessel.SelectedResources.Count > 0)
           {

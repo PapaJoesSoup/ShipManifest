@@ -1,5 +1,6 @@
 using System;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace ShipManifest.Windows
 {
   internal static class WindowControl
   {
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Vector2 _displayViewerPosition = Vector2.zero;
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -120,7 +121,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Hatches Tab
-      if (SMSettings.EnableCls)
+      if (CurrSettings.EnableCls)
       {
         GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (GUILayout.Button(hatchContent, hatchesStyle, GUILayout.Height(20))) // "Hatches"
@@ -285,42 +286,42 @@ namespace ShipManifest.Windows
       switch (_selectedTab)
       {
         case Tab.Panel:
-          GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(retSolarContent, GUILayout.Height(20))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
           if (GUILayout.Button(extSolarContent, GUILayout.Height(20))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Radiator:
-          GUI.enabled = SMAddon.SmVessel.Radiators.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.Radiators.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(retRadiateContent, GUILayout.Height(20))) // "Retract All Radiators"
             TabRadiator.RetractAllRadiators();
           if (GUILayout.Button(extRadiateContent, GUILayout.Height(20))) // "Extend All Radiators"
             TabRadiator.ExtendAllRadiators();
           break;
         case Tab.Hatch:
-          GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(closenHatchContent, GUILayout.Height(20))) // "Close All Hatches"
             TabHatch.CloseAllHatches();
           if (GUILayout.Button(openHatchContent, GUILayout.Height(20))) // "Open All Hatches"
             TabHatch.OpenAllHatches();
           break;
         case Tab.Antenna:
-          GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(retAntennaContent, GUILayout.Height(20))) // "Retract All Antennas"
             TabAntenna.RetractAllAntennas();
           if (GUILayout.Button(extAntennaContent, GUILayout.Height(20))) // "Extend All Antennas"
             TabAntenna.ExtendAllAntennas();
           break;
         case Tab.Light:
-          GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(offLightContent, GUILayout.Height(20))) // "Turn Off All Lights"
             TabLight.TurnOffAllLights();
           if (GUILayout.Button(onLightContent, GUILayout.Height(20))) // "Turn On All Lights"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Lab:
-          GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!SMSettings.RealControl || SMConditions.IsShipControllable());
+          GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(offLabsContent, GUILayout.Height(20))) // "Turn Off All Labs"
             TabLight.TurnOffAllLights();
           if (GUILayout.Button(onLabsContent, GUILayout.Height(20))) // "Turn On All Labs"

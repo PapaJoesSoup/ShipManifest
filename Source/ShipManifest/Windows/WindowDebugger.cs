@@ -4,13 +4,14 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows
 {
   internal static class WindowDebugger
   {
-    internal static Rect Position = SMSettings.DefaultPosition;
+    internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow

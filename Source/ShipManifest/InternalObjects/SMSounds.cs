@@ -1,4 +1,5 @@
 using System;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.InternalObjects
@@ -9,15 +10,15 @@ namespace ShipManifest.InternalObjects
     #region Static vars...
     // Default sound license: CC-By-SA
     // http://www.freesound.org/people/adcbicycle/sounds/14214/
-    internal static string AudioSourceCrewPathStart = SMSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
-    internal static string AudioSourceCrewPathRun = SMSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
-    internal static string AudioSourceCrewPathStop = SMSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
+    internal static string AudioSourceCrewPathStart = CurrSettings.CrewSoundStart ?? "ShipManifest/Sounds/14214-1";
+    internal static string AudioSourceCrewPathRun = CurrSettings.CrewSoundRun ?? "ShipManifest/Sounds/14214-2";
+    internal static string AudioSourceCrewPathStop = CurrSettings.CrewSoundStop ?? "ShipManifest/Sounds/14214-3";
 
     // Default sound license: CC-By-SA
     // http://www.freesound.org/people/vibe_crc/sounds/59328/
-    internal static string SourcePumpPathStart = SMSettings.PumpSoundStart ?? "ShipManifest/Sounds/59328-1";
-    internal static string SourcePumpPathRun = SMSettings.PumpSoundRun ?? "ShipManifest/Sounds/59328-2";
-    internal static string SourcePumpPathStop = SMSettings.PumpSoundStop ?? "ShipManifest/Sounds/59328-3";
+    internal static string SourcePumpPathStart = CurrSettings.PumpSoundStart ?? "ShipManifest/Sounds/59328-1";
+    internal static string SourcePumpPathRun = CurrSettings.PumpSoundRun ?? "ShipManifest/Sounds/59328-2";
+    internal static string SourcePumpPathStop = CurrSettings.PumpSoundStop ?? "ShipManifest/Sounds/59328-3";
 
     // Resource transfer vars
     internal static AudioSource SourcePumpStart;
@@ -57,16 +58,16 @@ namespace ShipManifest.InternalObjects
 
           // configure sources
           SourceCrewStart.clip = ClipCrewStart; // Start sound
-          SourceCrewStart.volume = (float)SMSettings.CrewSoundVol;
+          SourceCrewStart.volume = (float)CurrSettings.CrewSoundVol;
           SourceCrewStart.pitch = 1f;
 
           SourceCrewRun.clip = ClipCrewRun; // Run sound
           SourceCrewRun.loop = true;
-          SourceCrewRun.volume = (float)SMSettings.CrewSoundVol;
+          SourceCrewRun.volume = (float)CurrSettings.CrewSoundVol;
           SourceCrewRun.pitch = 1f;
 
           SourceCrewStop.clip = ClipCrewStop; // Stop Sound
-          SourceCrewStop.volume = (float)SMSettings.CrewSoundVol;
+          SourceCrewStop.volume = (float)CurrSettings.CrewSoundVol;
           SourceCrewStop.pitch = 1f;
         }
 
@@ -85,16 +86,16 @@ namespace ShipManifest.InternalObjects
 
           // configure sources
           SourcePumpStart.clip = ClipPumpStart; // Start sound
-          SourcePumpStart.volume = (float)SMSettings.PumpSoundVol;
+          SourcePumpStart.volume = (float)CurrSettings.PumpSoundVol;
           SourcePumpStart.pitch = 1f;
 
           SourcePumpRun.clip = ClipPumpRun; // Run sound
           SourcePumpRun.loop = true;
-          SourcePumpRun.volume = (float)SMSettings.PumpSoundVol;
+          SourcePumpRun.volume = (float)CurrSettings.PumpSoundVol;
           SourcePumpRun.pitch = 1f;
 
           SourcePumpStop.clip = ClipPumpStop; // Stop Sound
-          SourcePumpStop.volume = (float)SMSettings.PumpSoundVol;
+          SourcePumpStop.volume = (float)CurrSettings.PumpSoundVol;
           SourcePumpStop.pitch = 1f;
         }
       }
@@ -109,12 +110,12 @@ namespace ShipManifest.InternalObjects
 
     internal static bool SoundSettingsChanged()
     {
-      return SMSettings.PumpSoundRun != SMSettings.PrevPumpSoundRun
-             || SMSettings.PumpSoundStart != SMSettings.PrevPumpSoundStart
-             || SMSettings.PumpSoundStop != SMSettings.PrevPumpSoundStop
-             || SMSettings.CrewSoundStart != SMSettings.PrevCrewSoundStart
-             || SMSettings.CrewSoundRun != SMSettings.PrevCrewSoundRun
-             || SMSettings.CrewSoundStop != SMSettings.PrevCrewSoundStop;
+      return CurrSettings.PumpSoundRun != OrigSettings.PumpSoundRun
+             || CurrSettings.PumpSoundStart != OrigSettings.PumpSoundStart
+             || CurrSettings.PumpSoundStop != OrigSettings.PumpSoundStop
+             || CurrSettings.CrewSoundStart != OrigSettings.CrewSoundStart
+             || CurrSettings.CrewSoundRun != OrigSettings.CrewSoundRun
+             || CurrSettings.CrewSoundStop != OrigSettings.CrewSoundStop;
     }
   }
 }
