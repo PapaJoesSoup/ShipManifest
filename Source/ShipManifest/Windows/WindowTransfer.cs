@@ -9,6 +9,7 @@ using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
 using UnityEngine;
+using VehiclePhysics;
 
 namespace ShipManifest.Windows
 {
@@ -18,6 +19,13 @@ namespace ShipManifest.Windows
 
     internal static string Title = "";
     internal static Rect Position = CurrSettings.DefaultPosition;
+    internal static float HeightScale = 1f;
+    internal static float ViewerHieght = 100;
+    internal static float MinHeight = 50;
+    internal static float WindowHeight = 279;
+    internal static bool ResizingWindow = false;
+    internal static Rect SelectBox = new Rect(0, 0, 300, ViewerHieght);
+    internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -44,8 +52,6 @@ namespace ShipManifest.Windows
     // Switches for List Viewers
     internal static bool ShowSourceVessels;
     internal static bool ShowTargetVessels;
-    internal static Rect SelectBox = new Rect(0, 0, 300, 100);
-    internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
     // vessel mode crew selection vars.
     internal static bool SelectAllFrom;
@@ -181,6 +187,7 @@ namespace ShipManifest.Windows
     // This window assumes that a resource has been selected on the Ship manifest window.
     internal static void Display(int _windowId)
     {
+
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -254,7 +261,26 @@ namespace ShipManifest.Windows
         // Display MouseOverHighlighting, if any
         SMHighlighter.MouseOverHighlight();
 
+        //resizing
+        Rect resizeRect =
+          new Rect(Position.width - 18, Position.height - 18, 16, 16);
+        GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+        if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+        {
+          ResizingWindow = true;
+        }
+
+        if (Event.current.type == EventType.Repaint && ResizingWindow)
+        {
+          if (Mouse.delta.y != 0)
+          {
+            float diff = Mouse.delta.y;
+            UpdateScale(diff);
+          }
+        }
+
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        Position.height = WindowHeight + HeightScale;
         SMAddon.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -276,7 +302,7 @@ namespace ShipManifest.Windows
       {
         // This is a scroll panel (we are using it to make button lists...)
         _sourceTransferViewerScrollPosition = GUILayout.BeginScrollView(_sourceTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
         if (ShowSourceVessels)
@@ -349,7 +375,7 @@ namespace ShipManifest.Windows
 
         // This is a scroll panel (we are using it to make button lists...)
         _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
         GUILayout.BeginVertical();
 
         if (ShowTargetVessels)
@@ -1896,6 +1922,17 @@ namespace ShipManifest.Windows
       part.Dispose();
       return results;
     }
+
+    internal static void UpdateScale(float diff)
+    {
+      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
+      if (ViewerHieght + HeightScale < MinHeight)
+      {
+        HeightScale = MinHeight - ViewerHieght;
+      }
+    }
+
+
     #endregion
   }
 }

@@ -18,6 +18,8 @@ namespace ShipManifest
   {
     // Object Scope:  Current Unity/KSP Scene.  Object will be destroyed and recreated when scene changes!
 
+    //internal SuitCombos suitCombos;
+
     #region Static Properties
 
     // Game object that keeps us running
@@ -150,6 +152,9 @@ namespace ShipManifest
 
           SMSettings.SaveSettings();
           //RunSave();
+
+          //Locate Helmet/suit picker
+          //suitCombos = FindObjectOfType<SuitCombos>();
         }
 
         // Instantiate Event handlers
@@ -300,6 +305,11 @@ namespace ShipManifest
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
+      if (Event.current.type == EventType.MouseUp)
+      {
+        if (WindowManifest.ResizingWindow) WindowManifest.ResizingWindow = false;
+        if (WindowTransfer.ResizingWindow) WindowTransfer.ResizingWindow = false;
+      }
       try
       {
         GUI.skin = CurrSettings.UseUnityStyle ? null : HighLogic.Skin;

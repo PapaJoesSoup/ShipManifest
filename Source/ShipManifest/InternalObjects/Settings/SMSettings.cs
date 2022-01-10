@@ -58,7 +58,7 @@ namespace ShipManifest.InternalObjects.Settings
           // Load suit Node
           ConfigNode smSuitNode = new ConfigNode();
           if (suitNode.TryGetNode("IVA", ref smSuitNode))
-          {                   
+          {
             SMSuit smSuit = new SMSuit();
 
             smSuitNode.TryGetValue("suitTexture", ref smSuit.suitTexture);
@@ -78,7 +78,7 @@ namespace ShipManifest.InternalObjects.Settings
               Debug.LogWarning($"[ShipManifest]: Could not find normal map '{smSuit.normalTexture}'");
           }
           else continue;
-        } 
+        }
       }
     }
 
@@ -120,8 +120,13 @@ namespace ShipManifest.InternalObjects.Settings
         WindowSettings.Position = GetRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
         WindowControl.Position = GetRectangle(windowsNode, "ControlPosition", WindowControl.Position);
         WindowRoster.Position = GetRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
+        WindowManifest.HeightScale = windowsNode.HasValue("ManifestHeightScale")
+          ? float.Parse(windowsNode.GetValue("ManifestHeightScale"))
+          : WindowManifest.HeightScale;
+        WindowTransfer.HeightScale = windowsNode.HasValue("TransferHeightScale")
+          ? float.Parse(windowsNode.GetValue("TransferHeightScale"))
+          : WindowTransfer.HeightScale;
 
-        // now the settings
         // Realism Settings
         CurrSettings.RealismMode = realismNode.HasValue("RealismMode")
           ? int.Parse(realismNode.GetValue("RealismMode"))
@@ -135,8 +140,8 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.RealControl = realismNode.HasValue("RealControl")
           ? bool.Parse(realismNode.GetValue("RealControl"))
           : CurrSettings.RealControl;
-        CurrSettings.EnableCrew = realismNode.HasValue("EnableCrew") 
-          ? bool.Parse(realismNode.GetValue("EnableCrew")) 
+        CurrSettings.EnableCrew = realismNode.HasValue("EnableCrew")
+          ? bool.Parse(realismNode.GetValue("EnableCrew"))
           : CurrSettings.EnableCrew;
         CurrSettings.EnableKerbalRename = realismNode.HasValue("EnableKerbalRename")
           ? bool.Parse(realismNode.GetValue("EnableKerbalRename"))
@@ -144,11 +149,11 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.EnableChangeProfession = realismNode.HasValue("EnableChangeProfession")
           ? bool.Parse(realismNode.GetValue("EnableChangeProfession"))
           : CurrSettings.EnableChangeProfession;
-        CurrSettings.EnableCrewModify = realismNode.HasValue("EnableCrewModify") 
-          ? bool.Parse(realismNode.GetValue("EnableCrewModify")) 
+        CurrSettings.EnableCrewModify = realismNode.HasValue("EnableCrewModify")
+          ? bool.Parse(realismNode.GetValue("EnableCrewModify"))
           : CurrSettings.EnableCrewModify;
-        CurrSettings.EnablePfCrews = realismNode.HasValue("EnablePfCrews") 
-          ? bool.Parse(realismNode.GetValue("EnablePfCrews")) 
+        CurrSettings.EnablePfCrews = realismNode.HasValue("EnablePfCrews")
+          ? bool.Parse(realismNode.GetValue("EnablePfCrews"))
           : CurrSettings.EnablePfCrews;
         CurrSettings.EnableStockCrewXfer = realismNode.HasValue("EnableStockCrewTransfer")
           ? bool.Parse(realismNode.GetValue("EnableStockCrewTransfer"))
@@ -163,8 +168,8 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.EnablePfResources = realismNode.HasValue("EnablePFResources")
           ? bool.Parse(realismNode.GetValue("EnablePFResources"))
           : CurrSettings.EnablePfResources;
-        CurrSettings.EnableCls = realismNode.HasValue("EnableCLS") 
-          ? bool.Parse(realismNode.GetValue("EnableCLS")) 
+        CurrSettings.EnableCls = realismNode.HasValue("EnableCLS")
+          ? bool.Parse(realismNode.GetValue("EnableCLS"))
           : CurrSettings.EnableCls;
         CurrSettings.OverrideStockCrewXfer = realismNode.HasValue("OverrideStockCrewTransfer")
           ? bool.Parse(realismNode.GetValue("OverrideStockCrewTransfer"))
@@ -172,11 +177,11 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.EnableClsAllowTransfer = realismNode.HasValue("EnableClsAllowTransfer")
           ? bool.Parse(realismNode.GetValue("EnableClsAllowTransfer"))
           : CurrSettings.EnableClsAllowTransfer;
-        CurrSettings.FlowRate = realismNode.HasValue("FlowRate") 
-          ? double.Parse(realismNode.GetValue("FlowRate")) 
+        CurrSettings.FlowRate = realismNode.HasValue("FlowRate")
+          ? double.Parse(realismNode.GetValue("FlowRate"))
           : CurrSettings.FlowRate;
-        CurrSettings.FlowCost = realismNode.HasValue("FlowCost") 
-          ? double.Parse(realismNode.GetValue("FlowCost")) 
+        CurrSettings.FlowCost = realismNode.HasValue("FlowCost")
+          ? double.Parse(realismNode.GetValue("FlowCost"))
           : CurrSettings.FlowCost;
         CurrSettings.MinFlowRate = realismNode.HasValue("MinFlowRate")
           ? double.Parse(realismNode.GetValue("MinFlowRate"))
@@ -265,20 +270,20 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.PumpSoundStart = soundsNode.HasValue("PumpSoundStart")
           ? soundsNode.GetValue("PumpSoundStart")
           : CurrSettings.PumpSoundStart;
-        CurrSettings.PumpSoundRun = soundsNode.HasValue("PumpSoundRun") 
-          ? soundsNode.GetValue("PumpSoundRun") 
+        CurrSettings.PumpSoundRun = soundsNode.HasValue("PumpSoundRun")
+          ? soundsNode.GetValue("PumpSoundRun")
           : CurrSettings.PumpSoundRun;
-        CurrSettings.PumpSoundStop = soundsNode.HasValue("PumpSoundStop") 
-          ? soundsNode.GetValue("PumpSoundStop") 
+        CurrSettings.PumpSoundStop = soundsNode.HasValue("PumpSoundStop")
+          ? soundsNode.GetValue("PumpSoundStop")
           : CurrSettings.PumpSoundStop;
         CurrSettings.CrewSoundStart = soundsNode.HasValue("CrewSoundStart")
           ? soundsNode.GetValue("CrewSoundStart")
           : CurrSettings.CrewSoundStart;
-        CurrSettings.CrewSoundRun = soundsNode.HasValue("CrewSoundRun") 
-          ? soundsNode.GetValue("CrewSoundRun") 
+        CurrSettings.CrewSoundRun = soundsNode.HasValue("CrewSoundRun")
+          ? soundsNode.GetValue("CrewSoundRun")
           : CurrSettings.CrewSoundRun;
-        CurrSettings.CrewSoundStop = soundsNode.HasValue("CrewSoundStop") 
-          ? soundsNode.GetValue("CrewSoundStop") 
+        CurrSettings.CrewSoundStop = soundsNode.HasValue("CrewSoundStop")
+          ? soundsNode.GetValue("CrewSoundStop")
           : CurrSettings.CrewSoundStop;
 
         CurrSettings.PumpSoundVol = soundsNode.HasValue("PumpSoundVol")
@@ -298,17 +303,17 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.VerboseLogging = configNode.HasValue("VerboseLogging")
           ? bool.Parse(configNode.GetValue("VerboseLogging"))
           : CurrSettings.VerboseLogging;
-        CurrSettings.AutoSave = configNode.HasValue("AutoSave") 
-          ? bool.Parse(configNode.GetValue("AutoSave")) 
+        CurrSettings.AutoSave = configNode.HasValue("AutoSave")
+          ? bool.Parse(configNode.GetValue("AutoSave"))
           : CurrSettings.AutoSave;
         CurrSettings.SaveIntervalSec = configNode.HasValue("SaveIntervalSec")
           ? int.Parse(configNode.GetValue("SaveIntervalSec"))
           : CurrSettings.SaveIntervalSec;
-        CurrSettings.AutoDebug = configNode.HasValue("AutoDebug") 
-          ? bool.Parse(configNode.GetValue("AutoDebug")) 
+        CurrSettings.AutoDebug = configNode.HasValue("AutoDebug")
+          ? bool.Parse(configNode.GetValue("AutoDebug"))
           : CurrSettings.AutoDebug;
-        DebugLogPath = configNode.HasValue("DebugLogPath") 
-          ? configNode.GetValue("DebugLogPath") 
+        DebugLogPath = configNode.HasValue("DebugLogPath")
+          ? configNode.GetValue("DebugLogPath")
           : DebugLogPath;
         CurrSettings.ErrorLogLength = configNode.HasValue("ErrorLogLength")
           ? configNode.GetValue("ErrorLogLength")
@@ -331,8 +336,8 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.TargetPartCrewColor = hiddenNode.HasValue("TargetPartCrewColor")
           ? hiddenNode.GetValue("TargetPartCrewColor")
           : CurrSettings.TargetPartCrewColor;
-        CurrSettings.MouseOverColor = hiddenNode.HasValue("MouseOverColor") 
-          ? hiddenNode.GetValue("MouseOverColor") 
+        CurrSettings.MouseOverColor = hiddenNode.HasValue("MouseOverColor")
+          ? hiddenNode.GetValue("MouseOverColor")
           : CurrSettings.MouseOverColor;
 
         // Hidden config
@@ -359,134 +364,136 @@ namespace ShipManifest.InternalObjects.Settings
 
     internal static void SaveSettings()
     {
-      if (Loaded && (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER))
+      if (!Loaded || (HighLogic.LoadedScene != GameScenes.FLIGHT &&
+                      HighLogic.LoadedScene != GameScenes.SPACECENTER)) return;
+      if (CurrSettings.EnableStockCrewXfer != OrigSettings.EnableStockCrewXfer)
       {
-        if (CurrSettings.EnableStockCrewXfer != OrigSettings.EnableStockCrewXfer)
-        {
-          SetStockCrewTransferState();
-        }
-        if (SMSound.SoundSettingsChanged()) SMSound.LoadSounds();
-
-        MemStoreTempSettings();
-        if (Settings == null)
-          Settings = LoadSettingsFile();
-
-        ConfigNode windowsNode = Settings.HasNode("SM_Windows")
-          ? Settings.GetNode("SM_Windows")
-          : Settings.AddNode("SM_Windows");
-        ConfigNode realismNode = Settings.HasNode("SM_Realism")
-          ? Settings.GetNode("SM_Realism")
-          : Settings.AddNode("SM_Realism");
-        ConfigNode highlightNode = Settings.HasNode("SM_Highlight")
-          ? Settings.GetNode("SM_Highlight")
-          : Settings.AddNode("SM_Highlight");
-        ConfigNode toolTipsNode = Settings.HasNode("SM_ToolTips")
-          ? Settings.GetNode("SM_ToolTips")
-          : Settings.AddNode("SM_ToolTips");
-        ConfigNode soundsNode = Settings.HasNode("SM_Sounds")
-          ? Settings.GetNode("SM_Sounds")
-          : Settings.AddNode("SM_Sounds");
-        ConfigNode configNode = Settings.HasNode("SM_Config")
-          ? Settings.GetNode("SM_Config")
-          : Settings.AddNode("SM_Config");
-        ConfigNode hiddenNode = Settings.HasNode("SM_Hidden") 
-          ? Settings.GetNode("SM_Hidden") 
-          : Settings.AddNode("SM_Hidden");
-
-        // Write window positions
-        WriteRectangle(windowsNode, "DefaultPosition", CurrSettings.DefaultPosition);
-        WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
-        WriteRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
-        WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
-        WriteRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
-        WriteRectangle(windowsNode, "ControlPosition", WindowControl.Position);
-        WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
-
-        //Write settings...
-        // Realism Settings
-        WriteValue(realismNode, "RealismMode", CurrSettings.RealismMode);
-        WriteValue(realismNode, "RealXfers", CurrSettings.RealXfers);
-        WriteValue(realismNode, "RealCrewXfers", CurrSettings.RealCrewXfers);
-        WriteValue(realismNode, "RealControl", CurrSettings.RealControl);
-        WriteValue(realismNode, "EnableCrew", CurrSettings.EnableCrew);
-        WriteValue(realismNode, "EnableCrewModify", CurrSettings.EnableCrewModify);
-        WriteValue(realismNode, "EnableKerbalRename", CurrSettings.EnableKerbalRename);
-        WriteValue(realismNode, "EnableChangeProfession", CurrSettings.EnableChangeProfession);
-        WriteValue(realismNode, "EnablePfCrews", CurrSettings.EnablePfCrews);
-        WriteValue(realismNode, "EnableStockCrewTransfer", CurrSettings.EnableStockCrewXfer);
-        WriteValue(realismNode, "EnableScience", CurrSettings.EnableScience);
-        WriteValue(realismNode, "EnableResources", CurrSettings.EnableResources);
-        WriteValue(realismNode, "EnablePFResources", CurrSettings.EnablePfResources);
-        WriteValue(realismNode, "EnableCLS", CurrSettings.EnableCls);
-        WriteValue(realismNode, "OverrideStockCrewTransfer", CurrSettings.OverrideStockCrewXfer);
-        WriteValue(realismNode, "EnableClsAllowTransfer", CurrSettings.EnableClsAllowTransfer);
-        WriteValue(realismNode, "FlowRate", CurrSettings.FlowRate);
-        WriteValue(realismNode, "FlowCost", CurrSettings.FlowCost);
-        WriteValue(realismNode, "MinFlowRate", CurrSettings.MinFlowRate);
-        WriteValue(realismNode, "MaxFlowRate", CurrSettings.MaxFlowRate);
-        WriteValue(realismNode, "MaxFlowTimeSec", CurrSettings.MaxFlowTimeSec);
-        WriteValue(realismNode, "EnableXferCost", CurrSettings.EnableXferCost);
-        WriteValue(realismNode, "LockSettings", CurrSettings.LockSettings);
-
-        // Highlighting Settings
-        WriteValue(highlightNode, "EnableHighlighting", CurrSettings.EnableHighlighting);
-        WriteValue(highlightNode, "OnlySourceTarget", CurrSettings.OnlySourceTarget);
-        WriteValue(highlightNode, "EnableCLSHighlighting", CurrSettings.EnableClsHighlighting);
-        WriteValue(highlightNode, "EnableEdgeHighlighting", CurrSettings.EnableEdgeHighlighting);
-
-        // ToolTip Settings
-        WriteValue(toolTipsNode, "ShowToolTips", CurrSettings.ShowToolTips);
-        WriteValue(toolTipsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
-        WriteValue(toolTipsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
-        WriteValue(toolTipsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
-        WriteValue(toolTipsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
-        WriteValue(toolTipsNode, "RealismToolTips", TabRealism.ShowToolTips);
-        WriteValue(toolTipsNode, "HighlightingToolTips", TabHighlight.ShowToolTips);
-        WriteValue(toolTipsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
-        WriteValue(toolTipsNode, "SoundsToolTips", TabSounds.ShowToolTips);
-        WriteValue(toolTipsNode, "ConfigToolTips", TabConfig.ShowToolTips);
-        WriteValue(toolTipsNode, "RosterToolTips", WindowRoster.ShowToolTips);
-        WriteValue(toolTipsNode, "ControlToolTips", WindowControl.ShowToolTips);
-        WriteValue(toolTipsNode, "HatchToolTips", TabHatch.ShowToolTips);
-        WriteValue(toolTipsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
-        WriteValue(toolTipsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
-        WriteValue(toolTipsNode, "LightToolTips", TabLight.ShowToolTips);
-
-        // Sound Settings
-        WriteValue(soundsNode, "PumpSoundStart", CurrSettings.PumpSoundStart);
-        WriteValue(soundsNode, "PumpSoundRun", CurrSettings.PumpSoundRun);
-        WriteValue(soundsNode, "PumpSoundStop", CurrSettings.PumpSoundStop);
-        WriteValue(soundsNode, "CrewSoundStart", CurrSettings.CrewSoundStart);
-        WriteValue(soundsNode, "CrewSoundRun", CurrSettings.CrewSoundRun);
-        WriteValue(soundsNode, "CrewSoundStop", CurrSettings.CrewSoundStop);
-        WriteValue(soundsNode, "PumpSoundVol", CurrSettings.PumpSoundVol);
-        WriteValue(soundsNode, "CrewSoundVol", CurrSettings.CrewSoundVol);
-
-        // Config Settings
-        WriteValue(configNode, "ShowDebugger", WindowDebugger.ShowWindow);
-        WriteValue(configNode, "EnableBlizzyToolbar", CurrSettings.EnableBlizzyToolbar);
-        WriteValue(configNode, "VerboseLogging", CurrSettings.VerboseLogging);
-        WriteValue(configNode, "AutoSave", CurrSettings.AutoSave);
-        WriteValue(configNode, "SaveIntervalSec", CurrSettings.SaveIntervalSec);
-        WriteValue(configNode, "AutoDebug", CurrSettings.AutoDebug);
-        WriteValue(configNode, "DebugLogPath", DebugLogPath);
-        WriteValue(configNode, "ErrorLogLength", CurrSettings.ErrorLogLength);
-        WriteValue(configNode, "SaveLogOnExit", CurrSettings.SaveLogOnExit);
-        WriteValue(configNode, "UseUnityStyle", CurrSettings.UseUnityStyle);
-
-        // Hidden Settings
-        WriteValue(hiddenNode, "ResourcePartColor", CurrSettings.ResourcePartColor);
-        WriteValue(hiddenNode, "SourcePartColor", CurrSettings.SourcePartColor);
-        WriteValue(hiddenNode, "TargetPartColor", CurrSettings.TargetPartColor);
-        WriteValue(hiddenNode, "TargetPartCrewColor", CurrSettings.TargetPartCrewColor);
-        WriteValue(hiddenNode, "MouseOverColor", CurrSettings.MouseOverColor);
-        WriteValue(hiddenNode, "CrewXferDelaySec", CurrSettings.CrewXferDelaySec);
-        WriteValue(hiddenNode, "IvaUpdateFrameDelay", CurrSettings.IvaUpdateFrameDelay);
-
-        if (!Directory.Exists(SettingsPath))
-          Directory.CreateDirectory(SettingsPath);
-        Settings.Save(SettingsFile);
+        SetStockCrewTransferState();
       }
+      if (SMSound.SoundSettingsChanged()) SMSound.LoadSounds();
+
+      MemStoreTempSettings();
+      if (Settings == null)
+        Settings = LoadSettingsFile();
+
+      ConfigNode windowsNode = Settings.HasNode("SM_Windows")
+        ? Settings.GetNode("SM_Windows")
+        : Settings.AddNode("SM_Windows");
+      ConfigNode realismNode = Settings.HasNode("SM_Realism")
+        ? Settings.GetNode("SM_Realism")
+        : Settings.AddNode("SM_Realism");
+      ConfigNode highlightNode = Settings.HasNode("SM_Highlight")
+        ? Settings.GetNode("SM_Highlight")
+        : Settings.AddNode("SM_Highlight");
+      ConfigNode toolTipsNode = Settings.HasNode("SM_ToolTips")
+        ? Settings.GetNode("SM_ToolTips")
+        : Settings.AddNode("SM_ToolTips");
+      ConfigNode soundsNode = Settings.HasNode("SM_Sounds")
+        ? Settings.GetNode("SM_Sounds")
+        : Settings.AddNode("SM_Sounds");
+      ConfigNode configNode = Settings.HasNode("SM_Config")
+        ? Settings.GetNode("SM_Config")
+        : Settings.AddNode("SM_Config");
+      ConfigNode hiddenNode = Settings.HasNode("SM_Hidden")
+        ? Settings.GetNode("SM_Hidden")
+        : Settings.AddNode("SM_Hidden");
+
+      // Write window positions
+      WriteRectangle(windowsNode, "DefaultPosition", CurrSettings.DefaultPosition);
+      WriteRectangle(windowsNode, "ManifestPosition", WindowManifest.Position);
+      WriteRectangle(windowsNode, "TransferPosition", WindowTransfer.Position);
+      WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
+      WriteRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
+      WriteRectangle(windowsNode, "ControlPosition", WindowControl.Position);
+      WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
+      WriteValue(windowsNode, "ManifestHeightScale", WindowManifest.HeightScale);
+      WriteValue(windowsNode, "TransferHeightScale", WindowTransfer.HeightScale);
+
+
+      //Write settings...
+      // Realism Settings
+      WriteValue(realismNode, "RealismMode", CurrSettings.RealismMode);
+      WriteValue(realismNode, "RealXfers", CurrSettings.RealXfers);
+      WriteValue(realismNode, "RealCrewXfers", CurrSettings.RealCrewXfers);
+      WriteValue(realismNode, "RealControl", CurrSettings.RealControl);
+      WriteValue(realismNode, "EnableCrew", CurrSettings.EnableCrew);
+      WriteValue(realismNode, "EnableCrewModify", CurrSettings.EnableCrewModify);
+      WriteValue(realismNode, "EnableKerbalRename", CurrSettings.EnableKerbalRename);
+      WriteValue(realismNode, "EnableChangeProfession", CurrSettings.EnableChangeProfession);
+      WriteValue(realismNode, "EnablePfCrews", CurrSettings.EnablePfCrews);
+      WriteValue(realismNode, "EnableStockCrewTransfer", CurrSettings.EnableStockCrewXfer);
+      WriteValue(realismNode, "EnableScience", CurrSettings.EnableScience);
+      WriteValue(realismNode, "EnableResources", CurrSettings.EnableResources);
+      WriteValue(realismNode, "EnablePFResources", CurrSettings.EnablePfResources);
+      WriteValue(realismNode, "EnableCLS", CurrSettings.EnableCls);
+      WriteValue(realismNode, "OverrideStockCrewTransfer", CurrSettings.OverrideStockCrewXfer);
+      WriteValue(realismNode, "EnableClsAllowTransfer", CurrSettings.EnableClsAllowTransfer);
+      WriteValue(realismNode, "FlowRate", CurrSettings.FlowRate);
+      WriteValue(realismNode, "FlowCost", CurrSettings.FlowCost);
+      WriteValue(realismNode, "MinFlowRate", CurrSettings.MinFlowRate);
+      WriteValue(realismNode, "MaxFlowRate", CurrSettings.MaxFlowRate);
+      WriteValue(realismNode, "MaxFlowTimeSec", CurrSettings.MaxFlowTimeSec);
+      WriteValue(realismNode, "EnableXferCost", CurrSettings.EnableXferCost);
+      WriteValue(realismNode, "LockSettings", CurrSettings.LockSettings);
+
+      // Highlighting Settings
+      WriteValue(highlightNode, "EnableHighlighting", CurrSettings.EnableHighlighting);
+      WriteValue(highlightNode, "OnlySourceTarget", CurrSettings.OnlySourceTarget);
+      WriteValue(highlightNode, "EnableCLSHighlighting", CurrSettings.EnableClsHighlighting);
+      WriteValue(highlightNode, "EnableEdgeHighlighting", CurrSettings.EnableEdgeHighlighting);
+
+      // ToolTip Settings
+      WriteValue(toolTipsNode, "ShowToolTips", CurrSettings.ShowToolTips);
+      WriteValue(toolTipsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
+      WriteValue(toolTipsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
+      WriteValue(toolTipsNode, "TransferToolTips", WindowTransfer.ShowToolTips);
+      WriteValue(toolTipsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
+      WriteValue(toolTipsNode, "RealismToolTips", TabRealism.ShowToolTips);
+      WriteValue(toolTipsNode, "HighlightingToolTips", TabHighlight.ShowToolTips);
+      WriteValue(toolTipsNode, "ToolTipsToolTips", TabToolTips.ShowToolTips);
+      WriteValue(toolTipsNode, "SoundsToolTips", TabSounds.ShowToolTips);
+      WriteValue(toolTipsNode, "ConfigToolTips", TabConfig.ShowToolTips);
+      WriteValue(toolTipsNode, "RosterToolTips", WindowRoster.ShowToolTips);
+      WriteValue(toolTipsNode, "ControlToolTips", WindowControl.ShowToolTips);
+      WriteValue(toolTipsNode, "HatchToolTips", TabHatch.ShowToolTips);
+      WriteValue(toolTipsNode, "PanelToolTips", TabSolarPanel.ShowToolTips);
+      WriteValue(toolTipsNode, "AntennaToolTips", TabAntenna.ShowToolTips);
+      WriteValue(toolTipsNode, "LightToolTips", TabLight.ShowToolTips);
+
+      // Sound Settings
+      WriteValue(soundsNode, "PumpSoundStart", CurrSettings.PumpSoundStart);
+      WriteValue(soundsNode, "PumpSoundRun", CurrSettings.PumpSoundRun);
+      WriteValue(soundsNode, "PumpSoundStop", CurrSettings.PumpSoundStop);
+      WriteValue(soundsNode, "CrewSoundStart", CurrSettings.CrewSoundStart);
+      WriteValue(soundsNode, "CrewSoundRun", CurrSettings.CrewSoundRun);
+      WriteValue(soundsNode, "CrewSoundStop", CurrSettings.CrewSoundStop);
+      WriteValue(soundsNode, "PumpSoundVol", CurrSettings.PumpSoundVol);
+      WriteValue(soundsNode, "CrewSoundVol", CurrSettings.CrewSoundVol);
+
+      // Config Settings
+      WriteValue(configNode, "ShowDebugger", WindowDebugger.ShowWindow);
+      WriteValue(configNode, "EnableBlizzyToolbar", CurrSettings.EnableBlizzyToolbar);
+      WriteValue(configNode, "VerboseLogging", CurrSettings.VerboseLogging);
+      WriteValue(configNode, "AutoSave", CurrSettings.AutoSave);
+      WriteValue(configNode, "SaveIntervalSec", CurrSettings.SaveIntervalSec);
+      WriteValue(configNode, "AutoDebug", CurrSettings.AutoDebug);
+      WriteValue(configNode, "DebugLogPath", DebugLogPath);
+      WriteValue(configNode, "ErrorLogLength", CurrSettings.ErrorLogLength);
+      WriteValue(configNode, "SaveLogOnExit", CurrSettings.SaveLogOnExit);
+      WriteValue(configNode, "UseUnityStyle", CurrSettings.UseUnityStyle);
+
+      // Hidden Settings
+      WriteValue(hiddenNode, "ResourcePartColor", CurrSettings.ResourcePartColor);
+      WriteValue(hiddenNode, "SourcePartColor", CurrSettings.SourcePartColor);
+      WriteValue(hiddenNode, "TargetPartColor", CurrSettings.TargetPartColor);
+      WriteValue(hiddenNode, "TargetPartCrewColor", CurrSettings.TargetPartCrewColor);
+      WriteValue(hiddenNode, "MouseOverColor", CurrSettings.MouseOverColor);
+      WriteValue(hiddenNode, "CrewXferDelaySec", CurrSettings.CrewXferDelaySec);
+      WriteValue(hiddenNode, "IvaUpdateFrameDelay", CurrSettings.IvaUpdateFrameDelay);
+
+      if (!Directory.Exists(SettingsPath))
+        Directory.CreateDirectory(SettingsPath);
+      Settings.Save(SettingsFile);
     }
 
     internal static void SetRealismMode(int mode)
@@ -646,7 +653,7 @@ namespace ShipManifest.InternalObjects.Settings
           && CurrSettings.LockSettings == false)
         return 2;
 
-        return 3;
+      return 3;
     }
 
     internal static void SetStockCrewTransferState()
@@ -660,17 +667,6 @@ namespace ShipManifest.InternalObjects.Settings
           if (parts.Current == null) continue;
           Part part = parts.Current;
           part.crewTransferAvailable = CurrSettings.EnableStockCrewXfer;
-          //TransferDialogSpawner Tds = part.FindModuleImplementing<TransferDialogSpawner>();
-          //if (EnableStockCrewXfer)
-          //{
-          //  if (Tds != null) continue;
-          //  part.AddModule("TransferDialogSpawner");
-          //  MonoUtilities.RefreshContextWindows(part);
-          //}
-          //else
-          //{
-          //  if (Tds != null) part.RemoveModule(Tds);
-          //}
         }
         parts.Dispose();
       }
@@ -708,8 +704,6 @@ namespace ShipManifest.InternalObjects.Settings
       {
         thisRect = defaultvalue;
       }
-
-
       return thisRect;
     }
 
@@ -746,16 +740,6 @@ namespace ShipManifest.InternalObjects.Settings
         {"burntorange", XKCDColors.BurntOrange},
         {"default", new Color(0.478f, 0.698f, 0.478f, 0.698f)}
       };
-    }
-
-    internal static void LoadCustomSuits()
-    {
-
-      // we can have multiple suit combos.  parse the list.
-
-      // Populate Suit list
-      // Use gamedatabase suitcombos.  this loads all stock and mod based combos.
-      // Build suit combo list for display in Roster
     }
 
     internal static void MemStoreTempSettings()

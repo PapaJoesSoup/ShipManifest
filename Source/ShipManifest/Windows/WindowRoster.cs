@@ -14,6 +14,7 @@ namespace ShipManifest.Windows
   {
     #region Properties
 
+
     internal static float WindowWidth = 830;
     internal static float WindowHeight = 330;
     internal static Rect Position = CurrSettings.DefaultPosition;
@@ -344,11 +345,15 @@ namespace ShipManifest.Windows
       }
 
       GUILayout.EndHorizontal();
+      //DisplaySuitColor();
     }
 
     private static void DisplaySuitColor()
     {
-
+      //if (SMAddon.Instance.suitCombos)
+      //{
+      //  SMAddon.Instance.suitCombos.helmetSuitPickerWindow.crew = SelectedKerbal.Kerbal;
+      //}
     }
 
     private static void DisplayRosterFilter()

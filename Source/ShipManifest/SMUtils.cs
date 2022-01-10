@@ -348,6 +348,10 @@ namespace ShipManifest
       }
     }
 
+    public static Texture2D resizeTexture =
+      GameDatabase.Instance.GetTexture(SMAddon.TextureFolder + "resizeSquare", false);
+
+
     internal enum LogType
     {
       Info,
