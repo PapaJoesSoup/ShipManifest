@@ -5,6 +5,10 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+
+
+Version 6.0.5.0 - Release 10 Jan 2022 - KSP 1.12.2
+--------------------------------------------------
  - New: Added Resizing height to Manifest and Transfer Windows. Persists between saves.  This expands the button selection panes only.
  - Changed:  Refactored persistant settings into Separate classes for cleaner code.
  - Fixed: Add missing suit type "Slim" to Crew suit assignments in Roster.

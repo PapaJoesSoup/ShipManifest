@@ -17,3 +17,4 @@ Release/
 
 # Specifically allow build artefacts in the Distribution folder
 !Distribution/**
+/Scripts/KSPDev Setup.bat.lnk
