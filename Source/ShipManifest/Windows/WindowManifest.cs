@@ -16,7 +16,7 @@ namespace ShipManifest.Windows
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
     internal static Rect Position = CurrSettings.DefaultPosition;
-    internal static float HeightScale = 1f;
+    internal static float HeightScale;
     internal static float ViewerHeight = 100;
     internal static float MinHeight = 50;
     internal static float WindowHeight = 282;
@@ -151,7 +151,7 @@ namespace ShipManifest.Windows
           if (Mouse.delta.y != 0)
           {
             float diff = Mouse.delta.y;
-            UpdateScale(diff);
+            GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
           }
         }
         //ResetZoomKeys();
@@ -602,13 +602,5 @@ namespace ShipManifest.Windows
       }
     }
 
-    internal static void UpdateScale(float diff)
-    {
-      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
-      if (ViewerHeight + HeightScale < MinHeight)
-      {
-        HeightScale = MinHeight - ViewerHeight;
-      }
-    }
   }
 }

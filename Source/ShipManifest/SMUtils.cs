@@ -13,120 +13,9 @@ namespace ShipManifest
 {
   internal static class SmUtils
   {
-    // Enum extensions
-    internal static VesselType Next(this VesselType type)
-    {
-      // Debris = 0,
-      // SpaceObject = 1,
-      // Unknown = 2,
-      // Probe = 3,
-      // Relay = 4,
-      // Rover = 5,
-      // Lander = 6,
-      // Ship = 7,
-      // Plane = 8,
-      // Station = 9,
-      // Base = 10,
-      // EVA = 11, skip
-      // Flag = 12, skip
-      // DeployedScienceController = 13,
-      // DeployedSciencePart = 14,
-      // DroppedPart = 15,
-      // DeployedGroundPart = 16
 
-      switch (type)
-      {
-        case VesselType.Debris:
-          return VesselType.SpaceObject;
-        case VesselType.SpaceObject:
-          return VesselType.Unknown;
-        case VesselType.Unknown:
-          return VesselType.Probe;
-        case VesselType.Probe:
-          return VesselType.Relay;
-        case VesselType.Relay:
-          return VesselType.Rover;
-        case VesselType.Rover:
-          return VesselType.Lander;
-        case VesselType.Lander:
-          return VesselType.Ship;
-        case VesselType.Ship:
-          return VesselType.Plane;
-        case VesselType.Plane:
-          return VesselType.Station;
-        case VesselType.Station:
-          return VesselType.Base;
-        case VesselType.Base:
-          return VesselType.DeployedScienceController;
-        case VesselType.DeployedScienceController:
-          return VesselType.DeployedSciencePart;
-        case VesselType.DeployedSciencePart:
-          return VesselType.DroppedPart;
-        case VesselType.DroppedPart:
-          return VesselType.DeployedGroundPart;
-        case VesselType.DeployedGroundPart:
-          return VesselType.Debris;
-        default:
-          return VesselType.Unknown;
-      }
-    }
-    internal static VesselType Back(this VesselType type)
-    {
-      // DeployedGroundPart = 16
-      // DroppedPart = 15,
-      // DeployedSciencePart = 14,
-      // DeployedScienceController = 13,
-      // Flag = 12,Skip
-      // EVA = 11, Skip
-      // Base = 10,
-      // Station = 9,
-      // Plane = 8,
-      // Ship = 7,
-      // Lander = 6,
-      // Rover = 5,
-      // Relay = 4,
-      // Probe = 3,
-      // Unknown = 2,
-      // SpaceObject = 1,
-      // Debris = 0,
-
-      switch (type)
-      {
-        case VesselType.DeployedGroundPart:
-          return VesselType.DroppedPart;
-        case VesselType.DroppedPart:
-          return VesselType.DeployedSciencePart;
-        case VesselType.DeployedSciencePart:
-          return VesselType.DeployedScienceController;
-        case VesselType.DeployedScienceController:
-          return VesselType.Base;
-        case VesselType.Base:
-          return VesselType.Station;
-        case VesselType.Station:
-          return VesselType.Plane;
-        case VesselType.Plane:
-          return VesselType.Ship;
-        case VesselType.Ship:
-          return VesselType.Lander;
-        case VesselType.Lander:
-          return VesselType.Rover;
-        case VesselType.Rover:
-          return VesselType.Relay;
-        case VesselType.Relay:
-          return VesselType.Probe;
-        case VesselType.Probe:
-          return VesselType.Unknown;
-        case VesselType.Unknown:
-          return VesselType.SpaceObject;
-        case VesselType.SpaceObject:
-          return VesselType.Debris;
-        case VesselType.Debris:
-          return VesselType.DeployedGroundPart;
-        default:
-          return VesselType.Unknown;
-      }
-    }
-
+    public static Texture2D resizeTexture =
+      GameDatabase.Instance.GetTexture(SMAddon.TextureFolder + "resizeSquare", false);
     internal static string AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
     internal static string PlugInPath = $"{AppPath}GameData/ShipManifest/Plugins/PluginData/ShipManifest/";
     internal static Vector2 DebugScrollPosition = Vector2.zero;
@@ -348,14 +237,125 @@ namespace ShipManifest
       }
     }
 
-    public static Texture2D resizeTexture =
-      GameDatabase.Instance.GetTexture(SMAddon.TextureFolder + "resizeSquare", false);
-
 
     internal enum LogType
     {
       Info,
       Error
+    }
+
+        // Enum extensions
+    internal static VesselType Next(this VesselType type)
+    {
+      // Debris = 0,
+      // SpaceObject = 1,
+      // Unknown = 2,
+      // Probe = 3,
+      // Relay = 4,
+      // Rover = 5,
+      // Lander = 6,
+      // Ship = 7,
+      // Plane = 8,
+      // Station = 9,
+      // Base = 10,
+      // EVA = 11, skip
+      // Flag = 12, skip
+      // DeployedScienceController = 13,
+      // DeployedSciencePart = 14,
+      // DroppedPart = 15,
+      // DeployedGroundPart = 16
+
+      switch (type)
+      {
+        case VesselType.Debris:
+          return VesselType.SpaceObject;
+        case VesselType.SpaceObject:
+          return VesselType.Unknown;
+        case VesselType.Unknown:
+          return VesselType.Probe;
+        case VesselType.Probe:
+          return VesselType.Relay;
+        case VesselType.Relay:
+          return VesselType.Rover;
+        case VesselType.Rover:
+          return VesselType.Lander;
+        case VesselType.Lander:
+          return VesselType.Ship;
+        case VesselType.Ship:
+          return VesselType.Plane;
+        case VesselType.Plane:
+          return VesselType.Station;
+        case VesselType.Station:
+          return VesselType.Base;
+        case VesselType.Base:
+          return VesselType.DeployedScienceController;
+        case VesselType.DeployedScienceController:
+          return VesselType.DeployedSciencePart;
+        case VesselType.DeployedSciencePart:
+          return VesselType.DroppedPart;
+        case VesselType.DroppedPart:
+          return VesselType.DeployedGroundPart;
+        case VesselType.DeployedGroundPart:
+          return VesselType.Debris;
+        default:
+          return VesselType.Unknown;
+      }
+    }
+    internal static VesselType Back(this VesselType type)
+    {
+      // DeployedGroundPart = 16
+      // DroppedPart = 15,
+      // DeployedSciencePart = 14,
+      // DeployedScienceController = 13,
+      // Flag = 12,Skip
+      // EVA = 11, Skip
+      // Base = 10,
+      // Station = 9,
+      // Plane = 8,
+      // Ship = 7,
+      // Lander = 6,
+      // Rover = 5,
+      // Relay = 4,
+      // Probe = 3,
+      // Unknown = 2,
+      // SpaceObject = 1,
+      // Debris = 0,
+
+      switch (type)
+      {
+        case VesselType.DeployedGroundPart:
+          return VesselType.DroppedPart;
+        case VesselType.DroppedPart:
+          return VesselType.DeployedSciencePart;
+        case VesselType.DeployedSciencePart:
+          return VesselType.DeployedScienceController;
+        case VesselType.DeployedScienceController:
+          return VesselType.Base;
+        case VesselType.Base:
+          return VesselType.Station;
+        case VesselType.Station:
+          return VesselType.Plane;
+        case VesselType.Plane:
+          return VesselType.Ship;
+        case VesselType.Ship:
+          return VesselType.Lander;
+        case VesselType.Lander:
+          return VesselType.Rover;
+        case VesselType.Rover:
+          return VesselType.Relay;
+        case VesselType.Relay:
+          return VesselType.Probe;
+        case VesselType.Probe:
+          return VesselType.Unknown;
+        case VesselType.Unknown:
+          return VesselType.SpaceObject;
+        case VesselType.SpaceObject:
+          return VesselType.Debris;
+        case VesselType.Debris:
+          return VesselType.DeployedGroundPart;
+        default:
+          return VesselType.Unknown;
+      }
     }
   }
 }

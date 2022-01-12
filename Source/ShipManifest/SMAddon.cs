@@ -309,6 +309,7 @@ namespace ShipManifest
       {
         if (WindowManifest.ResizingWindow) WindowManifest.ResizingWindow = false;
         if (WindowTransfer.ResizingWindow) WindowTransfer.ResizingWindow = false;
+        if (WindowRoster.ResizingWindow) WindowRoster.ResizingWindow = false;
       }
       try
       {
@@ -908,6 +909,11 @@ namespace ShipManifest
         windowPosition.x = Screen.width - windowPosition.width;
       if (windowPosition.yMax > Screen.height)
         windowPosition.y = Screen.height - windowPosition.height;
+
+      if (windowPosition.width > Screen.width - windowPosition.x)
+        windowPosition.width = Screen.width - windowPosition.x;
+      if (windowPosition.height > Screen.height - windowPosition.y)
+        windowPosition.height = Screen.height - windowPosition.y;
     }
 
     internal static Rect GuiToScreenRect(Rect rect)

@@ -17,8 +17,17 @@ namespace ShipManifest.Windows
 
     internal static float WindowWidth = 830;
     internal static float WindowHeight = 330;
+    internal static float CurrWindowHeight = 330;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 230;
+    internal static float SuitHeight = 55;
+    internal static float EditHeight = 234;
+    internal static float CreateHeight = 29;
+    internal static float MinHeight = 230;
+    internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
-    internal static Rect ViewBox = new Rect(0, 0, 810, 230);
+    internal static Rect ViewBox = new Rect(0, 0, 810, ViewerHeight);
+
     private static bool _inputLocked;
     private static bool _showWindow;
     internal static bool ShowWindow
@@ -210,7 +219,27 @@ namespace ShipManifest.Windows
         }
 
         GUILayout.EndVertical();
+
+        //resizing
+        CurrWindowHeight = Position.height;
+        Rect resizeRect =
+          new Rect(Position.width - 18, Position.height - 18, 16, 16);
+        GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+        if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+        {
+          ResizingWindow = true;
+        }
+        if (Event.current.type == EventType.Repaint && ResizingWindow)
+        {
+          if (Mouse.delta.y != 0)
+          {
+            float diff = Mouse.delta.y;
+            GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+          }
+        }
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        //Account for resizing based on actions..
+        Position.height = WindowHeight + ActionHeight() + HeightScale;
         SMAddon.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -414,7 +443,7 @@ namespace ShipManifest.Windows
         GUILayout.EndHorizontal();
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(ViewBox.height), GUILayout.Width(ViewBox.width));
+          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewBox.width));
 
         // vars for acton to occurs after button press
         bool isAction = false;
@@ -984,6 +1013,22 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.EndHorizontal();
+    }
+
+    internal static float ActionHeight()
+    {
+      switch (editMode)
+      {
+        case EditMode.Edit:
+          return EditHeight;
+        case EditMode.Suit:
+          return SuitHeight;
+        case EditMode.Create:
+          return CreateHeight;
+        case EditMode.None:
+        default:
+          return 0;
+      }
     }
 
     #endregion Methods

@@ -19,12 +19,12 @@ namespace ShipManifest.Windows
 
     internal static string Title = "";
     internal static Rect Position = CurrSettings.DefaultPosition;
-    internal static float HeightScale = 1f;
-    internal static float ViewerHieght = 100;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 100;
     internal static float MinHeight = 50;
     internal static float WindowHeight = 279;
     internal static bool ResizingWindow = false;
-    internal static Rect SelectBox = new Rect(0, 0, 300, ViewerHieght);
+    internal static Rect SelectBox = new Rect(0, 0, 300, ViewerHeight);
     internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
     private static bool _inputLocked;
@@ -275,7 +275,7 @@ namespace ShipManifest.Windows
           if (Mouse.delta.y != 0)
           {
             float diff = Mouse.delta.y;
-            UpdateScale(diff);
+            GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
           }
         }
 
@@ -1922,16 +1922,6 @@ namespace ShipManifest.Windows
       part.Dispose();
       return results;
     }
-
-    internal static void UpdateScale(float diff)
-    {
-      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
-      if (ViewerHieght + HeightScale < MinHeight)
-      {
-        HeightScale = MinHeight - ViewerHieght;
-      }
-    }
-
 
     #endregion
   }
