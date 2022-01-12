@@ -307,9 +307,11 @@ namespace ShipManifest
     {
       if (Event.current.type == EventType.MouseUp)
       {
+        // Turn off window resizing
         if (WindowManifest.ResizingWindow) WindowManifest.ResizingWindow = false;
         if (WindowTransfer.ResizingWindow) WindowTransfer.ResizingWindow = false;
         if (WindowRoster.ResizingWindow) WindowRoster.ResizingWindow = false;
+        if (WindowControl.ResizingWindow) WindowControl.ResizingWindow = false;
       }
       try
       {

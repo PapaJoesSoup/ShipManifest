@@ -49,7 +49,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height, iLabs.Current.part, Event.current.mousePosition);
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height + WindowControl.HeightScale, iLabs.Current.part, Event.current.mousePosition);
         }
         iLabs.Dispose();
 

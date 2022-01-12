@@ -8,6 +8,11 @@ namespace ShipManifest.Windows
 {
   internal static class WindowControl
   {
+    internal static float WindowHeight = 280;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 200;
+    internal static float MinHeight = 200;
+    internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Vector2 _displayViewerPosition = Vector2.zero;
     private static bool _inputLocked;
@@ -32,7 +37,7 @@ namespace ShipManifest.Windows
 
 
     // Tab only vars, used in each tab
-    internal static Rect TabBox = new Rect(0, 0, 450, 200);
+    internal static Rect TabBox = new Rect(0, 0, 450, ViewerHeight);
     internal static string TabRule = new string('_', 120);
     internal const float GuiRuleWidth = 420;
 
@@ -90,8 +95,25 @@ namespace ShipManifest.Windows
 
       DisplayTabActions();
       GUILayout.EndVertical();
+      //resizing
+      Rect resizeRect =
+        new Rect(Position.width - 18, Position.height - 18, 16, 16);
+      GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+      if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+      {
+        ResizingWindow = true;
+      }
 
+      if (Event.current.type == EventType.Repaint && ResizingWindow)
+      {
+        if (Mouse.delta.y != 0)
+        {
+          float diff = Mouse.delta.y;
+          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+        }
+      }
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+      Position.height = WindowHeight + HeightScale;
       SMAddon.RepositionWindow(ref Position);
     }
 
@@ -248,7 +270,7 @@ namespace ShipManifest.Windows
     internal static void DisplaySelectedTab()
     {
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-       GUILayout.Height(TabBox.height), GUILayout.Width(TabBox.width));
+       GUILayout.Height(TabBox.height + HeightScale), GUILayout.Width(TabBox.width));
       switch (_selectedTab)
       {
         case Tab.Vessel:

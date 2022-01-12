@@ -123,12 +123,12 @@ namespace ShipManifest.Windows
              && position.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
     }
 
-    internal static void UpdateScale(float diff, float ViewerHeight, ref float HeightScale, float MinHeight)
+    internal static void UpdateScale(float diff, float viewerHeight, ref float heightScale, float minHeight)
     {
-      HeightScale += Mathf.Abs(diff) > .01f ? diff : diff > 0 ? .01f : -.01f;
-      if (ViewerHeight + HeightScale < MinHeight)
+      heightScale += diff;
+      if (viewerHeight + heightScale < minHeight)
       {
-        HeightScale = MinHeight - ViewerHeight;
+        heightScale = minHeight - viewerHeight;
       }
     }
   }

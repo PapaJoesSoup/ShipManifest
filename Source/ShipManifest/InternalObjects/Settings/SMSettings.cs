@@ -126,6 +126,12 @@ namespace ShipManifest.InternalObjects.Settings
         WindowTransfer.HeightScale = windowsNode.HasValue("TransferHeightScale")
           ? float.Parse(windowsNode.GetValue("TransferHeightScale"))
           : WindowTransfer.HeightScale;
+        WindowRoster.HeightScale = windowsNode.HasValue("RosterHeightScale")
+          ? float.Parse(windowsNode.GetValue("RosterHeightScale"))
+          : WindowRoster.HeightScale;
+        WindowControl.HeightScale = windowsNode.HasValue("ControlHeightScale")
+          ? float.Parse(windowsNode.GetValue("ControlHeightScale"))
+          : WindowControl.HeightScale;
 
         // Realism Settings
         CurrSettings.RealismMode = realismNode.HasValue("RealismMode")
@@ -408,6 +414,8 @@ namespace ShipManifest.InternalObjects.Settings
       WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
       WriteValue(windowsNode, "ManifestHeightScale", WindowManifest.HeightScale);
       WriteValue(windowsNode, "TransferHeightScale", WindowTransfer.HeightScale);
+      WriteValue(windowsNode, "RosterHeightScale", WindowRoster.HeightScale);
+      WriteValue(windowsNode, "ControlHeightScale", WindowControl.HeightScale);
 
 
       //Write settings...
