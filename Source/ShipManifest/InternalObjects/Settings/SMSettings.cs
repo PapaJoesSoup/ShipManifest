@@ -137,6 +137,9 @@ namespace ShipManifest.InternalObjects.Settings
         WindowDebugger.HeightScale = windowsNode.HasValue("DebugHeightScale")
           ? float.Parse(windowsNode.GetValue("DebugHeightScale"))
           : WindowDebugger.HeightScale;
+        WindowSettings.HeightScale = windowsNode.HasValue("SettingsHeightScale")
+          ? float.Parse(windowsNode.GetValue("SettingsHeightScale"))
+          : WindowSettings.HeightScale;
 
         // Realism Settings
         CurrSettings.RealismMode = realismNode.HasValue("RealismMode")
@@ -423,6 +426,7 @@ namespace ShipManifest.InternalObjects.Settings
       WriteValue(windowsNode, "RosterHeightScale", WindowRoster.HeightScale);
       WriteValue(windowsNode, "ControlHeightScale", WindowControl.HeightScale);
       WriteValue(windowsNode, "DebugHeightScale", WindowDebugger.HeightScale);
+      WriteValue(windowsNode, "SettingsHeightScale", WindowSettings.HeightScale);
 
 
       //Write settings...

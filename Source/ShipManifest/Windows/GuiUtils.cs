@@ -139,7 +139,7 @@ namespace ShipManifest.Windows
       if (WindowRoster.ResizingWindow) WindowRoster.ResizingWindow = false;
       if (WindowControl.ResizingWindow) WindowControl.ResizingWindow = false;
       if (WindowDebugger.ResizingWindow) WindowDebugger.ResizingWindow = false;
-      //if (WindowSettings.ResizingWindow) WindowSettings.ResizingWindow = false;
+      if (WindowSettings.ResizingWindow) WindowSettings.ResizingWindow = false;
     }
 
     internal static void RepositionWindows()

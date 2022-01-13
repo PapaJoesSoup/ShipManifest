@@ -10,6 +10,11 @@ namespace ShipManifest.Windows
   {
     #region Settings Window (GUI)
 
+    internal static float WindowHeight = 380;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 300;
+    internal static float MinHeight = 300;
+    internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -75,7 +80,7 @@ namespace ShipManifest.Windows
       DisplayTabButtons();
 
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(300), GUILayout.Width(380));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(380));
       GUILayout.BeginVertical();
 
       DisplaySelectedTab(_displayViewerPosition);
@@ -87,7 +92,25 @@ namespace ShipManifest.Windows
 
       GUILayout.EndVertical();
 
+      //resizing
+      Rect resizeRect =
+        new Rect(Position.width - 18, Position.height - 18, 16, 16);
+      GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+      if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+      {
+        ResizingWindow = true;
+      }
+
+      if (Event.current.type == EventType.Repaint && ResizingWindow)
+      {
+        if (Mouse.delta.y != 0)
+        {
+          float diff = Mouse.delta.y;
+          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+        }
+      }
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+      Position.height = WindowHeight + HeightScale;
       GuiUtils.RepositionWindow(ref Position);
     }
 
