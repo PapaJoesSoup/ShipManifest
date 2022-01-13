@@ -281,7 +281,7 @@ namespace ShipManifest.Windows
 
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         Position.height = WindowHeight + HeightScale;
-        SMAddon.RepositionWindow(ref Position);
+        GuiUtils.RepositionWindow(ref Position);
       }
       catch (Exception ex)
       {

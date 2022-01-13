@@ -120,6 +120,8 @@ namespace ShipManifest.InternalObjects.Settings
         WindowSettings.Position = GetRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
         WindowControl.Position = GetRectangle(windowsNode, "ControlPosition", WindowControl.Position);
         WindowRoster.Position = GetRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
+
+        // Lets ge our window scaling values
         WindowManifest.HeightScale = windowsNode.HasValue("ManifestHeightScale")
           ? float.Parse(windowsNode.GetValue("ManifestHeightScale"))
           : WindowManifest.HeightScale;
@@ -132,6 +134,9 @@ namespace ShipManifest.InternalObjects.Settings
         WindowControl.HeightScale = windowsNode.HasValue("ControlHeightScale")
           ? float.Parse(windowsNode.GetValue("ControlHeightScale"))
           : WindowControl.HeightScale;
+        WindowDebugger.HeightScale = windowsNode.HasValue("DebugHeightScale")
+          ? float.Parse(windowsNode.GetValue("DebugHeightScale"))
+          : WindowDebugger.HeightScale;
 
         // Realism Settings
         CurrSettings.RealismMode = realismNode.HasValue("RealismMode")
@@ -365,7 +370,7 @@ namespace ShipManifest.InternalObjects.Settings
       SMStyle.WindowStyle = null;
 
       // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
-      SMAddon.RepositionWindows();
+      GuiUtils.RepositionWindows();
     }
 
     internal static void SaveSettings()
@@ -412,10 +417,12 @@ namespace ShipManifest.InternalObjects.Settings
       WriteRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
       WriteRectangle(windowsNode, "ControlPosition", WindowControl.Position);
       WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
+
       WriteValue(windowsNode, "ManifestHeightScale", WindowManifest.HeightScale);
       WriteValue(windowsNode, "TransferHeightScale", WindowTransfer.HeightScale);
       WriteValue(windowsNode, "RosterHeightScale", WindowRoster.HeightScale);
       WriteValue(windowsNode, "ControlHeightScale", WindowControl.HeightScale);
+      WriteValue(windowsNode, "DebugHeightScale", WindowDebugger.HeightScale);
 
 
       //Write settings...

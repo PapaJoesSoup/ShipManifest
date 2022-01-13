@@ -308,10 +308,7 @@ namespace ShipManifest
       if (Event.current.type == EventType.MouseUp)
       {
         // Turn off window resizing
-        if (WindowManifest.ResizingWindow) WindowManifest.ResizingWindow = false;
-        if (WindowTransfer.ResizingWindow) WindowTransfer.ResizingWindow = false;
-        if (WindowRoster.ResizingWindow) WindowRoster.ResizingWindow = false;
-        if (WindowControl.ResizingWindow) WindowControl.ResizingWindow = false;
+        GuiUtils.ResetResize();
       }
       try
       {
@@ -326,6 +323,7 @@ namespace ShipManifest
         SmUtils.LogMessage($"Error in:  SMAddon.OnGUI.  {ex}", SmUtils.LogType.Error, true);
       }
     }
+
 
     internal void Update()
     {
@@ -891,44 +889,6 @@ namespace ShipManifest
       }
     }
 
-    internal static void RepositionWindows()
-    {
-      RepositionWindow(ref WindowManifest.Position);
-      RepositionWindow(ref WindowTransfer.Position);
-      RepositionWindow(ref WindowDebugger.Position);
-      RepositionWindow(ref WindowSettings.Position);
-      RepositionWindow(ref WindowControl.Position);
-      RepositionWindow(ref WindowRoster.Position);
-    }
-
-    internal static void RepositionWindow(ref Rect windowPosition)
-    {
-      // This method uses Gui point system.
-      if (windowPosition.x < 0) windowPosition.x = 0;
-      if (windowPosition.y < 0) windowPosition.y = 0;
-
-      if (windowPosition.xMax > Screen.width)
-        windowPosition.x = Screen.width - windowPosition.width;
-      if (windowPosition.yMax > Screen.height)
-        windowPosition.y = Screen.height - windowPosition.height;
-
-      if (windowPosition.width > Screen.width - windowPosition.x)
-        windowPosition.width = Screen.width - windowPosition.x;
-      if (windowPosition.height > Screen.height - windowPosition.y)
-        windowPosition.height = Screen.height - windowPosition.y;
-    }
-
-    internal static Rect GuiToScreenRect(Rect rect)
-    {
-      // Must run during OnGui to work...
-      Rect newRect = new Rect
-      {
-        position = GUIUtility.GUIToScreenPoint(rect.position),
-        width = rect.width,
-        height = rect.height
-      };
-      return newRect;
-    }
     #endregion
 
     #region Action Methods

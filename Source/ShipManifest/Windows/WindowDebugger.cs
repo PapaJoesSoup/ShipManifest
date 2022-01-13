@@ -11,6 +11,11 @@ namespace ShipManifest.Windows
 {
   internal static class WindowDebugger
   {
+    internal static float WindowHeight = 380;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 300;
+    internal static float MinHeight = 200;
+    internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -60,7 +65,7 @@ namespace ShipManifest.Windows
 
       GUILayout.BeginVertical();
       SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(300), GUILayout.Width(500));
+        GUILayout.Height(ViewerHeight), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
       List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
@@ -95,8 +100,27 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
 
       GUILayout.EndVertical();
+      //resizing
+      Rect resizeRect =
+        new Rect(Position.width - 18, Position.height - 18, 16, 16);
+      GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+      if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+      {
+        ResizingWindow = true;
+      }
+
+      if (Event.current.type == EventType.Repaint && ResizingWindow)
+      {
+        if (Mouse.delta.y != 0)
+        {
+          float diff = Mouse.delta.y;
+          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+        }
+      }
+      //ResetZoomKeys();
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-      SMAddon.RepositionWindow(ref Position);
+      Position.height = WindowHeight + HeightScale;
+      GuiUtils.RepositionWindow(ref Position);
     }
 
     internal static void Savelog()

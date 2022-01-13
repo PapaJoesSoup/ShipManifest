@@ -88,7 +88,7 @@ namespace ShipManifest.Windows
       GUILayout.EndVertical();
 
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-      SMAddon.RepositionWindow(ref Position);
+      GuiUtils.RepositionWindow(ref Position);
     }
 
     private static void DisplayTabButtons()
