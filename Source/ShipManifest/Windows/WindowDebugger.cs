@@ -11,7 +11,7 @@ namespace ShipManifest.Windows
 {
   internal static class WindowDebugger
   {
-    internal static float WindowHeight = 380;
+    internal static float WindowHeight = 355;
     internal static float HeightScale;
     internal static float ViewerHeight = 300;
     internal static float MinHeight = 200;
@@ -65,7 +65,7 @@ namespace ShipManifest.Windows
 
       GUILayout.BeginVertical();
       SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(ViewerHeight), GUILayout.Width(500));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
       List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
