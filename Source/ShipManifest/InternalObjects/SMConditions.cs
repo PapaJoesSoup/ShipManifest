@@ -237,6 +237,49 @@ namespace ShipManifest.InternalObjects
       }
     }
 
+    internal static bool CanShowWindowTransfer()
+    {
+      try
+      {
+        bool canShow = false;
+        if (SMAddon.ShowUi
+            && HighLogic.LoadedScene == GameScenes.FLIGHT
+            && !IsPauseMenuOpen()
+            && !IsFlightDialogDisplaying()
+            && FlightGlobals.fetch != null
+            && FlightGlobals.ActiveVessel != null
+            && !FlightGlobals.ActiveVessel.isEVA
+            && FlightGlobals.ActiveVessel.vesselType != VesselType.Flag
+            //&& FlightGlobals.ActiveVessel.vesselType != VesselType.Debris
+            //&& FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
+            //&& CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
+          )
+          canShow = WindowTransfer.ShowWindow && SMAddon.SmVessel.SelectedResources.Count > 0;
+        return canShow;
+      }
+      catch (Exception ex)
+      {
+        if (!SMAddon.FrameErrTripped)
+        {
+          string values = $"SmAddon.ShowUI = {SMAddon.ShowUi}\r\n";
+          values += $"HighLogic.LoadedScene = {HighLogic.LoadedScene}\r\n";
+          values += $"PauseMenu.isOpen = {IsPauseMenuOpen()}\r\n";
+          values += $"FlightResultsDialog.isDisplaying = {IsFlightDialogDisplaying()}\r\n";
+          values += $"FlightGlobals.fetch != null = {(FlightGlobals.fetch != null)}\r\n";
+          values += $"FlightGlobals.ActiveVessel != null = {(FlightGlobals.ActiveVessel != null)}\r\n";
+          values += $"!FlightGlobals.ActiveVessel.isEVA = {(FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.isEVA)}\r\n";
+          if (FlightGlobals.ActiveVessel != null)
+            values += $"FlightGlobals.ActiveVessel.vesselType = {FlightGlobals.ActiveVessel.vesselType}\r\n";
+          values += $"CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA = {(CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA)}";
+
+          SmUtils.LogMessage(
+            $" in CanShowShipManifest (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}\r\n\r\nValues:  {values}", SmUtils.LogType.Error, true);
+          SMAddon.FrameErrTripped = true;
+        }
+        return false;
+      }
+    }
+
     internal static bool IsFlightDialogDisplaying()
     {
       try

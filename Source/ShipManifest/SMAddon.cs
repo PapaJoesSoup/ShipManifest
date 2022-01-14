@@ -638,6 +638,7 @@ namespace ShipManifest
             DummyHandler,
             ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
             GameDatabase.Instance.GetTexture(TextureFolder + iconfile, false));
+          _smButtonStock.onRightClick = OnSmRightClick;
 
           if (WindowManifest.ShowWindow)
             _smButtonStock.SetTexture(
@@ -719,6 +720,52 @@ namespace ShipManifest
     }
 
     //Toolbar button click handlers
+    internal static void OnSmRightClick()
+    {
+      try
+      {
+        if (WindowTransfer.ShowWindow)
+        {
+          // SM Transfer window is showing.  Turn off.
+          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpProcessOn)
+            return;
+
+          SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
+          //SmVessel.SelectedResources.Clear();
+          SmVessel.SelectedPartsSource.Clear();
+          SmVessel.SelectedPartsTarget.Clear();
+          SmVessel.SelectedVesselsSource.Clear();
+          SmVessel.SelectedVesselsTarget.Clear();
+          WindowTransfer.ShowWindow = !WindowTransfer.ShowWindow;
+        }
+        else
+        {
+          // SMTransfer is not showing. turn on if we can.
+          if (SMConditions.CanShowShipManifest(true) && SmVessel.SelectedResources.Count > 0)
+            WindowTransfer.ShowWindow = !WindowTransfer.ShowWindow;
+          else
+            return;
+        }
+        //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
+
+        if (CurrSettings.EnableBlizzyToolbar)
+          _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
+        else
+          _smButtonStock.SetTexture(
+            GameDatabase.Instance.GetTexture(
+              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_128" : $"{TextureFolder}IconOff_128", false));
+      }
+      catch (Exception ex)
+      {
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
+      }
+      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Exit");
+      //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
+
+    }
+
     internal static void OnSmButtonClicked()
     {
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Enter");
@@ -732,7 +779,7 @@ namespace ShipManifest
             return;
 
           SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
-          SmVessel.SelectedResources.Clear();
+          //SmVessel.SelectedResources.Clear();
           SmVessel.SelectedPartsSource.Clear();
           SmVessel.SelectedPartsTarget.Clear();
           SmVessel.SelectedVesselsSource.Clear();
@@ -878,6 +925,14 @@ namespace ShipManifest
           if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             SMHighlighter.HighlightClsVessel(false, true);
         }
+        if (SMConditions.CanShowWindowTransfer())
+        {
+          step = "3 - Show Transfer";
+          // Lets build the running totals for each resource for display in title...
+          WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
+            WindowTransfer.Title, GUILayout.MinHeight(20));
+        }
+
       }
       catch (Exception ex)
       {

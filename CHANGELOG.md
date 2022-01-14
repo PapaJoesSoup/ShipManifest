@@ -5,6 +5,10 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+ - New: Added Resizing height to all Windows. Persists between saves. Issues: 45 and 61
+ - New: Refactored resizing code to be window agnostic.
+ - New: Added ability to open Transfer window separately from Manifest window.  If resources are selected, right clicking the app Icon will toggle the transfer window directly.
+ - Changed: Refactored and moved some Gui utility methods from SmAddon to GuiUtils
 
 
 Version 6.0.5.0 - Release 10 Jan 2022 - KSP 1.12.2

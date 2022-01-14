@@ -211,7 +211,7 @@ namespace ShipManifest.Windows
       if (GUI.Button(rect, label))
       {
         ShowWindow = false;
-        SMAddon.SmVessel.SelectedResources.Clear();
+        //SMAddon.SmVessel.SelectedResources.Clear();
         SMAddon.SmVessel.SelectedPartsSource.Clear();
         SMAddon.SmVessel.SelectedPartsTarget.Clear();
         SMAddon.SmVessel.SelectedVesselsSource.Clear();
