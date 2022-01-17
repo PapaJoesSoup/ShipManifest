@@ -46,7 +46,6 @@ namespace ShipManifest.Windows
 
     internal static string titleContent           = SmUtils.SmTags["#smloc_manifest_002"];
     internal static GUIContent closeContent       = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_001"]);
-    internal static GUIContent closeXContent      = new GUIContent("", SmUtils.SmTags["#smloc_window_tt_002"]);
     internal static string noResSelContent        = SmUtils.SmTags["#smloc_manifest_003"];
     internal static string multiResSelContent     = SmUtils.SmTags["#smloc_manifest_004"];
     internal static string fillCrewContent        = SmUtils.SmTags["#smloc_manifest_005"];
@@ -58,6 +57,7 @@ namespace ShipManifest.Windows
     internal static string fillContent            = SmUtils.SmTags["#smloc_manifest_011"];
     internal static string settingsContent        = SmUtils.SmTags["#smloc_manifest_012"];
     internal static string rosterContent          = SmUtils.SmTags["#smloc_manifest_013"];
+    internal static string transferContent        = SmUtils.SmTags["#smloc_transfer_000"];
     internal static string controlContent         = SmUtils.SmTags["#smloc_manifest_014"];
 
     #endregion Localization strings
@@ -83,12 +83,8 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       // "Close Window");
-      if (SMConditions.IsTransferInProgress())
-      {
-        GUI.enabled = false;
-      }
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, SMConditions.IsTransferInProgress() ? closeXContent : closeContent))
+      if (GUI.Button(rect, closeContent))
       {
         SMAddon.OnSmButtonClicked();
         ToolTip = "";
@@ -426,6 +422,29 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
 
+      GUI.enabled = SMConditions.CanShowWindowTransfer(); 
+      GUIStyle transferStyle = WindowTransfer.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+      if (GUILayout.Button(transferContent, transferStyle, GUILayout.Height(20))) // "Transfer"
+      {
+        try
+        {
+          if (WindowTransfer.ShowWindow)
+          {
+            WindowTransfer.BtnCloseWindow();
+          }
+          else
+          {
+            WindowTransfer.ShowWindow = true;
+          }
+        }
+        catch (Exception ex)
+        {
+          SmUtils.LogMessage(
+            $" opening Roster Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
+            true);
+        }
+      }
+      GUI.enabled = true;
       GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
       if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.Height(20))) // "Settings"
       {

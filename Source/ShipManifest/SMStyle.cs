@@ -23,6 +23,7 @@ namespace ShipManifest
     internal static GUIStyle LabelStyle;
     internal static GUIStyle LabelTabHeader;
     internal static GUIStyle LabelStyleBold;
+    internal static GUIStyle LabelStyleCenter;
     internal static GUIStyle LabelStyleRed;
     internal static GUIStyle LabelStyleCyan;
     internal static GUIStyle LabelStyleYellow;
@@ -250,6 +251,13 @@ namespace ShipManifest
         fontSize = 18,
         fontStyle = FontStyle.Bold
       };
+
+      LabelStyleCenter = new GUIStyle(GUI.skin.label)
+      {
+        alignment = TextAnchor.UpperCenter,
+        fontStyle = FontStyle.Bold
+      };
+
 
       LabelStyleRed = new GUIStyle(LabelStyle) {normal = {textColor = Color.red}};
 

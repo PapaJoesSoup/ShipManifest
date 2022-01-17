@@ -254,7 +254,7 @@ namespace ShipManifest.InternalObjects
             //&& FlightGlobals.ActiveVessel.vesselType != VesselType.Unknown
             //&& CameraManager.Instance.currentCameraMode != CameraManager.CameraMode.IVA
           )
-          canShow = WindowTransfer.ShowWindow && SMAddon.SmVessel.SelectedResources.Count > 0;
+          canShow = SMAddon.SmVessel.SelectedResources.Count > 0;
         return canShow;
       }
       catch (Exception ex)

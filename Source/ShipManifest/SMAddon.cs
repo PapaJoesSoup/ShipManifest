@@ -8,6 +8,7 @@ using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using ShipManifest.Windows;
+using ShipManifest.Windows.Popups;
 using UnityEngine;
 
 namespace ShipManifest
@@ -727,16 +728,7 @@ namespace ShipManifest
         if (WindowTransfer.ShowWindow)
         {
           // SM Transfer window is showing.  Turn off.
-          if (SmVessel.TransferCrewObj.CrewXferActive || TransferPump.PumpProcessOn)
-            return;
-
-          SMHighlighter.ClearResourceHighlighting(SmVessel.SelectedResourcesParts);
-          //SmVessel.SelectedResources.Clear();
-          SmVessel.SelectedPartsSource.Clear();
-          SmVessel.SelectedPartsTarget.Clear();
-          SmVessel.SelectedVesselsSource.Clear();
-          SmVessel.SelectedVesselsTarget.Clear();
-          WindowTransfer.ShowWindow = !WindowTransfer.ShowWindow;
+          WindowTransfer.BtnCloseWindow();
         }
         else
         {
@@ -898,6 +890,19 @@ namespace ShipManifest
 
         step = "1 - Show Interface(s)";
         // Is the scene one we want to be visible in?
+        if (SMConditions.CanShowWindowTransfer() && WindowTransfer.ShowWindow)
+        {
+          step = "3 - Show Transfer";
+          // Lets build the running totals for each resource for display in title...
+          WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
+            WindowTransfer.Title, GUILayout.MinHeight(20));
+
+          if (TransferPump.Paused && PopupCloseTransfer.ShowWindow)
+          {
+            PopupCloseTransfer.Position = GUILayout.Window(398549, PopupCloseTransfer.Position, PopupCloseTransfer.Display,
+              PopupCloseTransfer.Title, GUILayout.MinHeight(20));
+          }
+        }
         if (SMConditions.CanShowShipManifest())
         {
           // What windows do we want to show?
@@ -924,13 +929,6 @@ namespace ShipManifest
           if (!CurrSettings.EnableCls || SmVessel == null) return;
           if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             SMHighlighter.HighlightClsVessel(false, true);
-        }
-        if (SMConditions.CanShowWindowTransfer())
-        {
-          step = "3 - Show Transfer";
-          // Lets build the running totals for each resource for display in title...
-          WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
-            WindowTransfer.Title, GUILayout.MinHeight(20));
         }
 
       }

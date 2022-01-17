@@ -67,6 +67,7 @@
     <Compile Include="Process\TransferPump.cs" />
     <Compile Include="InternalObjects\SMHighlighter.cs" />
     <Compile Include="APIClients\ToolbarWrapper.cs" />
+    <Compile Include="Windows\Popups\PopupCloseTransfer.cs" />
     <Compile Include="Windows\Tabs\Control\TabAntenna.cs" />
     <Compile Include="Windows\Tabs\Control\TabRadiator.cs" />
     <Compile Include="Windows\Tabs\Control\TabVessels.cs" />

@@ -8,6 +8,7 @@ using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using ShipManifest.Process;
+using ShipManifest.Windows.Popups;
 using UnityEngine;
 using VehiclePhysics;
 
@@ -187,6 +188,7 @@ namespace ShipManifest.Windows
     // This window assumes that a resource has been selected on the Ship manifest window.
     internal static void Display(int _windowId)
     {
+      GUI.enabled = !SMConditions.IsTransferInProgress() || !PopupCloseTransfer.ShowWindow;
 
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
@@ -199,31 +201,14 @@ namespace ShipManifest.Windows
       SMHighlighter.IsMouseOver = false;
 
       //"Close Window");
-      GUIContent label = closeContent;
-      if (SMConditions.IsTransferInProgress())
-      {
-        //Cannot close window");
-        label = noCloseContent;
-        GUI.enabled = false;
-      }
-
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, label))
+      if (GUI.Button(rect, SMConditions.IsTransferInProgress() ? noCloseContent : closeContent))
       {
-        ShowWindow = false;
-        //SMAddon.SmVessel.SelectedResources.Clear();
-        SMAddon.SmVessel.SelectedPartsSource.Clear();
-        SMAddon.SmVessel.SelectedPartsTarget.Clear();
-        SMAddon.SmVessel.SelectedVesselsSource.Clear();
-        SMAddon.SmVessel.SelectedVesselsTarget.Clear();
-        ToolTip = "";
-        SMHighlighter.Update_Highlighter();
-        return;
+        if (BtnCloseWindow()) return;
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-      GUI.enabled = true;
       try
       {
         // This window assumes that a resource has been selected on the Ship manifest window.
@@ -288,6 +273,33 @@ namespace ShipManifest.Windows
         SmUtils.LogMessage(
           $" in Ship Manifest Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error, true);
       }
+    }
+
+    internal static bool BtnCloseWindow()
+    {
+      if (SMConditions.IsTransferInProgress() && !PopupCloseTransfer.ShowWindow)
+      {
+        ToolTip = "";
+        GUI.enabled = false;
+        TransferPump.Paused = true;
+        PopupCloseTransfer.Position = new Rect(Position.x + 100, Position.y + 50, 0, 0);
+        PopupCloseTransfer.ShowWindow = true;
+      }
+      else
+      {
+        ShowWindow = false;
+        TransferPump.Paused = false;
+        PopupCloseTransfer.ShowWindow = false;
+        SMAddon.SmVessel.SelectedPartsSource.Clear();
+        SMAddon.SmVessel.SelectedPartsTarget.Clear();
+        SMAddon.SmVessel.SelectedVesselsSource.Clear();
+        SMAddon.SmVessel.SelectedVesselsTarget.Clear();
+        ToolTip = "";
+        SMHighlighter.Update_Highlighter();
+        return true;
+      }
+
+      return false;
     }
 
     #region Viewer Selections (Top Half)

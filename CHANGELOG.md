@@ -5,9 +5,12 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
- - New: Added Resizing height to all Windows. Persists between saves. Issues: 45 and 61
- - New: Refactored resizing code to be window agnostic.
  - New: Added ability to open Transfer window separately from Manifest window.  If resources are selected, right clicking the app Icon will toggle the transfer window directly.
+        Issue:  https://github.com/papajoessoup/ShipManifest/issues/60
+ - New: Added Resizing height to all Windows. Persists between saves.
+        Issues: https://github.com/papajoessoup/ShipManifest/issues/45 and
+                https://github.com/papajoessoup/ShipManifest/issues61
+ - New: Refactored resizing code to be window agnostic.
  - Changed: Refactored and moved some Gui utility methods from SmAddon to GuiUtils
 
 
@@ -19,7 +22,7 @@ Version 6.0.5.0 - Release 10 Jan 2022 - KSP 1.12.2
  - Fixed: Correct tool tip for Realistic Crew Transfer option in Realism Settings.
 
 
- Version 6.0.4.0 - Release 12 Dec 2021 - KSP 1.12.2
+Version 6.0.4.0 - Release 12 Dec 2021 - KSP 1.12.2
 --------------------------------------------------
  - New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
  - New: Added  a realism setting for Realistic Crew transfers. you can now disable sounds and delay from Crew Transfers. 

@@ -27,6 +27,8 @@ namespace ShipManifest.Process
     // used during transfer operations.
     public static bool PumpProcessOn { get; internal set; }
 
+    // Used to pause all pump operations.
+    public static bool Paused = false;
 
     // Constructor properties
 
@@ -291,6 +293,7 @@ namespace ShipManifest.Process
 
               // 2. Lets wait long enough to get a resource volume worth moving
               pump.TimeStamp = DateTime.Now;
+              if (Paused) break;
               pump.Running(deltaT);
               break;
             case PumpState.Stop:
@@ -567,6 +570,10 @@ namespace ShipManifest.Process
       {
         if (tPumps.Current == null) continue;
         if (tPumps.Current.PumpId == pumpId && tPumps.Current.IsPumpOn) tPumps.Current.PumpStatus = PumpState.Stop;
+
+        // If we pass a zero turn off any pumps that are on.
+        if (pumpId == 0 && tPumps.Current.IsPumpOn) tPumps.Current.PumpStatus = PumpState.Stop;
+
       }
       tPumps.Dispose();
     }
