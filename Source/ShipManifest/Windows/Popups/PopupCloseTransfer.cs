@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using UnityEngine;
@@ -11,7 +12,7 @@ namespace ShipManifest.Windows.Popups
 {
   internal static class PopupCloseTransfer
   {
-    internal static float WindowHeight = 200;
+    internal static float WindowHeight = 185;
     internal static float WindowWidth = 420;
     internal static float TextWidth = 400;
     internal static Rect Position = CurrSettings.DefaultPosition;
@@ -62,6 +63,7 @@ namespace ShipManifest.Windows.Popups
       if (GUILayout.Button(cancelContent, GUILayout.Height(20))) //"Cancel"
       {
         TransferPump.Paused = false;
+        SMSound.SourcePumpRun.Play();
         ShowWindow = false;
       }
       GUILayout.EndHorizontal();

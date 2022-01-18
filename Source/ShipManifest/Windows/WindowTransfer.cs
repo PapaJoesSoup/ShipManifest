@@ -282,13 +282,13 @@ namespace ShipManifest.Windows
         ToolTip = "";
         GUI.enabled = false;
         TransferPump.Paused = true;
+        SMSound.SourcePumpRun.Stop();
         PopupCloseTransfer.Position = new Rect(Position.x + 100, Position.y + 50, 0, 0);
         PopupCloseTransfer.ShowWindow = true;
       }
       else
       {
         ShowWindow = false;
-        TransferPump.Paused = false;
         PopupCloseTransfer.ShowWindow = false;
         SMAddon.SmVessel.SelectedPartsSource.Clear();
         SMAddon.SmVessel.SelectedPartsTarget.Clear();

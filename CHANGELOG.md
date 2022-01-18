@@ -11,6 +11,7 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
         Issues: https://github.com/papajoessoup/ShipManifest/issues/45 and
                 https://github.com/papajoessoup/ShipManifest/issues61
  - New: Refactored resizing code to be window agnostic.
+ - New: Refactored closing transfer window during in progress transfer operations.  Now pauses the transfers and prompts the user to confirm killing transfer to close window.
  - Changed: Refactored and moved some Gui utility methods from SmAddon to GuiUtils
 
 

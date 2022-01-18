@@ -899,8 +899,9 @@ namespace ShipManifest
 
           if (TransferPump.Paused && PopupCloseTransfer.ShowWindow)
           {
+            GUIStyle popupStyle = new GUIStyle(HighLogic.Skin.window);
             PopupCloseTransfer.Position = GUILayout.Window(398549, PopupCloseTransfer.Position, PopupCloseTransfer.Display,
-              PopupCloseTransfer.Title, GUILayout.MinHeight(20));
+              PopupCloseTransfer.Title, popupStyle, GUILayout.MinHeight(20));
           }
         }
         if (SMConditions.CanShowShipManifest())
