@@ -8,6 +8,7 @@ namespace ShipManifest
   internal static class SMStyle
   {
     internal static GUIStyle WindowStyle;
+    internal static GUIStyle PopupStyle;
     internal static GUIStyle IconStyle;
     internal static GUIStyle ButtonSourceStyle;
     internal static GUIStyle ButtonTargetStyle;
@@ -44,6 +45,8 @@ namespace ShipManifest
     internal static void SetStyles()
     {
       WindowStyle = new GUIStyle(GUI.skin.window);
+      PopupStyle = new GUIStyle(HighLogic.Skin.window);
+
       IconStyle = new GUIStyle();
 
       ButtonStyle = new GUIStyle(GUI.skin.button)
