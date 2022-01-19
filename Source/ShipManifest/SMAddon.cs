@@ -811,6 +811,10 @@ namespace ShipManifest
     internal static void OnSmIconHover()
     {
       PopupSmBtnHover.ShowWindow = !PopupSmBtnHover.ShowWindow;
+      if (PopupSmBtnHover.ShowWindow)
+      {
+        PopupSmBtnHover.Position.y = Event.current.mousePosition.y - 100;
+      }
     }
 
     internal static void OnSmRosterClicked()

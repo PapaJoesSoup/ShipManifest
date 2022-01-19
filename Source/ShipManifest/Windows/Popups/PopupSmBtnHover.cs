@@ -8,7 +8,7 @@ namespace ShipManifest.Windows.Popups
     internal static float WindowHeight = 200;
     internal static float WindowWidth = 420;
     internal static float TextWidth = 400;
-    internal static Rect Position = new Rect(Screen.width - 460, (Screen.height / 2) - 200, WindowWidth, WindowHeight);
+    internal static Rect Position = new Rect(Screen.width - 462, (Screen.height / 2) - 200, WindowWidth, WindowHeight);
 
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -23,20 +23,17 @@ namespace ShipManifest.Windows.Popups
           InputLockManager.RemoveControlLock("SM_Window");
           _inputLocked = false;
         }
-
         _showWindow = value;
       }
     }
 
     // Content strings
-    internal static string Title = "Ship Manifest";
-    internal static string descContent = "A tool to manage your ship's 'things'";
-    internal static string aboutContent =
-      "This mod provides many quality of life features for managing your vessels, crew and resources.\n\nLeft Click to toggle the Manifest window, where you can select what you wish to manage.\n\nRight Click to toggle the Transfer window for quick access to transferring resources and crew around your vessel(s)";
+    internal static string Title = SmUtils.SmTags["#smloc_manifest_001"];
+    internal static string descContent = SmUtils.SmTags["#smloc_popup_smbtn_hover_001"];
+    internal static string aboutContent = SmUtils.SmTags["#smloc_popup_smbtn_hover_002"];
 
     internal static void Display(int _windowId)
     {
-
 
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
