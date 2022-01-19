@@ -58,6 +58,7 @@ namespace ShipManifest.InternalObjects.Settings
     // ConfigToolTips = TabConfig.ShowToolTips;
     // ModToolTips = TabInstalledMods.ShowToolTips;
     // DebuggerToolTips = WindowDebugger.ShowToolTips;
+    // AppIconToolTips = PopupSmBtnHover.ShowToolTips;
 
     // Sound Tab Options
     // All Default sounds licensing is: CC-By-SA

@@ -58,6 +58,7 @@ namespace ShipManifest.InternalObjects.Settings
     internal static bool ConfigToolTips = true;
     internal static bool ModsToolTips = true;
     internal static bool DebuggerToolTips = true;
+    internal static bool AppIconToolTips = true;
 
 
     //Highlighting Tab Options

@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using ShipManifest.Modules;
 using ShipManifest.Windows;
+using ShipManifest.Windows.Popups;
 using ShipManifest.Windows.Tabs.Control;
 using ShipManifest.Windows.Tabs.Settings;
 using UnityEngine;
@@ -279,6 +280,9 @@ namespace ShipManifest.InternalObjects.Settings
         WindowDebugger.ShowToolTips = toolTipsNode.HasValue("DebuggerToolTips")
           ? bool.Parse(toolTipsNode.GetValue("DebuggerToolTips"))
           : WindowDebugger.ShowToolTips;
+        PopupSmBtnHover.ShowToolTips = toolTipsNode.HasValue("AppIconToolTips")
+          ? bool.Parse(toolTipsNode.GetValue("AppIconToolTips"))
+          : PopupSmBtnHover.ShowToolTips;
 
         // Sounds Settings
         CurrSettings.PumpSoundStart = soundsNode.HasValue("PumpSoundStart")
@@ -463,6 +467,7 @@ namespace ShipManifest.InternalObjects.Settings
 
       // ToolTip Settings
       WriteValue(toolTipsNode, "ShowToolTips", CurrSettings.ShowToolTips);
+      WriteValue(toolTipsNode, "AppIconToolTips", PopupSmBtnHover.ShowToolTips);
       WriteValue(toolTipsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
       WriteValue(toolTipsNode, "ManifestToolTips", WindowManifest.ShowToolTips);
       WriteValue(toolTipsNode, "TransferToolTips", WindowTransfer.ShowToolTips);

@@ -10,6 +10,10 @@ namespace ShipManifest.Windows.Popups
     internal static float TextWidth = 400;
     internal static Rect Position = new Rect(Screen.width - 462, (Screen.height / 2) - 200, WindowWidth, WindowHeight);
 
+    internal static string ToolTip = "";
+    internal static bool ToolTipActive;
+    internal static bool ShowToolTips = true;
+
     private static bool _inputLocked;
     private static bool _showWindow;
 

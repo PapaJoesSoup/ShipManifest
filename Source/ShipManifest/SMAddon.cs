@@ -810,6 +810,11 @@ namespace ShipManifest
 
     internal static void OnSmIconHover()
     {
+      if (!PopupSmBtnHover.ShowToolTips)
+      {
+        PopupSmBtnHover.ShowWindow = false;
+        return;
+      }
       PopupSmBtnHover.ShowWindow = !PopupSmBtnHover.ShowWindow;
       if (PopupSmBtnHover.ShowWindow)
       {

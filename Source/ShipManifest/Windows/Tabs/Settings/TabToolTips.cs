@@ -1,5 +1,6 @@
 using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
+using ShipManifest.Windows.Popups;
 using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
@@ -42,6 +43,7 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent lightTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_016"], SmUtils.SmTags["#smloc_settings_tooltips_tt_016"]);
     internal static GUIContent labsTtContent      = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_017"], SmUtils.SmTags["#smloc_settings_tooltips_tt_017"]);
     internal static GUIContent vesselTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
+    internal static GUIContent appIconTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_019"], SmUtils.SmTags["#smloc_settings_tooltips_tt_019"]);
 
 
     internal static void Display(Vector2 displayViewerPosition)
@@ -65,6 +67,15 @@ namespace ShipManifest.Windows.Tabs.Settings
         ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUI.enabled = CurrSettings.ShowToolTips;
+
+      // App Icon Popup
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(guiIndent);
+      PopupSmBtnHover.ShowToolTips = GUILayout.Toggle(PopupSmBtnHover.ShowToolTips, appIconTtContent, GUILayout.Width(guiToggleWidth));
+      GUILayout.EndHorizontal();
+      _rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && _canShowToolTips)
+        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Debugger Window
       GUILayout.BeginHorizontal();
