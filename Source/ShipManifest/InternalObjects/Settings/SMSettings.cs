@@ -820,6 +820,7 @@ namespace ShipManifest.InternalObjects.Settings
       OrigSettings.PanelToolTips = TabSolarPanel.ShowToolTips;
       OrigSettings.AntennaToolTips = TabAntenna.ShowToolTips;
       OrigSettings.LightToolTips = TabLight.ShowToolTips;
+      OrigSettings.AppIconToolTips = PopupSmBtnHover.ShowToolTips;
 
       OrigSettings.RealismToolTips = TabRealism.ShowToolTips;
       OrigSettings.ToolTipsToolTips = TabToolTips.ShowToolTips;
@@ -884,6 +885,7 @@ namespace ShipManifest.InternalObjects.Settings
       TabSolarPanel.ShowToolTips = OrigSettings.PanelToolTips;
       TabAntenna.ShowToolTips = OrigSettings.AntennaToolTips;
       TabLight.ShowToolTips = OrigSettings.LightToolTips;
+      PopupSmBtnHover.ShowToolTips = OrigSettings.AppIconToolTips;
 
       TabRealism.ShowToolTips = OrigSettings.RealismToolTips;
       TabHighlight.ShowToolTips = OrigSettings.HighlightToolTips;
