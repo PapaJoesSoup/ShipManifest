@@ -51,6 +51,8 @@ namespace ShipManifest
     private static ApplicationLauncherButton _smSettingsStock;
     private static ApplicationLauncherButton _smRosterStock;
 
+    internal static Vector3 IconPosition = new Vector3();
+
     // Repeating error latch
     internal static bool FrameErrTripped;
 
@@ -106,7 +108,7 @@ namespace ShipManifest
         if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER) return;
 
         // Cache Localization Strings
-        // (must occur first to allow static string var initializaion on static windows)
+        // (must occur first to allow static string var initialization on static windows)
         SmUtils.CacheSmLocalization();
 
         //WindowDebugger.Initialize();
@@ -633,8 +635,8 @@ namespace ShipManifest
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmButtonClicked,
             OnSmButtonClicked,
-            DummyHandler,
-            DummyHandler,
+            OnSmIconHover,
+            OnSmIconHover,
             DummyHandler,
             DummyHandler,
             ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
@@ -721,43 +723,6 @@ namespace ShipManifest
     }
 
     //Toolbar button click handlers
-    internal static void OnSmRightClick()
-    {
-      try
-      {
-        if (WindowTransfer.ShowWindow)
-        {
-          // SM Transfer window is showing.  Turn off.
-          WindowTransfer.BtnCloseWindow();
-        }
-        else
-        {
-          // SMTransfer is not showing. turn on if we can.
-          if (SMConditions.CanShowShipManifest(true) && SmVessel.SelectedResources.Count > 0)
-            WindowTransfer.ShowWindow = !WindowTransfer.ShowWindow;
-          else
-            return;
-        }
-        //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
-
-        if (CurrSettings.EnableBlizzyToolbar)
-          _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
-            ? $"{TextureFolder}IconOn_24"
-            : $"{TextureFolder}IconOff_24";
-        else
-          _smButtonStock.SetTexture(
-            GameDatabase.Instance.GetTexture(
-              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_128" : $"{TextureFolder}IconOff_128", false));
-      }
-      catch (Exception ex)
-      {
-        SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
-      }
-      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Exit");
-      //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
-
-    }
-
     internal static void OnSmButtonClicked()
     {
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Enter");
@@ -804,6 +769,48 @@ namespace ShipManifest
       }
       //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Exit");
       //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
+    }
+
+    internal static void OnSmRightClick()
+    {
+      try
+      {
+        if (WindowTransfer.ShowWindow)
+        {
+          // SM Transfer window is showing.  Turn off.
+          WindowTransfer.BtnCloseWindow();
+        }
+        else
+        {
+          // SMTransfer is not showing. turn on if we can.
+          if (SMConditions.CanShowShipManifest(true) && SmVessel.SelectedResources.Count > 0)
+            WindowTransfer.ShowWindow = !WindowTransfer.ShowWindow;
+          else
+            return;
+        }
+        //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
+
+        if (CurrSettings.EnableBlizzyToolbar)
+          _smButtonBlizzy.TexturePath = WindowManifest.ShowWindow
+            ? $"{TextureFolder}IconOn_24"
+            : $"{TextureFolder}IconOff_24";
+        else
+          _smButtonStock.SetTexture(
+            GameDatabase.Instance.GetTexture(
+              WindowManifest.ShowWindow ? $"{TextureFolder}IconOn_128" : $"{TextureFolder}IconOff_128", false));
+      }
+      catch (Exception ex)
+      {
+        SmUtils.LogMessage($"Error in:  SMAddon.OnSMButtonToggle.  {ex}", SmUtils.LogType.Error, true);
+      }
+      //Debug.Log("[ShipManifest]:  ShipManifestAddon.OnSMButtonToggle Exit");
+      //Debug.Log("[ShipManifest]:  ShowWIndow:  " + WindowManifest.ShowWindow + ", ShowUi:  " + ShowUi);
+
+    }
+
+    internal static void OnSmIconHover()
+    {
+      PopupSmBtnHover.ShowWindow = !PopupSmBtnHover.ShowWindow;
     }
 
     internal static void OnSmRosterClicked()
@@ -867,6 +874,10 @@ namespace ShipManifest
         if (WindowDebugger.ShowWindow)
           WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display,
             WindowDebugger.Title, GUILayout.MinHeight(20));
+
+        if(PopupSmBtnHover.ShowWindow)
+          PopupSmBtnHover.Position = GUILayout.Window(398650, PopupSmBtnHover.Position, PopupSmBtnHover.Display,
+            PopupSmBtnHover.Title, GUILayout.MinHeight(20));
 
         if (HighLogic.LoadedScene == GameScenes.FLIGHT && SMConditions.CanShowShipManifest() || 
             HighLogic.LoadedScene == GameScenes.SPACECENTER && ShowUi && !SMConditions.IsPauseMenuOpen())

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
 using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
