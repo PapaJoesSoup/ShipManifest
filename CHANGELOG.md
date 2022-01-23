@@ -5,6 +5,12 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+
+
+
+
+Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
+--------------------------------------------------
  - New: Added ability to open Transfer window separately from Manifest window.  If resources are selected in the Manifest window,
         right click the app Icon to toggle the transfer window directly. Manifest window can be closed any time.
         Issue:  https://github.com/papajoessoup/ShipManifest/issues/60

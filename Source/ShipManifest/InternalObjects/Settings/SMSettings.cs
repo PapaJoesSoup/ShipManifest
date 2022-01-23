@@ -384,6 +384,10 @@ namespace ShipManifest.InternalObjects.Settings
     {
       if (!Loaded || (HighLogic.LoadedScene != GameScenes.FLIGHT &&
                       HighLogic.LoadedScene != GameScenes.SPACECENTER)) return;
+      if (CurrSettings.RealXfers != OrigSettings.RealXfers)
+      {
+        SetRealTransfersState();
+      }
       if (CurrSettings.EnableStockCrewXfer != OrigSettings.EnableStockCrewXfer)
       {
         SetStockCrewTransferState();
@@ -678,6 +682,11 @@ namespace ShipManifest.InternalObjects.Settings
         return 2;
 
       return 3;
+    }
+
+    internal static void SetRealTransfersState()
+    {
+      SMAddon.SmVessel.UpdatePartsByResource();
     }
 
     internal static void SetStockCrewTransferState()

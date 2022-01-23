@@ -232,7 +232,7 @@ namespace ShipManifest
         }
       }
 
-      // Control Window datasources
+      // Control Window data sources
       GetDockedVessels();
       GetHatches();
       GetAntennas();
@@ -417,7 +417,7 @@ namespace ShipManifest
       //Now lets scrub the list to remove child vessels within the list.
       // this can happen when multiple decouples and docking occur...
       List<ModDockedVessel> vesselsToRemove = new List<ModDockedVessel>();
-      // create vessel list to start wtih
+      // create vessel list to start with
       List<ModDockedVessel>.Enumerator srcVessels = _modDockedVessels.GetEnumerator();
       while (srcVessels.MoveNext())
       {
