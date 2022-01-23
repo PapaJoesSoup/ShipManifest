@@ -5,7 +5,8 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
-
+- Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
+         Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
 
 
 
