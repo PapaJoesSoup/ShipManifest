@@ -303,6 +303,7 @@ namespace ShipManifest
         if (_smSettingsBlizzy != null)
           _smSettingsBlizzy.Destroy();
       }
+        GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGuiAppLauncherDestroyed);
     }
 
     // ReSharper disable once InconsistentNaming
