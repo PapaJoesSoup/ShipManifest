@@ -83,6 +83,7 @@ namespace ShipManifest.InternalObjects.Settings
 
     //Config Tab options
     internal static bool EnableBlizzyToolbar;
+    internal static bool EnableSettingsIcon;
     internal static bool VerboseLogging;
     internal static bool AutoDebug;
     internal static bool SaveLogOnExit;

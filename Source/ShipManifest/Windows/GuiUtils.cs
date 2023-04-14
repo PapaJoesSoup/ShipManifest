@@ -1,3 +1,5 @@
+using System.Globalization;
+using ShipManifest.InternalObjects;
 using UnityEngine;
 
 namespace ShipManifest.Windows
@@ -179,6 +181,47 @@ namespace ShipManifest.Windows
         height = rect.height
       };
       return newRect;
+    }
+
+    internal static bool DisplaySettingsToggle( bool setting, GUIContent content, ref ToolTip toolTip, float toggleWidth, float scrollX)
+    {
+      setting = GUILayout.Toggle(setting, content, GUILayout.Width(toggleWidth));
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
+      return setting;
+    }
+
+    internal static string DisplaySettingsTextField(string setting, GUIContent labelContent, float labelWidth, float textWidth, GUIContent unitsContent, float unitsWidth, ToolTip toolTip, float scrollX)
+    {
+      GUILayout.BeginHorizontal();
+      //Error Log Length:
+      GUILayout.Label(labelContent, GUILayout.Width(labelWidth));
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
+      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth));
+      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
+      GUILayout.EndHorizontal();
+      return setting;
+    }
+
+    internal static double DisplaySettingsSlider(SliderData slider, ref ToolTip toolTip, float scrollX)
+    {
+      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth), GUILayout.Height(20));
+      Rect rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
+      double setting = GUILayout.HorizontalSlider((float)slider.setting, (float)slider.minValue,
+        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth), GUILayout.Height(20));
+      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth), GUILayout.Height(20));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
+      return setting;
     }
   }
 }

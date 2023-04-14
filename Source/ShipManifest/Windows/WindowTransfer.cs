@@ -10,7 +10,6 @@ using ShipManifest.Modules;
 using ShipManifest.Process;
 using ShipManifest.Windows.Popups;
 using UnityEngine;
-using VehiclePhysics;
 
 namespace ShipManifest.Windows
 {
@@ -28,19 +27,19 @@ namespace ShipManifest.Windows
     internal static Rect SelectBox = new Rect(0, 0, 300, ViewerHeight);
     internal static Rect DetailsBox = new Rect(0,0, 300, 120);
 
-    private static bool _inputLocked;
-    private static bool _showWindow;
+    private static bool inputLocked;
+    private static bool showWindow;
     internal static bool ShowWindow
     {
-      get => _showWindow;
+      get => showWindow;
       set
       {
         if (!value)
         {
           InputLockManager.RemoveControlLock("SM_Window");
-          _inputLocked = false;
+          inputLocked = false;
         }
-        _showWindow = value;
+        showWindow = value;
       }
     }
     internal static bool ToolTipActive;
@@ -186,12 +185,12 @@ namespace ShipManifest.Windows
     // Resource Transfer Window
     // This window allows you some control over the selected resource on a selected source and target part
     // This window assumes that a resource has been selected on the Ship manifest window.
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
       GUI.enabled = !SMConditions.IsTransferInProgress() || !PopupCloseTransfer.ShowWindow;
 
       // set input locks when mouseover window...
-      _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+      inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, inputLocked);
 
       string displayAmounts = SmUtils.DisplayVesselResourceTotals(SMAddon.SmVessel.SelectedResources[0]);
       Title = $"{titleContent} - {SMAddon.SmVessel.Vessel.vesselName}{displayAmounts}"; // "Transfer"
@@ -1728,17 +1727,17 @@ namespace ShipManifest.Windows
 
     internal static ProtoCrewMember FindFrozenKerbal(string crewName)
     {
-      ProtoCrewMember retval = null;
+      ProtoCrewMember pcm = null;
       IEnumerator<ProtoCrewMember> crew = HighLogic.CurrentGame.CrewRoster.Unowned.GetEnumerator();
       while (crew.MoveNext())
       {
         if (crew.Current == null) continue;
         if (crew.Current.name != crewName) continue;
-        retval = crew.Current;
+        pcm = crew.Current;
         break;
       }
       crew.Dispose();
-      return retval;
+      return pcm;
     }
 
     private static bool CanDumpPart(Part part)

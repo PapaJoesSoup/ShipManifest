@@ -86,37 +86,37 @@ namespace ShipManifest.InternalObjects
       if (!string.IsNullOrEmpty(WindowTransfer.ToolTip))
       {
         toolTip = WindowTransfer.ToolTip;
-        source = "WindowTransfer";
+        source = nameof(WindowTransfer);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(WindowRoster.ToolTip))
       {
         toolTip = WindowRoster.ToolTip;
-        source = "WindowRoster";
+        source = nameof(WindowRoster);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(WindowDebugger.ToolTip))
       {
         toolTip = WindowDebugger.ToolTip;
-        source = "WindowDebugger";
+        source = nameof(WindowDebugger);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(WindowManifest.ToolTip))
       {
         toolTip = WindowManifest.ToolTip;
-        source = "WindowManifest";
+        source = nameof(WindowManifest);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(WindowControl.ToolTip))
       {
         toolTip = WindowControl.ToolTip;
-        source = "WindowControl";
+        source = nameof(WindowControl);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(WindowSettings.ToolTip))
       {
         toolTip = WindowSettings.ToolTip;
-        source = "WindowSettings";
+        source = nameof(WindowSettings);
         return toolTip;
       }
 
@@ -124,63 +124,63 @@ namespace ShipManifest.InternalObjects
       if (!string.IsNullOrEmpty(TabVessel.ToolTip))
       {
         toolTip = TabVessel.ToolTip;
-        source = "TabVessel";
+        source = nameof(TabVessel);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(TabHatch.ToolTip))
       {
         toolTip = TabHatch.ToolTip;
-        source = "TabHatch";
+        source = nameof(TabHatch);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(TabSolarPanel.ToolTip))
       {
         toolTip = TabSolarPanel.ToolTip;
-        source = "TabSolarPanel";
+        source = nameof(TabSolarPanel);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(TabAntenna.ToolTip))
       {
         toolTip = TabAntenna.ToolTip;
-        source = "TabAntenna";
+        source = nameof(TabAntenna);
         return toolTip;
       }
       if (!string.IsNullOrEmpty(TabLight.ToolTip))
       {
         toolTip = TabLight.ToolTip;
-        source = "TabLight";
+        source = nameof(TabLight);
         return toolTip;
       }
 
       // Settings Window Tab switches
-      if (!string.IsNullOrEmpty(TabRealism.ToolTip))
+      if (!string.IsNullOrEmpty(TabRealism.toolTip.Desc))
       {
-        toolTip = TabRealism.ToolTip;
-        source = "TabRealism";
+        toolTip = TabRealism.toolTip.Desc;
+        source = nameof(TabRealism);
         return toolTip;
       }
-      if (!string.IsNullOrEmpty(TabHighlight.ToolTip))
+      if (!string.IsNullOrEmpty(TabHighlight.toolTip.Desc))
       {
-        toolTip = TabHighlight.ToolTip;
-        source = "TabHighlight";
+        toolTip = TabHighlight.toolTip.Desc;
+        source = nameof(TabHighlight);
         return toolTip;
       }
-      if (!string.IsNullOrEmpty(TabSounds.ToolTip))
+      if (!string.IsNullOrEmpty(TabSounds.toolTip.Desc))
       {
-        toolTip = TabSounds.ToolTip;
-        source = "TabSounds";
+        toolTip = TabSounds.toolTip.Desc;
+        source = nameof(TabSounds);
         return toolTip;
       }
-      if (!string.IsNullOrEmpty(TabToolTips.ToolTip))
+      if (!string.IsNullOrEmpty(TabToolTips.toolTip.Desc))
       {
-        toolTip = TabToolTips.ToolTip;
-        source = "TabToolTips";
+        toolTip = TabToolTips.toolTip.Desc;
+        source = nameof(TabToolTips);
         return toolTip;
       }
-      if (!string.IsNullOrEmpty(TabConfig.ToolTip))
+      if (!string.IsNullOrEmpty(TabConfig.toolTip.Desc))
       {
-        toolTip = TabConfig.ToolTip;
-        source = "TabConfig";
+        toolTip = TabConfig.toolTip.Desc;
+        source = nameof(TabConfig);
         return toolTip;
       }
       source = "";
@@ -191,25 +191,25 @@ namespace ShipManifest.InternalObjects
     {
       switch (Source)
       {
-        case "WindowSettings":
-        case "TabRealism":
-        case "TabHighlight":
-        case "TabSounds":
-        case "TabToolTips":
-        case "TabConfig":
-        case "WindowRoster":
+        case nameof(WindowSettings):
+        case nameof(TabRealism):
+        case nameof(TabHighlight):
+        case nameof(TabSounds):
+        case nameof(TabToolTips):
+        case nameof(TabConfig):
+        case nameof(WindowRoster):
           return HighLogic.LoadedScene == GameScenes.SPACECENTER && SMAddon.ShowUi && !SMConditions.IsPauseMenuOpen() ||
                  HighLogic.LoadedScene == GameScenes.FLIGHT && SMConditions.CanShowShipManifest();
-        case "WindowManifest":
-        case "WindowTransfer":
-        case "WindowControl":
-        case "TabVessel":
-        case "TabHatch":
-        case "TabSolarPanel":
-        case "TabAntenna":
-        case "TabLight":
+        case nameof(WindowManifest):
+        case nameof(WindowTransfer):
+        case nameof(WindowControl):
+        case nameof(TabVessel):
+        case nameof(TabHatch):
+        case nameof(TabSolarPanel):
+        case nameof(TabAntenna):
+        case nameof(TabLight):
           return SMConditions.CanShowShipManifest();
-        case "WindowDebugger":
+        case nameof(WindowDebugger):
           return true;
         default:
           return false;

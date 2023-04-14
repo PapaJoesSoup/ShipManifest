@@ -1,4 +1,3 @@
-using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Popups
@@ -34,9 +33,8 @@ namespace ShipManifest.Windows.Popups
     internal static string descContent = SmUtils.SmTags["#smloc_popup_smbtn_hover_001"];
     internal static string aboutContent = SmUtils.SmTags["#smloc_popup_smbtn_hover_002"];
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 

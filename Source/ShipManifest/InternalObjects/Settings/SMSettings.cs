@@ -315,6 +315,9 @@ namespace ShipManifest.InternalObjects.Settings
         CurrSettings.EnableBlizzyToolbar = configNode.HasValue("EnableBlizzyToolbar")
           ? bool.Parse(configNode.GetValue("EnableBlizzyToolbar"))
           : CurrSettings.EnableBlizzyToolbar;
+        CurrSettings.EnableSettingsIcon = configNode.HasValue("EnableSettingsIcon")
+          ? bool.Parse(configNode.GetValue("EnableSettingsIcon"))
+          : CurrSettings.EnableSettingsIcon;
         WindowDebugger.ShowWindow = configNode.HasValue("ShowDebugger")
           ? bool.Parse(configNode.GetValue("ShowDebugger"))
           : WindowDebugger.ShowWindow;
@@ -501,6 +504,7 @@ namespace ShipManifest.InternalObjects.Settings
       // Config Settings
       WriteValue(configNode, "ShowDebugger", WindowDebugger.ShowWindow);
       WriteValue(configNode, "EnableBlizzyToolbar", CurrSettings.EnableBlizzyToolbar);
+      WriteValue(configNode, "EnableSettingsIcon", CurrSettings.EnableSettingsIcon);
       WriteValue(configNode, "VerboseLogging", CurrSettings.VerboseLogging);
       WriteValue(configNode, "AutoSave", CurrSettings.AutoSave);
       WriteValue(configNode, "SaveIntervalSec", CurrSettings.SaveIntervalSec);
@@ -817,6 +821,7 @@ namespace ShipManifest.InternalObjects.Settings
       OrigSettings.UseUnityStyle = CurrSettings.UseUnityStyle;
       OrigSettings.LockSettings = CurrSettings.LockSettings;
       OrigSettings.EnableBlizzyToolbar = CurrSettings.EnableBlizzyToolbar;
+      OrigSettings.EnableSettingsIcon = CurrSettings.EnableSettingsIcon;
       OrigSettings.SaveLogOnExit = CurrSettings.SaveLogOnExit;
       OrigSettings.ShowToolTips = CurrSettings.ShowToolTips;
       OrigSettings.DebuggerToolTips = WindowDebugger.ShowToolTips;
@@ -882,6 +887,7 @@ namespace ShipManifest.InternalObjects.Settings
       CurrSettings.UseUnityStyle = OrigSettings.UseUnityStyle;
       CurrSettings.LockSettings = OrigSettings.LockSettings;
       CurrSettings.EnableBlizzyToolbar = OrigSettings.EnableBlizzyToolbar;
+      CurrSettings.EnableSettingsIcon = OrigSettings.EnableSettingsIcon;
       CurrSettings.SaveLogOnExit = OrigSettings.SaveLogOnExit;
       CurrSettings.ShowToolTips = OrigSettings.ShowToolTips;
       WindowDebugger.ShowToolTips = OrigSettings.DebuggerToolTips;

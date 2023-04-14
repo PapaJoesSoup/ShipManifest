@@ -34,10 +34,8 @@ namespace ShipManifest.Windows.Popups
     internal static GUIContent cancelContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_003"]); // = "Cancel"
 
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-
-
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 

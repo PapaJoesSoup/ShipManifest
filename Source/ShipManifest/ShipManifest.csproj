@@ -69,6 +69,7 @@
     <Compile Include="APIClients\ToolbarWrapper.cs" />
     <Compile Include="Windows\Popups\PopupSmBtnHover.cs" />
     <Compile Include="Windows\Popups\PopupCloseTransfer.cs" />
+    <Compile Include="Windows\SliderData.cs" />
     <Compile Include="Windows\Tabs\Control\TabAntenna.cs" />
     <Compile Include="Windows\Tabs\Control\TabRadiator.cs" />
     <Compile Include="Windows\Tabs\Control\TabVessels.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Windows\Tabs\Settings\TabSounds.cs" />
     <Compile Include="Windows\Tabs\Settings\TabToolTips.cs" />
     <Compile Include="Windows\GuiUtils.cs" />
+    <Compile Include="Windows\ToolTip.cs" />
     <Compile Include="Windows\WindowControl.cs" />
     <Compile Include="Windows\WindowDebugger.cs" />
     <Compile Include="Modules\ModHatch.cs" />
@@ -98,7 +100,9 @@
     <Compile Include="SMUtils.cs" />
     <Compile Include="WeakReference.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Windows\Viewers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>

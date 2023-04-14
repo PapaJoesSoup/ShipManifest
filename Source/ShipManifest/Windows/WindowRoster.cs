@@ -134,6 +134,8 @@ namespace ShipManifest.Windows
     internal static string suitKerbalTtContent  = "Change this Kerbal's Suit";
     internal static string cnxSuitKrblTtContent = "Cancel changes to this Kerbal'Suit";
     internal static string displayErrorContent  = SmUtils.SmTags["#smloc_error_001"];
+    internal static string settingsContent = SmUtils.SmTags["#smloc_manifest_012"];
+
     #endregion Localization Strings
 
 
@@ -162,9 +164,8 @@ namespace ShipManifest.Windows
 
     #region Gui Layout
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-      
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -205,6 +206,7 @@ namespace ShipManifest.Windows
         else
         {
           GUILayout.BeginHorizontal();
+          // Crew Create/Modify Button
           GUI.enabled = CurrSettings.EnableCrewModify;
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
           if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
@@ -214,6 +216,31 @@ namespace ShipManifest.Windows
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+
+          // Settings Window Button
+          if (!CurrSettings.EnableSettingsIcon && HighLogic.LoadedScene == GameScenes.SPACECENTER)
+          {
+            GUI.enabled = true;
+            GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
+            if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.MaxWidth(120), GUILayout.Height(20)))
+            {
+              try
+              {
+                WindowSettings.ShowWindow = !WindowSettings.ShowWindow;
+                if (WindowSettings.ShowWindow)
+                {
+                  // Store settings in case we cancel later...
+                  SMSettings.MemStoreTempSettings();
+                }
+              }
+              catch (Exception ex)
+              {
+                SmUtils.LogMessage(
+                  $" opening Settings Window.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", SmUtils.LogType.Error,
+                  true);
+              }
+            }
+          }
           GUILayout.EndHorizontal();
           GUI.enabled = true;
         }

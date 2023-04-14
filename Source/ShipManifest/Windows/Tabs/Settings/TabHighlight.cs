@@ -10,15 +10,17 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string StrFlowCost = "0";
 
     // GUI tooltip and label support
-    private static Rect _rect;
     private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 300;
     private const float guiIndent = 20;
 
-    internal static string ToolTip = "";
-    internal static bool ToolTipActive;
-    internal static bool ShowToolTips = true;
-    private static bool _canShowToolTips = true;
+    internal static ToolTip toolTip;
+    private static bool _showToolTips = true;
+    internal static bool ShowToolTips
+    {
+      get => _showToolTips;
+      set => _showToolTips = toolTip.Show = value;
+    }
 
     internal static Rect Position = WindowSettings.Position;
 
@@ -29,12 +31,21 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent modeClsContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_003"], SmUtils.SmTags["#smloc_settings_highlight_tt_003"]);
     internal static GUIContent modeEdgeContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_004"], SmUtils.SmTags["#smloc_settings_highlight_tt_004"]);
 
+    static TabHighlight()
+    {
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
+
+
 
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
-      ToolTipActive = false;
-      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
+      toolTip.Active = false;
+      toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
       int scrollX = 20;
@@ -45,13 +56,9 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
       // EnableHighlighting Mode
-      GUILayout.BeginHorizontal();
       // Enable Highlighting
-      CurrSettings.EnableHighlighting = GUILayout.Toggle(CurrSettings.EnableHighlighting, modeAllContent, GUILayout.Width(guiToggleWidth));
-      GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      CurrSettings.EnableHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableHighlighting, modeAllContent,
+        ref toolTip, guiToggleWidth, scrollX);
       if (CurrSettings.EnableHighlighting != OrigSettings.EnableHighlighting && HighLogic.LoadedSceneIsFlight)
       {
         if (CurrSettings.EnableCls)
@@ -73,11 +80,9 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
       // Highlight Only Source / Target Parts";
-      CurrSettings.OnlySourceTarget = GUILayout.Toggle(CurrSettings.OnlySourceTarget, modeSTContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.OnlySourceTarget = GuiUtils.DisplaySettingsToggle(CurrSettings.OnlySourceTarget, modeSTContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       if (CurrSettings.OnlySourceTarget && (!OrigSettings.OnlySourceTarget || CurrSettings.EnableClsHighlighting))
       {
         CurrSettings.EnableClsHighlighting = false;
@@ -98,11 +103,9 @@ namespace ShipManifest.Windows.Tabs.Settings
         GUI.enabled = true;
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      CurrSettings.EnableClsHighlighting = GUILayout.Toggle(CurrSettings.EnableClsHighlighting, modeClsContent, GUILayout.Width(guiToggleWidth));
+      CurrSettings.EnableClsHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableClsHighlighting, modeClsContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
       if (CurrSettings.EnableClsHighlighting && (!OrigSettings.EnableClsHighlighting || CurrSettings.OnlySourceTarget))
         CurrSettings.OnlySourceTarget = false;
       if (HighLogic.LoadedSceneIsFlight && CurrSettings.EnableCls &&
@@ -115,13 +118,8 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Enable Edge Highlighting Mode
       GUI.enabled = CurrSettings.EnableHighlighting;
-      GUILayout.BeginHorizontal();
-      // Enable Edge Highlighting (On Mouse Overs)
-      CurrSettings.EnableEdgeHighlighting = GUILayout.Toggle(CurrSettings.EnableEdgeHighlighting, modeEdgeContent, GUILayout.Width(guiToggleWidth));
-      GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      CurrSettings.EnableEdgeHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableEdgeHighlighting, modeEdgeContent,
+        ref toolTip, guiToggleWidth, scrollX);
       if (CurrSettings.EnableEdgeHighlighting != OrigSettings.EnableEdgeHighlighting && HighLogic.LoadedSceneIsFlight)
       {
         if (CurrSettings.EnableEdgeHighlighting == false)

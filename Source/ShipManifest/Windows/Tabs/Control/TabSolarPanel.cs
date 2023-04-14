@@ -59,15 +59,15 @@ namespace ShipManifest.Windows.Tabs.Control
             label = $"{iPanels.Current.PanelStatus} - ({lockedContent}) - {iPanels.Current.Title}"; // "Locked"
           }
           bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
+          Rect rect = GUILayoutUtility.GetLastRect();
+          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height + WindowControl.HeightScale, iPanels.Current.SPart, Event.current.mousePosition);
           step = "button toggle check";
           if (!open && newOpen)
             iPanels.Current.ExtendPanel();
           else if (open && !newOpen)
             iPanels.Current.RetractPanel();
 
-          Rect rect = GUILayoutUtility.GetLastRect();
-          if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
-            SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height + WindowControl.HeightScale, iPanels.Current.SPart, Event.current.mousePosition);
         }
         iPanels.Dispose();
 

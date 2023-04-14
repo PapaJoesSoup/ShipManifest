@@ -71,10 +71,9 @@ namespace ShipManifest.Windows
     private static Vector2 _smScrollViewerPosition = Vector2.zero;
     private static Vector2 _resourceScrollViewerPosition = Vector2.zero;
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-      Title =
-        $"{titleContent} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.vesselName}";
+      Title = $"{titleContent} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.GetDisplayName()}";
 
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);

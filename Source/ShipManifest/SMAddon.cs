@@ -64,7 +64,7 @@ namespace ShipManifest
 
     #endregion
 
-    // Makes instance available via reflection
+    // Makes singleton instance available via reflection
     public static SMAddon Instance;
 
     public SMAddon()
@@ -290,8 +290,9 @@ namespace ShipManifest
         }
         if (_smButtonStock == null && _smSettingsStock == null && _smRosterStock == null)
         {
-          // Remove the stock toolbar button launcher handler
+          // Remove the stock toolbar button launcher handlers
           GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
+          GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGuiAppLauncherDestroyed);
         }
       }
       else
@@ -489,8 +490,8 @@ namespace ShipManifest
       // Disable the stock Transfer action if SM dictates.
       if (!CurrSettings.EnableStockCrewXfer || TransferCrew.CrewXferState != TransferCrew.XferState.Off)
       {
-        if (!CurrSettings.EnableStockCrewXfer) DisplayScreenMsg("SM Has Disabled Stock Crew Transfers. (Check your SM settings)");
-        if (TransferCrew.CrewXferState != TransferCrew.XferState.Off) DisplayScreenMsg("Stock Crew Transfer Disabled.  SM Crew Transfer in Progress.");
+        if (!CurrSettings.EnableStockCrewXfer) DisplayScreenMsg(SmUtils.SmTags["#smloc_addon_001"]);
+        if (TransferCrew.CrewXferState != TransferCrew.XferState.Off) DisplayScreenMsg(SmUtils.SmTags["#smloc_addon_002"]);
         crewTransferData.canTransfer = false;
         return;
       }
@@ -503,7 +504,7 @@ namespace ShipManifest
       {
         if (new DfWrapper.DeepFreezer(crewTransferData.destPart.Modules["DeepFreezer"]).FreezerSpace == 0)
         {
-          DisplayScreenMsg("Destination part is a Freezer and it is full. Aborting Transfer.");
+          DisplayScreenMsg(SmUtils.SmTags["#smloc_addon_003"]);
           crewTransferData.canTransfer = false;
           return;
         }
@@ -512,7 +513,7 @@ namespace ShipManifest
       // CLS is enabled and parts are not in same space.  Abort Transfer.
       if (!SMConditions.IsClsInSameSpace(crewTransferData.sourcePart, crewTransferData.destPart))
       {
-         DisplayScreenMsg("CLS is Enabled in SM. Parts are not in Same Space. Aborting Transfer.");
+         DisplayScreenMsg(SmUtils.SmTags["#smloc_addon_004"]);
         crewTransferData.canTransfer = false;
         return;
       }
@@ -521,7 +522,7 @@ namespace ShipManifest
       if (!CurrSettings.OverrideStockCrewXfer) return;
 
       // store data from event.
-      DisplayScreenMsg("SM is overriding Stock Transfers.  SM based Crew Transfer initiating...");
+      DisplayScreenMsg(SmUtils.SmTags["#smloc_addon_005S"]);
       SmVessel.TransferCrewObj.FromPart = crewTransferData.sourcePart;
       SmVessel.TransferCrewObj.ToPart = crewTransferData.destPart;
       SmVessel.TransferCrewObj.FromCrewMember = crewTransferData.crewMember;
@@ -650,7 +651,7 @@ namespace ShipManifest
         }
 
         // Setup Settings Button
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER && _smSettingsStock == null &&
+        if (HighLogic.LoadedScene == GameScenes.SPACECENTER && CurrSettings.EnableSettingsIcon && _smSettingsStock == null &&
             !CurrSettings.EnableBlizzyToolbar)
         {
           string iconfile = "IconS_Off_128";

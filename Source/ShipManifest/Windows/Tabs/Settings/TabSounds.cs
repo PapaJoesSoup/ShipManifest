@@ -11,13 +11,18 @@ namespace ShipManifest.Windows.Tabs.Settings
     // GUI tooltip and label support
     private static Rect _rect;
     private const float guiRuleWidth = 350;
-    private const float guiTextWidth = 220;
+    private const float guiTextWidth = 200;
     private const float guiLabelWidth = 100;
 
-    internal static string ToolTip = "";
-    internal static bool ToolTipActive;
-    internal static bool ShowToolTips = true;
-    private static bool _canShowToolTips = true;
+    internal static ToolTip toolTip;
+
+    private static bool _showToolTips = true;
+    internal static bool ShowToolTips
+    {
+      get => _showToolTips;
+      set => _showToolTips = toolTip.Show = value;
+    }
+
     internal static Rect Position = WindowSettings.Position;
 
     // Content strings
@@ -34,13 +39,21 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent runCrewContent   = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_010"]}:", SmUtils.SmTags["#smloc_settings_sounds_tt_006"]);
     internal static GUIContent stopCrewContent  = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_011"]}:", SmUtils.SmTags["#smloc_settings_sounds_tt_007"]);
     internal static GUIContent volCrewContent   = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_012"]}:", SmUtils.SmTags["#smloc_settings_sounds_tt_004"]);
+    internal static GUIContent filePathContent  = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_013"]}");
 
+    static TabSounds()
+    {
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
 
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
-      ToolTipActive = false;
-      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
+      toolTip.Active = false;
+      toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
       int scrollX = 20;
@@ -51,93 +64,77 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Label(xferPumpContent, GUILayout.Height(20)); //"Transfer Pump:"
 
       // Pump Start Sound
-      GUILayout.BeginHorizontal();
       // Pump Starting:
-      GUILayout.Label(startPumpContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.PumpSoundStart = GUILayout.TextField(CurrSettings.PumpSoundStart, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.PumpSoundStart = GuiUtils.DisplaySettingsTextField(CurrSettings.PumpSoundStart, startPumpContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Pump Run Sound
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(runPumpContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.PumpSoundRun = GUILayout.TextField(CurrSettings.PumpSoundRun, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.PumpSoundRun = GuiUtils.DisplaySettingsTextField(CurrSettings.PumpSoundRun, runPumpContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Pump Stop Sound
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(stopPumpContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.PumpSoundStop = GUILayout.TextField(CurrSettings.PumpSoundStop, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.PumpSoundStop = GuiUtils.DisplaySettingsTextField(CurrSettings.PumpSoundStop, stopPumpContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Pump Sound Volume
       GUILayout.BeginHorizontal();
       GUILayout.Label(volPumpContent, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, scrollX);
 
       // Volume Slider Control
-      GUILayout.Label(volMinContent, GUILayout.Width(40),GUILayout.Height(20)); // "Min"
-      CurrSettings.PumpSoundVol = GUILayout.HorizontalSlider((float)CurrSettings.PumpSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
-      GUILayout.Label(volMaxContent, GUILayout.Width(40), GUILayout.Height(20));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      SliderData slider = new SliderData
+      {
+        minContent = volMinContent,
+        maxContent = volMaxContent,
+        setting = CurrSettings.PumpSoundVol,
+        minValue = 0f,
+        maxValue = 1f,
+        minWidth = 40,
+        maxWidth = 40,
+        sliderWidth = 140
+      };
+
+      CurrSettings.PumpSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
 
       GUILayout.Label(" ", GUILayout.Height(10));
+
       // Crew:
       GUILayout.Label(crewContent, GUILayout.Height(20));
       // Crew Start Sound
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(startCrewContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.CrewSoundStart = GUILayout.TextField(CurrSettings.CrewSoundStart, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.CrewSoundStart = GuiUtils.DisplaySettingsTextField(CurrSettings.CrewSoundStart, startCrewContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Crew Run Sound
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(runCrewContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.CrewSoundRun = GUILayout.TextField(CurrSettings.CrewSoundRun, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.CrewSoundRun = GuiUtils.DisplaySettingsTextField(CurrSettings.CrewSoundRun, runCrewContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Crew Stop Sound
-      GUILayout.BeginHorizontal();
-      GUILayout.Label(stopCrewContent, GUILayout.Width(guiLabelWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-      CurrSettings.CrewSoundStop = GUILayout.TextField(CurrSettings.CrewSoundStop, GUILayout.Width(guiTextWidth));
-      GUILayout.EndHorizontal();
+      CurrSettings.CrewSoundStop = GuiUtils.DisplaySettingsTextField(CurrSettings.CrewSoundStop, stopCrewContent,
+        guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
 
       // Crew Sound Volume
       GUILayout.BeginHorizontal();
       GUILayout.Label(volCrewContent, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      if (Event.current.type == EventType.Repaint && toolTip.CanShow)
+        toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, scrollX);
 
       // Volume Slider Control
-      GUILayout.Label(volMinContent, GUILayout.Width(40), GUILayout.Height(20)); // "Min"
-      CurrSettings.CrewSoundVol = GUILayout.HorizontalSlider((float)CurrSettings.CrewSoundVol, 0f, 1f, GUILayout.Width(140), GUILayout.Height(20));
-      GUILayout.Label(volMaxContent, GUILayout.Width(40), GUILayout.Height(20));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      slider = new SliderData
+      {
+        minContent = volMinContent,
+        maxContent = volMaxContent,
+        setting = CurrSettings.CrewSoundVol,
+        minValue = 0f,
+        maxValue = 1f,
+        minWidth = 40,
+        maxWidth = 40,
+        sliderWidth = 140
+      };
+      CurrSettings.CrewSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
     }
   }

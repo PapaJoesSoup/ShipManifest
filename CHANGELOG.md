@@ -5,9 +5,14 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
-- Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
-         Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
-
+ - Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
+          Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
+ - Fixed: Memory leak on SM destruction.  One handler was not being removed.
+          Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/64
+ - New: Localized Screen messages in Crew transfers.
+        Note: Localizations are machine translations. Any help in improving them is appreciated.
+ - New: 
+ - Changed: Refactored remaining windows and tabs to clean up display code.  Moved a lot of redundant code into GUI utility methods.
 
 
 Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
@@ -18,7 +23,7 @@ Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
  - New: Added App Icon Hover Tooltip for Mod Description and hints on use of left and right clicks in SM.  Can be disabled in Settings, Tooltips.  
  - New: Added Resizing height to all Windows. Persists between saves.
         Issues: https://github.com/papajoessoup/ShipManifest/issues/45 and
-                https://github.com/papajoessoup/ShipManifest/issues61
+                https://github.com/papajoessoup/ShipManifest/issues/61
  - New: Refactored resizing code to be window agnostic.
  - New: Refactored closing transfer window during in progress transfer operations.  Now pauses the transfers and prompts the user to confirm killing transfer to close window.
  - Changed: Refactored and moved some Gui utility methods from SmAddon to GuiUtils

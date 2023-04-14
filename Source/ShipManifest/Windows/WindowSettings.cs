@@ -51,7 +51,7 @@ namespace ShipManifest.Windows
     internal static GUIContent tabConfigContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_008"], SmUtils.SmTags["#smloc_settings_tt_008"]);
 
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);

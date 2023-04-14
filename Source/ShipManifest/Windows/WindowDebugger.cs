@@ -44,9 +44,8 @@ namespace ShipManifest.Windows
     internal static GUIContent closeLogContent  = new GUIContent(SmUtils.SmTags["#smloc_debug_003"]);
 
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 

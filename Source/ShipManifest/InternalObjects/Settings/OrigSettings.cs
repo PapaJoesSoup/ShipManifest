@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace ShipManifest.InternalObjects.Settings
 {
   internal static class OrigSettings
@@ -69,6 +67,7 @@ namespace ShipManifest.InternalObjects.Settings
 
     //Config Tab options
     internal static bool EnableBlizzyToolbar;
+    internal static bool EnableSettingsIcon;
     internal static bool VerboseLogging;
     internal static bool ShowDebugger;
     internal static string ErrorLogLength = "1000";

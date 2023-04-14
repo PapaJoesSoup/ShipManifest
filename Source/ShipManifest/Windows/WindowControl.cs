@@ -67,9 +67,8 @@ namespace ShipManifest.Windows
     internal static GUIContent clrVesselContent   = new GUIContent(SmUtils.SmTags["#smloc_control_019"]);
 
 
-    internal static void Display(int _windowId)
+    internal static void Display(int windowId)
     {
-
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 

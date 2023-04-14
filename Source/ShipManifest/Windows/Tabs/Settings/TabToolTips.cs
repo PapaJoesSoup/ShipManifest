@@ -1,4 +1,3 @@
-using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Windows.Popups;
 using ShipManifest.Windows.Tabs.Control;
@@ -11,16 +10,20 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string StrFlowCost = "0";
 
     // GUI tooltip and label support
-    private static Rect _rect;
     private const float guiRuleWidth = 350;
     private const float guiToggleWidth = 300;
     private const float guiIndent = 20;
     private const float gui2xIndent = 40;
 
-    internal static string ToolTip = "";
-    internal static bool ToolTipActive;
-    internal static bool ShowToolTips = true;
-    private static bool _canShowToolTips = true;
+    internal static ToolTip toolTip;
+
+    private static bool _showToolTips = true;
+    internal static bool ShowToolTips
+    {
+      get => _showToolTips;
+      set => _showToolTips = toolTip.Show = value;
+    }
+
     internal static Rect Position = WindowSettings.Position;
 
     // Content strings
@@ -42,199 +45,162 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent antennaTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_015"], SmUtils.SmTags["#smloc_settings_tooltips_tt_015"]);
     internal static GUIContent lightTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_016"], SmUtils.SmTags["#smloc_settings_tooltips_tt_016"]);
     internal static GUIContent labsTtContent      = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_017"], SmUtils.SmTags["#smloc_settings_tooltips_tt_017"]);
-    internal static GUIContent vesselTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
-    internal static GUIContent appIconTtContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_019"], SmUtils.SmTags["#smloc_settings_tooltips_tt_019"]);
+    internal static GUIContent vesselTtContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
+    internal static GUIContent appIconTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_019"], SmUtils.SmTags["#smloc_settings_tooltips_tt_019"]);
 
+    static TabToolTips() { toolTip = new ToolTip { Show = ShowToolTips }; }
 
     internal static void Display(Vector2 displayViewerPosition)
     {
       // Reset Tooltip active flag...
-      ToolTipActive = false;
-      ToolTip = "";
-      _canShowToolTips = WindowSettings.ShowToolTips && ShowToolTips;
+      toolTip.Active = false;
+      toolTip.Desc = "";
+      toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
       Position = WindowSettings.Position;
       int scrollX = 20;
 
-      // Enable Tool Tips
       GUI.enabled = true;
+      // Tab Header
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader); //"ToolTips"
       GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
 
-      CurrSettings.ShowToolTips = GUILayout.Toggle(CurrSettings.ShowToolTips, allTtContent, GUILayout.Width(guiToggleWidth));
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
+      // Enable Tool Tips
+      CurrSettings.ShowToolTips = GuiUtils.DisplaySettingsToggle(CurrSettings.ShowToolTips, allTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
 
       GUI.enabled = CurrSettings.ShowToolTips;
 
       // App Icon Popup
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      PopupSmBtnHover.ShowToolTips = GUILayout.Toggle(PopupSmBtnHover.ShowToolTips, appIconTtContent, GUILayout.Width(guiToggleWidth));
+      PopupSmBtnHover.ShowToolTips = GuiUtils.DisplaySettingsToggle(PopupSmBtnHover.ShowToolTips, appIconTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Debugger Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, debugTtContent, GUILayout.Width(guiToggleWidth));
+      WindowDebugger.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowDebugger.ShowToolTips, debugTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Manifest Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowManifest.ShowToolTips = GUILayout.Toggle(WindowManifest.ShowToolTips, manifestTtContent, GUILayout.Width(guiToggleWidth));
+      WindowManifest.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowManifest.ShowToolTips, manifestTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Transfer Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowTransfer.ShowToolTips = GUILayout.Toggle(WindowTransfer.ShowToolTips, transferTtContent, GUILayout.Width(guiToggleWidth));
+      WindowTransfer.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowTransfer.ShowToolTips, transferTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Setting Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, settingsTtContent, GUILayout.Width(guiToggleWidth));
+      WindowSettings.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowSettings.ShowToolTips, settingsTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
-
       GUI.enabled = CurrSettings.ShowToolTips && WindowSettings.ShowToolTips;
 
       // SW - Realism Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabRealism.ShowToolTips = GUILayout.Toggle(TabRealism.ShowToolTips, realismTtContent, GUILayout.Width(guiToggleWidth));
+      TabRealism.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabRealism.ShowToolTips, realismTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // SW - Highlighting Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabHighlight.ShowToolTips = GUILayout.Toggle(TabHighlight.ShowToolTips, highlightTtContent, GUILayout.Width(guiToggleWidth));
+      TabHighlight.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabHighlight.ShowToolTips, highlightTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // SW - ToolTips Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      ShowToolTips = GUILayout.Toggle(ShowToolTips, tooltipsTtContent, GUILayout.Width(guiToggleWidth));
+      ShowToolTips = GuiUtils.DisplaySettingsToggle(ShowToolTips, tooltipsTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // SW - Sounds Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, soundsTtContent, GUILayout.Width(guiToggleWidth));
+      TabSounds.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabSounds.ShowToolTips, soundsTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // SW - Config Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabConfig.ShowToolTips = GUILayout.Toggle(TabConfig.ShowToolTips, configTtContent, GUILayout.Width(guiToggleWidth));
+      TabConfig.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabConfig.ShowToolTips, configTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUI.enabled = CurrSettings.ShowToolTips;
 
       // Roster Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, rosterTtContent, GUILayout.Width(guiToggleWidth));
+      WindowRoster.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowRoster.ShowToolTips, rosterTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // Control Window
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
-      WindowControl.ShowToolTips = GUILayout.Toggle(WindowControl.ShowToolTips, controlTtContent, GUILayout.Width(guiToggleWidth));
+      WindowControl.ShowToolTips = GuiUtils.DisplaySettingsToggle(WindowControl.ShowToolTips, controlTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUI.enabled = CurrSettings.ShowToolTips && WindowControl.ShowToolTips;
 
       // CW - Vessel Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabVessel.ShowToolTips, vesselTtContent, GUILayout.Width(guiToggleWidth));
+      TabVessel.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabVessel.ShowToolTips, vesselTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // CW - Hatch Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabHatch.ShowToolTips = GUILayout.Toggle(TabHatch.ShowToolTips, hatchTtContent, GUILayout.Width(guiToggleWidth));
+      TabHatch.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabHatch.ShowToolTips, hatchTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // CW - Solar Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabSolarPanel.ShowToolTips = GUILayout.Toggle(TabSolarPanel.ShowToolTips, solarTtContent, GUILayout.Width(guiToggleWidth));
+      TabSolarPanel.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabSolarPanel.ShowToolTips, solarTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // CW - Antenna Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabAntenna.ShowToolTips = GUILayout.Toggle(TabAntenna.ShowToolTips, antennaTtContent, GUILayout.Width(guiToggleWidth));
+      TabAntenna.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabAntenna.ShowToolTips, antennaTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // CW - Light Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabLight.ShowToolTips = GUILayout.Toggle(TabLight.ShowToolTips, lightTtContent, GUILayout.Width(guiToggleWidth));
+      TabLight.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabLight.ShowToolTips, lightTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       // CW - Labs Tab
       GUILayout.BeginHorizontal();
       GUILayout.Space(gui2xIndent);
-      TabScienceLab.ShowToolTips = GUILayout.Toggle(TabScienceLab.ShowToolTips, labsTtContent, GUILayout.Width(guiToggleWidth));
+      TabScienceLab.ShowToolTips = GuiUtils.DisplaySettingsToggle(TabScienceLab.ShowToolTips, labsTtContent,
+        ref toolTip, guiToggleWidth, scrollX);
       GUILayout.EndHorizontal();
-      _rect = GUILayoutUtility.GetLastRect();
-      if (Event.current.type == EventType.Repaint && _canShowToolTips)
-        ToolTip = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref ToolTipActive, scrollX);
 
       GUI.enabled = true;
     }
