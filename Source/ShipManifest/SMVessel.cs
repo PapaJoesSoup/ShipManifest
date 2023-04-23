@@ -64,9 +64,6 @@ namespace ShipManifest
     // dataSources for Resource manifest and ResourceTransfer windows
     #region Instance DataSource properties
 
-    // Provides a list of resources
-    internal List<string> ResourceList = new List<string>();
-
     // This is the main part Dictionary.  Provides a list of resources and the parts that contain that resource.
     private Dictionary<string, List<Part>> _partsByResource;
     internal Dictionary<string, List<Part>> PartsByResource

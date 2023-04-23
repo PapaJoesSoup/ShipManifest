@@ -217,7 +217,7 @@ namespace ShipManifest.Windows
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
-          // Settings Window Button
+          // Add Settings Window Button if Setting Icon is disabled...
           if (!CurrSettings.EnableSettingsIcon && HighLogic.LoadedScene == GameScenes.SPACECENTER)
           {
             GUI.enabled = true;

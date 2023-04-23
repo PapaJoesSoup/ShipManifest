@@ -5,13 +5,16 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
- - Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
+- Fixed: Correct error in SMManifest window with the vessel name.  Was using a nonlocalized name. Now properly localized.
+- Fixed: Rate Modifier field in Science window was displaying incorrect value.  Now properly displays the value.
+- Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
  - Fixed: Memory leak on SM destruction.  One handler was not being removed.
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/64
  - New: Localized Screen messages in Crew transfers.
-        Note: Localizations are machine translations. Any help in improving them is appreciated.
- - New: 
+        Note: Many localizations are machine translations. Any help in improving them is appreciated.
+ - New: Added a Settings button to the Roster window when in the Space Center.  This button appears if you disable the Settings icon on the toolbar.
+        This setting is in the Config Tab.
  - Changed: Refactored remaining windows and tabs to clean up display code.  Moved a lot of redundant code into GUI utility methods.
 
 
