@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("ShipManifest")]
-[assembly: AssemblyDescription("Ship Manifest Manages your vessel")]
+[assembly: AssemblyDescription("Ship Manifest manages your vessel")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PapaJoe's SOUP")]
 [assembly: AssemblyProduct("ShipManifest")]
-[assembly: AssemblyCopyright("Copyright ©  2013-2021")]
+[assembly: AssemblyCopyright("Copyright ©  2013-2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

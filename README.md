@@ -17,7 +17,7 @@ This mod recommends the following mods:
 * [ConnectedLivingSpace][CLS] - this mod enables visualisation of living spaces and whether they are internally reachable.
 
 ## Installation
-Extract the contents of the "GameData" directory in the ZIP into the KSP "GameData" folder.
+Extract the contents of the "GameData" directory in the ZIP into the KSP "GameData" folder. Path should be `[KSP]/GameData/ShipManifest/`.
 
 ## Resources
 * Source Code on [GitHub][GitHub]
@@ -40,6 +40,6 @@ Extract the contents of the "GameData" directory in the ZIP into the KSP "GameDa
 [SourceShield]: https://img.shields.io/badge/source%20code-github-yellowgreen
 [LicenseShield]: https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey?logo=creativecommons
 
-[release]: https://github.com/mwerle/ShipManifest/releases/latest
+[release]: https://github.com/papajoessoup/ShipManifest/releases/latest
 [CKAN]: https://github.com/KSP-CKAN/CKAN
 [CLS]: https://forum.kerbalspaceprogram.com/index.php?showtopic=192130

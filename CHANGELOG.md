@@ -16,7 +16,7 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
  - New: Added a Settings button to the Roster window when in the Space Center.  This button appears if you disable the Settings icon on the toolbar.
         This setting is in the Config Tab.
  - Changed: Refactored remaining windows and tabs to clean up display code.  Moved a lot of redundant code into GUI utility methods.
-
+ - Changed: Added ability to scale the window size with the KSP UI Scale setting.
 
 Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
 --------------------------------------------------
