@@ -13,7 +13,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static bool IsRtAntennas;
-    private const float guiToggleWidth = 325;
+    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
+    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_000"]);
@@ -35,7 +36,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       GUILayout.Label(
         InstalledMods.IsRtInstalled ? titleRmContent : titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -48,7 +49,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "get Antenna label";
           string label = $"{iAntennas.Current.AntennaStatus} - {iAntennas.Current.Title}";
           bool open = iAntennas.Current.Extended;
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
           step = "button toggle check";
           if (!open && newOpen)
             iAntennas.Current.ExtendAntenna();

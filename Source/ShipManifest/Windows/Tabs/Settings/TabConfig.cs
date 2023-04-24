@@ -9,8 +9,10 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string TxtSaveInterval = CurrSettings.SaveIntervalSec.ToString();
 
     // GUI tooltip and label support
-    private const float guiRuleWidth = 350;
-    private const float guiMaintoggleWidth = 300;
+    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
+    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
+    private static float guiMaintoggleWidth = 300 * GameSettings.UI_SCALE;
+    private static float guiLabelWidth = 110 * GameSettings.UI_SCALE;
 
     internal static ToolTip toolTip;
 
@@ -56,7 +58,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       //Configuration Title
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
 
       if (!ToolbarManager.ToolbarAvailable)
       {
@@ -100,7 +102,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       //Error Log Length:
       CurrSettings.ErrorLogLength = GuiUtils.DisplaySettingsTextField(CurrSettings.ErrorLogLength, logLengthContent,
-        110, 50, linesContent, 40, toolTip, scrollX);
+        guiLabelWidth, 50, linesContent, 40, toolTip, scrollX);
 
       // Enable AutoSave Settings
       CurrSettings.AutoSave = GuiUtils.DisplaySettingsToggle(CurrSettings.AutoSave, autoSaveContent, 
@@ -108,7 +110,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Save Interval Settings
       TxtSaveInterval = GuiUtils.DisplaySettingsTextField(TxtSaveInterval, saveIntervalContent,
-        110, 50, secondsContent, 40, toolTip, scrollX);
+        guiLabelWidth, 50, secondsContent, 40, toolTip, scrollX);
     }
   }
 }

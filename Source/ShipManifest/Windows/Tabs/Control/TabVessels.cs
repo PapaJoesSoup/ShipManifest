@@ -15,10 +15,11 @@ namespace ShipManifest.Windows.Tabs.Control
     private static bool _canShowToolTips = true;
 
     // Temporary change in label width to allow release.  Will work vessel combining in a later release.
-    //private const float guiLabelWidth = 200;
-    private const float guiLabelWidth = 230;
-    private const float guiUndockBtnWidth = 60;
-    private const float guiEditBtnWidth = 40;
+    //internal static float guiLabelWidth = 200;
+    internal static float guiLabelWidth = 230 * GameSettings.UI_SCALE;
+    internal static float guiUndockBtnWidth = 60 * GameSettings.UI_SCALE;
+    internal static float guiEditBtnWidth = 40 * GameSettings.UI_SCALE;
+    internal static float guiXferBtnWidth = 15 * GameSettings.UI_SCALE;
 
     internal static int CombineVesselCount = 0;
 
@@ -57,13 +58,13 @@ namespace ShipManifest.Windows.Tabs.Control
       // List column titLes
       GUILayout.BeginHorizontal();
       GUILayout.Label(colActionContent, GUILayout.Width(guiUndockBtnWidth));
-      GUILayout.Label(colNameContent, GUILayout.Width(guiLabelWidth/2));
+      GUILayout.Label(colNameContent, GUILayout.Width((guiLabelWidth/ 2)));
       GUILayout.Label(colActionContent, GUILayout.Width(guiEditBtnWidth));
-      GUILayout.Label(colTypeContent, GUILayout.Width(guiLabelWidth/2));
+      GUILayout.Label(colTypeContent, GUILayout.Width((guiLabelWidth/ 2)));
       GUILayout.Label(colActionContent, GUILayout.Width(guiEditBtnWidth));
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -80,7 +81,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           bool isChecked = mdv.Combine;
           // temporary commenting of combine code to allow release.  Will work for next version.
-          //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20));
+          //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20 * GameSettings.UI_SCALE));
           if (isChecked) combineVesselcount += 1;
           if (isChecked != mdv.Combine)
           {
@@ -96,7 +97,7 @@ namespace ShipManifest.Windows.Tabs.Control
           //    Event.current.mousePosition);
           //}
 
-          if (GUILayout.Button(undockVesselContent, GUILayout.Width(guiUndockBtnWidth))) //"UnDock"
+          if (GUILayout.Button(undockVesselContent, GUILayout.Width(guiUndockBtnWidth * GameSettings.UI_SCALE))) //"UnDock"
           {
             // close hatches If CLS applies
             if (SMConditions.IsClsEnabled()) CloseVesselHatches(mdv);
@@ -115,9 +116,9 @@ namespace ShipManifest.Windows.Tabs.Control
 
           GUI.enabled = true;
           if (mdv.IsEditing)
-            mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width((guiLabelWidth) - (guiUndockBtnWidth + 5)));
+            mdv.RenameVessel = GUILayout.TextField(mdv.RenameVessel, GUILayout.Width((guiLabelWidth - (guiUndockBtnWidth + 5))));
           else
-            GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width(guiLabelWidth/2));
+            GUILayout.Label($"{mdv.VesselInfo.name}", GUILayout.Width((guiLabelWidth/ 2)));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
           {
@@ -127,7 +128,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           // now editing buttons.
           GUIContent content = mdv.IsEditing ? saveNameContent : editNameContent; 
-          if (GUILayout.Button(content, GUILayout.Width(guiEditBtnWidth)))
+          if (GUILayout.Button(content, GUILayout.Width(guiEditBtnWidth * GameSettings.UI_SCALE)))
           {
             if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
             {
@@ -152,7 +153,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           if (mdv.IsEditing)
           {
-            if (GUILayout.Button(cancelNameContent, GUILayout.Width(guiUndockBtnWidth)))
+            if (GUILayout.Button(cancelNameContent, GUILayout.Width(guiUndockBtnWidth * GameSettings.UI_SCALE)))
             {
               mdv.RenameVessel = null;
               mdv.IsEditing = false;
@@ -161,7 +162,7 @@ namespace ShipManifest.Windows.Tabs.Control
           else
           {
             // Vessel Type display/edit
-            GUILayout.Label($"{mdv.VesselInfo.vesselType.ToString()}", GUILayout.Width(guiLabelWidth/2));
+            GUILayout.Label($"{mdv.VesselInfo.vesselType.ToString()}", GUILayout.Width(guiLabelWidth/ 2 * GameSettings.UI_SCALE));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
             {
@@ -170,11 +171,11 @@ namespace ShipManifest.Windows.Tabs.Control
             }
             if (mdv.IsReTyping)
             {
-              if (GUILayout.Button("<", SMStyle.ButtonOptionStyle,GUILayout.Width(15)))
+              if (GUILayout.Button("<", SMStyle.ButtonOptionStyle,GUILayout.Width(guiXferBtnWidth)))
               {
                 mdv.TypeVessel = mdv.TypeVessel.Back();
               }
-              if (GUILayout.Button(">", SMStyle.ButtonOptionStyle, GUILayout.Width(15)))
+              if (GUILayout.Button(">", SMStyle.ButtonOptionStyle, GUILayout.Width(guiXferBtnWidth)))
               {
                 mdv.TypeVessel = mdv.TypeVessel.Next();
               }

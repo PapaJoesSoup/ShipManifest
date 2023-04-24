@@ -136,7 +136,19 @@ namespace ShipManifest
           FrameErrTripped = false;
 
         if (WindowRoster.ResetRosterSize)
-          WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 : 350;
+          WindowRoster.Position.height = (CurrSettings.UseUnityStyle ? 330 : 350) * GameSettings.UI_SCALE;
+
+        // clear window sizes
+        WindowManifest.Position.width = 0;
+        WindowManifest.Position.height = 0;
+        WindowTransfer.Position.width = 0;
+        WindowTransfer.Position.height = 0;
+        WindowRoster.Position.width = 0;
+        WindowRoster.Position.height = 0;
+        WindowSettings.Position.width = 0;
+        WindowSettings.Position.height = 0;
+        WindowDebugger.Position.width = 0;
+        WindowDebugger.Position.height = 0;
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
         {
@@ -883,11 +895,11 @@ namespace ShipManifest
         step = "0 - Start";
         if (WindowDebugger.ShowWindow)
           WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display,
-            WindowDebugger.Title, GUILayout.MinHeight(20));
+            WindowDebugger.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
 
         if(PopupSmBtnHover.ShowWindow)
           PopupSmBtnHover.Position = GUILayout.Window(398650, PopupSmBtnHover.Position, PopupSmBtnHover.Display,
-            PopupSmBtnHover.Title, GUILayout.MinHeight(20));
+            PopupSmBtnHover.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
 
         if (HighLogic.LoadedScene == GameScenes.FLIGHT && SMConditions.CanShowShipManifest() || 
             HighLogic.LoadedScene == GameScenes.SPACECENTER && ShowUi && !SMConditions.IsPauseMenuOpen())
@@ -896,16 +908,16 @@ namespace ShipManifest
           {
             step = "4 - Show Settings";
             WindowSettings.Position = GUILayout.Window(398546, WindowSettings.Position, WindowSettings.Display,
-              WindowSettings.Title, GUILayout.MinHeight(20));
+              WindowSettings.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
           }
 
           if (WindowRoster.ShowWindow)
           {
             step = "6 - Show Roster";
             if (WindowRoster.ResetRosterSize)
-              WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 : 350;
+              WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 * GameSettings.UI_SCALE : 350 * GameSettings.UI_SCALE;
             WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display,
-              WindowRoster.Title, GUILayout.MinHeight(20));
+              WindowRoster.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
           }
         }
 
@@ -916,12 +928,12 @@ namespace ShipManifest
           step = "3 - Show Transfer";
           // Lets build the running totals for each resource for display in title...
           WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
-            WindowTransfer.Title, GUILayout.MinHeight(20));
+            WindowTransfer.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
 
           if (TransferPump.Paused && PopupCloseTransfer.ShowWindow)
           {
             PopupCloseTransfer.Position = GUILayout.Window(398549, PopupCloseTransfer.Position, PopupCloseTransfer.Display,
-              PopupCloseTransfer.Title, SMStyle.PopupStyle, GUILayout.MinHeight(20));
+              PopupCloseTransfer.Title, SMStyle.PopupStyle, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
           }
         }
         if (SMConditions.CanShowShipManifest())
@@ -929,20 +941,20 @@ namespace ShipManifest
           // What windows do we want to show?
           step = "2 - Can Show Manifest - true";
           WindowManifest.Position = GUILayout.Window(398544, WindowManifest.Position, WindowManifest.Display,
-            WindowManifest.Title, GUILayout.MinHeight(20));
+            WindowManifest.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
 
           if (WindowTransfer.ShowWindow && SmVessel.SelectedResources.Count > 0)
           {
             step = "3 - Show Transfer";
             // Lets build the running totals for each resource for display in title...
             WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
-              WindowTransfer.Title, GUILayout.MinHeight(20));
+              WindowTransfer.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
           }
 
           if (!WindowManifest.ShowWindow || !WindowControl.ShowWindow) return;
            step = "7 - Show Control";
           WindowControl.Position = GUILayout.Window(398548, WindowControl.Position, WindowControl.Display,
-            WindowControl.Title, GUILayout.MinWidth(350), GUILayout.MinHeight(20));
+            WindowControl.Title, GUILayout.MinWidth(350 * GameSettings.UI_SCALE), GUILayout.MinHeight(20));
         }
         else
         {

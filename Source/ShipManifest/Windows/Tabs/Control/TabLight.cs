@@ -11,7 +11,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    private const float guiToggleWidth = 325;
+    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
+    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_light_000"]);
@@ -31,7 +32,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -42,7 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iLights.Current == null) continue;
           string label = $"{iLights.Current.Status} - {iLights.Current.Title}";
           bool onState = iLights.Current.IsOn;
-          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
+          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
           step = "button toggle check";
           if (!onState && newOnState)
             iLights.Current.TurnOnLight();

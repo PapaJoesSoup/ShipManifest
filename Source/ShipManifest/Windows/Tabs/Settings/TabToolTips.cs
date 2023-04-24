@@ -10,10 +10,11 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static string StrFlowCost = "0";
 
     // GUI tooltip and label support
-    private const float guiRuleWidth = 350;
-    private const float guiToggleWidth = 300;
-    private const float guiIndent = 20;
-    private const float gui2xIndent = 40;
+    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
+    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
+    private static float guiToggleWidth = 300 * GameSettings.UI_SCALE;
+    private static float guiIndent = 20 * GameSettings.UI_SCALE;
+    private static float gui2xIndent = 40 * GameSettings.UI_SCALE;
 
     internal static ToolTip toolTip;
 
@@ -63,7 +64,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = true;
       // Tab Header
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader); //"ToolTips"
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth));
 
       // Enable Tool Tips
       CurrSettings.ShowToolTips = GuiUtils.DisplaySettingsToggle(CurrSettings.ShowToolTips, allTtContent,

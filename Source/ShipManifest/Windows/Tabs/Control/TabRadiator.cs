@@ -11,7 +11,8 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    private const float guiToggleWidth = 325;
+    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
+    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
@@ -32,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       //GUILayout.Label("Deployable Radiator Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -59,7 +60,7 @@ namespace ShipManifest.Windows.Tabs.Control
           {
             label = $"{iRadiators.Current.PanelStatus} - ({lockedContent}) - {iRadiators.Current.Title}"; // "Locked"
           }
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
           step = "button toggle check";
           if (!open && newOpen)
             iRadiators.Current.ExtendPanel();

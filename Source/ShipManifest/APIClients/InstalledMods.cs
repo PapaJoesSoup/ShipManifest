@@ -35,7 +35,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth));
+        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth * GameSettings.UI_SCALE));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }
@@ -52,7 +52,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth));
+        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth * GameSettings.UI_SCALE));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }

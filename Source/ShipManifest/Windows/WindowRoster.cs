@@ -15,18 +15,46 @@ namespace ShipManifest.Windows
     #region Properties
 
 
-    internal static float WindowWidth = 830;
-    internal static float WindowHeight = 330;
-    internal static float CurrWindowHeight = 330;
+    internal static float WindowWidth = 830 * GameSettings.UI_SCALE;
+    internal static float WindowHeight = 330 * GameSettings.UI_SCALE;
+    internal static float ViewerWidth = 810 * GameSettings.UI_SCALE;
+    internal static float ViewerHeight = 230 * GameSettings.UI_SCALE;
+    internal static float SuitHeight = 55 * GameSettings.UI_SCALE;
+    internal static float EditHeight = 234 * GameSettings.UI_SCALE;
+    internal static float CreateHeight = 29 * GameSettings.UI_SCALE;
+    internal static float MinHeight = 230 * GameSettings.UI_SCALE;
+
     internal static float HeightScale;
-    internal static float ViewerHeight = 230;
-    internal static float SuitHeight = 55;
-    internal static float EditHeight = 234;
-    internal static float CreateHeight = 29;
-    internal static float MinHeight = 230;
+
+    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
+    internal static float guiToggleAllWidth = 60 * GameSettings.UI_SCALE;
+    internal static float guiToggleWidth2 = 80 * GameSettings.UI_SCALE;
+    internal static float guiToggleWidth3 = 90 * GameSettings.UI_SCALE;
+    internal static float guiToggleWidth4 = 95 * GameSettings.UI_SCALE;
+    internal static float guiToggleWidth5 = 130 * GameSettings.UI_SCALE;
+    internal static float guiActionBtn1Width = 50 * GameSettings.UI_SCALE;
+    internal static float guiActionBtn2Width = 55 * GameSettings.UI_SCALE;
+    internal static float guiActionBtn3Width = 65 * GameSettings.UI_SCALE;
+    internal static float guiActionBtn4Width = 80 * GameSettings.UI_SCALE;
+    internal static float guiActionBtn5Width = 120 * GameSettings.UI_SCALE;
+
+    internal static float guiTableCol1Width = 140 * GameSettings.UI_SCALE;
+    internal static float guiTableCol2Width = 50 * GameSettings.UI_SCALE;
+    internal static float guiTableCol3Width = 70 * GameSettings.UI_SCALE;
+    internal static float guiTableCol4Width = 30 * GameSettings.UI_SCALE;
+    internal static float guiTableCol5Width = 70 * GameSettings.UI_SCALE;
+    internal static float guiTableCol6Width = 55 * GameSettings.UI_SCALE;
+    internal static float guiTableCol7Width = 220 * GameSettings.UI_SCALE;
+    internal static float guiTableCol8Width = 55 * GameSettings.UI_SCALE;
+    internal static float guiTableCol9Width = 65 * GameSettings.UI_SCALE;
+    internal static float guiLabelKerbalWidth = 300 * GameSettings.UI_SCALE;
+    internal static float guiLabelAttributesWidth = 85 * GameSettings.UI_SCALE;
+    internal static float guiLabelFilterWidth = 40 * GameSettings.UI_SCALE;
+
+    
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
-    internal static Rect ViewBox = new Rect(0, 0, 810, ViewerHeight);
+    internal static Rect ViewBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
 
     private static bool _inputLocked;
     private static bool _showWindow;
@@ -209,7 +237,7 @@ namespace ShipManifest.Windows
           // Crew Create/Modify Button
           GUI.enabled = CurrSettings.EnableCrewModify;
           GUIContent guilabel = new GUIContent(addKerbalContent, GUI.enabled ? addKerbalOffContent : addKerbalEditContent); // "Opens the Kerbal creation editor."
-          if (GUILayout.Button(guilabel, GUILayout.MaxWidth(120), GUILayout.Height(20)))
+          if (GUILayout.Button(guilabel, GUILayout.MaxWidth(guiActionBtn5Width), GUILayout.Height(guiLineHeight)))
           {
             editMode = EditMode.Create;
           }
@@ -222,7 +250,7 @@ namespace ShipManifest.Windows
           {
             GUI.enabled = true;
             GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-            if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.MaxWidth(120), GUILayout.Height(20)))
+            if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.MaxWidth(guiActionBtn5Width), GUILayout.Height(guiLineHeight)))
             {
               try
               {
@@ -248,7 +276,6 @@ namespace ShipManifest.Windows
         GUILayout.EndVertical();
 
         //resizing
-        CurrWindowHeight = Position.height;
         Rect resizeRect =
           new Rect(Position.width - 18, Position.height - 18, 16, 16);
         GUI.DrawTexture(resizeRect, SmUtils.resizeTexture, ScaleMode.StretchToFill, true);
@@ -330,7 +357,7 @@ namespace ShipManifest.Windows
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
       // "Create"
-      if (GUILayout.Button(createContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
+      if (GUILayout.Button(createContent, GUILayout.MaxWidth(guiActionBtn4Width), GUILayout.Height(guiLineHeight)))
       {
         bool kerbalFound = false;
         ProtoCrewMember.KerbalType kerbalType = KerbalProfession == Profession.Tourist
@@ -348,7 +375,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       // Cancel
-      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(80), GUILayout.Height(20)))
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(guiActionBtn4Width), GUILayout.Height(guiLineHeight)))
       {
         SelectedKerbal = null;
         editMode = EditMode.None;
@@ -362,17 +389,17 @@ namespace ShipManifest.Windows
     private static void DisplaySelectProfession()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(profContent, GUILayout.Width(85)); // "Profession:"
-      bool isPilot = GUILayout.Toggle(KerbalProfession == Profession.Pilot, pilotContent, GUILayout.Width(90)); // "Pilot"
+      GUILayout.Label(profContent, GUILayout.Width(guiLabelAttributesWidth)); // "Profession:"
+      bool isPilot = GUILayout.Toggle(KerbalProfession == Profession.Pilot, pilotContent, GUILayout.Width(guiToggleWidth3)); // "Pilot"
       if (isPilot) KerbalProfession = Profession.Pilot;
 
-      bool isEngineer = GUILayout.Toggle(KerbalProfession == Profession.Engineer, engineerContent, GUILayout.Width(90)); // "Engineer"
+      bool isEngineer = GUILayout.Toggle(KerbalProfession == Profession.Engineer, engineerContent, GUILayout.Width(guiToggleWidth3)); // "Engineer"
       if (isEngineer) KerbalProfession = Profession.Engineer;
 
-      bool isScientist = GUILayout.Toggle(KerbalProfession == Profession.Scientist, scientistContent, GUILayout.Width(90)); // "Scientist"
+      bool isScientist = GUILayout.Toggle(KerbalProfession == Profession.Scientist, scientistContent, GUILayout.Width(guiToggleWidth3)); // "Scientist"
       if (isScientist) KerbalProfession = Profession.Scientist;
 
-      bool isTourist = GUILayout.Toggle(KerbalProfession == Profession.Tourist, touristContent, GUILayout.Width(90)); // "Tourist"
+      bool isTourist = GUILayout.Toggle(KerbalProfession == Profession.Tourist, touristContent, GUILayout.Width(guiToggleWidth3)); // "Tourist"
       if (isTourist) KerbalProfession = Profession.Tourist;
 
       GUILayout.EndHorizontal();
@@ -381,22 +408,22 @@ namespace ShipManifest.Windows
     private static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(suitContent, GUILayout.Width(85)); // "Suit:"
+      GUILayout.Label(suitContent, GUILayout.Width(guiLabelAttributesWidth)); // "Suit:"
 
       // Always available
-      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, dfltSuitContent, GUILayout.Width(90)); // "Default"
+      bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, dfltSuitContent, GUILayout.Width(guiToggleWidth3)); // "Default"
       if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
 
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, vntgeSuitContent, GUILayout.Width(90)); // "Vintage"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, vntgeSuitContent, GUILayout.Width(guiToggleWidth3)); // "Vintage"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
       }
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futrSuitContent, GUILayout.Width(90)); // "Future"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, futrSuitContent, GUILayout.Width(guiToggleWidth3)); // "Future"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
       }
       if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Slim)) {
-        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Slim, slimSuitContent, GUILayout.Width(90)); // "Slim"
+        isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Slim, slimSuitContent, GUILayout.Width(guiToggleWidth3)); // "Slim"
         if (isSet) suit = ProtoCrewMember.KerbalSuit.Slim;
       }
 
@@ -415,36 +442,36 @@ namespace ShipManifest.Windows
     private static void DisplayRosterFilter()
     {
       GUILayout.BeginHorizontal();
-      GUILayout.Label(filterContent, GUILayout.Width(40)); // Filter
+      GUILayout.Label(filterContent, GUILayout.Width(guiLabelFilterWidth)); // Filter
 
-      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilter.All, allContent, GUILayout.Width(60)); // "All"
+      bool isAll = GUILayout.Toggle(CurrentFilter == KerbalFilter.All, allContent, GUILayout.Width(guiToggleAllWidth)); // "All"
       if (isAll) CurrentFilter = KerbalFilter.All;
 
-      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilter.Assigned, assignContent, GUILayout.Width(95)); // "Assigned"
+      bool isAssign = GUILayout.Toggle(CurrentFilter == KerbalFilter.Assigned, assignContent, GUILayout.Width(guiToggleWidth4)); // "Assigned"
       if (isAssign) CurrentFilter = KerbalFilter.Assigned;
 
       if (HighLogic.LoadedSceneIsFlight)
       {
-        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilter.Vessel, vesselContent, GUILayout.Width(80)); // "Vessel"
+        bool isVessel = GUILayout.Toggle(CurrentFilter == KerbalFilter.Vessel, vesselContent, GUILayout.Width(guiToggleWidth2)); // "Vessel"
         if (isVessel) CurrentFilter = KerbalFilter.Vessel;
       }
 
-      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilter.Available, availContent, GUILayout.Width(95)); // "Available"
+      bool isAvail = GUILayout.Toggle(CurrentFilter == KerbalFilter.Available, availContent, GUILayout.Width(guiToggleWidth4)); // "Available"
       if (isAvail) CurrentFilter = KerbalFilter.Available;
 
-      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilter.Dead, deadContent, GUILayout.Width(130)); // "Dead/Missing"
+      bool isDead = GUILayout.Toggle(CurrentFilter == KerbalFilter.Dead, deadContent, GUILayout.Width(guiToggleWidth5)); // "Dead/Missing"
       if (isDead) CurrentFilter = KerbalFilter.Dead;
 
       if (InstalledMods.IsDfInstalled)
       {
-        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilter.Frozen, frozenContent, GUILayout.Width(80)); // "Frozen"
+        bool isFrozen = GUILayout.Toggle(CurrentFilter == KerbalFilter.Frozen, frozenContent, GUILayout.Width(guiToggleWidth2)); // "Frozen"
         if (isFrozen) CurrentFilter = KerbalFilter.Frozen;
       }
 
-      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilter.Applicant, applicantContent, GUILayout.Width(130)); // "Applicant"
+      bool isApplicant = GUILayout.Toggle(CurrentFilter == KerbalFilter.Applicant, applicantContent, GUILayout.Width(guiToggleWidth5)); // "Applicant"
       if (isApplicant) CurrentFilter = KerbalFilter.Applicant;
 
-      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilter.Broken, brokenContent, GUILayout.Width(130)); // "Broken"
+      bool isBroken = GUILayout.Toggle(CurrentFilter == KerbalFilter.Broken, brokenContent, GUILayout.Width(guiToggleWidth5)); // "Broken"
       if (isBroken) CurrentFilter = KerbalFilter.Broken;
 
       GUILayout.EndHorizontal();
@@ -457,16 +484,15 @@ namespace ShipManifest.Windows
         GUILayout.BeginVertical();
         // Roster List Header...
         GUILayout.BeginHorizontal();
-        //GUILayout.Label("", GUILayout.Width(5));
-        GUILayout.Label(nameContent, GUILayout.Width(140)); // "Name"
-        GUILayout.Label(genderContent, GUILayout.Width(50)); // "Gender"
-        GUILayout.Label(profContent, GUILayout.Width(70)); // "Profession"
-        GUILayout.Label(skillContent, GUILayout.Width(30)); // "Skill"
-        GUILayout.Label(suitContent, GUILayout.Width(70)); // "Suit"
-        GUILayout.Label(suitContent, GUILayout.Width(55)); // "Suit"
-        GUILayout.Label(statusContent, GUILayout.Width(220)); // "Status"
-        GUILayout.Label(editContent, GUILayout.Width(55)); // "Edit"
-        GUILayout.Label(actionContent, GUILayout.Width(65)); // "Action"
+        GUILayout.Label(nameContent, GUILayout.Width(guiTableCol1Width)); // "Name"
+        GUILayout.Label(genderContent, GUILayout.Width(guiTableCol2Width)); // "Gender"
+        GUILayout.Label(profContent, GUILayout.Width(guiTableCol3Width)); // "Profession"
+        GUILayout.Label(skillContent, GUILayout.Width(guiTableCol4Width)); // "Skill"
+        GUILayout.Label(suitContent, GUILayout.Width(guiTableCol5Width)); // "Suit"
+        GUILayout.Label(suitContent, GUILayout.Width(guiTableCol6Width)); // "Suit"
+        GUILayout.Label(statusContent, GUILayout.Width(guiTableCol7Width)); // "Status"
+        GUILayout.Label(editContent, GUILayout.Width(guiTableCol8Width)); // "Edit"
+        GUILayout.Label(actionContent, GUILayout.Width(guiTableCol9Width)); // "Action"
         GUILayout.EndHorizontal();
 
         _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, SMStyle.ScrollStyle,
@@ -530,15 +556,14 @@ namespace ShipManifest.Windows
             rosterDetails = kerbals.Current.type == ProtoCrewMember.KerbalType.Applicant ? kerbals.Current.type.ToString() : kerbals.Current.rosterStatus.ToString();
           }
           GUILayout.BeginHorizontal();
-          GUILayout.Label(kerbals.Current.name, labelStyle, GUILayout.Width(140), GUILayout.Height(20));
-          GUILayout.Label(kerbals.Current.gender.ToString(), labelStyle, GUILayout.Width(50));
-          GUILayout.Label(kerbals.Current.experienceTrait.Title, labelStyle, GUILayout.Width(70));
-          GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
-          GUILayout.Label(kerbals.Current.suit.ToString(), labelStyle, GUILayout.Width(70));
+          GUILayout.Label(kerbals.Current.name, labelStyle, GUILayout.Width(guiTableCol1Width), GUILayout.Height(guiLineHeight));
+          GUILayout.Label(kerbals.Current.gender.ToString(), labelStyle, GUILayout.Width(guiTableCol2Width));
+          GUILayout.Label(kerbals.Current.experienceTrait.Title, labelStyle, GUILayout.Width(guiTableCol3Width));
+          GUILayout.Label(kerbals.Current.experienceLevel.ToString(), labelStyle, GUILayout.Width(guiTableCol4Width));
+          GUILayout.Label(kerbals.Current.suit.ToString(), labelStyle, GUILayout.Width(guiTableCol5Width));
 
           SetupSuitButton(kerbals.Current, out string buttonText, out string buttonToolTip);
-          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
-            GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(guiTableCol6Width), GUILayout.Height(guiLineHeight)))
           {
             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbals.Current)
             {
@@ -555,11 +580,10 @@ namespace ShipManifest.Windows
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, XOffset);
 
-          GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(215));
+          GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(guiTableCol7Width));
 
           SetupEditButton(kerbals.Current, out buttonText, out buttonToolTip);
-          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(55), GUILayout.Height(20),
-            GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(guiActionBtn2Width), GUILayout.Height(guiLineHeight)))
           {
             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbals.Current)
             {
@@ -580,7 +604,7 @@ namespace ShipManifest.Windows
           // Setup buttons with gui state, button text and tooltip.
           SetupActionButton(kerbals.Current, out buttonText, out buttonToolTip);
 
-          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(65), GUILayout.Height(20)))
+          if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(guiActionBtn3Width), GUILayout.Height(guiLineHeight)))
           {
             isAction = true;
             actionKerbal = kerbals.Current;
@@ -646,7 +670,7 @@ namespace ShipManifest.Windows
       }
       else
         GUILayout.Label($"{SelectedKerbal.Name} - ({SelectedKerbal.Trait})", SMStyle.LabelStyleBold,
-          GUILayout.MaxWidth(300));
+          GUILayout.MaxWidth(guiLabelKerbalWidth));
 
       if (!string.IsNullOrEmpty(SMAddon.SaveMessage))
       {
@@ -664,29 +688,29 @@ namespace ShipManifest.Windows
       // TODO: Realism setting to enable Kerbal Gender Change for existing Kerbals?
       bool isMale = ProtoCrewMember.Gender.Male == SelectedKerbal.Gender;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(genderContent, GUILayout.Width(85)); // "Gender"
-      isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(90));
+      GUILayout.Label(genderContent, GUILayout.Width(guiLabelAttributesWidth)); // "Gender"
+      isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(guiToggleWidth3));
       isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString());
       SelectedKerbal.Gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
       GUILayout.EndHorizontal();
 
       GUILayout.Label(courageContent); // "Courage"
-      SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
+      SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(guiLabelKerbalWidth));
 
       GUILayout.Label(stupidContent); // "Stupidity"
-      SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
+      SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(guiLabelKerbalWidth));
 
       GUILayout.BeginHorizontal();
-      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, badassContent, GUILayout.Width(90)); // "Badass"
-      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, veteranContent, GUILayout.Width(90)); // "Veteran"
+      SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, badassContent, GUILayout.Width(guiToggleWidth3)); // "Badass"
+      SelectedKerbal.Veteran = GUILayout.Toggle(SelectedKerbal.Veteran, veteranContent, GUILayout.Width(guiToggleWidth3)); // "Veteran"
       GUILayout.EndHorizontal();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(50))) // "Cancel"
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(guiActionBtn1Width))) // "Cancel"
       {
         SelectedKerbal = null;
       }
-      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
+      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(guiActionBtn1Width)))
       {
         if (CurrSettings.EnableKerbalRename && CurrSettings.EnableChangeProfession)
         {
@@ -1017,13 +1041,13 @@ namespace ShipManifest.Windows
       editMode = EditMode.Suit;
       DisplaySelectSuit(ref selectedKerbal.Suit);
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(50))) // "Cancel"
+      if (GUILayout.Button(cancelContent, GUILayout.MaxWidth(guiActionBtn1Width))) // "Cancel"
       {
         SelectedKerbal = null;
         editMode = EditMode.None;
       }
 
-      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(50)))
+      if (GUILayout.Button(applyContent, GUILayout.MaxWidth(guiActionBtn1Width)))
       {
         if (SelectedKerbal != null)
         {

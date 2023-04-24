@@ -53,7 +53,7 @@ namespace ShipManifest
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.blue},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -67,7 +67,7 @@ namespace ShipManifest
       ButtonToggledStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -85,7 +85,7 @@ namespace ShipManifest
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.green},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -99,7 +99,7 @@ namespace ShipManifest
       ButtonToggledStyleLeft = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -115,7 +115,7 @@ namespace ShipManifest
       ButtonSourceStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -130,7 +130,7 @@ namespace ShipManifest
       ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.SourcePartColor]},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -146,7 +146,7 @@ namespace ShipManifest
       ButtonTargetStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -161,8 +161,8 @@ namespace ShipManifest
       ButtonOptionStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = 12,
-        fixedHeight = 20,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fixedHeight = 20 * GameSettings.UI_SCALE,
         padding =
         {
           top = 0,
@@ -178,7 +178,7 @@ namespace ShipManifest
       ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.TargetPartColor]},
-        fontSize = 12,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         padding =
         {
           top = 0,
@@ -251,7 +251,7 @@ namespace ShipManifest
 
       LabelStyleBold = new GUIStyle(GUI.skin.label)
       {
-        fontSize = 18,
+        fontSize = (int)(12 * GameSettings.UI_SCALE),
         fontStyle = FontStyle.Bold
       };
 

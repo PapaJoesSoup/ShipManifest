@@ -11,7 +11,9 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    private const float guiToggleWidth = 325;
+    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
+    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
+
 
     //Content vars
     internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_panel_000"]);
@@ -31,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -58,7 +60,7 @@ namespace ShipManifest.Windows.Tabs.Control
           {
             label = $"{iPanels.Current.PanelStatus} - ({lockedContent}) - {iPanels.Current.Title}"; // "Locked"
           }
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(40));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
             SMHighlighter.SetMouseOverData(rect, scrollY, scrollX, WindowControl.TabBox.height + WindowControl.HeightScale, iPanels.Current.SPart, Event.current.mousePosition);

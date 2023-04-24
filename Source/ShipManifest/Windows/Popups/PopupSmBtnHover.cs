@@ -39,11 +39,11 @@ namespace ShipManifest.Windows.Popups
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(5));
+      GUILayout.Label("", GUILayout.Height(5 * GameSettings.UI_SCALE));
 
-      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth));
-      GUILayout.Label("", GUILayout.Height(5));
-      GUILayout.Label(aboutContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth));
+      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * GameSettings.UI_SCALE));
+      GUILayout.Label("", GUILayout.Height(5 * GameSettings.UI_SCALE));
+      GUILayout.Label(aboutContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * GameSettings.UI_SCALE));
 
       GUILayout.EndVertical();
       //ResetZoomKeys();

@@ -22,8 +22,8 @@ namespace ShipManifest.Windows
 
     internal static string ColorSelector(out string toolTip)
     {
-      const float guiWidth = 20;
-      const float guiHeight = 20;
+      float guiWidth = 20 * GameSettings.UI_SCALE;
+      float guiHeight = 20 * GameSettings.UI_SCALE;
       string thisColor = "";
       toolTip = "";
 
@@ -200,8 +200,8 @@ namespace ShipManifest.Windows
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
-      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth));
-      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth));
+      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth * GameSettings.UI_SCALE));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
@@ -211,13 +211,13 @@ namespace ShipManifest.Windows
 
     internal static double DisplaySettingsSlider(SliderData slider, ref ToolTip toolTip, float scrollX)
     {
-      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth), GUILayout.Height(20));
+      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth * GameSettings.UI_SCALE), GUILayout.Height(20 * GameSettings.UI_SCALE));
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
       double setting = GUILayout.HorizontalSlider((float)slider.setting, (float)slider.minValue,
-        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth), GUILayout.Height(20));
-      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth), GUILayout.Height(20));
+        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth * GameSettings.UI_SCALE), GUILayout.Height(20 * GameSettings.UI_SCALE));
+      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth * GameSettings.UI_SCALE), GUILayout.Height(20 * GameSettings.UI_SCALE));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);

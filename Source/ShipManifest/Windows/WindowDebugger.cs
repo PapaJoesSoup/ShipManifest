@@ -11,10 +11,13 @@ namespace ShipManifest.Windows
 {
   internal static class WindowDebugger
   {
-    internal static float WindowHeight = 355;
+    internal static float WindowHeight = 355 * GameSettings.UI_SCALE;
     internal static float HeightScale;
-    internal static float ViewerHeight = 300;
-    internal static float MinHeight = 200;
+    internal static float ViewerWidth = 500 * GameSettings.UI_SCALE;
+    internal static float ViewerHeight = 300 * GameSettings.UI_SCALE;
+    internal static float guiTextAreaWidth = 460 * GameSettings.UI_SCALE;
+    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
+    internal static float MinHeight = 200 * GameSettings.UI_SCALE;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -64,14 +67,14 @@ namespace ShipManifest.Windows
 
       GUILayout.BeginVertical();
       SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(500));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
       GUILayout.BeginVertical();
 
       List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
       while (errors.MoveNext())
       {
         if (errors.Current == null) continue;
-        GUILayout.TextArea(errors.Current, GUILayout.Width(460));
+        GUILayout.TextArea(errors.Current, GUILayout.Width(guiTextAreaWidth));
         
       }
       errors.Dispose();
@@ -80,17 +83,17 @@ namespace ShipManifest.Windows
       GUILayout.EndScrollView();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(clrLogContent, GUILayout.Height(20))) //"Clear log"
+      if (GUILayout.Button(clrLogContent, GUILayout.Height(guiLineHeight))) //"Clear log"
       {
         SmUtils.LogItemList.Clear();
         SmUtils.LogItemList.Add($"Info:  Log Cleared at {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC.");
       }
-      if (GUILayout.Button(saveLogContent, GUILayout.Height(20))) // "Save Log"
+      if (GUILayout.Button(saveLogContent, GUILayout.Height(guiLineHeight))) // "Save Log"
       {
         // Create log file and save.
         Savelog();
       }
-      if (GUILayout.Button(closeLogContent, GUILayout.Height(20))) // "Close"
+      if (GUILayout.Button(closeLogContent, GUILayout.Height(guiLineHeight))) // "Close"
       {
         // Create log file and save.
         ShowWindow = false;

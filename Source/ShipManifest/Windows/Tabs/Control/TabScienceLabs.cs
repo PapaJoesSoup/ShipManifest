@@ -10,13 +10,14 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    private const float guiLabelWidth = 260;
+    internal static float guiLabelWidth = 260 * GameSettings.UI_SCALE;
+    internal static float guiLabelHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
     internal static string opContent    = SmUtils.SmTags["#smloc_control_lab_001"];
     internal static string inopContent  = SmUtils.SmTags["#smloc_control_lab_002"];
-
+    
 
     internal static void Display()
     {
@@ -32,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
       string step = "start";
       try
       {
@@ -45,7 +46,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "gui enable";
           GUI.enabled = true;
           string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? opContent : inopContent)})"; // Operational, InOp
-          GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(40));
+          GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(guiLabelHeight));
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))

@@ -14,12 +14,20 @@ namespace ShipManifest.Windows
 
     #region Properties
 
-    internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; // 
+    internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; 
     internal static Rect Position = CurrSettings.DefaultPosition;
+    internal static float UIScale = 1.0f;
     internal static float HeightScale;
-    internal static float ViewerHeight = 100;
-    internal static float MinHeight = 50;
-    internal static float WindowHeight = 282;
+    internal static float ViewerHeight = 100 * GameSettings.UI_SCALE;
+    internal static float ViewerWidth = 300 * GameSettings.UI_SCALE;
+    internal static float MinHeight = 50 * GameSettings.UI_SCALE;
+    internal static float WindowHeight = 282 * GameSettings.UI_SCALE;
+    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
+    internal static float guiLabelWidth = 265 * GameSettings.UI_SCALE;
+    internal static float guiActionButtonWidth = 134 * GameSettings.UI_SCALE;
+    internal static float guiFillButtonWidth = 35 * GameSettings.UI_SCALE;
+    internal static float guiDumpButtonWidth = 45 * GameSettings.UI_SCALE;
+
     internal static bool ResizingWindow = false;
 
     private static bool _inputLocked;
@@ -96,7 +104,7 @@ namespace ShipManifest.Windows
       {
         GUILayout.BeginVertical();
         _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(300));
+          GUILayout.Height((ViewerHeight + HeightScale)), GUILayout.Width(ViewerWidth));
         GUILayout.BeginVertical();
 
         // Prelaunch (landed) Gui
@@ -122,7 +130,7 @@ namespace ShipManifest.Windows
             resLabel = multiResSelContent;
             break;
         }
-        GUILayout.Label($"{resLabel}", GUILayout.Width(300), GUILayout.Height(20));
+        GUILayout.Label($"{resLabel}", GUILayout.Width(ViewerWidth), GUILayout.Height(guiLineHeight));
 
         // Resource Details List Viewer
         ResourceDetailsViewer();
@@ -178,11 +186,11 @@ namespace ShipManifest.Windows
         {
           GUILayout.BeginHorizontal();
           // Realism Mode is desirable, as there is a cost associated with a kerbal on a flight.   No cheating!
-          if (GUILayout.Button(fillCrewContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Crew"
+          if (GUILayout.Button(fillCrewContent, SMStyle.ButtonStyle, GUILayout.Width(guiActionButtonWidth), GUILayout.Height(guiLineHeight))) // "Fill Crew"
           {
             SMAddon.SmVessel.FillCrew();
           }
-          if (GUILayout.Button(emptyCrewContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Crew"
+          if (GUILayout.Button(emptyCrewContent, SMStyle.ButtonStyle, GUILayout.Width(guiActionButtonWidth), GUILayout.Height(guiLineHeight))) // "Empty Crew"
           {
             SMAddon.SmVessel.EmptyCrew();
           }
@@ -191,11 +199,11 @@ namespace ShipManifest.Windows
 
         if (!CurrSettings.EnablePfResources) return;
         GUILayout.BeginHorizontal();
-        if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Fill Resources"
+        if (GUILayout.Button(fillResContent, SMStyle.ButtonStyle, GUILayout.Width(guiActionButtonWidth), GUILayout.Height(guiLineHeight))) // "Fill Resources"
         {
           SMAddon.SmVessel.FillResources();
         }
-        if (GUILayout.Button(emptyResContent, SMStyle.ButtonStyle, GUILayout.Width(134), GUILayout.Height(20))) // "Empty Resources"
+        if (GUILayout.Button(emptyResContent, SMStyle.ButtonStyle, GUILayout.Width(guiActionButtonWidth), GUILayout.Height(guiLineHeight))) // "Empty Resources"
         {
           SMAddon.SmVessel.DumpAllResources();
         }
@@ -234,7 +242,7 @@ namespace ShipManifest.Windows
           GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
-          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width), GUILayout.Height(20)))
+          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width * GameSettings.UI_SCALE), GUILayout.Height(guiLineHeight)))
           {
             ResourceButtonToggled(keys.Current);
             SMHighlighter.Update_Highlighter();
@@ -249,7 +257,7 @@ namespace ShipManifest.Windows
               TransferPump.TriggerButton.Manifest);
             GUIContent dumpContent = !TransferPump.IsPumpInProgress(pumpId) ? dumpResContent : stopDumpResContent;
             GUI.enabled = SMConditions.CanResourceBeDumped(keys.Current);
-            if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(45), GUILayout.Height(20)))
+            if (GUILayout.Button(dumpContent, SMStyle.ButtonStyle, GUILayout.Width(guiDumpButtonWidth), GUILayout.Height(guiLineHeight)))
             {
               SMVessel.ToggleDumpResource(keys.Current, pumpId);
             }
@@ -260,8 +268,8 @@ namespace ShipManifest.Windows
               SMAddon.SmVessel.PartsByResource[keys.Current].Count > 0)
           {
             GUI.enabled = SMConditions.CanResourceBeFilled(keys.Current);
-            if (GUILayout.Button($"{fillContent}", SMStyle.ButtonStyle, GUILayout.Width(35),
-              GUILayout.Height(20))) // "Fill"
+            if (GUILayout.Button($"{fillContent}", SMStyle.ButtonStyle, GUILayout.Width(guiFillButtonWidth),
+              GUILayout.Height(guiLineHeight))) // "Fill"
             {
               SMAddon.SmVessel.FillResource(keys.Current);
             }
@@ -347,7 +355,7 @@ namespace ShipManifest.Windows
       try
       {
         _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(100), GUILayout.Width(300));
+          GUILayout.Height(ViewerHeight), GUILayout.Width(ViewerWidth));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.SelectedResources.Count > 0)
@@ -360,16 +368,16 @@ namespace ShipManifest.Windows
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
               GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
-              GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(265),
-                GUILayout.Height(18));
+              GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(guiLabelWidth),
+                GUILayout.Height(18 * GameSettings.UI_SCALE));
               GUIStyle noPad = SMStyle.LabelStyleNoPad;
               List<string>.Enumerator sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
               while (sResources.MoveNext())
               {
                 if (sResources.Current == null) continue;
                 GUILayout.Label(
-                  $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(265),
-                  GUILayout.Height(16));
+                  $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(guiLabelWidth),
+                  GUILayout.Height(16 * GameSettings.UI_SCALE));
               }
               sResources.Dispose();
             }
@@ -378,7 +386,7 @@ namespace ShipManifest.Windows
               GUILayout.BeginHorizontal();
               GUILayout.Label(
                 $"{part.partInfo.title}, ({SmUtils.GetPartCrewCount(part)}/{part.CrewCapacity})",
-                GUILayout.Width(265), GUILayout.Height(20));
+                GUILayout.Width(guiLabelWidth), GUILayout.Height(guiLineHeight));
               GUILayout.EndHorizontal();
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
@@ -396,7 +404,7 @@ namespace ShipManifest.Windows
                   scienceCount += experiment.GetScienceCount();
               }
               GUILayout.BeginHorizontal();
-              GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", GUILayout.Width(265));
+              GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", GUILayout.Width(guiLabelWidth));
               GUILayout.EndHorizontal();
             }
           }

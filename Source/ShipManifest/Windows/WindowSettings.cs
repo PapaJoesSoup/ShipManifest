@@ -10,10 +10,12 @@ namespace ShipManifest.Windows
   {
     #region Settings Window (GUI)
 
-    internal static float WindowHeight = 380;
+    internal static float WindowHeight = 380 * GameSettings.UI_SCALE;
     internal static float HeightScale;
-    internal static float ViewerHeight = 300;
-    internal static float MinHeight = 300;
+    internal static float ViewerHeight = 300 * GameSettings.UI_SCALE;
+    internal static float ViewerWidth = 380 * GameSettings.UI_SCALE;
+    internal static float MinHeight = 300 * GameSettings.UI_SCALE;
+    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -80,7 +82,7 @@ namespace ShipManifest.Windows
       DisplayTabButtons();
 
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(380));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
       GUILayout.BeginVertical();
 
       DisplaySelectedTab(_displayViewerPosition);
@@ -119,7 +121,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       GUIStyle realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(tabRealismContent, realismStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabRealismContent, realismStyle, GUILayout.Height(guiLineHeight)))
       {
         _selectedTab = Tab.Realism;
       }
@@ -129,7 +131,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle highlightStyle = _selectedTab == Tab.Highlight ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(tabHighlightContent, highlightStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabHighlightContent, highlightStyle, GUILayout.Height(guiLineHeight)))
       {
         _selectedTab = Tab.Highlight;
       }
@@ -138,7 +140,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle tooltipStyle = _selectedTab == Tab.ToolTips ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(tabTooltipContent, tooltipStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabTooltipContent, tooltipStyle, GUILayout.Height(guiLineHeight)))
       {
         _selectedTab = Tab.ToolTips;
       }
@@ -147,7 +149,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle soundStyle = _selectedTab == Tab.Sounds ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(tabSoundsContent, soundStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabSoundsContent, soundStyle, GUILayout.Height(guiLineHeight)))
       {
         _selectedTab = Tab.Sounds;
       }
@@ -156,7 +158,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUIStyle configStyle = _selectedTab == Tab.Config ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(tabConfigContent, configStyle, GUILayout.Height(20)))
+      if (GUILayout.Button(tabConfigContent, configStyle, GUILayout.Height(guiLineHeight)))
       {
         _selectedTab = Tab.Config;
       }
@@ -196,7 +198,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       // Save
-      if (GUILayout.Button(saveContent, GUILayout.Height(20)))
+      if (GUILayout.Button(saveContent, GUILayout.Height(guiLineHeight)))
       {
         ToolTip = "";
         CurrSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
@@ -218,7 +220,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Cancel
-      if (GUILayout.Button(cancelContent, GUILayout.Height(20)))
+      if (GUILayout.Button(cancelContent, GUILayout.Height(guiLineHeight)))
       {
         ToolTip = "";
         // We've cancelled, so restore original settings.

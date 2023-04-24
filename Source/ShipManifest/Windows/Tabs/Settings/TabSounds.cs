@@ -10,9 +10,11 @@ namespace ShipManifest.Windows.Tabs.Settings
 
     // GUI tooltip and label support
     private static Rect _rect;
-    private const float guiRuleWidth = 350;
-    private const float guiTextWidth = 200;
-    private const float guiLabelWidth = 100;
+    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
+    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
+    private static float guiTextWidth = 200 * GameSettings.UI_SCALE;
+    private static float guiLabelWidth = 100 * GameSettings.UI_SCALE;
+    private static float guiLineHeight = 20 * GameSettings.UI_SCALE;
 
     internal static ToolTip toolTip;
 
@@ -59,9 +61,9 @@ namespace ShipManifest.Windows.Tabs.Settings
       int scrollX = 20;
 
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth));
 
-      GUILayout.Label(xferPumpContent, GUILayout.Height(20)); //"Transfer Pump:"
+      GUILayout.Label(xferPumpContent, GUILayout.Height(guiLineHeight)); //"Transfer Pump:"
 
       // Pump Start Sound
       // Pump Starting:
@@ -99,10 +101,10 @@ namespace ShipManifest.Windows.Tabs.Settings
       CurrSettings.PumpSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(" ", GUILayout.Height(10));
+      GUILayout.Label(" ", GUILayout.Height(guiRuleHeight));
 
       // Crew:
-      GUILayout.Label(crewContent, GUILayout.Height(20));
+      GUILayout.Label(crewContent, GUILayout.Height(guiLineHeight));
       // Crew Start Sound
       CurrSettings.CrewSoundStart = GuiUtils.DisplaySettingsTextField(CurrSettings.CrewSoundStart, startCrewContent,
         guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);

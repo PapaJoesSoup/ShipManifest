@@ -8,10 +8,13 @@ namespace ShipManifest.Windows
 {
   internal static class WindowControl
   {
-    internal static float WindowHeight = 280;
+    internal static float WindowHeight = 280 * GameSettings.UI_SCALE;
+    internal static float ViewerWidth = 450 * GameSettings.UI_SCALE;
+    internal static float ViewerHeight = 200 * GameSettings.UI_SCALE;
+    internal static float MinHeight = 200 * GameSettings.UI_SCALE;
+    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
     internal static float HeightScale;
-    internal static float ViewerHeight = 200;
-    internal static float MinHeight = 200;
+
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Vector2 _displayViewerPosition = Vector2.zero;
@@ -37,9 +40,10 @@ namespace ShipManifest.Windows
 
 
     // Tab only vars, used in each tab
-    internal static Rect TabBox = new Rect(0, 0, 450, ViewerHeight);
+    internal static Rect TabBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
+    internal static float GuiRuleWidth = 420 * GameSettings.UI_SCALE;
+    internal static float GuiRuleHeight = 10 * GameSettings.UI_SCALE;
     internal static string TabRule = new string('_', 120);
-    internal const float GuiRuleWidth = 420;
 
     // Content strings
     internal static string Title                  = SmUtils.SmTags["#smloc_control_001"];
@@ -123,7 +127,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
       GUI.enabled = true;
       GUIStyle vesselsStyle = _selectedTab == Tab.Vessel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(vesselContent, vesselsStyle, GUILayout.Height(20))) 
+      if (GUILayout.Button(vesselContent, vesselsStyle, GUILayout.Height(guiLineHeight))) 
       {
         try
         {
@@ -145,7 +149,7 @@ namespace ShipManifest.Windows
       if (CurrSettings.EnableCls)
       {
         GUIStyle hatchesStyle = _selectedTab == Tab.Hatch ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-        if (GUILayout.Button(hatchContent, hatchesStyle, GUILayout.Height(20))) // "Hatches"
+        if (GUILayout.Button(hatchContent, hatchesStyle, GUILayout.Height(guiLineHeight))) // "Hatches"
         {
           try
           {
@@ -168,7 +172,7 @@ namespace ShipManifest.Windows
 
       // Solar Tab
       GUIStyle panelsStyle = _selectedTab == Tab.Panel ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(solarContent, panelsStyle, GUILayout.Height(20))) // "Solar Panels"
+      if (GUILayout.Button(solarContent, panelsStyle, GUILayout.Height(guiLineHeight))) // "Solar Panels"
       {
         try
         {
@@ -188,7 +192,7 @@ namespace ShipManifest.Windows
 
       // Radiator Tab
       GUIStyle radiatorsStyle = _selectedTab == Tab.Radiator ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(radiatorContent, radiatorsStyle, GUILayout.Height(20))) // "Radiators"
+      if (GUILayout.Button(radiatorContent, radiatorsStyle, GUILayout.Height(guiLineHeight))) // "Radiators"
       {
         try
         {
@@ -208,7 +212,7 @@ namespace ShipManifest.Windows
 
       // Antenna Tab
       GUIStyle antennaStyle = _selectedTab == Tab.Antenna ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(antennaContent, antennaStyle, GUILayout.Height(20))) // "Antennas"
+      if (GUILayout.Button(antennaContent, antennaStyle, GUILayout.Height(guiLineHeight))) // "Antennas"
       {
         try
         {
@@ -227,7 +231,7 @@ namespace ShipManifest.Windows
 
       // Lights Tab
       GUIStyle lightsStyle = _selectedTab == Tab.Light ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(lightContent, lightsStyle, GUILayout.Height(20))) // "Lights"
+      if (GUILayout.Button(lightContent, lightsStyle, GUILayout.Height(guiLineHeight))) // "Lights"
       {
         try
         {
@@ -269,7 +273,7 @@ namespace ShipManifest.Windows
     internal static void DisplaySelectedTab()
     {
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-       GUILayout.Height(TabBox.height + HeightScale), GUILayout.Width(TabBox.width));
+       GUILayout.Height((TabBox.height + HeightScale)), GUILayout.Width(TabBox.width));
       switch (_selectedTab)
       {
         case Tab.Vessel:
@@ -308,57 +312,57 @@ namespace ShipManifest.Windows
       {
         case Tab.Panel:
           GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retSolarContent, GUILayout.Height(20))) // "Retract All Solar Panels"
+          if (GUILayout.Button(retSolarContent, GUILayout.Height(guiLineHeight))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
-          if (GUILayout.Button(extSolarContent, GUILayout.Height(20))) // "Extend All Solar Panels"
+          if (GUILayout.Button(extSolarContent, GUILayout.Height(guiLineHeight))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Radiator:
           GUI.enabled = SMAddon.SmVessel.Radiators.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retRadiateContent, GUILayout.Height(20))) // "Retract All Radiators"
+          if (GUILayout.Button(retRadiateContent, GUILayout.Height(guiLineHeight))) // "Retract All Radiators"
             TabRadiator.RetractAllRadiators();
-          if (GUILayout.Button(extRadiateContent, GUILayout.Height(20))) // "Extend All Radiators"
+          if (GUILayout.Button(extRadiateContent, GUILayout.Height(guiLineHeight))) // "Extend All Radiators"
             TabRadiator.ExtendAllRadiators();
           break;
         case Tab.Hatch:
           GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(closenHatchContent, GUILayout.Height(20))) // "Close All Hatches"
+          if (GUILayout.Button(closenHatchContent, GUILayout.Height(guiLineHeight))) // "Close All Hatches"
             TabHatch.CloseAllHatches();
-          if (GUILayout.Button(openHatchContent, GUILayout.Height(20))) // "Open All Hatches"
+          if (GUILayout.Button(openHatchContent, GUILayout.Height(guiLineHeight))) // "Open All Hatches"
             TabHatch.OpenAllHatches();
           break;
         case Tab.Antenna:
           GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retAntennaContent, GUILayout.Height(20))) // "Retract All Antennas"
+          if (GUILayout.Button(retAntennaContent, GUILayout.Height(guiLineHeight))) // "Retract All Antennas"
             TabAntenna.RetractAllAntennas();
-          if (GUILayout.Button(extAntennaContent, GUILayout.Height(20))) // "Extend All Antennas"
+          if (GUILayout.Button(extAntennaContent, GUILayout.Height(guiLineHeight))) // "Extend All Antennas"
             TabAntenna.ExtendAllAntennas();
           break;
         case Tab.Light:
           GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(offLightContent, GUILayout.Height(20))) // "Turn Off All Lights"
+          if (GUILayout.Button(offLightContent, GUILayout.Height(guiLineHeight))) // "Turn Off All Lights"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(onLightContent, GUILayout.Height(20))) // "Turn On All Lights"
+          if (GUILayout.Button(onLightContent, GUILayout.Height(guiLineHeight))) // "Turn On All Lights"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Lab:
           GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(offLabsContent, GUILayout.Height(20))) // "Turn Off All Labs"
+          if (GUILayout.Button(offLabsContent, GUILayout.Height(guiLineHeight))) // "Turn Off All Labs"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(onLabsContent, GUILayout.Height(20))) // "Turn On All Labs"
+          if (GUILayout.Button(onLabsContent, GUILayout.Height(guiLineHeight))) // "Turn On All Labs"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Vessel:
-          GUILayout.Label("", GUILayout.Height(20));
+          GUILayout.Label("", GUILayout.Height(guiLineHeight));
           // Temporary commenting of code to allow release.  Will work Vessel combining in later release.
           //GUI.enabled = TabVessel.CombineVesselCount > 0;
-          //if (GUILayout.Button(selVesselContent, GUILayout.Height(20))) // "Combine Selected Vessels"
+          //if (GUILayout.Button(selVesselContent, GUILayout.Height(guiLineHeight))) // "Combine Selected Vessels"
           //  TabVessel.CombineSelectedVessels();
-          //if (GUILayout.Button(clrVesselContent, GUILayout.Height(20))) // "Clear Vessel Selections"
+          //if (GUILayout.Button(clrVesselContent, GUILayout.Height(guiLineHeight))) // "Clear Vessel Selections"
           //  TabVessel.ClearVesselCount();
           break;
         case Tab.None:
-          GUILayout.Label("", GUILayout.Height(20));
+          GUILayout.Label("", GUILayout.Height(guiLineHeight));
           break;
         default:
           throw new ArgumentOutOfRangeException();
