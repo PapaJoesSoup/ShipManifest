@@ -7,14 +7,21 @@ namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabHighlight
   {
-    internal static string StrFlowCost = "0";
 
-    // GUI tooltip and label support
-    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
-    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
-    private static float guiToggleWidth = 300 * GameSettings.UI_SCALE;
-    private static float guiIndent = 20 * GameSettings.UI_SCALE;
+    static TabHighlight()
+    {
+      RefreshUIScale();
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
 
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiIndent;
+
+    // ToolTip vars
     internal static ToolTip toolTip;
     private static bool _showToolTips = true;
     internal static bool ShowToolTips
@@ -23,38 +30,30 @@ namespace ShipManifest.Windows.Tabs.Settings
       set => _showToolTips = toolTip.Show = value;
     }
 
-    internal static Rect Position = WindowSettings.Position;
+    internal static string StrFlowCost = "0";
+
 
     // Content strings
-    internal static GUIContent titleContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_config_000"]);
+    internal static GUIContent titleContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_000"]);
     internal static GUIContent modeAllContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_001"], SmUtils.SmTags["#smloc_settings_highlight_tt_001"]);
     internal static GUIContent modeSTContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_002"], SmUtils.SmTags["#smloc_settings_highlight_tt_002"]);
     internal static GUIContent modeClsContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_003"], SmUtils.SmTags["#smloc_settings_highlight_tt_003"]);
     internal static GUIContent modeEdgeContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_highlight_004"], SmUtils.SmTags["#smloc_settings_highlight_tt_004"]);
 
-    static TabHighlight()
-    {
-      toolTip = new ToolTip
-      {
-        Show = ShowToolTips
-      };
-    }
-
-
 
     internal static void Display(Vector2 displayViewerPosition)
     {
+
       // Reset Tooltip active flag...
       toolTip.Active = false;
       toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
-      Position = WindowSettings.Position;
       int scrollX = 20;
 
       GUI.enabled = true;
       // Tab Title
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       // EnableHighlighting Mode
       // Enable Highlighting
@@ -139,5 +138,12 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
       GUI.enabled = true;
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 300 * CurrSettings.CurrentUIScale;
+      guiIndent = 20 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

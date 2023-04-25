@@ -8,14 +8,26 @@ namespace ShipManifest.Windows
 {
   internal static class WindowSettings
   {
+
+    static WindowSettings()
+    {
+      RefreshUIScale();
+    }
+
     #region Settings Window (GUI)
 
-    internal static float WindowHeight = 380 * GameSettings.UI_SCALE;
+    // UIScale settings
+    internal static float WindowHeight;
+    internal static float MinHeight;
+    internal static float ViewerHeight;
+    internal static float ViewerWidth;
+    internal static float GuiRuleWidth;
+    internal static float GuiRuleHeight;
+    internal static float guiLineHeight;
+
+
+
     internal static float HeightScale;
-    internal static float ViewerHeight = 300 * GameSettings.UI_SCALE;
-    internal static float ViewerWidth = 380 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 300 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -36,6 +48,7 @@ namespace ShipManifest.Windows
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static string ToolTip = "";
+
     internal static string TabRule = new string('_', 92);
 
     private static Tab _selectedTab = Tab.Realism;
@@ -55,6 +68,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -78,7 +92,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
-
+      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
       DisplayTabButtons();
 
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
@@ -118,6 +132,7 @@ namespace ShipManifest.Windows
 
     private static void DisplayTabButtons()
     {
+
       GUILayout.BeginHorizontal();
 
       GUIStyle realismStyle = _selectedTab == Tab.Realism ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
@@ -195,6 +210,7 @@ namespace ShipManifest.Windows
 
     private static void DisplayActionButtons()
     {
+
       GUILayout.BeginHorizontal();
 
       // Save
@@ -238,7 +254,18 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    private enum Tab
+    internal static void RefreshUIScale()
+    {
+      WindowHeight = 380 * CurrSettings.CurrentUIScale;
+      MinHeight = 300 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 300 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 380 * CurrSettings.CurrentUIScale;
+      GuiRuleWidth = 350 * CurrSettings.CurrentUIScale;
+      GuiRuleHeight = 10 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+    }
+
+  private enum Tab
     {
       Realism,
       Config,

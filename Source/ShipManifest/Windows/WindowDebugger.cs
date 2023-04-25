@@ -11,13 +11,22 @@ namespace ShipManifest.Windows
 {
   internal static class WindowDebugger
   {
-    internal static float WindowHeight = 355 * GameSettings.UI_SCALE;
+
+    static WindowDebugger()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float WindowHeight;
+    internal static float ViewerWidth;
+    internal static float ViewerHeight;
+    internal static float guiTextAreaWidth;
+    internal static float guiLineHeight;
+    internal static float MinHeight;
+
+
     internal static float HeightScale;
-    internal static float ViewerWidth = 500 * GameSettings.UI_SCALE;
-    internal static float ViewerHeight = 300 * GameSettings.UI_SCALE;
-    internal static float guiTextAreaWidth = 460 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 200 * GameSettings.UI_SCALE;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -49,6 +58,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -69,6 +79,7 @@ namespace ShipManifest.Windows
       SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
         GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
       GUILayout.BeginVertical();
+      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
 
       List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
       while (errors.MoveNext())
@@ -170,5 +181,16 @@ namespace ShipManifest.Windows
           true);
       }
     }
-  }
+
+    internal static void RefreshUIScale()
+    {
+      WindowHeight = 355 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 500 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 300 * CurrSettings.CurrentUIScale;
+      guiTextAreaWidth = 460 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      MinHeight = 200 * CurrSettings.CurrentUIScale;
+    }
+
+}
 }

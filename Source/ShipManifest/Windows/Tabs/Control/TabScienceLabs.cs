@@ -1,17 +1,27 @@
 using System;
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabScienceLab
   {
+
+    static TabScienceLab()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiLabelWidth;
+    internal static float guiLabelHeight;
+
+    // ToolTip vars
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    internal static float guiLabelWidth = 260 * GameSettings.UI_SCALE;
-    internal static float guiLabelHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
@@ -21,6 +31,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display()
     {
+
       //float scrollX = WindowControl.Position.x + 10;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 10;
@@ -65,5 +76,12 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       GUILayout.EndVertical();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiLabelWidth = 260 * CurrSettings.CurrentUIScale;
+      guiLabelHeight = 40 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

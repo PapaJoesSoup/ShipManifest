@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using UnityEngine;
 
@@ -9,12 +10,20 @@ namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabAntenna
   {
+
+    static TabAntenna()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiToggleHeight;
+
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static bool IsRtAntennas;
-    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
-    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_antenna_000"]);
@@ -96,6 +105,12 @@ namespace ShipManifest.Windows.Tabs.Control
         iAntennas.Current.RetractAntenna();
       }
       iAntennas.Dispose();
+    }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 325 * CurrSettings.CurrentUIScale;
+      guiToggleHeight = 40 * CurrSettings.CurrentUIScale;
     }
   }
 }

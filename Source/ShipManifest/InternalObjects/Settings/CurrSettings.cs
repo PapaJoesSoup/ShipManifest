@@ -103,6 +103,8 @@ namespace ShipManifest.InternalObjects.Settings
     internal static string MouseOverColor = "burntorange";
     internal static double CrewXferDelaySec = 7;
     internal static int IvaUpdateFrameDelay = 10;
+    // this is set to 0 to ensure it causes the setuistyles to execute in the first ongui event
+    internal static float CurrentUIScale = 0;
 
 
   }

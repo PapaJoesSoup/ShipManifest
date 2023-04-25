@@ -6,18 +6,23 @@ namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabSounds
   {
-    internal static string StrFlowCost = "0";
 
-    // GUI tooltip and label support
-    private static Rect _rect;
-    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
-    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
-    private static float guiTextWidth = 200 * GameSettings.UI_SCALE;
-    private static float guiLabelWidth = 100 * GameSettings.UI_SCALE;
-    private static float guiLineHeight = 20 * GameSettings.UI_SCALE;
+    static TabSounds()
+    {
+      RefreshUIScale();
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
 
+    // UIScale settings
+    internal static float guiTextWidth;
+    internal static float guiLabelWidth;
+    internal static float guiLineHeight;
+
+    // ToolTip vars
     internal static ToolTip toolTip;
-
     private static bool _showToolTips = true;
     internal static bool ShowToolTips
     {
@@ -25,7 +30,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       set => _showToolTips = toolTip.Show = value;
     }
 
-    internal static Rect Position = WindowSettings.Position;
+    internal static string StrFlowCost = "0";
+    private static Rect _rect;
 
     // Content strings
     internal static GUIContent titleContent     = new GUIContent(SmUtils.SmTags["#smloc_settings_sounds_000"]);
@@ -43,25 +49,17 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent volCrewContent   = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_012"]}:", SmUtils.SmTags["#smloc_settings_sounds_tt_004"]);
     internal static GUIContent filePathContent  = new GUIContent($"{SmUtils.SmTags["#smloc_settings_sounds_013"]}");
 
-    static TabSounds()
-    {
-      toolTip = new ToolTip
-      {
-        Show = ShowToolTips
-      };
-    }
-
     internal static void Display(Vector2 displayViewerPosition)
     {
+
       // Reset Tooltip active flag...
       toolTip.Active = false;
       toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
-      Position = WindowSettings.Position;
       int scrollX = 20;
 
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       GUILayout.Label(xferPumpContent, GUILayout.Height(guiLineHeight)); //"Transfer Pump:"
 
@@ -101,7 +99,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       CurrSettings.PumpSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(" ", GUILayout.Height(guiRuleHeight));
+      GUILayout.Label(" ", GUILayout.Height(WindowSettings.GuiRuleHeight));
 
       // Crew:
       GUILayout.Label(crewContent, GUILayout.Height(guiLineHeight));
@@ -139,5 +137,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       CurrSettings.CrewSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiTextWidth = 200 * (CurrSettings.CurrentUIScale / 2);
+      guiLabelWidth = 100 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

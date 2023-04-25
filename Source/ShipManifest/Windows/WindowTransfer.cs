@@ -15,31 +15,50 @@ namespace ShipManifest.Windows
 {
   internal static class WindowTransfer
   {
+
+    static WindowTransfer()
+    {
+      RefreshUIScale();
+    }
+
     #region Properties
+
+    // UIScale settings
+    internal static float ViewerWidth;
+    internal static float ViewerHeight;
+    internal static float ViewerHeight2;
+    internal static float MinHeight;
+    internal static float WindowHeight;
+    internal static float textWidth;
+    internal static float toggleWidth;
+    internal static float guiLineHeight;
+    internal static float guiBtnMoveWidth;
+    internal static float label1Width;
+    internal static float guibtnAction1Width;
+    internal static float guibtnAction2Width;
+    internal static float guibtnAction3Width;
+    internal static float cmWidth;
+    internal static float cmMoveWidth;
+    internal static float guiDumpFillWidth;
+    internal static float guiBtnFillWidth;
+    internal static float btnWidth;
+    internal static float guiLabelScienceWidth;
+    internal static float guiLabelScience2Width;
+    internal static float labelWidth;
+    internal static float labelWidth2;
+    internal static float sliderWidth;
+    internal static float guiLineHeight2;
+    internal static float guiLableXferWidth;
+    internal static float guiLabelSliderWidth;
+    internal static float guiSpaceWidth;
+    internal static Rect SelectBox;
+    internal static Rect DetailsBox;
+
 
     internal static string Title = "";
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static float HeightScale;
-    internal static float ViewerHeight = 100 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 50 * GameSettings.UI_SCALE;
-    internal static float WindowHeight = 279 * GameSettings.UI_SCALE;
     internal static bool ResizingWindow = false;
-    internal static Rect SelectBox = new Rect(0, 0, 300 * GameSettings.UI_SCALE, ViewerHeight);
-    internal static Rect DetailsBox = new Rect(0,0, 300 * GameSettings.UI_SCALE, 120 * GameSettings.UI_SCALE);
-
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
-    internal static float guiSpaceWidth = 20 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight2 = 18 * GameSettings.UI_SCALE;
-    internal static float guiDumpFillWidth = 45 * GameSettings.UI_SCALE;
-    internal static float guiBtnFillWidth = 30 * GameSettings.UI_SCALE;
-    internal static float guiBtnMoveWidth = 15 * GameSettings.UI_SCALE;
-    internal static float guiLableXferWidth = 120 * GameSettings.UI_SCALE;
-    internal static float guiLabelScienceWidth = 205 * GameSettings.UI_SCALE;
-    internal static float guiLabelScience2Width = 220 * GameSettings.UI_SCALE;
-    internal static float guibtnAction1Width = 40 * GameSettings.UI_SCALE;
-    internal static float guibtnAction2Width = 50 * GameSettings.UI_SCALE;
-    internal static float guibtnAction3Width = 90 * GameSettings.UI_SCALE;
-    internal static float guiLabelSliderWidth = 50 * GameSettings.UI_SCALE;
 
     private static bool inputLocked;
     private static bool showWindow;
@@ -201,6 +220,7 @@ namespace ShipManifest.Windows
     // This window assumes that a resource has been selected on the Ship manifest window.
     internal static void Display(int windowId)
     {
+
       GUI.enabled = !SMConditions.IsTransferInProgress() || !PopupCloseTransfer.ShowWindow;
 
       // set input locks when mouseover window...
@@ -225,6 +245,9 @@ namespace ShipManifest.Windows
       try
       {
         // This window assumes that a resource has been selected on the Ship manifest window.
+        GUILayout.BeginVertical();
+        GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+        GUILayout.EndVertical();
         GUILayout.BeginHorizontal();
         //Left Column Begins
         GUILayout.BeginVertical();
@@ -323,6 +346,7 @@ namespace ShipManifest.Windows
     private static Vector2 _sourceTransferViewerScrollPosition = Vector2.zero;
     internal static void SourceTransferViewer()
     {
+
       try
       {
         // This is a scroll panel (we are using it to make button lists...)
@@ -350,6 +374,7 @@ namespace ShipManifest.Windows
     private static Vector2 _sourceDetailsViewerScrollPosition = Vector2.zero;
     private static void SourceDetailsViewer()
     {
+
       try
       {
         // Source Part resource Details
@@ -389,6 +414,7 @@ namespace ShipManifest.Windows
     private static Vector2 _targetTransferViewerScrollPosition = Vector2.zero;
     private static void TargetTransferViewer()
     {
+
       try
       {
         // Adjust target style colors for part selectors when using/not using CLS highlighting
@@ -423,6 +449,7 @@ namespace ShipManifest.Windows
     private static Vector2 _targetDetailsViewerScrollPosition = Vector2.zero;
     private static void TargetDetailsViewer()
     {
+
       try
       {
         // Target Part resource details
@@ -462,8 +489,6 @@ namespace ShipManifest.Windows
     private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypeXfer xferType)
     {
       GUI.enabled = true;
-      float textWidth = 220 * GameSettings.UI_SCALE;
-      float toggleWidth = 65 * GameSettings.UI_SCALE; 
       string labelText = "";
 
       GUILayout.BeginHorizontal();
@@ -511,6 +536,7 @@ namespace ShipManifest.Windows
     private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypeXfer xferType,
       Vector2 viewerScrollPosition)
     {
+
       //float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       //float scrollY = Position.y + 30 - viewerScrollPosition.y;
       float scrollX = (xferType == TransferPump.TypeXfer.SourceToTarget ? 20 : 320);
@@ -535,7 +561,7 @@ namespace ShipManifest.Windows
             btnWidth = 173;
 
           // scale buttonwidth
-          btnWidth = btnWidth * GameSettings.UI_SCALE;
+          btnWidth = btnWidth * CurrSettings.CurrentUIScale;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -588,6 +614,7 @@ namespace ShipManifest.Windows
     private static void VesselTransferViewer(List<string> selectedResources, TransferPump.TypeXfer xferType,
       Vector2 viewerScrollPosition)
     {
+
       //float scrollX = Position.x + (pumpType == TransferPump.TypePump.SourceToTarget ? 20 : 320);
       //float scrollY = Position.y + 30 - viewerScrollPosition.y;
       float scrollX = xferType == TransferPump.TypeXfer.SourceToTarget ? 20 : 320;
@@ -608,7 +635,7 @@ namespace ShipManifest.Windows
           float btnWidth = 273;
           if (!CurrSettings.RealXfers) btnWidth = 180;
 
-          btnWidth = btnWidth * GameSettings.UI_SCALE;
+          btnWidth = btnWidth * CurrSettings.CurrentUIScale;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -702,6 +729,7 @@ namespace ShipManifest.Windows
 
     private static void ResourceDumpFillButtons(List<string> selectedResources, TransferPump.TypeXfer xferType, Part part)
     {
+
       uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()), part, part,
         xferType, TransferPump.TriggerButton.Transfer);
 
@@ -745,6 +773,7 @@ namespace ShipManifest.Windows
 
     private static void CrewFillDumpVesselButtons(ModDockedVessel vessel)
     {
+
       int crewCapacity = SmUtils.GetPartsCrewCapacity(vessel.VesselParts);
       int crewCount = SmUtils.GetPartsCrewCount(vessel.VesselParts);
       GUI.enabled = SmUtils.GetPartsCrewCapacity(vessel.VesselParts) > 0;
@@ -868,7 +897,6 @@ namespace ShipManifest.Windows
 
     private static void FrozenCrewMemberDetails(float xOffset, DfWrapper.FrznCrewMbr frznCrew)
     {
-      float label1Width = 190 * GameSettings.UI_SCALE;
 
       GUILayout.BeginHorizontal();
       GUI.enabled = false;
@@ -901,7 +929,6 @@ namespace ShipManifest.Windows
     private static void ShowSelectAllOption(List<ProtoCrewMember> selectedCrewMembers, List<Part> selectedPartsFrom, List<Part> selectedPartsTo,
       bool isSourceView, int sourceCrewCount, int targetCapacity, bool selectAll, bool touristsOnly, float xOffset)
     {
-      float label1Width = 180 * GameSettings.UI_SCALE;
       Rect rect;
       GUILayout.BeginHorizontal();
       GUI.enabled = selectedPartsFrom.Count > 0 && selectedPartsTo.Count > 0 && sourceCrewCount > 0 && targetCapacity > 0;
@@ -941,7 +968,6 @@ namespace ShipManifest.Windows
 
     private static bool ShowOptionTouristsOnly(bool isSourceView, bool touristsOnly, float xOffset)
     {
-      float label1Width = 180 * GameSettings.UI_SCALE;
       Rect rect;
       GUI.enabled = true;
       // check to see if crewmembers selected match criteria for a show Tourists only setting...
@@ -978,8 +1004,6 @@ namespace ShipManifest.Windows
 
     private static void CrewMemberDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, ProtoCrewMember crewMember, float xOffset, bool isVesselMode, int targetCapacity)
     {
-      float cmWidth = 180 * GameSettings.UI_SCALE;
-      float cmMoveWidth = 25 * GameSettings.UI_SCALE;
 
       Rect rect;
       GUILayout.BeginHorizontal();
@@ -1018,7 +1042,7 @@ namespace ShipManifest.Windows
 
     private static void CrewMemberXferButton(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, ProtoCrewMember crewMember, float xOffset)
     {
-      float btnWidth = 60 * GameSettings.UI_SCALE;
+
       Rect rect;
       GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
       if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember.Equals(crewMember) ||
@@ -1064,6 +1088,7 @@ namespace ShipManifest.Windows
 
     private static void CrewSelectedXferButton(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, float xOffset)
     {
+
       Rect rect;
       //if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMembers == crewMembers ||
       //     SMAddon.SmVessel.TransferCrewObj.ToCrewMembers == crewMembers) && SMConditions.IsTransferInProgress())
@@ -1092,6 +1117,7 @@ namespace ShipManifest.Windows
     // TODO: This method is currntly unused.  Examine for relavence and need
     private static void ScienceVesselDetails(Dictionary<PartModule, bool> sourceModules, Dictionary<PartModule, bool> targetModules, bool isVesselMode)
     {
+
       if (sourceModules.Count <= 0 || targetModules.Count <= 0) return;
       const float xOffset = 30;
       // Okay, for vessels we want summaries.  then a result list of modules to transfer based on those summaries.
@@ -1258,6 +1284,7 @@ namespace ShipManifest.Windows
 
     private static void ScienceDetailsSource(bool isVesselMode)
     {
+
       if (SMAddon.SmVessel.SelectedPartsSource.Count <= 0) return;
       const float xOffset = 30;
 
@@ -1420,6 +1447,7 @@ namespace ShipManifest.Windows
 
     private static void ScienceDetailsTarget()
     {
+
       const float xOffset = 30;
       if (SMAddon.SmVessel.SelectedPartsTarget.Count <= 0) return;
       int count =
@@ -1471,9 +1499,6 @@ namespace ShipManifest.Windows
     private static void ResourceDetailsViewer(TransferPump.TypeXfer pumpType)
     {
       Rect rect;
-      float labelWidth = 65 * GameSettings.UI_SCALE;
-      float labelWidth2 = 80 * GameSettings.UI_SCALE;
-      float sliderWidth = 95 * GameSettings.UI_SCALE;
 
       // Let's get the pump objects we may use...
       List<string> selectedResources = SMAddon.SmVessel.SelectedResources;
@@ -1558,7 +1583,7 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
       thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount,
-        GUILayout.Width(190 * GameSettings.UI_SCALE));
+        GUILayout.Width(190 * CurrSettings.CurrentUIScale));
       activePump.EditSliderAmount = thisXferAmount.ToString(CultureInfo.InvariantCulture);
 
       // set Xfer button style
@@ -1584,6 +1609,7 @@ namespace ShipManifest.Windows
 
     private static void ResourceFlowButtons(TransferPump.TypeXfer pumpType, int scrollX)
     {
+
       string step = "";
       try
       {
@@ -1961,5 +1987,39 @@ namespace ShipManifest.Windows
     }
 
     #endregion
+
+    internal static void RefreshUIScale()
+    {
+      ViewerWidth = 300 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 100 * CurrSettings.CurrentUIScale;
+      ViewerHeight2 = 120 * CurrSettings.CurrentUIScale;
+      MinHeight = 50 * CurrSettings.CurrentUIScale;
+      WindowHeight = 279 * CurrSettings.CurrentUIScale;
+      textWidth = 220 * CurrSettings.CurrentUIScale;
+      toggleWidth = 65 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      guiBtnMoveWidth = 15 * CurrSettings.CurrentUIScale;
+      label1Width = 190 * CurrSettings.CurrentUIScale;
+      guibtnAction1Width = 40 * CurrSettings.CurrentUIScale;
+      guibtnAction2Width = 50 * CurrSettings.CurrentUIScale;
+      guibtnAction3Width = 90 * CurrSettings.CurrentUIScale;
+      cmWidth = 180 * CurrSettings.CurrentUIScale;
+      cmMoveWidth = 25 * CurrSettings.CurrentUIScale;
+      guiDumpFillWidth = 45 * CurrSettings.CurrentUIScale;
+      guiBtnFillWidth = 30 * CurrSettings.CurrentUIScale;
+      btnWidth = 60 * CurrSettings.CurrentUIScale;
+      guiLabelScienceWidth = 205 * CurrSettings.CurrentUIScale;
+      guiLabelScience2Width = 220 * CurrSettings.CurrentUIScale;
+      labelWidth = 65 * CurrSettings.CurrentUIScale;
+      labelWidth2 = 80 * CurrSettings.CurrentUIScale;
+      sliderWidth = 95 * CurrSettings.CurrentUIScale;
+      guiLineHeight2 = 18 * CurrSettings.CurrentUIScale;
+      guiLableXferWidth = 120 * CurrSettings.CurrentUIScale;
+      guiLabelSliderWidth = 50 * CurrSettings.CurrentUIScale;
+      guiSpaceWidth = 20 * CurrSettings.CurrentUIScale;
+      SelectBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
+      DetailsBox = new Rect(0, 0, ViewerWidth, ViewerHeight2);
+    }
+
   }
 }

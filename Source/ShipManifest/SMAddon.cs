@@ -9,6 +9,8 @@ using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Process;
 using ShipManifest.Windows;
 using ShipManifest.Windows.Popups;
+using ShipManifest.Windows.Tabs.Settings;
+using ShipManifest.Windows.Tabs.Control;
 using UnityEngine;
 
 namespace ShipManifest
@@ -136,19 +138,8 @@ namespace ShipManifest
           FrameErrTripped = false;
 
         if (WindowRoster.ResetRosterSize)
-          WindowRoster.Position.height = (CurrSettings.UseUnityStyle ? 330 : 350) * GameSettings.UI_SCALE;
+          WindowRoster.Position.height = (CurrSettings.UseUnityStyle ? 330 : 350) * CurrSettings.CurrentUIScale;
 
-        // clear window sizes
-        WindowManifest.Position.width = 0;
-        WindowManifest.Position.height = 0;
-        WindowTransfer.Position.width = 0;
-        WindowTransfer.Position.height = 0;
-        WindowRoster.Position.width = 0;
-        WindowRoster.Position.height = 0;
-        WindowSettings.Position.width = 0;
-        WindowSettings.Position.height = 0;
-        WindowDebugger.Position.width = 0;
-        WindowDebugger.Position.height = 0;
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
         {
@@ -223,6 +214,55 @@ namespace ShipManifest
         SmUtils.LogMessage($"Error in:  SMAddon.Start.  {ex}", SmUtils.LogType.Error, true);
       }
     }
+
+    private static void ResetWindows()
+    {
+      // clear window sizes
+      WindowManifest.Position.width = 0;
+      WindowManifest.Position.height = 0;
+      WindowTransfer.Position.width = 0;
+      WindowTransfer.Position.height = 0;
+      WindowRoster.Position.width = 0;
+      WindowRoster.Position.height = 0;
+      WindowSettings.Position.width = 0;
+      WindowSettings.Position.height = 0;
+      WindowDebugger.Position.width = 0;
+      WindowDebugger.Position.height = 0;
+
+      // refresh ui scales on all windows
+      WindowManifest.RefreshUIScale();
+      WindowTransfer.RefreshUIScale();
+      WindowControl.RefreshUIScale();
+      TabAntenna.RefreshUIScale();
+      TabHatch.RefreshUIScale();
+      TabLight.RefreshUIScale();
+      TabRadiator.RefreshUIScale();
+      TabScienceLab.RefreshUIScale();
+      TabSolarPanel.RefreshUIScale();
+      TabVessel.RefreshUIScale();
+
+      PopupSmBtnHover.RefreshUIScale();
+      PopupCloseTransfer.RefreshUIScale();
+      
+      WindowSettings.RefreshUIScale();
+      TabConfig.RefreshUIScale();
+      TabHighlight.RefreshUIScale();
+      TabRealism.RefreshUIScale();
+      TabSounds.RefreshUIScale();
+      TabToolTips.RefreshUIScale();
+
+      WindowDebugger.RefreshUIScale();
+      WindowRoster.RefreshUIScale();
+
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+      WindowManifest.RefreshUIScale();
+    }
+
 
     internal void OnDestroy()
     {
@@ -321,6 +361,8 @@ namespace ShipManifest
     // ReSharper disable once InconsistentNaming
     internal void OnGUI()
     {
+      CheckForUIScaleChange();
+
       if (Event.current.type == EventType.MouseUp)
       {
         // Turn off window resizing
@@ -330,7 +372,6 @@ namespace ShipManifest
       {
         GUI.skin = CurrSettings.UseUnityStyle ? null : HighLogic.Skin;
 
-        SMStyle.SetupGuiStyles();
         Display();
         SMToolTips.ShowToolTips();
       }
@@ -396,6 +437,14 @@ namespace ShipManifest
           FrameErrTripped = true;
         }
       }
+    }
+
+    private void CheckForUIScaleChange()
+    {
+      if (Math.Abs(CurrSettings.CurrentUIScale - GameSettings.UI_SCALE) < .01f) return;
+      CurrSettings.CurrentUIScale = GameSettings.UI_SCALE;
+      SMStyle.SetupGuiStyles();
+      ResetWindows();
     }
 
     // save settings on scene changes
@@ -895,11 +944,11 @@ namespace ShipManifest
         step = "0 - Start";
         if (WindowDebugger.ShowWindow)
           WindowDebugger.Position = GUILayout.Window(398643, WindowDebugger.Position, WindowDebugger.Display,
-            WindowDebugger.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+            WindowDebugger.Title,GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
 
         if(PopupSmBtnHover.ShowWindow)
           PopupSmBtnHover.Position = GUILayout.Window(398650, PopupSmBtnHover.Position, PopupSmBtnHover.Display,
-            PopupSmBtnHover.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+            PopupSmBtnHover.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
 
         if (HighLogic.LoadedScene == GameScenes.FLIGHT && SMConditions.CanShowShipManifest() || 
             HighLogic.LoadedScene == GameScenes.SPACECENTER && ShowUi && !SMConditions.IsPauseMenuOpen())
@@ -908,16 +957,16 @@ namespace ShipManifest
           {
             step = "4 - Show Settings";
             WindowSettings.Position = GUILayout.Window(398546, WindowSettings.Position, WindowSettings.Display,
-              WindowSettings.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+              WindowSettings.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
           }
 
           if (WindowRoster.ShowWindow)
           {
             step = "6 - Show Roster";
             if (WindowRoster.ResetRosterSize)
-              WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 * GameSettings.UI_SCALE : 350 * GameSettings.UI_SCALE;
+              WindowRoster.Position.height = CurrSettings.UseUnityStyle ? 330 * CurrSettings.CurrentUIScale : 350 * CurrSettings.CurrentUIScale;
             WindowRoster.Position = GUILayout.Window(398547, WindowRoster.Position, WindowRoster.Display,
-              WindowRoster.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+              WindowRoster.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
           }
         }
 
@@ -928,12 +977,12 @@ namespace ShipManifest
           step = "3 - Show Transfer";
           // Lets build the running totals for each resource for display in title...
           WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
-            WindowTransfer.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+            WindowTransfer.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
 
           if (TransferPump.Paused && PopupCloseTransfer.ShowWindow)
           {
             PopupCloseTransfer.Position = GUILayout.Window(398549, PopupCloseTransfer.Position, PopupCloseTransfer.Display,
-              PopupCloseTransfer.Title, SMStyle.PopupStyle, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+              PopupCloseTransfer.Title, SMStyle.PopupStyle, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
           }
         }
         if (SMConditions.CanShowShipManifest())
@@ -941,20 +990,20 @@ namespace ShipManifest
           // What windows do we want to show?
           step = "2 - Can Show Manifest - true";
           WindowManifest.Position = GUILayout.Window(398544, WindowManifest.Position, WindowManifest.Display,
-            WindowManifest.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+            WindowManifest.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
 
           if (WindowTransfer.ShowWindow && SmVessel.SelectedResources.Count > 0)
           {
             step = "3 - Show Transfer";
             // Lets build the running totals for each resource for display in title...
             WindowTransfer.Position = GUILayout.Window(398545, WindowTransfer.Position, WindowTransfer.Display,
-              WindowTransfer.Title, GUILayout.MinHeight(20 * GameSettings.UI_SCALE));
+              WindowTransfer.Title, GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
           }
 
           if (!WindowManifest.ShowWindow || !WindowControl.ShowWindow) return;
            step = "7 - Show Control";
           WindowControl.Position = GUILayout.Window(398548, WindowControl.Position, WindowControl.Display,
-            WindowControl.Title, GUILayout.MinWidth(350 * GameSettings.UI_SCALE), GUILayout.MinHeight(20));
+            WindowControl.Title, GUILayout.MinWidth(350 * CurrSettings.CurrentUIScale), GUILayout.MinHeight(20 * CurrSettings.CurrentUIScale));
         }
         else
         {

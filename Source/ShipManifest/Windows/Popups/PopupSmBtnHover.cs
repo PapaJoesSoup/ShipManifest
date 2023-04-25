@@ -1,13 +1,14 @@
+using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
 
 namespace ShipManifest.Windows.Popups
 {
   internal static class PopupSmBtnHover
   {
-    internal static float WindowHeight = 200;
-    internal static float WindowWidth = 420;
     internal static float TextWidth = 400;
-    internal static Rect Position = new Rect(Screen.width - 462, (Screen.height / 2) - 200, WindowWidth, WindowHeight);
+    internal static float WindowWidth = 420;
+    internal static float WindowHeight = 200 * CurrSettings.CurrentUIScale;
+    internal static Rect Position = new Rect(Screen.width - 462 * CurrSettings.CurrentUIScale, (Screen.height / 2) - 200 * CurrSettings.CurrentUIScale, WindowWidth, WindowHeight);
 
     internal static bool ShowToolTips = true;
 
@@ -39,17 +40,23 @@ namespace ShipManifest.Windows.Popups
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(5 * GameSettings.UI_SCALE));
+      GUILayout.Label("", GUILayout.Height(5 * CurrSettings.CurrentUIScale));
 
-      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * GameSettings.UI_SCALE));
-      GUILayout.Label("", GUILayout.Height(5 * GameSettings.UI_SCALE));
-      GUILayout.Label(aboutContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", GUILayout.Height(5 * CurrSettings.CurrentUIScale));
+      GUILayout.Label(aboutContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
 
       GUILayout.EndVertical();
       //ResetZoomKeys();
       Position.width = WindowWidth;
       Position.height = WindowHeight;
       GuiUtils.RepositionWindow(ref Position);
+    }
+
+    internal static void RefreshUIScale()
+    {
+      WindowHeight = 200 * CurrSettings.CurrentUIScale;
+      Position = new Rect(Screen.width - 462 * CurrSettings.CurrentUIScale, (Screen.height / 2) - 200 * CurrSettings.CurrentUIScale, WindowWidth, WindowHeight);
     }
   }
 }

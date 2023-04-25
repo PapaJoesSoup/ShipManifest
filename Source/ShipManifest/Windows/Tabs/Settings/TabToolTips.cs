@@ -7,15 +7,23 @@ namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabToolTips
   {
-    internal static string StrFlowCost = "0";
 
-    // GUI tooltip and label support
-    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
-    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
-    private static float guiToggleWidth = 300 * GameSettings.UI_SCALE;
-    private static float guiIndent = 20 * GameSettings.UI_SCALE;
-    private static float gui2xIndent = 40 * GameSettings.UI_SCALE;
+    static TabToolTips()
+    {
+      RefreshUIScale();
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
 
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiIndent;
+    internal static float gui2xIndent;
+
+
+    // GUI sizing with scaling
     internal static ToolTip toolTip;
 
     private static bool _showToolTips = true;
@@ -25,7 +33,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       set => _showToolTips = toolTip.Show = value;
     }
 
-    internal static Rect Position = WindowSettings.Position;
+    internal static string StrFlowCost = "0";
 
     // Content strings
     internal static GUIContent titleContent       = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_000"]);
@@ -49,22 +57,21 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent vesselTtContent    = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_018"], SmUtils.SmTags["#smloc_settings_tooltips_tt_018"]);
     internal static GUIContent appIconTtContent   = new GUIContent(SmUtils.SmTags["#smloc_settings_tooltips_019"], SmUtils.SmTags["#smloc_settings_tooltips_tt_019"]);
 
-    static TabToolTips() { toolTip = new ToolTip { Show = ShowToolTips }; }
 
     internal static void Display(Vector2 displayViewerPosition)
     {
+
       // Reset Tooltip active flag...
       toolTip.Active = false;
       toolTip.Desc = "";
       toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
-      Position = WindowSettings.Position;
       int scrollX = 20;
 
       GUI.enabled = true;
       // Tab Header
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader); //"ToolTips"
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       // Enable Tool Tips
       CurrSettings.ShowToolTips = GuiUtils.DisplaySettingsToggle(CurrSettings.ShowToolTips, allTtContent,
@@ -205,5 +212,13 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUI.enabled = true;
     }
-  }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 300 * CurrSettings.CurrentUIScale;
+      guiIndent = 20 * CurrSettings.CurrentUIScale;
+      gui2xIndent = 40 * CurrSettings.CurrentUIScale;
+    }
+
+}
 }

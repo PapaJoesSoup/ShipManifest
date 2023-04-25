@@ -7,6 +7,7 @@ namespace ShipManifest
   // ReSharper disable once InconsistentNaming
   internal static class SMStyle
   {
+    #region Properties
     internal static GUIStyle WindowStyle;
     internal static GUIStyle PopupStyle;
     internal static GUIStyle IconStyle;
@@ -34,10 +35,10 @@ namespace ShipManifest
     internal static GUIStyle LabelStyleHardRule;
     internal static GUIStyle ToolTipStyle;
     internal static GUIStyle ScrollStyle;
+    #endregion properties
 
     internal static void SetupGuiStyles()
     {
-      if (WindowStyle != null) return;
       SMSettings.LoadColors();
       SetStyles();
     }
@@ -45,6 +46,29 @@ namespace ShipManifest
     internal static void SetStyles()
     {
       WindowStyle = new GUIStyle(GUI.skin.window);
+
+      // Scale skin fonts
+      GUI.skin.label.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.textArea.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.textField.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.button.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.toggle.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.box.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.scrollView.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalScrollbarLeftButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.horizontalScrollbarRightButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalScrollbarUpButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.verticalScrollbarDownButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      GUI.skin.window.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+
       PopupStyle = new GUIStyle(HighLogic.Skin.window);
 
       IconStyle = new GUIStyle();
@@ -53,7 +77,7 @@ namespace ShipManifest
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.blue},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -67,7 +91,7 @@ namespace ShipManifest
       ButtonToggledStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -85,7 +109,7 @@ namespace ShipManifest
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.green},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -99,7 +123,7 @@ namespace ShipManifest
       ButtonToggledStyleLeft = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -115,7 +139,7 @@ namespace ShipManifest
       ButtonSourceStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -130,7 +154,7 @@ namespace ShipManifest
       ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.SourcePartColor]},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -146,7 +170,7 @@ namespace ShipManifest
       ButtonTargetStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -161,8 +185,8 @@ namespace ShipManifest
       ButtonOptionStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
-        fixedHeight = 20 * GameSettings.UI_SCALE,
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
+        fixedHeight = 20 * CurrSettings.CurrentUIScale,
         padding =
         {
           top = 0,
@@ -178,7 +202,7 @@ namespace ShipManifest
       ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.TargetPartColor]},
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -251,7 +275,7 @@ namespace ShipManifest
 
       LabelStyleBold = new GUIStyle(GUI.skin.label)
       {
-        fontSize = (int)(12 * GameSettings.UI_SCALE),
+        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         fontStyle = FontStyle.Bold
       };
 

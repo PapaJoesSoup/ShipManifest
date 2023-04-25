@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using UnityEngine;
 
@@ -8,11 +9,20 @@ namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabLight
   {
+
+    static TabLight()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiToggleHeight;
+
+    // TooTip vars
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
-    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_light_000"]);
@@ -20,6 +30,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display()
     {
+
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
@@ -90,5 +101,12 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       iLights.Dispose();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 325 * CurrSettings.CurrentUIScale;
+      guiToggleHeight = 40 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

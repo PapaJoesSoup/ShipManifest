@@ -2,16 +2,30 @@ using System.Globalization;
 using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
 using UnityEngine;
+using static GUIUtil;
 
 namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabRealism
   {
-    internal static string StrFlowCost = "0";
+
+    static TabRealism()
+    {
+      RefreshUIScale();
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
+
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiIndent;
+    internal static float guiLabelWidth;
+
 
     // GUI tooltip and label support
     internal static ToolTip toolTip;
-
     private static bool _showToolTips = true;
     internal static bool ShowToolTips
     {
@@ -19,13 +33,8 @@ namespace ShipManifest.Windows.Tabs.Settings
       set => _showToolTips = toolTip.Show = value;
     }
 
-    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
-    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
-    private static float guiToggleWidth = 300 * GameSettings.UI_SCALE;
-    private static float guiIndent = 20 * GameSettings.UI_SCALE;
-    private static float guiLabelWidth = 135 * GameSettings.UI_SCALE;
+    internal static string StrFlowCost = "0";
 
-    internal static Rect Position = WindowSettings.Position;
 
     // Content strings
     internal static GUIContent titleContent         = new GUIContent(SmUtils.SmTags["#smloc_settings_config_000"]);
@@ -65,32 +74,24 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent modeOptionContent    = new GUIContent($"{SmUtils.SmTags["#smloc_settings_realism_003"]}:", SmUtils.SmTags["#smloc_settings_realism_tt_002"]);
     internal static GUIContent realCrewXferContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_realism_032"], SmUtils.SmTags["#smloc_settings_realism_tt_029"]);
 
-    static TabRealism()
-    {
-      toolTip = new ToolTip
-      {
-        Show = ShowToolTips
-      };
-    }
-
     internal static void Display(Vector2 displayViewerPosition)
     {
+
       // Reset Tooltip active flag...
       toolTip.Active = false;
       toolTip.CanShow = WindowSettings.ShowToolTips && ShowToolTips;
 
-      Position = WindowSettings.Position;
       int scrollX = 20;
 
       GUI.enabled = true;
       GUILayout.Label(!CurrSettings.LockSettings ? optionsContent : lockContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10 * GameSettings.UI_SCALE), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       bool isEnabled = !CurrSettings.LockSettings;
       //RealismMode Buttons.
       DisplayRealismButtons();
 
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10 * GameSettings.UI_SCALE), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
 
       // RealXfers Mode
@@ -344,7 +345,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // reset gui.enabled to default
       GUI.enabled = true;
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10 * GameSettings.UI_SCALE), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       // LockSettings Mode
       GUI.enabled = isEnabled;
@@ -352,7 +353,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       CurrSettings.LockSettings = GuiUtils.DisplaySettingsToggle(CurrSettings.LockSettings, lockSettingContent,
         ref toolTip, guiToggleWidth, scrollX);
       GUI.enabled = true;
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(10 * GameSettings.UI_SCALE), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
     }
 
     private static void DisplayRealismButtons()
@@ -380,7 +381,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUI.enabled = true;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(modeOptionContent, SMStyle.LabelStyleNoWrap, GUILayout.Width(90 * GameSettings.UI_SCALE));
+      GUILayout.Label(modeOptionContent, SMStyle.LabelStyleNoWrap, GUILayout.Width(90 * CurrSettings.CurrentUIScale));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, 10);
@@ -390,7 +391,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       for (int x = 0; x <= 3; x++)
       {
         if (x == 3) GUI.enabled = false;
-        if (GUILayout.Button(options[x], styles[x], GUILayout.Height(20 * GameSettings.UI_SCALE)))
+        if (GUILayout.Button(options[x], styles[x], GUILayout.Height(WindowSettings.guiLineHeight), GUILayout.Width(60 * CurrSettings.CurrentUIScale)))
         {
           if (x != CurrSettings.RealismMode) SMSettings.SetRealismMode(x);
         }
@@ -401,5 +402,13 @@ namespace ShipManifest.Windows.Tabs.Settings
       }
       GUILayout.EndHorizontal();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 300 * CurrSettings.CurrentUIScale;
+      guiIndent = 20 * CurrSettings.CurrentUIScale;
+      guiLabelWidth = 135 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

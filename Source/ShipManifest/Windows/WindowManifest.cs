@@ -12,21 +12,29 @@ namespace ShipManifest.Windows
   internal static class WindowManifest
   {
 
+    static WindowManifest()
+    {
+      RefreshUIScale();
+    }
+
     #region Properties
+
+    // UIScale settings
+    internal static float ViewerHeight;
+    internal static float ViewerWidth;
+    internal static float MinHeight;
+    internal static float WindowHeight;
+    internal static float guiLineHeight;
+    internal static float guiActionButtonWidth;
+    internal static float guiDumpButtonWidth;
+    internal static float guiFillButtonWidth;
+    internal static float guiLabelWidth;
+
 
     internal static string Title = $"Ship Manifest - {SMSettings.CurVersion}"; 
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static float UIScale = 1.0f;
     internal static float HeightScale;
-    internal static float ViewerHeight = 100 * GameSettings.UI_SCALE;
-    internal static float ViewerWidth = 300 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 50 * GameSettings.UI_SCALE;
-    internal static float WindowHeight = 282 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
-    internal static float guiLabelWidth = 265 * GameSettings.UI_SCALE;
-    internal static float guiActionButtonWidth = 134 * GameSettings.UI_SCALE;
-    internal static float guiFillButtonWidth = 35 * GameSettings.UI_SCALE;
-    internal static float guiDumpButtonWidth = 45 * GameSettings.UI_SCALE;
 
     internal static bool ResizingWindow = false;
 
@@ -81,6 +89,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+
       Title = $"{titleContent} {SMSettings.CurVersion} - {SMAddon.SmVessel.Vessel.GetDisplayName()}";
 
       // set input locks when mouseover window...
@@ -103,8 +112,9 @@ namespace ShipManifest.Windows
       try
       {
         GUILayout.BeginVertical();
+        GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
         _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height((ViewerHeight + HeightScale)), GUILayout.Width(ViewerWidth));
+          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
         GUILayout.BeginVertical();
 
         // Prelaunch (landed) Gui
@@ -180,6 +190,7 @@ namespace ShipManifest.Windows
 
     private static void PreLaunchGui()
     {
+
       try
       {
         if (CurrSettings.EnablePfCrews)
@@ -223,6 +234,7 @@ namespace ShipManifest.Windows
 
     private static void ResourceButtonsList()
     {
+
       try
       {
         // List required here to prevent loop sync errors with live source.
@@ -242,7 +254,7 @@ namespace ShipManifest.Windows
           GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
-          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width * GameSettings.UI_SCALE), GUILayout.Height(guiLineHeight)))
+          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width * CurrSettings.CurrentUIScale), GUILayout.Height(guiLineHeight)))
           {
             ResourceButtonToggled(keys.Current);
             SMHighlighter.Update_Highlighter();
@@ -352,6 +364,7 @@ namespace ShipManifest.Windows
 
     private static void ResourceDetailsViewer()
     {
+
       try
       {
         _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
@@ -369,7 +382,7 @@ namespace ShipManifest.Windows
             {
               GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
               GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(guiLabelWidth),
-                GUILayout.Height(18 * GameSettings.UI_SCALE));
+                GUILayout.Height(18 * CurrSettings.CurrentUIScale));
               GUIStyle noPad = SMStyle.LabelStyleNoPad;
               List<string>.Enumerator sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
               while (sResources.MoveNext())
@@ -377,7 +390,7 @@ namespace ShipManifest.Windows
                 if (sResources.Current == null) continue;
                 GUILayout.Label(
                   $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(guiLabelWidth),
-                  GUILayout.Height(16 * GameSettings.UI_SCALE));
+                  GUILayout.Height(16 * CurrSettings.CurrentUIScale));
               }
               sResources.Dispose();
             }
@@ -431,7 +444,7 @@ namespace ShipManifest.Windows
 
       GUI.enabled = SMConditions.CanShowWindowTransfer(); 
       GUIStyle transferStyle = WindowTransfer.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(transferContent, transferStyle, GUILayout.Height(20))) // "Transfer"
+      if (GUILayout.Button(transferContent, transferStyle, GUILayout.Height(guiLineHeight))) // "Transfer"
       {
         try
         {
@@ -453,7 +466,7 @@ namespace ShipManifest.Windows
       }
       GUI.enabled = true;
       GUIStyle settingsStyle = WindowSettings.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.Height(20))) // "Settings"
+      if (GUILayout.Button(settingsContent, settingsStyle, GUILayout.Height(guiLineHeight))) // "Settings"
       {
         try
         {
@@ -473,7 +486,7 @@ namespace ShipManifest.Windows
       }
 
       GUIStyle rosterStyle = WindowRoster.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(rosterContent, rosterStyle, GUILayout.Height(20))) // "Roster"
+      if (GUILayout.Button(rosterContent, rosterStyle, GUILayout.Height(guiLineHeight))) // "Roster"
       {
         try
         {
@@ -497,7 +510,7 @@ namespace ShipManifest.Windows
       }
 
       GUIStyle controlStyle = WindowControl.ShowWindow ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(controlContent, controlStyle, GUILayout.Height(20))) // "Control"
+      if (GUILayout.Button(controlContent, controlStyle, GUILayout.Height(guiLineHeight))) // "Control"
       {
         try
         {
@@ -628,5 +641,19 @@ namespace ShipManifest.Windows
       }
     }
 
+    internal static void RefreshUIScale()
+    {
+      ViewerHeight = 100 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 300 * CurrSettings.CurrentUIScale;
+      MinHeight = 50 * CurrSettings.CurrentUIScale;
+      WindowHeight = 282 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      guiActionButtonWidth = 134 * CurrSettings.CurrentUIScale;
+      guiDumpButtonWidth = 45 * CurrSettings.CurrentUIScale;
+      guiFillButtonWidth = 35 * CurrSettings.CurrentUIScale;
+      guiLabelWidth = 265 * CurrSettings.CurrentUIScale;
+
   }
+
+}
 }

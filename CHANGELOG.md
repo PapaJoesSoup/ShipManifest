@@ -11,12 +11,12 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
  - Fixed: Memory leak on SM destruction.  One handler was not being removed.
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/64
+ - New: Refactored mod to support KSP UI scaling.  you folks with the 4k monitors should be able to see the text now.
  - New: Localized Screen messages in Crew transfers.
         Note: Many localizations are machine translations. Any help in improving them is appreciated.
  - New: Added a Settings button to the Roster window when in the Space Center.  This button appears if you disable the Settings icon on the toolbar.
         This setting is in the Config Tab.
  - Changed: Refactored remaining windows and tabs to clean up display code.  Moved a lot of redundant code into GUI utility methods.
- - Changed: Added ability to scale the window size with the KSP UI Scale setting.
 
 Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
 --------------------------------------------------
@@ -42,7 +42,7 @@ Version 6.0.5.0 - Release 10 Jan 2022 - KSP 1.12.2
 
 Version 6.0.4.0 - Release 12 Dec 2021 - KSP 1.12.2
 --------------------------------------------------
- - New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
+- New: Added support to the Roster Window for selecting spacesuits while in Space Center and in Flight for assigned Crew.
  - New: Added  a realism setting for Realistic Crew transfers. you can now disable sounds and delay from Crew Transfers. 
    Previously, you had to disable Realistic Transfers to get similar behavior. Realistic Transfers has been renamed to Realistic Resource Transfers.
    The Realistic Crew transfers option is found under "Enable SM Crew Transfers" in the Realism Tab of the Settings Window.

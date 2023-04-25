@@ -40,12 +40,12 @@ namespace ShipManifest.Windows.Popups
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(20 * GameSettings.UI_SCALE));
-      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * GameSettings.UI_SCALE));
+      GUILayout.Label("", GUILayout.Height(20 * CurrSettings.CurrentUIScale));
+      GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
 
-      GUILayout.Label("", GUILayout.Height(30 * GameSettings.UI_SCALE));
+      GUILayout.Label("", GUILayout.Height(30 * CurrSettings.CurrentUIScale));
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(closeContent, GUILayout.Height(20 * GameSettings.UI_SCALE))) // "Close"
+      if (GUILayout.Button(closeContent, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) // "Close"
       {
         // Abort all Transfers and quit
         TransferPump.AbortAllPumpsInProcess(0);
@@ -53,7 +53,7 @@ namespace ShipManifest.Windows.Popups
         WindowTransfer.BtnCloseWindow();
         return;
       }
-      if (GUILayout.Button(cancelContent, GUILayout.Height(20 * GameSettings.UI_SCALE))) //"Cancel"
+      if (GUILayout.Button(cancelContent, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) //"Cancel"
       {
         TransferPump.Paused = false;
         SMSound.SourcePumpRun.Play();
@@ -66,6 +66,13 @@ namespace ShipManifest.Windows.Popups
       Position.width = WindowWidth;
       Position.height = WindowHeight;
       GuiUtils.RepositionWindow(ref Position);
+    }
+
+    internal static void RefreshUIScale()
+    {
+      WindowWidth = 420;
+      TextWidth = 400;
+      WindowHeight = 185 * CurrSettings.CurrentUIScale;
     }
   }
 }

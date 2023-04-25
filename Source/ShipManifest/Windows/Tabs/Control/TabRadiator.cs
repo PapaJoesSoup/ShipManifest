@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using UnityEngine;
 
@@ -8,11 +9,20 @@ namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabRadiator
   {
+
+    static TabRadiator()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiToggleWidth;
+    internal static float guiToggleHeight;
+
+    //ToolTip vars
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
-    internal static float guiToggleHeight = 40 * GameSettings.UI_SCALE;
 
     //Content vars
     internal static GUIContent titleContent   = new GUIContent(SmUtils.SmTags["#smloc_control_radiator_000"]);
@@ -22,6 +32,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display()
     {
+
       float scrollX = 10;
       float scrollY = WindowControl._displayViewerPosition.y;
 
@@ -110,5 +121,12 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       iRadiators.Dispose();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 325 * CurrSettings.CurrentUIScale;
+      guiToggleHeight = 40 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

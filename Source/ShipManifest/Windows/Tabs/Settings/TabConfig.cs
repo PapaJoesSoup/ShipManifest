@@ -6,23 +6,29 @@ namespace ShipManifest.Windows.Tabs.Settings
 {
   internal static class TabConfig
   {
-    internal static string TxtSaveInterval = CurrSettings.SaveIntervalSec.ToString();
 
-    // GUI tooltip and label support
-    private static float guiRuleWidth = 350 * GameSettings.UI_SCALE;
-    private static float guiRuleHeight = 10 * GameSettings.UI_SCALE;
-    private static float guiMaintoggleWidth = 300 * GameSettings.UI_SCALE;
-    private static float guiLabelWidth = 110 * GameSettings.UI_SCALE;
+    static TabConfig()
+    {
+      RefreshUIScale();
+      toolTip = new ToolTip
+      {
+        Show = ShowToolTips
+      };
+    }
 
+    // UIScale settings
+    internal static float guiMaintoggleWidth;
+    internal static float guiLabelWidth;
+
+    // ToolTip vars
     internal static ToolTip toolTip;
-
     private static bool _showToolTips = true;
     internal static bool ShowToolTips {
       get => _showToolTips;
       set => _showToolTips = toolTip.Show = value;
     }
 
-    internal static Rect Position = WindowSettings.Position;
+    internal static string TxtSaveInterval = CurrSettings.SaveIntervalSec.ToString();
 
     // Content strings
     internal static GUIContent titleContent         = new GUIContent(SmUtils.SmTags["#smloc_settings_config_000"]);
@@ -39,26 +45,18 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static GUIContent linesContent         = new GUIContent(SmUtils.SmTags["#smloc_settings_config_011"]);
     internal static GUIContent settingsIconContent  = new GUIContent(SmUtils.SmTags["#smloc_settings_config_012"], SmUtils.SmTags["#smloc_settings_config_tt_010"]);
 
-    static TabConfig()
-    {
-      toolTip = new ToolTip
-      {
-        Show = ShowToolTips
-      };
-    }
-
     internal static void Display(Vector2 displayViewerPosition)
     {
+
       // Reset Tooltip active flag...
       toolTip.Active = false;
       toolTip.CanShow = WindowSettings.ShowToolTips && toolTip.Show;
 
-      Position = WindowSettings.Position;
       int scrollX = 20;
 
       //Configuration Title
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(guiRuleHeight), GUILayout.Width(guiRuleWidth * GameSettings.UI_SCALE));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
       if (!ToolbarManager.ToolbarAvailable)
       {
@@ -112,5 +110,12 @@ namespace ShipManifest.Windows.Tabs.Settings
       TxtSaveInterval = GuiUtils.DisplaySettingsTextField(TxtSaveInterval, saveIntervalContent,
         guiLabelWidth, 50, secondsContent, 40, toolTip, scrollX);
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiMaintoggleWidth = 300 * CurrSettings.CurrentUIScale;
+      guiLabelWidth = 110 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

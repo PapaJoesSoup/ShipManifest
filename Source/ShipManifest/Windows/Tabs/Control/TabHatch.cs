@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ConnectedLivingSpace;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using UnityEngine;
 
@@ -10,16 +11,24 @@ namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabHatch
   {
+
+    static TabHatch()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiToggleWidth;
+
+    //Tooltip vars
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
-    internal static float guiToggleWidth = 325 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
-
+    
     //Content vars
     internal static GUIContent titleContent = new GUIContent(SmUtils.SmTags["#smloc_control_hatch_000"]);
 
-
+    
     internal static void Display()
     {
       //float scrollX = WindowControl.Position.x + 20;
@@ -115,5 +124,11 @@ namespace ShipManifest.Windows.Tabs.Control
       iModules.Dispose();
       SMAddon.FireEventTriggers();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiToggleWidth = 325 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }

@@ -12,46 +12,48 @@ namespace ShipManifest.Windows
 {
   internal static class WindowRoster
   {
+
+    // Static Constructor
+    static WindowRoster()
+    {
+      RefreshUIScale();
+    }
     #region Properties
 
-
-    internal static float WindowWidth = 830 * GameSettings.UI_SCALE;
-    internal static float WindowHeight = 330 * GameSettings.UI_SCALE;
-    internal static float ViewerWidth = 810 * GameSettings.UI_SCALE;
-    internal static float ViewerHeight = 230 * GameSettings.UI_SCALE;
-    internal static float SuitHeight = 55 * GameSettings.UI_SCALE;
-    internal static float EditHeight = 234 * GameSettings.UI_SCALE;
-    internal static float CreateHeight = 29 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 230 * GameSettings.UI_SCALE;
+    internal static float WindowWidth;
+    internal static float WindowHeight;
+    internal static float ViewerWidth;
+    internal static float ViewerHeight;
+    internal static float SuitHeight;
+    internal static float EditHeight;
+    internal static float CreateHeight;
+    internal static float MinHeight;
+    internal static float guiLineHeight;
+    internal static float guiToggleAllWidth;
+    internal static float guiToggleWidth2;
+    internal static float guiToggleWidth3;
+    internal static float guiToggleWidth4;
+    internal static float guiToggleWidth5;
+    internal static float guiActionBtn1Width;
+    internal static float guiActionBtn2Width;
+    internal static float guiActionBtn3Width;
+    internal static float guiActionBtn4Width;
+    internal static float guiActionBtn5Width;
+    internal static float guiLabelAttributesWidth;
+    internal static float guiLabelKerbalWidth;
+    internal static float guiLabelFilterWidth;
+    internal static float guiTableCol1Width;
+    internal static float guiTableCol2Width;
+    internal static float guiTableCol3Width;
+    internal static float guiTableCol4Width;
+    internal static float guiTableCol5Width;
+    internal static float guiTableCol6Width;
+    internal static float guiTableCol7Width;
+    internal static float guiTableCol8Width;
+    internal static float guiTableCol9Width;
 
     internal static float HeightScale;
 
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
-    internal static float guiToggleAllWidth = 60 * GameSettings.UI_SCALE;
-    internal static float guiToggleWidth2 = 80 * GameSettings.UI_SCALE;
-    internal static float guiToggleWidth3 = 90 * GameSettings.UI_SCALE;
-    internal static float guiToggleWidth4 = 95 * GameSettings.UI_SCALE;
-    internal static float guiToggleWidth5 = 130 * GameSettings.UI_SCALE;
-    internal static float guiActionBtn1Width = 50 * GameSettings.UI_SCALE;
-    internal static float guiActionBtn2Width = 55 * GameSettings.UI_SCALE;
-    internal static float guiActionBtn3Width = 65 * GameSettings.UI_SCALE;
-    internal static float guiActionBtn4Width = 80 * GameSettings.UI_SCALE;
-    internal static float guiActionBtn5Width = 120 * GameSettings.UI_SCALE;
-
-    internal static float guiTableCol1Width = 140 * GameSettings.UI_SCALE;
-    internal static float guiTableCol2Width = 50 * GameSettings.UI_SCALE;
-    internal static float guiTableCol3Width = 70 * GameSettings.UI_SCALE;
-    internal static float guiTableCol4Width = 30 * GameSettings.UI_SCALE;
-    internal static float guiTableCol5Width = 70 * GameSettings.UI_SCALE;
-    internal static float guiTableCol6Width = 55 * GameSettings.UI_SCALE;
-    internal static float guiTableCol7Width = 220 * GameSettings.UI_SCALE;
-    internal static float guiTableCol8Width = 55 * GameSettings.UI_SCALE;
-    internal static float guiTableCol9Width = 65 * GameSettings.UI_SCALE;
-    internal static float guiLabelKerbalWidth = 300 * GameSettings.UI_SCALE;
-    internal static float guiLabelAttributesWidth = 85 * GameSettings.UI_SCALE;
-    internal static float guiLabelFilterWidth = 40 * GameSettings.UI_SCALE;
-
-    
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static Rect ViewBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
@@ -194,8 +196,9 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
-      // set input locks when mouseover window...
-      _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+
+    // set input locks when mouseover window...
+    _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -354,6 +357,7 @@ namespace ShipManifest.Windows
 
     private static void CreateKerbalViewer()
     {
+
       DisplaySelectProfession();
       GUILayout.BeginHorizontal();
       // "Create"
@@ -388,6 +392,7 @@ namespace ShipManifest.Windows
 
     private static void DisplaySelectProfession()
     {
+
       GUILayout.BeginHorizontal();
       GUILayout.Label(profContent, GUILayout.Width(guiLabelAttributesWidth)); // "Profession:"
       bool isPilot = GUILayout.Toggle(KerbalProfession == Profession.Pilot, pilotContent, GUILayout.Width(guiToggleWidth3)); // "Pilot"
@@ -407,6 +412,7 @@ namespace ShipManifest.Windows
 
     private static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
     {
+
       GUILayout.BeginHorizontal();
       GUILayout.Label(suitContent, GUILayout.Width(guiLabelAttributesWidth)); // "Suit:"
 
@@ -441,6 +447,7 @@ namespace ShipManifest.Windows
 
     private static void DisplayRosterFilter()
     {
+
       GUILayout.BeginHorizontal();
       GUILayout.Label(filterContent, GUILayout.Width(guiLabelFilterWidth)); // Filter
 
@@ -479,9 +486,12 @@ namespace ShipManifest.Windows
 
     private static void DisplayRosterListViewer()
     {
+
       try
       {
         GUILayout.BeginVertical();
+        GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+
         // Roster List Header...
         GUILayout.BeginHorizontal();
         GUILayout.Label(nameContent, GUILayout.Width(guiTableCol1Width)); // "Name"
@@ -660,6 +670,7 @@ namespace ShipManifest.Windows
 
     private static void EditKerbalViewer()
     {
+
       GUILayout.Label(SelectedKerbal.IsNew ? addKerbalContent : editKerbalContent);
       if (CurrSettings.EnableKerbalRename)
       {
@@ -879,7 +890,7 @@ namespace ShipManifest.Windows
 
     #endregion Gui Layout
 
-    #region Action Methods
+#region Action Methods
 
     private static string GetFrozenKerbalDetails(ProtoCrewMember kerbal)
     {
@@ -1038,6 +1049,7 @@ namespace ShipManifest.Windows
 
     private static void SetKerbalSuit(ModKerbal selectedKerbal)
     {
+
       editMode = EditMode.Suit;
       DisplaySelectSuit(ref selectedKerbal.Suit);
       GUILayout.BeginHorizontal();
@@ -1066,7 +1078,43 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    internal static float ActionHeight()
+    internal static void RefreshUIScale()
+    {
+      WindowWidth = 830 * CurrSettings.CurrentUIScale;
+      WindowHeight = 330 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 810 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 230 * CurrSettings.CurrentUIScale;
+      SuitHeight = 55 * CurrSettings.CurrentUIScale;
+      EditHeight = 234 * CurrSettings.CurrentUIScale;
+      CreateHeight = 29 * CurrSettings.CurrentUIScale;
+      MinHeight = 230 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      guiToggleAllWidth = 60 * CurrSettings.CurrentUIScale;
+      guiToggleWidth2 = 80 * CurrSettings.CurrentUIScale;
+      guiToggleWidth3 = 90 * CurrSettings.CurrentUIScale;
+      guiToggleWidth4 = 95 * CurrSettings.CurrentUIScale;
+      guiToggleWidth5 = 130 * CurrSettings.CurrentUIScale;
+      guiActionBtn1Width = 50 * CurrSettings.CurrentUIScale;
+      guiActionBtn2Width = 55 * CurrSettings.CurrentUIScale;
+      guiActionBtn3Width = 65 * CurrSettings.CurrentUIScale;
+      guiActionBtn4Width = 80 * CurrSettings.CurrentUIScale;
+      guiActionBtn5Width = 120 * CurrSettings.CurrentUIScale;
+      guiLabelAttributesWidth = 85 * CurrSettings.CurrentUIScale;
+      guiLabelKerbalWidth = 300 * CurrSettings.CurrentUIScale;
+      guiLabelFilterWidth = 40 * CurrSettings.CurrentUIScale;
+      guiTableCol1Width = 140 * CurrSettings.CurrentUIScale;
+      guiTableCol2Width = 50 * CurrSettings.CurrentUIScale;
+      guiTableCol3Width = 70 * CurrSettings.CurrentUIScale;
+      guiTableCol4Width = 30 * CurrSettings.CurrentUIScale;
+      guiTableCol5Width = 70 * CurrSettings.CurrentUIScale;
+      guiTableCol6Width = 55 * CurrSettings.CurrentUIScale;
+      guiTableCol7Width = 220 * CurrSettings.CurrentUIScale;
+      guiTableCol8Width = 55 * CurrSettings.CurrentUIScale;
+      guiTableCol9Width = 65 * CurrSettings.CurrentUIScale;
+  }
+
+
+  internal static float ActionHeight()
     {
       switch (editMode)
       {

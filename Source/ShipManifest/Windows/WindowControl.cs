@@ -8,11 +8,12 @@ namespace ShipManifest.Windows
 {
   internal static class WindowControl
   {
-    internal static float WindowHeight = 280 * GameSettings.UI_SCALE;
-    internal static float ViewerWidth = 450 * GameSettings.UI_SCALE;
-    internal static float ViewerHeight = 200 * GameSettings.UI_SCALE;
-    internal static float MinHeight = 200 * GameSettings.UI_SCALE;
-    internal static float guiLineHeight = 20 * GameSettings.UI_SCALE;
+
+    static WindowControl()
+    {
+      RefreshUIScale();
+    }
+
     internal static float HeightScale;
 
     internal static bool ResizingWindow = false;
@@ -40,9 +41,15 @@ namespace ShipManifest.Windows
 
 
     // Tab only vars, used in each tab
+    internal static float WindowHeight;
+    internal static float MinHeight;
+    internal static float ViewerWidth;
+    internal static float ViewerHeight;
+    internal static float GuiRuleWidth;
+    internal static float GuiRuleHeight;
+    internal static float guiLineHeight;
+
     internal static Rect TabBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
-    internal static float GuiRuleWidth = 420 * GameSettings.UI_SCALE;
-    internal static float GuiRuleHeight = 10 * GameSettings.UI_SCALE;
     internal static string TabRule = new string('_', 120);
 
     // Content strings
@@ -73,6 +80,7 @@ namespace ShipManifest.Windows
 
     internal static void Display(int windowId)
     {
+
       // set input locks when mouseover window...
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
@@ -91,6 +99,7 @@ namespace ShipManifest.Windows
 
       // This is a scroll panel (we are using it to make button lists...)
       GUILayout.BeginVertical();
+      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
       DisplayWindowTabs();
 
       // This is a scroll panel (we are using it to make button lists...)
@@ -122,6 +131,7 @@ namespace ShipManifest.Windows
 
     internal static void DisplayWindowTabs()
     {
+
       // Vessels
       Rect rect;
       GUILayout.BeginHorizontal();
@@ -250,7 +260,7 @@ namespace ShipManifest.Windows
 
       // Labs Tab
       GUIStyle labsStyle = _selectedTab == Tab.Lab ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
-      if (GUILayout.Button(labsContent, labsStyle, GUILayout.Height(20))) // "Labs"
+      if (GUILayout.Button(labsContent, labsStyle, GUILayout.Height(guiLineHeight))) // "Labs"
       {
         try
         {
@@ -307,6 +317,7 @@ namespace ShipManifest.Windows
 
     internal static void DisplayTabActions()
     {
+
       GUILayout.BeginHorizontal();
       switch (_selectedTab)
       {
@@ -371,7 +382,18 @@ namespace ShipManifest.Windows
       GUILayout.EndHorizontal();
     }
 
-    private enum Tab
+    internal static void RefreshUIScale()
+    {
+      WindowHeight = 280 * CurrSettings.CurrentUIScale;
+      MinHeight = 200 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 450 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 200 * CurrSettings.CurrentUIScale;
+      GuiRuleWidth = 420 * CurrSettings.CurrentUIScale;
+      GuiRuleHeight = 10 * CurrSettings.CurrentUIScale;
+      guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+    }
+
+  private enum Tab
     {
       None,
       Antenna,

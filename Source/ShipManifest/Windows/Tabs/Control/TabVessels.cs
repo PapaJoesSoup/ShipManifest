@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ShipManifest.InternalObjects;
+using ShipManifest.InternalObjects.Settings;
 using ShipManifest.Modules;
 using UniLinq;
 using UnityEngine;
@@ -9,17 +10,23 @@ namespace ShipManifest.Windows.Tabs.Control
 {
   internal static class TabVessel
   {
+
+    static TabVessel()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiLabelWidth;
+    internal static float guiUndockBtnWidth;
+    internal static float guiEditBtnWidth;
+    internal static float guiXferBtnWidth;
+
+    // TooTip vars
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     private static bool _canShowToolTips = true;
-
-    // Temporary change in label width to allow release.  Will work vessel combining in a later release.
-    //internal static float guiLabelWidth = 200;
-    internal static float guiLabelWidth = 230 * GameSettings.UI_SCALE;
-    internal static float guiUndockBtnWidth = 60 * GameSettings.UI_SCALE;
-    internal static float guiEditBtnWidth = 40 * GameSettings.UI_SCALE;
-    internal static float guiXferBtnWidth = 15 * GameSettings.UI_SCALE;
 
     internal static int CombineVesselCount = 0;
 
@@ -38,6 +45,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void Display()
     {
+
       //float scrollX = WindowControl.Position.x + 20;
       //float scrollY = WindowControl.Position.y + 50 - displayViewerPosition.y;
       float scrollX = 20;
@@ -77,11 +85,9 @@ namespace ShipManifest.Windows.Tabs.Control
           GUI.enabled = mdv.IsDocked;
           
           GUILayout.BeginHorizontal();
-          
-
           bool isChecked = mdv.Combine;
           // temporary commenting of combine code to allow release.  Will work for next version.
-          //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20 * GameSettings.UI_SCALE));
+          //isChecked = GUILayout.Toggle(isChecked, addVesselContent, GUILayout.Width(20 * CurrSettings.CurrentUIScale));
           if (isChecked) combineVesselcount += 1;
           if (isChecked != mdv.Combine)
           {
@@ -97,7 +103,7 @@ namespace ShipManifest.Windows.Tabs.Control
           //    Event.current.mousePosition);
           //}
 
-          if (GUILayout.Button(undockVesselContent, GUILayout.Width(guiUndockBtnWidth * GameSettings.UI_SCALE))) //"UnDock"
+          if (GUILayout.Button(undockVesselContent, GUILayout.Width(guiUndockBtnWidth * CurrSettings.CurrentUIScale))) //"UnDock"
           {
             // close hatches If CLS applies
             if (SMConditions.IsClsEnabled()) CloseVesselHatches(mdv);
@@ -128,7 +134,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           // now editing buttons.
           GUIContent content = mdv.IsEditing ? saveNameContent : editNameContent; 
-          if (GUILayout.Button(content, GUILayout.Width(guiEditBtnWidth * GameSettings.UI_SCALE)))
+          if (GUILayout.Button(content, GUILayout.Width(guiEditBtnWidth * CurrSettings.CurrentUIScale)))
           {
             if (SMAddon.SmVessel.DockedVessels[v].IsEditing)
             {
@@ -153,7 +159,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           if (mdv.IsEditing)
           {
-            if (GUILayout.Button(cancelNameContent, GUILayout.Width(guiUndockBtnWidth * GameSettings.UI_SCALE)))
+            if (GUILayout.Button(cancelNameContent, GUILayout.Width(guiUndockBtnWidth * CurrSettings.CurrentUIScale)))
             {
               mdv.RenameVessel = null;
               mdv.IsEditing = false;
@@ -162,7 +168,7 @@ namespace ShipManifest.Windows.Tabs.Control
           else
           {
             // Vessel Type display/edit
-            GUILayout.Label($"{mdv.VesselInfo.vesselType.ToString()}", GUILayout.Width(guiLabelWidth/ 2 * GameSettings.UI_SCALE));
+            GUILayout.Label($"{mdv.VesselInfo.vesselType.ToString()}", GUILayout.Width(guiLabelWidth/ 2 * CurrSettings.CurrentUIScale));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
             {
@@ -328,5 +334,14 @@ namespace ShipManifest.Windows.Tabs.Control
       }
       mdv.Dispose();
     }
+
+    internal static void RefreshUIScale()
+    {
+      guiLabelWidth = 230 * CurrSettings.CurrentUIScale;
+      guiUndockBtnWidth = 60 * CurrSettings.CurrentUIScale;
+      guiEditBtnWidth = 40 * CurrSettings.CurrentUIScale;
+      guiXferBtnWidth = 15 * CurrSettings.CurrentUIScale;
+    }
+
   }
 }
