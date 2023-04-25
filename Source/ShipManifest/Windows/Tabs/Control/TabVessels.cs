@@ -17,6 +17,9 @@ namespace ShipManifest.Windows.Tabs.Control
     }
 
     // UIScale settings
+    internal static float WindowHeight = 280;
+    internal static float ViewerHeight = 200;
+    internal static float MinHeight = 200;
     internal static float guiLabelWidth;
     internal static float guiUndockBtnWidth;
     internal static float guiEditBtnWidth;
@@ -337,6 +340,9 @@ namespace ShipManifest.Windows.Tabs.Control
 
     internal static void RefreshUIScale()
     {
+      WindowHeight = 280 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 200 * CurrSettings.CurrentUIScale;
+      MinHeight = 200 * CurrSettings.CurrentUIScale;
       guiLabelWidth = 230 * CurrSettings.CurrentUIScale;
       guiUndockBtnWidth = 60 * CurrSettings.CurrentUIScale;
       guiEditBtnWidth = 40 * CurrSettings.CurrentUIScale;

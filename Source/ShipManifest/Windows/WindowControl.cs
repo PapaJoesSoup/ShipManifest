@@ -283,7 +283,7 @@ namespace ShipManifest.Windows
     internal static void DisplaySelectedTab()
     {
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-       GUILayout.Height((TabBox.height + HeightScale)), GUILayout.Width(TabBox.width));
+       GUILayout.Height((TabBox.height + HeightScale)), GUILayout.Width(TabBox.width), GUILayout.MinHeight(MinHeight + HeightScale));
       switch (_selectedTab)
       {
         case Tab.Vessel:
