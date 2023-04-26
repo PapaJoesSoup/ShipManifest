@@ -1,11 +1,13 @@
 ----------------
 Ship Manifest
 ----------------
-KSP Version supported:  1.3
+KSP Version supported:  1.12.x
 ----------------
 
+KSP Forum OP:  https://forum.kerbalspaceprogram.com/index.php?showtopic=56643
+
 ----------------
-Download: Kerbalstuff - https://kerbalstuff.com/mod/261/Ship%20Manifest
+Download: SpaceDock - https://kerbalstuff.com/mod/261/Ship%20Manifest
           CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
 Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
@@ -27,7 +29,8 @@ What's New:
 
 Thanks for downloading Ship Manifest!
 
-Ship Manifest is a tool to manage your ship's "things".  I started with Crew Manifest (http://forum.kerbalspaceprogram.com/threads/60936) as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.
+Ship Manifest is a tool to manage your ship's "things".  I started with Crew Manifest
+as a basis for this work, with great thanks to vXSovereignXv for creating Crew Manifest, and Sarbian for contributions to Crew Manifest.
 
 I've now re-imagined it into Ship Manifest, using the same easy to navigate visual system that vXSovereignXv used.  SM has since been expanded and refactored to the point that it is now a completely original work.
 
