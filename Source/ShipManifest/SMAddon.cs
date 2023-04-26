@@ -261,6 +261,8 @@ namespace ShipManifest
       WindowManifest.RefreshUIScale();
       WindowManifest.RefreshUIScale();
       WindowManifest.RefreshUIScale();
+
+      GuiUtils.RefreshUIScale();
     }
 
 

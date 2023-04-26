@@ -5,18 +5,20 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
-- Fixed: Correct error in SMManifest window with the vessel name.  Was using a nonlocalized name. Now properly localized.
+- Fixed: Correct error in Manifest window with the vessel name.  Was using a nonlocalized name. Now properly localized.
 - Fixed: Rate Modifier field in Science window was displaying incorrect value.  Now properly displays the value.
 - Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/63
  - Fixed: Memory leak on SM destruction.  One handler was not being removed.
           Issue:  https://github.com/PapaJoesSoup/ShipManifest/issues/64
- - New: Refactored mod to support KSP UI scaling.  you folks with the 4k monitors should be able to see the text now.
+ - New: Refactored mod to support KSP UI scaling.  You folks with the 4k monitors should be able to see the text now.
  - New: Localized Screen messages in Crew transfers.
         Note: Many localizations are machine translations. Any help in improving them is appreciated.
- - New: Added a Settings button to the Roster window when in the Space Center.  This button appears if you disable the Settings icon on the toolbar.
-        This setting is in the Config Tab.
+ - New: Added a Settings button to the Roster window when in the Space Center.  This button appears if you disable the Settings icon
+        on the toolbar.  This setting is in the Config Tab.
  - Changed: Refactored remaining windows and tabs to clean up display code.  Moved a lot of redundant code into GUI utility methods.
+ - Changed: Refactored all windows to cache all localization strings and object size values.
+            Object size values only recalculate if the screen resolution is changed.  Hopefully this helps a bit with performance.
 
 Version 6.0.6.0 - Release 19 Jan 2022 - KSP 1.12.3
 --------------------------------------------------

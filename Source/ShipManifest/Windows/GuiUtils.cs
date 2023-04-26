@@ -7,6 +7,16 @@ namespace ShipManifest.Windows
 {
   internal static class GuiUtils
   {
+
+    static GuiUtils()
+    {
+      RefreshUIScale();
+    }
+
+    // UIScale settings
+    internal static float guiWidth = 20 * CurrSettings.CurrentUIScale;
+    internal static float guiHeight = 20 * CurrSettings.CurrentUIScale;
+
     // Color content strings
     internal static GUIContent blueContent    = new GUIContent("", "Blue");
     internal static GUIContent blackContent   = new GUIContent("", "Black");
@@ -23,8 +33,6 @@ namespace ShipManifest.Windows
 
     internal static string ColorSelector(out string toolTip)
     {
-      float guiWidth = 20 * CurrSettings.CurrentUIScale;
-      float guiHeight = 20 * CurrSettings.CurrentUIScale;
       string thisColor = "";
       toolTip = "";
 
@@ -201,8 +209,8 @@ namespace ShipManifest.Windows
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
-      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth * CurrSettings.CurrentUIScale));
-      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth * CurrSettings.CurrentUIScale));
+      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth));
+      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
@@ -212,17 +220,23 @@ namespace ShipManifest.Windows
 
     internal static double DisplaySettingsSlider(SliderData slider, ref ToolTip toolTip, float scrollX)
     {
-      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth * CurrSettings.CurrentUIScale), GUILayout.Height(20 * CurrSettings.CurrentUIScale));
+      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth), GUILayout.Height(guiHeight));
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
       double setting = GUILayout.HorizontalSlider((float)slider.setting, (float)slider.minValue,
-        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth * CurrSettings.CurrentUIScale), GUILayout.Height(20 * CurrSettings.CurrentUIScale));
-      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth * CurrSettings.CurrentUIScale), GUILayout.Height(20 * CurrSettings.CurrentUIScale));
+        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth), GUILayout.Height(guiHeight));
+      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth), GUILayout.Height(guiHeight));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
       return setting;
+    }
+
+    internal static void RefreshUIScale()
+    {
+      guiWidth = 20 * CurrSettings.CurrentUIScale;
+      guiHeight = 20 * CurrSettings.CurrentUIScale;
     }
   }
 }

@@ -22,6 +22,9 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static float guiToggleWidth;
     internal static float guiIndent;
     internal static float guiLabelWidth;
+    internal static float guiSliderWidth;
+    internal static float guiSliderMinWidth;
+    internal static float guiSliderMaxWidth;
 
 
     // GUI tooltip and label support
@@ -264,7 +267,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       StrFlowCost = SmUtils.GetStringZero(StrFlowCost);
 
       StrFlowCost = GuiUtils.DisplaySettingsTextField(StrFlowCost, xferCostAmtContent,
-        guiLabelWidth, 80, ecUnitContent, 80, toolTip, scrollX);
+        guiLabelWidth - (guiIndent/2), 80, ecUnitContent, 80, toolTip, scrollX);
       GUILayout.EndHorizontal();
 
       // update decimal bool 
@@ -302,10 +305,10 @@ namespace ShipManifest.Windows.Tabs.Settings
         maxValue = CurrSettings.MaxFlowRate,
         setting =  CurrSettings.FlowRate,
         minContent = new GUIContent(CurrSettings.MinFlowRate.ToString(CultureInfo.InvariantCulture)),
-        minWidth = 10,
+        minWidth = guiSliderMinWidth,
         maxContent = flowSliderContent,
-        maxWidth = 40,
-        sliderWidth = 240
+        maxWidth = guiSliderMaxWidth,
+        sliderWidth = guiSliderWidth
       };
 
       GUILayout.BeginHorizontal();
@@ -408,6 +411,9 @@ namespace ShipManifest.Windows.Tabs.Settings
       guiToggleWidth = 300 * CurrSettings.CurrentUIScale;
       guiIndent = 20 * CurrSettings.CurrentUIScale;
       guiLabelWidth = 135 * CurrSettings.CurrentUIScale;
+      guiSliderWidth = 240 * CurrSettings.CurrentUIScale;
+      guiSliderMinWidth = 10 * CurrSettings.CurrentUIScale;
+      guiSliderMaxWidth = 40 * CurrSettings.CurrentUIScale;
     }
 
   }

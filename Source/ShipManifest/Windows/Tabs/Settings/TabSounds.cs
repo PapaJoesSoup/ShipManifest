@@ -20,6 +20,9 @@ namespace ShipManifest.Windows.Tabs.Settings
     internal static float guiTextWidth;
     internal static float guiLabelWidth;
     internal static float guiLineHeight;
+    internal static float guiSliderWidth;
+    internal static float guiSliderMinWidth;
+    internal static float guiSliderMaxWidth;
 
     // ToolTip vars
     internal static ToolTip toolTip;
@@ -91,9 +94,9 @@ namespace ShipManifest.Windows.Tabs.Settings
         setting = CurrSettings.PumpSoundVol,
         minValue = 0f,
         maxValue = 1f,
-        minWidth = 40,
-        maxWidth = 40,
-        sliderWidth = 140
+        minWidth = guiSliderMinWidth,
+        maxWidth = guiSliderMaxWidth,
+        sliderWidth = guiSliderWidth
       };
 
       CurrSettings.PumpSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
@@ -123,27 +126,19 @@ namespace ShipManifest.Windows.Tabs.Settings
         toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, scrollX);
 
       // Volume Slider Control
-      slider = new SliderData
-      {
-        minContent = volMinContent,
-        maxContent = volMaxContent,
-        setting = CurrSettings.CrewSoundVol,
-        minValue = 0f,
-        maxValue = 1f,
-        minWidth = 40,
-        maxWidth = 40,
-        sliderWidth = 140
-      };
+      slider.setting = CurrSettings.CrewSoundVol;
       CurrSettings.CrewSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
     }
 
     internal static void RefreshUIScale()
     {
-      guiTextWidth = 200 * (CurrSettings.CurrentUIScale / 2);
+      guiTextWidth = 200 * (CurrSettings.CurrentUIScale);
       guiLabelWidth = 100 * CurrSettings.CurrentUIScale;
       guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      guiSliderWidth = 185 * CurrSettings.CurrentUIScale;
+      guiSliderMinWidth = 10 * CurrSettings.CurrentUIScale;
+      guiSliderMaxWidth = 40 * CurrSettings.CurrentUIScale;
     }
-
   }
 }
