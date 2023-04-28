@@ -88,52 +88,52 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUI.enabled = true;
       GUILayout.Label(!CurrSettings.LockSettings ? optionsContent : lockContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
 
       bool isEnabled = !CurrSettings.LockSettings;
       //RealismMode Buttons.
       DisplayRealismButtons();
 
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
 
 
       // RealXfers Mode
       GUI.enabled = isEnabled;
       // Realistic Transfers;
       CurrSettings.RealXfers = GuiUtils.DisplaySettingsToggle(CurrSettings.RealXfers, realXferContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
 
       // RealControl Mode
       GUI.enabled = isEnabled;
       // Realistic Control
       CurrSettings.RealControl = GuiUtils.DisplaySettingsToggle(CurrSettings.RealControl, realControlContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
 
       // EnableCrew Modifications
       GUI.enabled = isEnabled;
       CurrSettings.EnableCrewModify = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableCrewModify, crewModifyContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
 
       // Enable Kerbal Renaming
       CurrSettings.EnableKerbalRename = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableKerbalRename, crewRenameContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
 
       //Enable Profession management
       CurrSettings.EnableChangeProfession = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableChangeProfession, professionContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUI.enabled = true;
 
       // Enable stock Crew Xfers
       GUI.enabled = CurrSettings.EnableCrew && isEnabled;
       // Enable Stock Crew Xfers;
       CurrSettings.EnableStockCrewXfer = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableStockCrewXfer, stkCrewXferContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
 
       // EnableCrew Xfer Mode
       GUI.enabled = isEnabled;
       // Enable SM Crew Xfers
       CurrSettings.EnableCrew = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableCrew, smCrewXfersContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       if (!CurrSettings.EnableCrew && HighLogic.LoadedSceneIsFlight)
       {
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
@@ -153,7 +153,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //Turns on/off Realistic Resource Transfers.
       GUILayout.Space(guiIndent);
       CurrSettings.RealCrewXfers = GuiUtils.DisplaySettingsToggle(CurrSettings.RealCrewXfers, realCrewXferContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // EnablePFResources Mode
@@ -161,7 +161,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       //Enable Crew Fill and Empty Ops in Pre-Flight
       GUILayout.Space(guiIndent);
       CurrSettings.EnablePfCrews = GuiUtils.DisplaySettingsToggle(CurrSettings.EnablePfCrews, pfCrewContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // Enable stock Crew Xfer Override
@@ -170,7 +170,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
       CurrSettings.OverrideStockCrewXfer = GuiUtils.DisplaySettingsToggle(CurrSettings.OverrideStockCrewXfer, orStkCrewXferContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // EnableCLS Mode
@@ -182,7 +182,7 @@ namespace ShipManifest.Windows.Tabs.Settings
         GUI.enabled = isEnabled;
       //Enable CLS  (Connected Living Spaces)";
       CurrSettings.EnableCls = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableCls, clsContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       if (CurrSettings.EnableCls != OrigSettings.EnableCls && HighLogic.LoadedSceneIsFlight)
@@ -206,14 +206,14 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
       CurrSettings.EnableClsAllowTransfer = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableClsAllowTransfer, clsAllowXferContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // EnableScience Mode
       GUI.enabled = isEnabled;
       //Enable Science Xfers
       CurrSettings.EnableScience = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableScience, modeScienceContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       if (!CurrSettings.EnableScience && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
@@ -225,7 +225,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = isEnabled;
       //Enable Resource Xfers
       CurrSettings.EnableResources = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableResources, modeResourcesContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       if (!CurrSettings.EnableResources && HighLogic.LoadedSceneIsFlight)
       {
         // Clear Resource selection.
@@ -243,7 +243,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent);
       //Enable Resources in Pre-Flight
       CurrSettings.EnablePfResources = GuiUtils.DisplaySettingsToggle(CurrSettings.EnablePfResources, pfResourcesContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // EnableXferCost Mode
@@ -251,7 +251,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent);
       // Resource Xfers Consume Power";
       CurrSettings.EnableXferCost = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableXferCost, xferCostOnContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
 
       // Resource Xfer EC cost
@@ -267,7 +267,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       StrFlowCost = SmUtils.GetStringZero(StrFlowCost);
 
       StrFlowCost = GuiUtils.DisplaySettingsTextField(StrFlowCost, xferCostAmtContent,
-        guiLabelWidth - (guiIndent/2), 80, ecUnitContent, 80, toolTip, scrollX);
+        guiLabelWidth - (guiIndent/2), 80 + WindowSettings.WidthScale, ecUnitContent, 80, toolTip, scrollX);
       GUILayout.EndHorizontal();
 
       // update decimal bool 
@@ -292,7 +292,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent * 1.25f);
       // Resource Flow Rate:
       strFlowRate = GuiUtils.DisplaySettingsTextField(strFlowRate, flowRateContent,
-        guiLabelWidth, 80, unitsSecContent, 80, toolTip, scrollX);
+        guiLabelWidth, 80 + WindowSettings.WidthScale, unitsSecContent, 80, toolTip, scrollX);
       GUILayout.EndHorizontal();
 
       if (float.TryParse(strFlowRate, out float newRate))
@@ -321,7 +321,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent * 1.5f);
       // - Min Flow Rate:
       strMinFlowRate = GuiUtils.DisplaySettingsTextField(strMinFlowRate, minRateContent,
-        guiLabelWidth, 80, unitSecMinContent, 80, toolTip, scrollX);
+        guiLabelWidth, 80 + WindowSettings.WidthScale, unitSecMinContent, 80, toolTip, scrollX);
       if (float.TryParse(strMinFlowRate, out newRate))
         CurrSettings.MinFlowRate = (int) newRate;
       GUILayout.EndHorizontal();
@@ -331,7 +331,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent * 1.5f);
       // - Max Flow Rate:
       strMaxFlowRate = GuiUtils.DisplaySettingsTextField(strMaxFlowRate, maxRateContent,
-        guiLabelWidth, 80, unitSecMinContent, 80, toolTip, scrollX);
+        guiLabelWidth, 80 + WindowSettings.WidthScale, unitSecMinContent, 80, toolTip, scrollX);
       if (float.TryParse(strMaxFlowRate, out newRate))
         CurrSettings.MaxFlowRate = (int) newRate;
       GUILayout.EndHorizontal();
@@ -341,22 +341,22 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent * 1.5f);
       // - Max Flow Time:
       strMaxFlowTime = GuiUtils.DisplaySettingsTextField(strMaxFlowTime, maxFlowTimeContent,
-        guiLabelWidth, 80, unitFlowTimeContent, 80, toolTip, scrollX);
+        guiLabelWidth, 80 + WindowSettings.WidthScale, unitFlowTimeContent, 80, toolTip, scrollX);
       if (float.TryParse(strMaxFlowTime, out newRate))
         CurrSettings.MaxFlowTimeSec = (int) newRate;
       GUILayout.EndHorizontal();
 
       // reset gui.enabled to default
       GUI.enabled = true;
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
 
       // LockSettings Mode
       GUI.enabled = isEnabled;
       // Lock Realism Settings  (If set ON, disable in config file)
       CurrSettings.LockSettings = GuiUtils.DisplaySettingsToggle(CurrSettings.LockSettings, lockSettingContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUI.enabled = true;
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
     }
 
     private static void DisplayRealismButtons()
@@ -384,7 +384,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       GUI.enabled = true;
       GUILayout.BeginHorizontal();
-      GUILayout.Label(modeOptionContent, SMStyle.LabelStyleNoWrap, GUILayout.Width(90 * CurrSettings.CurrentUIScale));
+      GUILayout.Label(modeOptionContent, SMStyle.LabelStyleNoWrap, GUILayout.Width(90 * CurrSettings.CurrentUIScale + WindowSettings.WidthScale));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, 10);

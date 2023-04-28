@@ -44,7 +44,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       //GUILayout.Label("Deployable Radiator Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth + WindowControl.WidthScale));
       string step = "start";
       try
       {
@@ -71,7 +71,7 @@ namespace ShipManifest.Windows.Tabs.Control
           {
             label = $"{iRadiators.Current.PanelStatus} - ({lockedContent}) - {iRadiators.Current.Title}"; // "Locked"
           }
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
+          bool newOpen = GUILayout.Toggle(open, label, SMStyle.SMSkin.toggle, GUILayout.Width(guiToggleWidth + WindowControl.WidthScale), GUILayout.Height(guiToggleHeight));
           step = "button toggle check";
           if (!open && newOpen)
             iRadiators.Current.ExtendPanel();

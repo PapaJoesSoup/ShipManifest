@@ -18,16 +18,16 @@ namespace ShipManifest.Windows
 
     // UIScale settings
     internal static float WindowHeight;
+    internal static float WindowWidth;
     internal static float MinHeight;
+    internal static float MinWidth;
     internal static float ViewerHeight;
     internal static float ViewerWidth;
     internal static float GuiRuleWidth;
     internal static float GuiRuleHeight;
     internal static float guiLineHeight;
-
-
-
     internal static float HeightScale;
+    internal static float WidthScale;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -92,11 +92,11 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(3 * CurrSettings.CurrentUIScale));
       DisplayTabButtons();
 
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth + WidthScale));
       GUILayout.BeginVertical();
 
       DisplaySelectedTab(_displayViewerPosition);
@@ -119,14 +119,17 @@ namespace ShipManifest.Windows
 
       if (Event.current.type == EventType.Repaint && ResizingWindow)
       {
-        if (Mouse.delta.y != 0)
+        if (Mouse.delta.y != 0 || Mouse.delta.x != 0)
         {
-          float diff = Mouse.delta.y;
-          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+          float yDiff = Mouse.delta.y;
+          float xDiff = Mouse.delta.x;
+          GuiUtils.UpdateHeightScale(yDiff, ViewerHeight, ref HeightScale, MinHeight);
+          GuiUtils.UpdateWidthScale(xDiff, ViewerWidth, ref WidthScale, MinWidth);
         }
       }
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
       Position.height = WindowHeight + HeightScale;
+      Position.width = WindowWidth + WidthScale;
       GuiUtils.RepositionWindow(ref Position);
     }
 
@@ -214,7 +217,7 @@ namespace ShipManifest.Windows
       GUILayout.BeginHorizontal();
 
       // Save
-      if (GUILayout.Button(saveContent, GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(saveContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight)))
       {
         ToolTip = "";
         CurrSettings.SaveIntervalSec = int.Parse(TabConfig.TxtSaveInterval);
@@ -236,7 +239,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Cancel
-      if (GUILayout.Button(cancelContent, GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(cancelContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight)))
       {
         ToolTip = "";
         // We've cancelled, so restore original settings.
@@ -256,8 +259,10 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      WindowHeight = 380 * CurrSettings.CurrentUIScale;
+      WindowHeight = 385 * CurrSettings.CurrentUIScale;
+      WindowWidth = 400 * CurrSettings.CurrentUIScale;
       MinHeight = 300 * CurrSettings.CurrentUIScale;
+      MinWidth = 385 * CurrSettings.CurrentUIScale;
       ViewerHeight = 300 * CurrSettings.CurrentUIScale;
       ViewerWidth = 380 * CurrSettings.CurrentUIScale;
       GuiRuleWidth = 350 * CurrSettings.CurrentUIScale;

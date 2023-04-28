@@ -134,12 +134,20 @@ namespace ShipManifest.Windows
              && position.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
     }
 
-    internal static void UpdateScale(float diff, float viewerHeight, ref float heightScale, float minHeight)
+    internal static void UpdateHeightScale(float yDiff, float viewerHeight, ref float heightScale, float minHeight)
     {
-      heightScale += diff;
+      heightScale += yDiff;
       if (viewerHeight + heightScale < minHeight)
       {
         heightScale = minHeight - viewerHeight;
+      }
+    }
+    internal static void UpdateWidthScale(float xDiff, float viewerWidth, ref float widthScale, float minWidth)
+    {
+      widthScale += xDiff;
+      if (viewerWidth + widthScale < minWidth)
+      {
+        widthScale = minWidth - viewerWidth;
       }
     }
 
@@ -194,7 +202,7 @@ namespace ShipManifest.Windows
 
     internal static bool DisplaySettingsToggle( bool setting, GUIContent content, ref ToolTip toolTip, float toggleWidth, float scrollX)
     {
-      setting = GUILayout.Toggle(setting, content, GUILayout.Width(toggleWidth));
+      setting = GUILayout.Toggle(setting, content, SMStyle.SMSkin.toggle, GUILayout.Width(toggleWidth));
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
@@ -205,12 +213,12 @@ namespace ShipManifest.Windows
     {
       GUILayout.BeginHorizontal();
       //Error Log Length:
-      GUILayout.Label(labelContent, GUILayout.Width(labelWidth));
+      GUILayout.Label(labelContent, SMStyle.SMSkin.label,GUILayout.Width(labelWidth));
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
-      setting = GUILayout.TextField(setting, GUILayout.Width(textWidth));
-      GUILayout.Label(unitsContent, GUILayout.Width(unitsWidth));
+      setting = GUILayout.TextField(setting, SMStyle.SMSkin.textField,GUILayout.Width(textWidth));
+      GUILayout.Label(unitsContent, SMStyle.SMSkin.label, GUILayout.Width(unitsWidth));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
@@ -220,13 +228,13 @@ namespace ShipManifest.Windows
 
     internal static double DisplaySettingsSlider(SliderData slider, ref ToolTip toolTip, float scrollX)
     {
-      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), GUILayout.Width(slider.minWidth), GUILayout.Height(guiHeight));
+      GUILayout.Label(slider.minValue.ToString(CultureInfo.InvariantCulture), SMStyle.SMSkin.label,GUILayout.Width(slider.minWidth), GUILayout.Height(guiHeight));
       Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);
       double setting = GUILayout.HorizontalSlider((float)slider.setting, (float)slider.minValue,
-        (float)slider.maxValue, GUILayout.Width(slider.sliderWidth), GUILayout.Height(guiHeight));
-      GUILayout.Label(slider.maxContent, GUILayout.Width(slider.maxWidth), GUILayout.Height(guiHeight));
+        (float)slider.maxValue, SMStyle.SMSkin.horizontalSlider, SMStyle.SMSkin.horizontalSliderThumb,GUILayout.Width(slider.sliderWidth), GUILayout.Height(guiHeight));
+      GUILayout.Label(slider.maxContent, SMStyle.SMSkin.label, GUILayout.Width(slider.maxWidth), GUILayout.Height(guiHeight));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref toolTip.Active, scrollX);

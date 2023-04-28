@@ -19,14 +19,17 @@ namespace ShipManifest.Windows
 
     // UIScale settings
     internal static float WindowHeight;
+    internal static float WindowWidth;
     internal static float ViewerWidth;
     internal static float ViewerHeight;
     internal static float guiTextAreaWidth;
     internal static float guiLineHeight;
     internal static float MinHeight;
+    internal static float MinWidth;
 
 
     internal static float HeightScale;
+    internal static float WidthScale;
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
     private static bool _inputLocked;
@@ -79,13 +82,13 @@ namespace ShipManifest.Windows
       SmUtils.DebugScrollPosition = GUILayout.BeginScrollView(SmUtils.DebugScrollPosition, SMStyle.ScrollStyle,
         GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(3 * CurrSettings.CurrentUIScale));
 
       List<string>.Enumerator errors = SmUtils.LogItemList.GetEnumerator();
       while (errors.MoveNext())
       {
         if (errors.Current == null) continue;
-        GUILayout.TextArea(errors.Current, GUILayout.Width(guiTextAreaWidth));
+        GUILayout.TextArea(errors.Current, SMStyle.SMSkin.textArea, GUILayout.Width(guiTextAreaWidth));
         
       }
       errors.Dispose();
@@ -94,17 +97,17 @@ namespace ShipManifest.Windows
       GUILayout.EndScrollView();
 
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(clrLogContent, GUILayout.Height(guiLineHeight))) //"Clear log"
+      if (GUILayout.Button(clrLogContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) //"Clear log"
       {
         SmUtils.LogItemList.Clear();
         SmUtils.LogItemList.Add($"Info:  Log Cleared at {DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)} UTC.");
       }
-      if (GUILayout.Button(saveLogContent, GUILayout.Height(guiLineHeight))) // "Save Log"
+      if (GUILayout.Button(saveLogContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Save Log"
       {
         // Create log file and save.
         Savelog();
       }
-      if (GUILayout.Button(closeLogContent, GUILayout.Height(guiLineHeight))) // "Close"
+      if (GUILayout.Button(closeLogContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Close"
       {
         // Create log file and save.
         ShowWindow = false;
@@ -124,10 +127,12 @@ namespace ShipManifest.Windows
 
       if (Event.current.type == EventType.Repaint && ResizingWindow)
       {
-        if (Mouse.delta.y != 0)
+        if (Mouse.delta.y != 0 || Mouse.delta.x != 0)
         {
-          float diff = Mouse.delta.y;
-          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+          float yDiff = Mouse.delta.y;
+          float xDiff = Mouse.delta.x;
+          GuiUtils.UpdateHeightScale(yDiff, ViewerHeight, ref HeightScale, MinHeight);
+          GuiUtils.UpdateWidthScale(xDiff, ViewerWidth, ref WidthScale, MinWidth);
         }
       }
       //ResetZoomKeys();
@@ -185,12 +190,14 @@ namespace ShipManifest.Windows
     internal static void RefreshUIScale()
     {
       WindowHeight = 355 * CurrSettings.CurrentUIScale;
+      WindowWidth = 520 * CurrSettings.CurrentUIScale;
       ViewerWidth = 500 * CurrSettings.CurrentUIScale;
       ViewerHeight = 300 * CurrSettings.CurrentUIScale;
       guiTextAreaWidth = 460 * CurrSettings.CurrentUIScale;
       guiLineHeight = 20 * CurrSettings.CurrentUIScale;
       MinHeight = 200 * CurrSettings.CurrentUIScale;
+      MinWidth = 500 * CurrSettings.CurrentUIScale;
     }
 
-}
+  }
 }

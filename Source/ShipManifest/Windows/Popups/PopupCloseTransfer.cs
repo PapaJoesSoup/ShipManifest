@@ -40,12 +40,12 @@ namespace ShipManifest.Windows.Popups
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(20 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label,GUILayout.Height(20 * CurrSettings.CurrentUIScale));
       GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
 
-      GUILayout.Label("", GUILayout.Height(30 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(30 * CurrSettings.CurrentUIScale));
       GUILayout.BeginHorizontal();
-      if (GUILayout.Button(closeContent, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) // "Close"
+      if (GUILayout.Button(closeContent, SMStyle.SMSkin.button, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) // "Close"
       {
         // Abort all Transfers and quit
         TransferPump.AbortAllPumpsInProcess(0);
@@ -53,7 +53,7 @@ namespace ShipManifest.Windows.Popups
         WindowTransfer.BtnCloseWindow();
         return;
       }
-      if (GUILayout.Button(cancelContent, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) //"Cancel"
+      if (GUILayout.Button(cancelContent, SMStyle.SMSkin.button, GUILayout.Height(20 * CurrSettings.CurrentUIScale))) //"Cancel"
       {
         TransferPump.Paused = false;
         SMSound.SourcePumpRun.Play();

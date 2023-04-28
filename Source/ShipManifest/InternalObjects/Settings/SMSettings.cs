@@ -126,21 +126,39 @@ namespace ShipManifest.InternalObjects.Settings
         WindowManifest.HeightScale = windowsNode.HasValue("ManifestHeightScale")
           ? float.Parse(windowsNode.GetValue("ManifestHeightScale"))
           : WindowManifest.HeightScale;
+        WindowManifest.WidthScale = windowsNode.HasValue("ManifestWidthScale")
+          ? float.Parse(windowsNode.GetValue("ManifestWidthScale"))
+          : WindowManifest.WidthScale;
         WindowTransfer.HeightScale = windowsNode.HasValue("TransferHeightScale")
           ? float.Parse(windowsNode.GetValue("TransferHeightScale"))
           : WindowTransfer.HeightScale;
+        WindowTransfer.WidthScale = windowsNode.HasValue("TransferWidthScale")
+          ? float.Parse(windowsNode.GetValue("TransferWidthScale"))
+          : WindowTransfer.WidthScale;
         WindowRoster.HeightScale = windowsNode.HasValue("RosterHeightScale")
           ? float.Parse(windowsNode.GetValue("RosterHeightScale"))
           : WindowRoster.HeightScale;
+        WindowRoster.WidthScale = windowsNode.HasValue("WidthScale")
+          ? float.Parse(windowsNode.GetValue("RosterWidthScale"))
+          : WindowRoster.WidthScale;
         WindowControl.HeightScale = windowsNode.HasValue("ControlHeightScale")
           ? float.Parse(windowsNode.GetValue("ControlHeightScale"))
           : WindowControl.HeightScale;
+        WindowControl.WidthScale = windowsNode.HasValue("ControlWidthScale")
+          ? float.Parse(windowsNode.GetValue("ControlWidthScale"))
+          : WindowControl.WidthScale;
         WindowDebugger.HeightScale = windowsNode.HasValue("DebugHeightScale")
           ? float.Parse(windowsNode.GetValue("DebugHeightScale"))
           : WindowDebugger.HeightScale;
+        WindowDebugger.WidthScale = windowsNode.HasValue("DebugWidthScale")
+          ? float.Parse(windowsNode.GetValue("DebugWidthScale"))
+          : WindowDebugger.WidthScale;
         WindowSettings.HeightScale = windowsNode.HasValue("SettingsHeightScale")
           ? float.Parse(windowsNode.GetValue("SettingsHeightScale"))
           : WindowSettings.HeightScale;
+        WindowSettings.WidthScale = windowsNode.HasValue("SettingsWidthScale")
+          ? float.Parse(windowsNode.GetValue("SettingsWidthScale"))
+          : WindowSettings.WidthScale;
 
         // Realism Settings
         CurrSettings.RealismMode = realismNode.HasValue("RealismMode")
@@ -433,12 +451,17 @@ namespace ShipManifest.InternalObjects.Settings
       WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
 
       WriteValue(windowsNode, "ManifestHeightScale", WindowManifest.HeightScale);
+      WriteValue(windowsNode, "ManifestWidthScale", WindowManifest.WidthScale);
       WriteValue(windowsNode, "TransferHeightScale", WindowTransfer.HeightScale);
+      WriteValue(windowsNode, "TransferWidthScale", WindowTransfer.WidthScale);
       WriteValue(windowsNode, "RosterHeightScale", WindowRoster.HeightScale);
+      WriteValue(windowsNode, "RosterWidthScale", WindowRoster.WidthScale);
       WriteValue(windowsNode, "ControlHeightScale", WindowControl.HeightScale);
+      WriteValue(windowsNode, "ControlWidthScale", WindowControl.WidthScale);
       WriteValue(windowsNode, "DebugHeightScale", WindowDebugger.HeightScale);
+      WriteValue(windowsNode, "DebugWidthScale", WindowDebugger.WidthScale);
       WriteValue(windowsNode, "SettingsHeightScale", WindowSettings.HeightScale);
-
+      WriteValue(windowsNode, "SettingsWidthScale", WindowSettings.WidthScale);
 
       //Write settings...
       // Realism Settings

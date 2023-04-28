@@ -40,5 +40,5 @@ using System.Runtime.InteropServices;
 // Be sure to build and deploy on Master branch after all merges are complete
 // Push to master as the last step.
 
-[assembly: AssemblyVersion("6.0.7.0")]
+[assembly: AssemblyVersion("6.0.8.0")]
 //[assembly: AssemblyFileVersion("5.2.1.0")]

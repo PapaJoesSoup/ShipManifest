@@ -43,7 +43,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth + WindowControl.WidthScale));
       string step = "start";
       try
       {
@@ -54,7 +54,7 @@ namespace ShipManifest.Windows.Tabs.Control
           if (iLights.Current == null) continue;
           string label = $"{iLights.Current.Status} - {iLights.Current.Title}";
           bool onState = iLights.Current.IsOn;
-          bool newOnState = GUILayout.Toggle(onState, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
+          bool newOnState = GUILayout.Toggle(onState, label, SMStyle.SMSkin.toggle, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight + WindowControl.WidthScale));
           step = "button toggle check";
           if (!onState && newOnState)
             iLights.Current.TurnOnLight();

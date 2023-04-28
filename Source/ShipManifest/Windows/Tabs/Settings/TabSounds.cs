@@ -64,7 +64,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
       GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
 
-      GUILayout.Label(xferPumpContent, GUILayout.Height(guiLineHeight)); //"Transfer Pump:"
+      GUILayout.Label(xferPumpContent, SMStyle.SMSkin.label, GUILayout.Height(guiLineHeight)); //"Transfer Pump:"
 
       // Pump Start Sound
       // Pump Starting:
@@ -81,7 +81,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Pump Sound Volume
       GUILayout.BeginHorizontal();
-      GUILayout.Label(volPumpContent, GUILayout.Width(guiLabelWidth));
+      GUILayout.Label(volPumpContent, SMStyle.SMSkin.label, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, scrollX);
@@ -102,10 +102,10 @@ namespace ShipManifest.Windows.Tabs.Settings
       CurrSettings.PumpSoundVol = GuiUtils.DisplaySettingsSlider(slider, ref toolTip, scrollX);
       GUILayout.EndHorizontal();
 
-      GUILayout.Label(" ", GUILayout.Height(WindowSettings.GuiRuleHeight));
+      GUILayout.Label(" ", SMStyle.SMSkin.label, GUILayout.Height(WindowSettings.GuiRuleHeight));
 
       // Crew:
-      GUILayout.Label(crewContent, GUILayout.Height(guiLineHeight));
+      GUILayout.Label(crewContent, SMStyle.SMSkin.label, GUILayout.Height(guiLineHeight));
       // Crew Start Sound
       CurrSettings.CrewSoundStart = GuiUtils.DisplaySettingsTextField(CurrSettings.CrewSoundStart, startCrewContent,
         guiLabelWidth, guiTextWidth, filePathContent, 40, toolTip, scrollX);
@@ -120,7 +120,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Crew Sound Volume
       GUILayout.BeginHorizontal();
-      GUILayout.Label(volCrewContent, GUILayout.Width(guiLabelWidth));
+      GUILayout.Label(volCrewContent, SMStyle.SMSkin.label, GUILayout.Width(guiLabelWidth));
       _rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && toolTip.CanShow)
         toolTip.Desc = SMToolTips.SetActiveToolTip(_rect, GUI.tooltip, ref toolTip.Active, scrollX);

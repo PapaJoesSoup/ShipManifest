@@ -44,7 +44,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       //GUILayout.Label("Hatch Control Center ", SMStyle.LabelTabHeader);
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth + WindowControl.WidthScale));
       string step = "start";
       try
       {
@@ -64,7 +64,7 @@ namespace ShipManifest.Windows.Tabs.Control
 
           step = "gui enable";
           GUI.enabled = isEnabled;
-          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", GUILayout.Width(guiToggleWidth));
+          bool newOpen = GUILayout.Toggle(open, $"{iHatch.HatchStatus} - {iHatch.Title}", SMStyle.SMSkin.toggle, GUILayout.Width(guiToggleWidth + WindowControl.WidthScale));
           step = "button toggle check";
           if (!open && newOpen)
           {

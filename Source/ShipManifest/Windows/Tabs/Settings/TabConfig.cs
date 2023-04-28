@@ -56,7 +56,7 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       //Configuration Title
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
 
       if (!ToolbarManager.ToolbarAvailable)
       {
@@ -69,46 +69,46 @@ namespace ShipManifest.Windows.Tabs.Settings
 
       // Enable Blizzy Toolbar (Replaces Stock Toolbar)";
       CurrSettings.EnableBlizzyToolbar = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableBlizzyToolbar, blizzyContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       GUI.enabled = true;
       // Enable Settings Icon on Toolbar;
       CurrSettings.EnableSettingsIcon = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableSettingsIcon, settingsIconContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       // UnityStyle Mode
       CurrSettings.UseUnityStyle = GuiUtils.DisplaySettingsToggle(CurrSettings.UseUnityStyle, unityStyleContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
       if (CurrSettings.UseUnityStyle != OrigSettings.UseUnityStyle)
         SMStyle.WindowStyle = null;
 
       // Enable Debug Window;
       WindowDebugger.ShowWindow = GuiUtils.DisplaySettingsToggle(WindowDebugger.ShowWindow, debugContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       // Enable Verbose Logging
       CurrSettings.VerboseLogging = GuiUtils.DisplaySettingsToggle(CurrSettings.VerboseLogging, loggingContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       // Enable SM Debug Window On Error
       CurrSettings.AutoDebug = GuiUtils.DisplaySettingsToggle(CurrSettings.AutoDebug, smErrorContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       // Save Error log on Exit
       CurrSettings.SaveLogOnExit = GuiUtils.DisplaySettingsToggle(CurrSettings.SaveLogOnExit, logExitContent,
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       //Error Log Length:
       CurrSettings.ErrorLogLength = GuiUtils.DisplaySettingsTextField(CurrSettings.ErrorLogLength, logLengthContent,
-        guiLabelWidth, 50, linesContent, 40, toolTip, scrollX);
+        guiLabelWidth, 50 + WindowSettings.WidthScale, linesContent, 40, toolTip, scrollX);
 
       // Enable AutoSave Settings
       CurrSettings.AutoSave = GuiUtils.DisplaySettingsToggle(CurrSettings.AutoSave, autoSaveContent, 
-        ref toolTip, guiMaintoggleWidth, scrollX);
+        ref toolTip, guiMaintoggleWidth + WindowSettings.WidthScale, scrollX);
 
       // Save Interval Settings
       TxtSaveInterval = GuiUtils.DisplaySettingsTextField(TxtSaveInterval, saveIntervalContent,
-        guiLabelWidth, 50, secondsContent, 40, toolTip, scrollX);
+        guiLabelWidth, 50 + WindowSettings.WidthScale, secondsContent, 40, toolTip, scrollX);
     }
 
     internal static void RefreshUIScale()

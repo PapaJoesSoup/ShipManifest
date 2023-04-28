@@ -7,8 +7,8 @@ KSP Version supported:  1.12.x
 KSP Forum OP:  https://forum.kerbalspaceprogram.com/index.php?showtopic=56643
 
 ----------------
-Download: SpaceDock - https://kerbalstuff.com/mod/261/Ship%20Manifest
-          CurseForge - http://kerbal.curseforge.com/ksp-mods/220357-ship-manifest
+Download: SpaceDock - https://spacedock.info/mod/189/ShipManifest
+          CurseForge - https://www.curseforge.com/kerbal/ksp-mods/shipmanifest
           Github - https://github.com/PapaJoesSoup/ShipManifest/releases
 Source:   Github - http://github.com/PapaJoesSoup/ShipManifest
 WIKI:     Github - http://github.com/PapaJoesSoup/ShipManifest/wiki
@@ -36,13 +36,13 @@ I've now re-imagined it into Ship Manifest, using the same easy to navigate visu
 
 
 NOTE:  SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
-	- Blizzy's Toolbar. http://forum.kerbalspaceprogram.com/threads/60863.
-	- Connected Living Space (Verson 1.1.1.0 or higher)  http://forum.kerbalspaceprogram.com/threads/70161.
+	- Blizzy's Toolbar.
+	- Connected Living Space  https://forum.kerbalspaceprogram.com/index.php?showtopic=109972.
 	- Module Manager  http://forum.kerbalspaceprogram.com/threads/55219
-	- DeepFreeze  (Version 0.16.0.2 or higher)  http://forum.kerbalspaceprogram.com/threads/124720
-	- RemoteTech Antennas  http://forum.kerbalspaceprogram.com/threads/83305
+	- DeepFreeze  http://forum.kerbalspaceprogram.com/threads/124720
+	- RemoteTech Antennas  https://forum.kerbalspaceprogram.com/index.php?showtopic=139167
 	- KSP-AVC  http://forum.kerbalspaceprogram.com/threads/79745
-	- CKAN  http://forum.kerbalspaceprogram.com/threads/100067
+	- CKAN  https://forum.kerbalspaceprogram.com/index.php?showtopic=197082
 
 --------------------
 Installation steps: 
@@ -57,6 +57,6 @@ Videos:
  - Kottabos did a fine review here:  www.youtube.com/watch?v=I_TNxjnW234 (Feb 28th 2014). It was very educational for me :).  I've long since fixed the bugs and added so much more... :D
 
 ------------	
-Acknoledgments:
+Acknowledgments:
 ------------	
- - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with KSP v0.22.  
+ - This work was originally based on Crew manifest 0.5.6.0 by xxSovereignxx as modified by Sarbian to work with KSP v0.22. (Wow, that was a long time ago - 2013... I've been working on this for 10 years...  I'm old...  I'm tired...  I'm going to bed now...  :D))  

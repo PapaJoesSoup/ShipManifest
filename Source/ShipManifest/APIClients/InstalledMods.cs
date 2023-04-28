@@ -36,7 +36,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth * CurrSettings.CurrentUIScale));
+        GUILayout.Label(fullName[0], SMStyle.SMSkin.label, GUILayout.Width(GuiWidth * CurrSettings.CurrentUIScale));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }
@@ -53,7 +53,7 @@ namespace ShipManifest.APIClients
         if (list.Current == null) continue;
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
-        GUILayout.Label(fullName[0], GUILayout.Width(GuiWidth * CurrSettings.CurrentUIScale));
+        GUILayout.Label(fullName[0], SMStyle.SMSkin.label,GUILayout.Width(GuiWidth * CurrSettings.CurrentUIScale));
         GUILayout.Label(fullName[1]);
         GUILayout.EndHorizontal();
       }

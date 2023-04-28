@@ -44,7 +44,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUILayout.BeginVertical();
       GUI.enabled = true;
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth + WindowControl.WidthScale));
       string step = "start";
       try
       {
@@ -57,7 +57,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "gui enable";
           GUI.enabled = true;
           string label = $"{iLabs.Current.name} - ({(iLabs.Current.IsOperational() ? opContent : inopContent)})"; // Operational, InOp
-          GUILayout.Label(label, GUILayout.Width(guiLabelWidth), GUILayout.Height(guiLabelHeight));
+          GUILayout.Label(label, SMStyle.SMSkin.label, GUILayout.Width(guiLabelWidth + WindowControl.WidthScale), GUILayout.Height(guiLabelHeight));
 
           Rect rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))

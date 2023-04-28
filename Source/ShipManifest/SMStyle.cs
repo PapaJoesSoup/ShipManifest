@@ -8,6 +8,10 @@ namespace ShipManifest
   internal static class SMStyle
   {
     #region Properties
+
+    internal static GUISkin SMSkin;
+    internal static GUISkin KSPSkin;
+    internal static GUISkin UnitySkin;
     internal static GUIStyle WindowStyle;
     internal static GUIStyle PopupStyle;
     internal static GUIStyle IconStyle;
@@ -45,35 +49,41 @@ namespace ShipManifest
 
     internal static void SetStyles()
     {
-      WindowStyle = new GUIStyle(GUI.skin.window);
+      // Set up GUI Styles
+      KSPSkin = HighLogic.Skin;
+      UnitySkin = GUI.skin;
+
+      SMSkin = CurrSettings.UseUnityStyle ? UnitySkin : KSPSkin;
+
+      WindowStyle = new GUIStyle(SMSkin.window);
 
       // Scale skin fonts
-      GUI.skin.label.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.textArea.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.textField.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.button.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.toggle.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.box.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.scrollView.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalScrollbarLeftButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.horizontalScrollbarRightButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalScrollbarUpButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.verticalScrollbarDownButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      GUI.skin.window.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.label.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.textArea.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.textField.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.button.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.toggle.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.box.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.scrollView.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalScrollbarLeftButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.horizontalScrollbarRightButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalScrollbarUpButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.verticalScrollbarDownButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      SMSkin.window.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
 
       PopupStyle = new GUIStyle(HighLogic.Skin.window);
 
       IconStyle = new GUIStyle();
 
-      ButtonStyle = new GUIStyle(GUI.skin.button)
+      ButtonStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.blue},
@@ -88,7 +98,7 @@ namespace ShipManifest
         clipping = TextClipping.Clip
       };
 
-      ButtonToggledStyle = new GUIStyle(GUI.skin.button)
+      ButtonToggledStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.green},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -105,7 +115,7 @@ namespace ShipManifest
       ButtonToggledStyle.alignment = TextAnchor.MiddleCenter;
       ButtonToggledStyle.clipping = TextClipping.Clip;
 
-      ButtonStyleLeft = new GUIStyle(GUI.skin.button)
+      ButtonStyleLeft = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.green},
@@ -120,7 +130,7 @@ namespace ShipManifest
         clipping = TextClipping.Clip
       };
 
-      ButtonToggledStyleLeft = new GUIStyle(GUI.skin.button)
+      ButtonToggledStyleLeft = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.green},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -136,7 +146,7 @@ namespace ShipManifest
       ButtonToggledStyleLeft.alignment = TextAnchor.MiddleLeft;
       ButtonToggledStyleLeft.clipping = TextClipping.Clip;
 
-      ButtonSourceStyle = new GUIStyle(GUI.skin.button)
+      ButtonSourceStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -151,7 +161,7 @@ namespace ShipManifest
         clipping = TextClipping.Clip
       };
 
-      ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button)
+      ButtonToggledSourceStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.SourcePartColor]},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -167,7 +177,7 @@ namespace ShipManifest
       ButtonToggledSourceStyle.alignment = TextAnchor.MiddleLeft;
       ButtonToggledSourceStyle.clipping = TextClipping.Clip;
 
-      ButtonTargetStyle = new GUIStyle(GUI.skin.button)
+      ButtonTargetStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -182,7 +192,7 @@ namespace ShipManifest
         clipping = TextClipping.Clip
       };
 
-      ButtonOptionStyle = new GUIStyle(GUI.skin.button)
+      ButtonOptionStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -199,7 +209,7 @@ namespace ShipManifest
         clipping = TextClipping.Clip
       };
 
-      ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button)
+      ButtonToggledTargetStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.TargetPartColor]},
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
@@ -215,7 +225,7 @@ namespace ShipManifest
       ButtonToggledTargetStyle.clipping = TextClipping.Clip;
       ButtonToggledTargetStyle.alignment = TextAnchor.MiddleLeft;
 
-      ToggleStyleHeader = new GUIStyle(GUI.skin.toggle)
+      ToggleStyleHeader = new GUIStyle(SMSkin.toggle)
       {
         padding =
         {
@@ -228,11 +238,11 @@ namespace ShipManifest
         alignment = TextAnchor.LowerLeft
       };
 
-      ErrorLabelRedStyle = new GUIStyle(GUI.skin.label) {normal = {textColor = Color.red}};
+      ErrorLabelRedStyle = new GUIStyle(SMSkin.label) {normal = {textColor = Color.red}};
 
-      LabelStyle = new GUIStyle(GUI.skin.label);
+      LabelStyle = new GUIStyle(SMSkin.label);
 
-      LabelTabHeader = new GUIStyle(GUI.skin.label)
+      LabelTabHeader = new GUIStyle(SMSkin.label)
       {
         padding =
         {
@@ -244,7 +254,7 @@ namespace ShipManifest
         margin = new RectOffset(0, 0, 0, 0)
       };
 
-      LabelStyleHardRule = new GUIStyle(GUI.skin.label)
+      LabelStyleHardRule = new GUIStyle(SMSkin.label)
       {
         padding =
         {
@@ -257,13 +267,13 @@ namespace ShipManifest
         margin = new RectOffset(0, 0, 0, 0)
       };
 
-      LabelStyleNoWrap = new GUIStyle(GUI.skin.label)
+      LabelStyleNoWrap = new GUIStyle(SMSkin.label)
       {
         wordWrap = false,
         clipping = TextClipping.Clip
       };
 
-      LabelStyleNoPad = new GUIStyle(GUI.skin.label)
+      LabelStyleNoPad = new GUIStyle(SMSkin.label)
       {
         padding =
         {
@@ -273,13 +283,13 @@ namespace ShipManifest
         wordWrap = false
       };
 
-      LabelStyleBold = new GUIStyle(GUI.skin.label)
+      LabelStyleBold = new GUIStyle(SMSkin.label)
       {
         fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         fontStyle = FontStyle.Bold
       };
 
-      LabelStyleCenter = new GUIStyle(GUI.skin.label)
+      LabelStyleCenter = new GUIStyle(SMSkin.label)
       {
         alignment = TextAnchor.UpperCenter,
         fontStyle = FontStyle.Bold
@@ -293,13 +303,12 @@ namespace ShipManifest
       LabelStyleYellow = new GUIStyle(LabelStyle) {normal = {textColor = Color.yellow}};
 
       LabelStyleGreen = new GUIStyle(LabelStyle) {normal = {textColor = Color.green}};
-      ScrollStyle = new GUIStyle(GUI.skin.box);
+      ScrollStyle = new GUIStyle(SMSkin.box);
 
-      if (GUI.skin != null)
-        GUI.skin = null;
+      //if (GUI.skin != null) GUI.skin = null;
 
       // ReSharper disable once PossibleNullReferenceException
-      ToolTipStyle = new GUIStyle(GUI.skin.textArea)
+      ToolTipStyle = new GUIStyle(SMSkin.textArea)
       {
         border = new RectOffset(4, 4, 4, 4),
         padding = new RectOffset(5, 5, 5, 5),
@@ -311,8 +320,6 @@ namespace ShipManifest
       };
       ToolTipStyle.hover.background = ToolTipStyle.normal.background;
 
-      if (!CurrSettings.UseUnityStyle)
-        GUI.skin = HighLogic.Skin;
     }
   }
 }

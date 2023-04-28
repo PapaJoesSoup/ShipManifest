@@ -40,10 +40,10 @@ namespace ShipManifest.Windows.Popups
       _inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
 
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(5 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(5 * CurrSettings.CurrentUIScale));
 
       GUILayout.Label(descContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
-      GUILayout.Label("", GUILayout.Height(5 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(5 * CurrSettings.CurrentUIScale));
       GUILayout.Label(aboutContent, SMStyle.LabelStyleCenter, GUILayout.Width(TextWidth * CurrSettings.CurrentUIScale));
 
       GUILayout.EndVertical();

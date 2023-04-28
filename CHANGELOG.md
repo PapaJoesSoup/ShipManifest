@@ -5,6 +5,14 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+- Fixed: Correct error with scaling where other mods are affected by SM scaling.  This was caused by GUI.skin issues and the way SM scales the UI.  Now SM scales only SM windows.
+         Issue: Forum post https://forum.kerbalspaceprogram.com/index.php?/topic/56643-112x-ship-manifest-crew-science-resources-v-6070-25-apr-23/&do=findComment&comment=4277051
+- New:  Added horizontal window resizing to all windows.  SM will remember these settings  between saves.
+
+
+
+Version 6.0.7.0 - Release 25 Apr 2023 - KSP 1.12.5
+--------------------------------------------------
 - Fixed: Correct error in Manifest window with the vessel name.  Was using a nonlocalized name. Now properly localized.
 - Fixed: Rate Modifier field in Science window was displaying incorrect value.  Now properly displays the value.
 - Fixed: Correct resource display error when RealXfers setting is changed and Saved in Realism settings.

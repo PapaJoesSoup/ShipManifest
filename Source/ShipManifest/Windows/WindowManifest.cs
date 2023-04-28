@@ -23,8 +23,12 @@ namespace ShipManifest.Windows
     internal static float ViewerHeight;
     internal static float ViewerWidth;
     internal static float MinHeight;
+    internal static float MinWidth;
     internal static float WindowHeight;
+    internal static float WindowWidth;
     internal static float guiLineHeight;
+    internal static float guiLineHeight2;
+    internal static float guiLineHeight3;
     internal static float guiActionButtonWidth;
     internal static float guiDumpButtonWidth;
     internal static float guiFillButtonWidth;
@@ -35,6 +39,7 @@ namespace ShipManifest.Windows
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static float UIScale = 1.0f;
     internal static float HeightScale;
+    internal static float WidthScale;
 
     internal static bool ResizingWindow = false;
 
@@ -112,9 +117,9 @@ namespace ShipManifest.Windows
       try
       {
         GUILayout.BeginVertical();
-        GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+        GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(3 * CurrSettings.CurrentUIScale));
         _smScrollViewerPosition = GUILayout.BeginScrollView(_smScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth));
+          GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewerWidth + WidthScale));
         GUILayout.BeginVertical();
 
         // Prelaunch (landed) Gui
@@ -140,7 +145,7 @@ namespace ShipManifest.Windows
             resLabel = multiResSelContent;
             break;
         }
-        GUILayout.Label($"{resLabel}", GUILayout.Width(ViewerWidth), GUILayout.Height(guiLineHeight));
+        GUILayout.Label($"{resLabel}", SMStyle.SMSkin.label, GUILayout.Width(ViewerWidth), GUILayout.Height(guiLineHeight));
 
         // Resource Details List Viewer
         ResourceDetailsViewer();
@@ -161,15 +166,18 @@ namespace ShipManifest.Windows
 
         if (Event.current.type == EventType.Repaint && ResizingWindow)
         {
-          if (Mouse.delta.y != 0)
+          if (Mouse.delta.y != 0 || Mouse.delta.x != 0)
           {
-            float diff = Mouse.delta.y;
-            GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+            float yDiff = Mouse.delta.y;
+            float xDiff = Mouse.delta.x;
+            GuiUtils.UpdateHeightScale(yDiff, ViewerHeight, ref HeightScale, MinHeight);
+            GuiUtils.UpdateWidthScale(xDiff, ViewerWidth, ref WidthScale, MinWidth);
           }
         }
         //ResetZoomKeys();
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         Position.height = WindowHeight + HeightScale;
+        Position.width = WindowWidth + WidthScale;
         GuiUtils.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -234,7 +242,6 @@ namespace ShipManifest.Windows
 
     private static void ResourceButtonsList()
     {
-
       try
       {
         // List required here to prevent loop sync errors with live source.
@@ -254,7 +261,7 @@ namespace ShipManifest.Windows
           GUIStyle style = SMAddon.SmVessel.SelectedResources.Contains(keys.Current)
             ? SMStyle.ButtonToggledStyle
             : SMStyle.ButtonStyle;
-          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width * CurrSettings.CurrentUIScale), GUILayout.Height(guiLineHeight)))
+          if (GUILayout.Button(displayAmounts, style, GUILayout.Width(width * CurrSettings.CurrentUIScale + WidthScale), GUILayout.Height(guiLineHeight)))
           {
             ResourceButtonToggled(keys.Current);
             SMHighlighter.Update_Highlighter();
@@ -368,7 +375,7 @@ namespace ShipManifest.Windows
       try
       {
         _resourceScrollViewerPosition = GUILayout.BeginScrollView(_resourceScrollViewerPosition, SMStyle.ScrollStyle,
-          GUILayout.Height(ViewerHeight), GUILayout.Width(ViewerWidth));
+          GUILayout.Height(ViewerHeight), GUILayout.Width(ViewerWidth + WidthScale));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.SelectedResources.Count > 0)
@@ -381,16 +388,16 @@ namespace ShipManifest.Windows
             if (SMConditions.AreSelectedResourcesTypeOther(SMAddon.SmVessel.SelectedResources))
             {
               GUIStyle noWrap = SMStyle.LabelStyleNoWrap;
-              GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(guiLabelWidth),
-                GUILayout.Height(18 * CurrSettings.CurrentUIScale));
+              GUILayout.Label($"{part.partInfo.title}", noWrap, GUILayout.Width(guiLabelWidth + WidthScale),
+                GUILayout.Height(guiLineHeight2));
               GUIStyle noPad = SMStyle.LabelStyleNoPad;
               List<string>.Enumerator sResources = SMAddon.SmVessel.SelectedResources.GetEnumerator();
               while (sResources.MoveNext())
               {
                 if (sResources.Current == null) continue;
                 GUILayout.Label(
-                  $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(guiLabelWidth),
-                  GUILayout.Height(16 * CurrSettings.CurrentUIScale));
+                  $" - {sResources.Current}:  ({part.Resources[sResources.Current].amount:######0.####}/{part.Resources[sResources.Current].maxAmount:######0.####})", noPad, GUILayout.Width(guiLabelWidth + WidthScale),
+                  GUILayout.Height(guiLineHeight3));
               }
               sResources.Dispose();
             }
@@ -398,8 +405,8 @@ namespace ShipManifest.Windows
             {
               GUILayout.BeginHorizontal();
               GUILayout.Label(
-                $"{part.partInfo.title}, ({SmUtils.GetPartCrewCount(part)}/{part.CrewCapacity})",
-                GUILayout.Width(guiLabelWidth), GUILayout.Height(guiLineHeight));
+                $"{part.partInfo.title}, ({SmUtils.GetPartCrewCount(part)}/{part.CrewCapacity})", SMStyle.SMSkin.label,
+                GUILayout.Width(guiLabelWidth + WidthScale), GUILayout.Height(guiLineHeight));
               GUILayout.EndHorizontal();
             }
             else if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
@@ -417,7 +424,7 @@ namespace ShipManifest.Windows
                   scienceCount += experiment.GetScienceCount();
               }
               GUILayout.BeginHorizontal();
-              GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", GUILayout.Width(guiLabelWidth));
+              GUILayout.Label($"{part.partInfo.title}, ({scienceCount})", SMStyle.SMSkin.label, GUILayout.Width(guiLabelWidth + WidthScale));
               GUILayout.EndHorizontal();
             }
           }
@@ -643,17 +650,20 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      ViewerHeight = 100 * CurrSettings.CurrentUIScale;
+      WindowHeight = 370 * CurrSettings.CurrentUIScale;
+      WindowWidth = 320 * CurrSettings.CurrentUIScale;
+      ViewerHeight = 140 * CurrSettings.CurrentUIScale;
       ViewerWidth = 300 * CurrSettings.CurrentUIScale;
-      MinHeight = 50 * CurrSettings.CurrentUIScale;
-      WindowHeight = 282 * CurrSettings.CurrentUIScale;
+      MinHeight = 140 * CurrSettings.CurrentUIScale;
+      MinWidth = 300 * CurrSettings.CurrentUIScale;
       guiLineHeight = 20 * CurrSettings.CurrentUIScale;
+      guiLineHeight2 = 18 * CurrSettings.CurrentUIScale;
+      guiLineHeight3 = 16 * CurrSettings.CurrentUIScale;
       guiActionButtonWidth = 134 * CurrSettings.CurrentUIScale;
       guiDumpButtonWidth = 45 * CurrSettings.CurrentUIScale;
       guiFillButtonWidth = 35 * CurrSettings.CurrentUIScale;
       guiLabelWidth = 265 * CurrSettings.CurrentUIScale;
 
+    }
   }
-
-}
 }

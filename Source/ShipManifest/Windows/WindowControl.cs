@@ -15,6 +15,7 @@ namespace ShipManifest.Windows
     }
 
     internal static float HeightScale;
+    internal static float WidthScale;
 
     internal static bool ResizingWindow = false;
     internal static Rect Position = CurrSettings.DefaultPosition;
@@ -42,7 +43,9 @@ namespace ShipManifest.Windows
 
     // Tab only vars, used in each tab
     internal static float WindowHeight;
+    internal static float WindowWidth;
     internal static float MinHeight;
+    internal static float MinWidth;
     internal static float ViewerWidth;
     internal static float ViewerHeight;
     internal static float GuiRuleWidth;
@@ -99,7 +102,7 @@ namespace ShipManifest.Windows
 
       // This is a scroll panel (we are using it to make button lists...)
       GUILayout.BeginVertical();
-      GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+      GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(3 * CurrSettings.CurrentUIScale));
       DisplayWindowTabs();
 
       // This is a scroll panel (we are using it to make button lists...)
@@ -118,14 +121,17 @@ namespace ShipManifest.Windows
 
       if (Event.current.type == EventType.Repaint && ResizingWindow)
       {
-        if (Mouse.delta.y != 0)
+        if (Mouse.delta.y != 0 || Mouse.delta.x != 0)
         {
-          float diff = Mouse.delta.y;
-          GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+          float yDiff = Mouse.delta.y;
+          float xDiff = Mouse.delta.x;
+          GuiUtils.UpdateHeightScale(yDiff, ViewerHeight, ref HeightScale, MinHeight);
+          GuiUtils.UpdateWidthScale(xDiff, ViewerWidth, ref WidthScale, MinWidth);
         }
       }
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
       Position.height = WindowHeight + HeightScale;
+      Position.width = WindowWidth + WidthScale;
       GuiUtils.RepositionWindow(ref Position);
     }
 
@@ -283,7 +289,7 @@ namespace ShipManifest.Windows
     internal static void DisplaySelectedTab()
     {
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, SMStyle.ScrollStyle,
-       GUILayout.Height((TabBox.height + HeightScale)), GUILayout.Width(TabBox.width), GUILayout.MinHeight(MinHeight + HeightScale));
+       GUILayout.Height((ViewerHeight + HeightScale)), GUILayout.Width(ViewerWidth + WidthScale), GUILayout.MinHeight(MinHeight + HeightScale));
       switch (_selectedTab)
       {
         case Tab.Vessel:
@@ -323,57 +329,57 @@ namespace ShipManifest.Windows
       {
         case Tab.Panel:
           GUI.enabled = SMAddon.SmVessel.SolarPanels.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retSolarContent, GUILayout.Height(guiLineHeight))) // "Retract All Solar Panels"
+          if (GUILayout.Button(retSolarContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Retract All Solar Panels"
             TabSolarPanel.RetractAllPanels();
-          if (GUILayout.Button(extSolarContent, GUILayout.Height(guiLineHeight))) // "Extend All Solar Panels"
+          if (GUILayout.Button(extSolarContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Extend All Solar Panels"
             TabSolarPanel.ExtendAllPanels();
           break;
         case Tab.Radiator:
           GUI.enabled = SMAddon.SmVessel.Radiators.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retRadiateContent, GUILayout.Height(guiLineHeight))) // "Retract All Radiators"
+          if (GUILayout.Button(retRadiateContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Retract All Radiators"
             TabRadiator.RetractAllRadiators();
-          if (GUILayout.Button(extRadiateContent, GUILayout.Height(guiLineHeight))) // "Extend All Radiators"
+          if (GUILayout.Button(extRadiateContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Extend All Radiators"
             TabRadiator.ExtendAllRadiators();
           break;
         case Tab.Hatch:
           GUI.enabled = SMAddon.SmVessel.Hatches.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
           if (GUILayout.Button(closenHatchContent, GUILayout.Height(guiLineHeight))) // "Close All Hatches"
             TabHatch.CloseAllHatches();
-          if (GUILayout.Button(openHatchContent, GUILayout.Height(guiLineHeight))) // "Open All Hatches"
+          if (GUILayout.Button(openHatchContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Open All Hatches"
             TabHatch.OpenAllHatches();
           break;
         case Tab.Antenna:
           GUI.enabled = SMAddon.SmVessel.Antennas.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(retAntennaContent, GUILayout.Height(guiLineHeight))) // "Retract All Antennas"
+          if (GUILayout.Button(retAntennaContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Retract All Antennas"
             TabAntenna.RetractAllAntennas();
-          if (GUILayout.Button(extAntennaContent, GUILayout.Height(guiLineHeight))) // "Extend All Antennas"
+          if (GUILayout.Button(extAntennaContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Extend All Antennas"
             TabAntenna.ExtendAllAntennas();
           break;
         case Tab.Light:
           GUI.enabled = SMAddon.SmVessel.Lights.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(offLightContent, GUILayout.Height(guiLineHeight))) // "Turn Off All Lights"
+          if (GUILayout.Button(offLightContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Turn Off All Lights"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(onLightContent, GUILayout.Height(guiLineHeight))) // "Turn On All Lights"
+          if (GUILayout.Button(onLightContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Turn On All Lights"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Lab:
           GUI.enabled = SMAddon.SmVessel.Labs.Count > 0 && (!CurrSettings.RealControl || SMConditions.IsShipControllable());
-          if (GUILayout.Button(offLabsContent, GUILayout.Height(guiLineHeight))) // "Turn Off All Labs"
+          if (GUILayout.Button(offLabsContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Turn Off All Labs"
             TabLight.TurnOffAllLights();
-          if (GUILayout.Button(onLabsContent, GUILayout.Height(guiLineHeight))) // "Turn On All Labs"
+          if (GUILayout.Button(onLabsContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Turn On All Labs"
             TabLight.TurnOnAllLights();
           break;
         case Tab.Vessel:
-          GUILayout.Label("", GUILayout.Height(guiLineHeight));
+          GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(guiLineHeight));
           // Temporary commenting of code to allow release.  Will work Vessel combining in later release.
           //GUI.enabled = TabVessel.CombineVesselCount > 0;
-          //if (GUILayout.Button(selVesselContent, GUILayout.Height(guiLineHeight))) // "Combine Selected Vessels"
+          //if (GUILayout.Button(selVesselContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Combine Selected Vessels"
           //  TabVessel.CombineSelectedVessels();
-          //if (GUILayout.Button(clrVesselContent, GUILayout.Height(guiLineHeight))) // "Clear Vessel Selections"
+          //if (GUILayout.Button(clrVesselContent, SMStyle.SMSkin.button, GUILayout.Height(guiLineHeight))) // "Clear Vessel Selections"
           //  TabVessel.ClearVesselCount();
           break;
         case Tab.None:
-          GUILayout.Label("", GUILayout.Height(guiLineHeight));
+          GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(guiLineHeight));
           break;
         default:
           throw new ArgumentOutOfRangeException();
@@ -384,9 +390,11 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      WindowHeight = 280 * CurrSettings.CurrentUIScale;
+      WindowHeight = 285 * CurrSettings.CurrentUIScale;
+      WindowWidth = 450 * CurrSettings.CurrentUIScale;
       MinHeight = 200 * CurrSettings.CurrentUIScale;
-      ViewerWidth = 450 * CurrSettings.CurrentUIScale;
+      MinWidth = 450 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 430 * CurrSettings.CurrentUIScale;
       ViewerHeight = 200 * CurrSettings.CurrentUIScale;
       GuiRuleWidth = 420 * CurrSettings.CurrentUIScale;
       GuiRuleHeight = 10 * CurrSettings.CurrentUIScale;

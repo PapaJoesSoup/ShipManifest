@@ -24,15 +24,18 @@ namespace ShipManifest.Windows
     #region Properties
 
     // UIScale settings
+    internal static float WindowHeight;
+    internal static float WindowWidth;
     internal static float ViewerWidth;
     internal static float ViewerHeight;
     internal static float ViewerHeight2;
     internal static float MinHeight;
-    internal static float WindowHeight;
+    internal static float MinWidth;
     internal static float textWidth;
     internal static float toggleWidth;
     internal static float guiLineHeight;
     internal static float guiBtnMoveWidth;
+    internal static float guiBtnExpandWidth;
     internal static float label1Width;
     internal static float guibtnAction1Width;
     internal static float guibtnAction2Width;
@@ -58,6 +61,7 @@ namespace ShipManifest.Windows
     internal static string Title = "";
     internal static Rect Position = CurrSettings.DefaultPosition;
     internal static float HeightScale;
+    internal static float WidthScale;
     internal static bool ResizingWindow = false;
 
     private static bool inputLocked;
@@ -246,7 +250,7 @@ namespace ShipManifest.Windows
       {
         // This window assumes that a resource has been selected on the Ship manifest window.
         GUILayout.BeginVertical();
-        GUILayout.Label("", GUILayout.Height(3 * CurrSettings.CurrentUIScale));
+        GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Height(3 * CurrSettings.CurrentUIScale));
         GUILayout.EndVertical();
         GUILayout.BeginHorizontal();
         //Left Column Begins
@@ -293,15 +297,18 @@ namespace ShipManifest.Windows
 
         if (Event.current.type == EventType.Repaint && ResizingWindow)
         {
-          if (Mouse.delta.y != 0)
+          if (Mouse.delta.y != 0 || Mouse.delta.x != 0)
           {
-            float diff = Mouse.delta.y;
-            GuiUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+            float yDiff = Mouse.delta.y;
+            float xDiff = Mouse.delta.x;
+            GuiUtils.UpdateHeightScale(yDiff, ViewerHeight, ref HeightScale, MinHeight);
+            GuiUtils.UpdateWidthScale(xDiff, ViewerWidth, ref WidthScale, MinWidth);
           }
         }
 
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
         Position.height = WindowHeight + HeightScale;
+        Position.width = WindowWidth + WidthScale;
         GuiUtils.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -346,12 +353,11 @@ namespace ShipManifest.Windows
     private static Vector2 _sourceTransferViewerScrollPosition = Vector2.zero;
     internal static void SourceTransferViewer()
     {
-
       try
       {
         // This is a scroll panel (we are using it to make button lists...)
         _sourceTransferViewerScrollPosition = GUILayout.BeginScrollView(_sourceTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width + WidthScale/2));
         GUILayout.BeginVertical();
 
         if (ShowSourceVessels)
@@ -374,13 +380,12 @@ namespace ShipManifest.Windows
     private static Vector2 _sourceDetailsViewerScrollPosition = Vector2.zero;
     private static void SourceDetailsViewer()
     {
-
       try
       {
         // Source Part resource Details
         // this Scroll viewer is for the details of the part selected above.
         _sourceDetailsViewerScrollPosition = GUILayout.BeginScrollView(_sourceDetailsViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(DetailsBox.height), GUILayout.Width(DetailsBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(DetailsBox.height), GUILayout.Width(DetailsBox.width + WidthScale/2));
         GUILayout.BeginVertical();
 
         if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
@@ -414,7 +419,6 @@ namespace ShipManifest.Windows
     private static Vector2 _targetTransferViewerScrollPosition = Vector2.zero;
     private static void TargetTransferViewer()
     {
-
       try
       {
         // Adjust target style colors for part selectors when using/not using CLS highlighting
@@ -426,7 +430,7 @@ namespace ShipManifest.Windows
 
         // This is a scroll panel (we are using it to make button lists...)
         _targetTransferViewerScrollPosition = GUILayout.BeginScrollView(_targetTransferViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(SelectBox.height + HeightScale), GUILayout.Width(SelectBox.width + WidthScale/2));
         GUILayout.BeginVertical();
 
         if (ShowTargetVessels)
@@ -449,12 +453,11 @@ namespace ShipManifest.Windows
     private static Vector2 _targetDetailsViewerScrollPosition = Vector2.zero;
     private static void TargetDetailsViewer()
     {
-
       try
       {
         // Target Part resource details
         _targetDetailsViewerScrollPosition = GUILayout.BeginScrollView(_targetDetailsViewerScrollPosition,
-          SMStyle.ScrollStyle, GUILayout.Height(DetailsBox.height), GUILayout.Width(DetailsBox.width));
+          SMStyle.ScrollStyle, GUILayout.Height(DetailsBox.height), GUILayout.Width(DetailsBox.width + WidthScale/2));
         GUILayout.BeginVertical();
 
         // --------------------------------------------------------------------------
@@ -483,54 +486,6 @@ namespace ShipManifest.Windows
     }
 
     #endregion
-
-    #endregion Viewer Selections (Top Half)
-
-    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypeXfer xferType)
-    {
-      GUI.enabled = true;
-      string labelText = "";
-
-      GUILayout.BeginHorizontal();
-      if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
-        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : noPartContent;
-      else
-      {
-        if (selectedParts != null)
-        {
-          if (selectedParts.Count > 1)
-            labelText = multiPartContent; // "Multiple Parts Selected");
-          else if (selectedParts.Count == 1)
-            labelText = $"{selectedParts[0].partInfo.title}";
-          else
-            labelText = noPartContent; // "No Part Selected");
-        }
-      }
-      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
-      if (SMAddon.SmVessel.ModDockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
-      {
-        if (xferType == TransferPump.TypeXfer.SourceToTarget)
-        {
-          bool prevValue = ShowSourceVessels;
-          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
-          if (!prevValue && ShowSourceVessels)
-            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-        }
-        else
-        {
-          if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
-          {
-            bool prevValue = ShowSourceVessels;
-            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, vesselsContent, GUILayout.Width(toggleWidth)); // "Vessels"
-            if (!prevValue && ShowSourceVessels)
-              WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
-          }
-        }
-      }
-      GUILayout.EndHorizontal();
-    }
-
-    #region Viewer Details (Bottom Half)
 
     #region Part/Vessel Buttons Viewer
     private static void PartsTransferViewer(List<string> selectedResources, TransferPump.TypeXfer xferType,
@@ -561,7 +516,7 @@ namespace ShipManifest.Windows
             btnWidth = 173;
 
           // scale buttonwidth
-          btnWidth = btnWidth * CurrSettings.CurrentUIScale;
+          btnWidth = btnWidth * CurrSettings.CurrentUIScale + WidthScale/2;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -589,7 +544,7 @@ namespace ShipManifest.Windows
           if (selectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
           {
             if (SMConditions.CanShowCrewFillDumpButtons())
-            CrewFillDumpPartButtons(parts.Current);
+              CrewFillDumpPartButtons(parts.Current);
           }
           if (SMConditions.AreSelectedResourcesTypeOther(selectedResources))
           {
@@ -635,7 +590,7 @@ namespace ShipManifest.Windows
           float btnWidth = 273;
           if (!CurrSettings.RealXfers) btnWidth = 180;
 
-          btnWidth = btnWidth * CurrSettings.CurrentUIScale;
+          btnWidth = btnWidth * CurrSettings.CurrentUIScale + WidthScale/2;
 
           // Set style based on viewer and toggled state.
           step = "Set style";
@@ -777,7 +732,7 @@ namespace ShipManifest.Windows
       int crewCapacity = SmUtils.GetPartsCrewCapacity(vessel.VesselParts);
       int crewCount = SmUtils.GetPartsCrewCount(vessel.VesselParts);
       GUI.enabled = SmUtils.GetPartsCrewCapacity(vessel.VesselParts) > 0;
-      if (GUILayout.Button(dumpCrewContent, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(dumpCrewContent, SMStyle.SMSkin.button, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
       {
         List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
         while (part.MoveNext())
@@ -792,7 +747,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUI.enabled = crewCount < crewCapacity;
-      if (GUILayout.Button(fillCrewContent, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(fillCrewContent, SMStyle.SMSkin.button, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
       {
         List<Part>.Enumerator part = vessel.VesselParts.GetEnumerator();
         while (part.MoveNext())
@@ -811,7 +766,7 @@ namespace ShipManifest.Windows
     {
 
       GUI.enabled = part.protoModuleCrew.Count > 0;
-      if (GUILayout.Button(dumpCrewContent, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(dumpCrewContent, SMStyle.SMSkin.button, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
       {
         SMPart.DumpCrew(part);
       }
@@ -820,7 +775,7 @@ namespace ShipManifest.Windows
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUI.enabled = part.protoModuleCrew.Count < part.CrewCapacity;
-      if (GUILayout.Button(fillCrewContent, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
+      if (GUILayout.Button(fillCrewContent, SMStyle.SMSkin.button, GUILayout.Width(guiDumpFillWidth), GUILayout.Height(guiLineHeight)))
       {
         SMPart.FillCrew(part);
       }
@@ -828,7 +783,56 @@ namespace ShipManifest.Windows
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
+
     #endregion
+
+    #endregion Viewer Selections (Top Half)
+
+    private static void TextBetweenViewers(IList<Part> selectedParts, TransferPump.TypeXfer xferType)
+    {
+      GUI.enabled = true;
+      string labelText = "";
+
+      GUILayout.BeginHorizontal();
+      if (SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
+        labelText = selectedParts.Count > 0 ? $"{selectedParts[0].partInfo.title}" : noPartContent;
+      else
+      {
+        if (selectedParts != null)
+        {
+          if (selectedParts.Count > 1)
+            labelText = multiPartContent; // "Multiple Parts Selected");
+          else if (selectedParts.Count == 1)
+            labelText = $"{selectedParts[0].partInfo.title}";
+          else
+            labelText = noPartContent; // "No Part Selected");
+        }
+      }
+      GUILayout.Label(labelText, SMStyle.LabelStyleNoWrap, GUILayout.Width(textWidth));
+      if (SMAddon.SmVessel.ModDockedVessels.Count > 0 && !SMAddon.SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Science.ToString()))
+      {
+        if (xferType == TransferPump.TypeXfer.SourceToTarget)
+        {
+          bool prevValue = ShowSourceVessels;
+          ShowSourceVessels = GUILayout.Toggle(ShowSourceVessels, vesselsContent, SMStyle.SMSkin.toggle, GUILayout.Width(toggleWidth)); // "Vessels"
+          if (!prevValue && ShowSourceVessels)
+            WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
+        }
+        else
+        {
+          if (SMAddon.SmVessel.ModDockedVessels.Count > 0)
+          {
+            bool prevValue = ShowSourceVessels;
+            ShowTargetVessels = GUILayout.Toggle(ShowTargetVessels, vesselsContent, SMStyle.SMSkin.toggle, GUILayout.Width(toggleWidth)); // "Vessels"
+            if (!prevValue && ShowSourceVessels)
+              WindowManifest.ResolveResourcePartSelections(SMAddon.SmVessel.SelectedResources);
+          }
+        }
+      }
+      GUILayout.EndHorizontal();
+    }
+
+    #region Viewer Details (Bottom Half)
 
     #region Crew Details Viewer
 
@@ -932,7 +936,7 @@ namespace ShipManifest.Windows
       Rect rect;
       GUILayout.BeginHorizontal();
       GUI.enabled = selectedPartsFrom.Count > 0 && selectedPartsTo.Count > 0 && sourceCrewCount > 0 && targetCapacity > 0;
-      selectAll = GUILayout.Toggle(selectAll, GUI.enabled ? selectAllContent : selectAllxContent, GUILayout.Width(label1Width));
+      selectAll = GUILayout.Toggle(selectAll, GUI.enabled ? selectAllContent : selectAllxContent, SMStyle.SMSkin.toggle, GUILayout.Width(label1Width));
       if (selectAll != (isSourceView ? SelectAllFrom : SelectAllTo))
       {
         if (selectAll)
@@ -971,7 +975,7 @@ namespace ShipManifest.Windows
       Rect rect;
       GUI.enabled = true;
       // check to see if crewmembers selected match criteria for a show Tourists only setting...
-      touristsOnly = GUILayout.Toggle(touristsOnly, touristOnlyContent, GUILayout.Width(label1Width));
+      touristsOnly = GUILayout.Toggle(touristsOnly, touristOnlyContent, SMStyle.SMSkin.toggle, GUILayout.Width(label1Width));
       if (touristsOnly != (isSourceView ? TouristsOnlyFrom : TouristsOnlyTo))
       {
         if (isSourceView) TouristsOnlyFrom = touristsOnly;
@@ -1004,13 +1008,12 @@ namespace ShipManifest.Windows
 
     private static void CrewMemberDetails(List<Part> selectedPartsFrom, List<Part> selectedPartsTo, List<ProtoCrewMember> crewMembers, ProtoCrewMember crewMember, float xOffset, bool isVesselMode, int targetCapacity)
     {
-
       Rect rect;
       GUILayout.BeginHorizontal();
       if (isVesselMode)
       {
         bool selected = crewMembers.Contains(crewMember);
-        selected = GUILayout.Toggle(selected, $"{crewMember.name} ({crewMember.experienceTrait.Title})", GUILayout.Width(cmWidth), GUILayout.Height(guiLineHeight));
+        selected = GUILayout.Toggle(selected, $"{crewMember.name} ({crewMember.experienceTrait.Title})", SMStyle.SMSkin.toggle, GUILayout.Width(cmWidth + WidthScale/2), GUILayout.Height(guiLineHeight));
         if (selected && !crewMembers.Contains(crewMember))
         {
           if (crewMembers.Count < targetCapacity) crewMembers.Add(crewMember);
@@ -1023,7 +1026,7 @@ namespace ShipManifest.Windows
       else
       {
         GUI.enabled = true;
-        GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })", GUILayout.Width(cmWidth), GUILayout.Height(guiLineHeight));
+        GUILayout.Label($"  {crewMember.name} ({crewMember.experienceTrait.Title })", SMStyle.SMSkin.label, GUILayout.Width(cmWidth + WidthScale/2), GUILayout.Height(guiLineHeight));
       }
       GUI.enabled = !SMConditions.IsTransferInProgress();
       if (GUILayout.Button(moveKerbalContent, SMStyle.ButtonStyle, GUILayout.Width(cmMoveWidth), GUILayout.Height(guiLineHeight)))
@@ -1045,11 +1048,11 @@ namespace ShipManifest.Windows
 
       Rect rect;
       GUI.enabled = SMConditions.CanKerbalsBeXferred(selectedPartsFrom, selectedPartsTo);
-      if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember.Equals(crewMember) ||
-           SMAddon.SmVessel.TransferCrewObj.ToCrewMember.Equals(crewMember)) && SMConditions.IsTransferInProgress())
+      if ((SMAddon.SmVessel.TransferCrewObj.FromCrewMember == crewMember ||
+           SMAddon.SmVessel.TransferCrewObj.ToCrewMember == crewMember) && SMConditions.IsTransferInProgress())
       {
         GUI.enabled = true;
-        GUILayout.Label(movingContent, GUILayout.Width(btnWidth), GUILayout.Height(guiLineHeight));
+        GUILayout.Label(movingContent, SMStyle.SMSkin.label, GUILayout.Width(btnWidth), GUILayout.Height(guiLineHeight));
       }
       else if (!SMConditions.IsClsInSameSpace(selectedPartsFrom[0],
         selectedPartsTo.Count > 0 ? selectedPartsTo[0] : null))
@@ -1095,8 +1098,8 @@ namespace ShipManifest.Windows
       if (SMConditions.IsTransferInProgress())
       {
         GUI.enabled = true;
-        //GUILayout.Label("Moving", GUILayout.Width(guibtnAction2Width), GUILayout.Height(guiLineHeight));
-        GUILayout.Label(movingContent, GUILayout.Width(guibtnAction2Width), GUILayout.Height(guiLineHeight));
+        //GUILayout.Label("Moving", SMStyle.SMSkin.label, GUILayout.Width(guibtnAction2Width), GUILayout.Height(guiLineHeight));
+        GUILayout.Label(movingContent, SMStyle.SMSkin.label, GUILayout.Width(guibtnAction2Width), GUILayout.Height(guiLineHeight));
       }
       else
       {
@@ -1155,7 +1158,7 @@ namespace ShipManifest.Windows
         string toolTip = $"{expScienceContent} {(GUI.enabled ? "" : disabledXferContent)}";
         GUIStyle expandStyle = ScienceModulesSource[modules.Current] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (ScienceModulesSource[modules.Current]) label = "-";
-        if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight)))
+        if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(guiBtnExpandWidth), GUILayout.Height(guiLineHeight)))
         {
           ScienceModulesSource[modules.Current] = !ScienceModulesSource[modules.Current];
         }
@@ -1164,7 +1167,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
         GUI.enabled = true;
-        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", GUILayout.Width(guiLabelScienceWidth),
+        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", SMStyle.SMSkin.label, GUILayout.Width(guiLabelScienceWidth + WidthScale/2),
           GUILayout.Height(guiLineHeight));
 
         // If we have target selected, it is not the same as the source, there is science to xfer.
@@ -1227,7 +1230,7 @@ namespace ShipManifest.Windows
           {
             if (items.Current == null) continue;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight));
+            GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight));
 
             // Get science data from experiment.
             string expId = ((ScienceData)items.Current).subjectID.Split('@')[0];
@@ -1314,7 +1317,7 @@ namespace ShipManifest.Windows
           $"{expScienceContent} {(GUI.enabled ? "" : disabledXferContent)}";
         GUIStyle expandStyle = ScienceModulesSource[modules.Current] ? SMStyle.ButtonToggledStyle : SMStyle.ButtonStyle;
         if (ScienceModulesSource[modules.Current]) label = "-";
-        if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight)))
+        if (GUILayout.Button(new GUIContent(label, toolTip), expandStyle, GUILayout.Width(guiBtnExpandWidth), GUILayout.Height(guiLineHeight)))
         {
           ScienceModulesSource[modules.Current] = !ScienceModulesSource[modules.Current];
         }
@@ -1323,7 +1326,7 @@ namespace ShipManifest.Windows
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
 
         GUI.enabled = true;
-        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", GUILayout.Width(guiLabelScienceWidth),
+        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", SMStyle.SMSkin.label, GUILayout.Width(guiLabelScienceWidth),
           GUILayout.Height(guiLineHeight));
 
         // If we have target selected, it is not the same as the source, there is science to xfer.
@@ -1387,7 +1390,7 @@ namespace ShipManifest.Windows
           {
             if (items.Current == null) continue;
             GUILayout.BeginHorizontal();
-            GUILayout.Label("", GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight));
+            GUILayout.Label("", SMStyle.SMSkin.label, GUILayout.Width(guiBtnMoveWidth), GUILayout.Height(guiLineHeight));
 
             // Get science data from experiment.
             string expId = ((ScienceData)items.Current).subjectID.Split('@')[0];
@@ -1462,7 +1465,7 @@ namespace ShipManifest.Windows
         if (!(modules.Current is IScienceDataContainer) || (modules.Current).moduleName == "ModuleScienceExperiment") continue;
         int scienceCount = ((IScienceDataContainer)modules.Current).GetScienceCount();
         GUILayout.BeginHorizontal();
-        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", GUILayout.Width(guiLabelScience2Width),
+        GUILayout.Label($"{modules.Current.moduleName} - ({scienceCount})", SMStyle.SMSkin.label, GUILayout.Width(guiLabelScience2Width + WidthScale/2),
           GUILayout.Height(guiLineHeight));
         // set the conditions for a button style change.
         bool isReceiveToggled = false;
@@ -1532,12 +1535,12 @@ namespace ShipManifest.Windows
         // We want to show this during transfer if the direction is correct...
         if (activePump.PumpType == pumpType)
         {
-          //GUILayout.Label("Xfer Remaining:", GUILayout.Width(guiLableXferWidth));
-          GUILayout.Label($"{xferRemainContent}:", GUILayout.Width(guiLableXferWidth));
+          //GUILayout.Label("Xfer Remaining:", SMStyle.SMSkin.label, GUILayout.Width(guiLableXferWidth));
+          GUILayout.Label($"{xferRemainContent}:", SMStyle.SMSkin.label, GUILayout.Width(guiLableXferWidth));
           
-          GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"));
+          GUILayout.Label(activePump.PumpBalance.ToString("#######0.##"), SMStyle.SMSkin.label);
           if (SMAddon.SmVessel.SelectedResources.Count > 1)
-            GUILayout.Label($" | {ratioPump.PumpBalance:#######0.##}");
+            GUILayout.Label($" | {ratioPump.PumpBalance:#######0.##}", SMStyle.SMSkin.label);
         }
       }
       else
@@ -1552,11 +1555,11 @@ namespace ShipManifest.Windows
           label = $"{resultsContent}:";
           toolTip = xferAmtTtContent;
         }
-        GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(labelWidth));
+        GUILayout.Label(new GUIContent(label, toolTip), SMStyle.SMSkin.label, GUILayout.Width(labelWidth));
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
           ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-        activePump.EditSliderAmount = GUILayout.TextField(activePump.EditSliderAmount, 20, GUILayout.Width(sliderWidth),
+        activePump.EditSliderAmount = GUILayout.TextField(activePump.EditSliderAmount, 20, SMStyle.SMSkin.textField, GUILayout.Width(sliderWidth + WidthScale/2),
           GUILayout.Height(guiLineHeight));
         thisXferAmount = double.Parse(activePump.EditSliderAmount);
         double ratioXferAmt = thisXferAmount * ratioPump.PumpRatio > ratioPump.FromCapacity
@@ -1566,7 +1569,7 @@ namespace ShipManifest.Windows
         {
           label = $" | {ratioXferAmt:#######0.##}";
           toolTip = $"{smallXferAmtTtContent}:  {ratioPump.PumpRatio}.\n{noteRatioTtContent}";
-          GUILayout.Label(new GUIContent(label, toolTip), GUILayout.Width(labelWidth2));
+          GUILayout.Label(new GUIContent(label, toolTip), SMStyle.SMSkin.label, GUILayout.Width(labelWidth2));
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
             ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
@@ -1582,14 +1585,14 @@ namespace ShipManifest.Windows
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
         ToolTip = SMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, xOffset);
-      thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount,
-        GUILayout.Width(190 * CurrSettings.CurrentUIScale));
+      thisXferAmount = GUILayout.HorizontalSlider((float)thisXferAmount, 0, (float)maxPumpAmount, SMStyle.SMSkin.horizontalSlider, SMStyle.SMSkin.horizontalSliderThumb,
+        GUILayout.Width(label1Width + WidthScale/2));
       activePump.EditSliderAmount = thisXferAmount.ToString(CultureInfo.InvariantCulture);
 
       // set Xfer button style
       GUIContent xferPumpContent = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && !activePump.IsPumpOn ? xferStartContent : xferStopContent;
       GUI.enabled = !TransferPump.PumpProcessOn || activePump.PumpType == pumpType && activePump.IsPumpOn;
-      if (GUILayout.Button(xferPumpContent, GUILayout.Width(guibtnAction1Width), GUILayout.Height(guiLineHeight2)))
+      if (GUILayout.Button(xferPumpContent, SMStyle.SMSkin.button, GUILayout.Width(guibtnAction1Width), GUILayout.Height(guiLineHeight2)))
       {
         uint pumpId = TransferPump.GetPumpIdFromHash(string.Join("", selectedResources.ToArray()),
           pumps[0].FromParts.First(), pumps[0].ToParts.Last(), pumpType, TransferPump.TriggerButton.Transfer);
@@ -1609,7 +1612,6 @@ namespace ShipManifest.Windows
 
     private static void ResourceFlowButtons(TransferPump.TypeXfer pumpType, int scrollX)
     {
-
       string step = "";
       try
       {
@@ -1627,13 +1629,13 @@ namespace ShipManifest.Windows
           GUILayout.BeginHorizontal();
           string label =
             $"{displayPumps.Current.Resource}: ({displayPumps.Current.FromRemaining:#######0.##}/{displayPumps.Current.FromCapacity:######0.##})";
-          GUILayout.Label(label , SMStyle.LabelStyleNoWrap, GUILayout.Width(guiLabelScience2Width),GUILayout.Height(guiLineHeight2));
-          GUILayout.Label(flowtext, GUILayout.Width(guiSpaceWidth), GUILayout.Height(guiLineHeight2));
+          GUILayout.Label(label , SMStyle.LabelStyleNoWrap, GUILayout.Width(guiLabelScience2Width + WidthScale/2),GUILayout.Height(guiLineHeight2));
+          GUILayout.Label(flowtext, SMStyle.SMSkin.label, GUILayout.Width(guiSpaceWidth), GUILayout.Height(guiLineHeight2));
           if (SMAddon.SmVessel.Vessel.IsControllable)
           {
             step = "render flow button(s)";
             //GUIContent content = new GUIContent("Flow", "Enables/Disables flow of selected resource(s) from selected part(s).");
-            if (GUILayout.Button(flowContent, GUILayout.Width(guibtnAction1Width), GUILayout.Height(guiLineHeight)))
+            if (GUILayout.Button(flowContent, SMStyle.SMSkin.button, GUILayout.Width(guibtnAction1Width), GUILayout.Height(guiLineHeight)))
             {
               List<Part>.Enumerator parts = displayPumps.Current.FromParts.GetEnumerator();
               while (parts.MoveNext())
@@ -1990,15 +1992,18 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      ViewerWidth = 300 * CurrSettings.CurrentUIScale;
-      ViewerHeight = 100 * CurrSettings.CurrentUIScale;
+      WindowHeight = 325 * CurrSettings.CurrentUIScale;
+      WindowWidth = 625 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 300 * CurrSettings.CurrentUIScale + WidthScale;
+      ViewerHeight = 120 * CurrSettings.CurrentUIScale + HeightScale;
       ViewerHeight2 = 120 * CurrSettings.CurrentUIScale;
-      MinHeight = 50 * CurrSettings.CurrentUIScale;
-      WindowHeight = 279 * CurrSettings.CurrentUIScale;
+      MinHeight = 120 * CurrSettings.CurrentUIScale;
+      MinWidth = 300 * CurrSettings.CurrentUIScale;
       textWidth = 220 * CurrSettings.CurrentUIScale;
       toggleWidth = 65 * CurrSettings.CurrentUIScale;
       guiLineHeight = 20 * CurrSettings.CurrentUIScale;
       guiBtnMoveWidth = 15 * CurrSettings.CurrentUIScale;
+      guiBtnExpandWidth = 20 * CurrSettings.CurrentUIScale;
       label1Width = 190 * CurrSettings.CurrentUIScale;
       guibtnAction1Width = 40 * CurrSettings.CurrentUIScale;
       guibtnAction2Width = 50 * CurrSettings.CurrentUIScale;
@@ -2009,7 +2014,7 @@ namespace ShipManifest.Windows
       guiBtnFillWidth = 30 * CurrSettings.CurrentUIScale;
       btnWidth = 60 * CurrSettings.CurrentUIScale;
       guiLabelScienceWidth = 205 * CurrSettings.CurrentUIScale;
-      guiLabelScience2Width = 220 * CurrSettings.CurrentUIScale;
+      guiLabelScience2Width = 215 * CurrSettings.CurrentUIScale;
       labelWidth = 65 * CurrSettings.CurrentUIScale;
       labelWidth2 = 80 * CurrSettings.CurrentUIScale;
       sliderWidth = 95 * CurrSettings.CurrentUIScale;

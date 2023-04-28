@@ -53,12 +53,12 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUI.enabled = true;
       // Tab Title
       GUILayout.Label(titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth));
+      GUILayout.Label(WindowSettings.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowSettings.GuiRuleHeight), GUILayout.Width(WindowSettings.GuiRuleWidth + WindowSettings.WidthScale));
 
       // EnableHighlighting Mode
       // Enable Highlighting
       CurrSettings.EnableHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableHighlighting, modeAllContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       if (CurrSettings.EnableHighlighting != OrigSettings.EnableHighlighting && HighLogic.LoadedSceneIsFlight)
       {
         if (CurrSettings.EnableCls)
@@ -81,7 +81,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.Space(guiIndent);
       // Highlight Only Source / Target Parts";
       CurrSettings.OnlySourceTarget = GuiUtils.DisplaySettingsToggle(CurrSettings.OnlySourceTarget, modeSTContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
       if (CurrSettings.OnlySourceTarget && (!OrigSettings.OnlySourceTarget || CurrSettings.EnableClsHighlighting))
       {
@@ -104,7 +104,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       GUILayout.BeginHorizontal();
       GUILayout.Space(guiIndent);
       CurrSettings.EnableClsHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableClsHighlighting, modeClsContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       GUILayout.EndHorizontal();
       if (CurrSettings.EnableClsHighlighting && (!OrigSettings.EnableClsHighlighting || CurrSettings.OnlySourceTarget))
         CurrSettings.OnlySourceTarget = false;
@@ -119,7 +119,7 @@ namespace ShipManifest.Windows.Tabs.Settings
       // Enable Edge Highlighting Mode
       GUI.enabled = CurrSettings.EnableHighlighting;
       CurrSettings.EnableEdgeHighlighting = GuiUtils.DisplaySettingsToggle(CurrSettings.EnableEdgeHighlighting, modeEdgeContent,
-        ref toolTip, guiToggleWidth, scrollX);
+        ref toolTip, guiToggleWidth + WindowSettings.WidthScale, scrollX);
       if (CurrSettings.EnableEdgeHighlighting != OrigSettings.EnableEdgeHighlighting && HighLogic.LoadedSceneIsFlight)
       {
         if (CurrSettings.EnableEdgeHighlighting == false)

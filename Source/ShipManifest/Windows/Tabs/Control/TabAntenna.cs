@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using KSP.UI.Screens.Settings;
 using ShipManifest.APIClients;
 using ShipManifest.InternalObjects;
 using ShipManifest.InternalObjects.Settings;
@@ -45,7 +46,7 @@ namespace ShipManifest.Windows.Tabs.Control
       GUI.enabled = true;
       GUILayout.Label(
         InstalledMods.IsRtInstalled ? titleRmContent : titleContent, SMStyle.LabelTabHeader);
-      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth));
+      GUILayout.Label(WindowControl.TabRule, SMStyle.LabelStyleHardRule, GUILayout.Height(WindowControl.GuiRuleHeight), GUILayout.Width(WindowControl.GuiRuleWidth + WindowControl.WidthScale));
       string step = "start";
       try
       {
@@ -58,7 +59,7 @@ namespace ShipManifest.Windows.Tabs.Control
           step = "get Antenna label";
           string label = $"{iAntennas.Current.AntennaStatus} - {iAntennas.Current.Title}";
           bool open = iAntennas.Current.Extended;
-          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth), GUILayout.Height(guiToggleHeight));
+          bool newOpen = GUILayout.Toggle(open, label, GUILayout.Width(guiToggleWidth + WindowControl.WidthScale), GUILayout.Height(guiToggleHeight));
           step = "button toggle check";
           if (!open && newOpen)
             iAntennas.Current.ExtendAntenna();
@@ -110,7 +111,7 @@ namespace ShipManifest.Windows.Tabs.Control
     internal static void RefreshUIScale()
     {
       guiToggleWidth = 325 * CurrSettings.CurrentUIScale;
-      guiToggleHeight = 40 * CurrSettings.CurrentUIScale;
+      guiToggleHeight = 40 * CurrSettings.CurrentUIScale; ;
     }
   }
 }
