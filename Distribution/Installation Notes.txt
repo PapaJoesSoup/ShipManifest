@@ -38,10 +38,10 @@ I've now re-imagined it into Ship Manifest, using the same easy to navigate visu
 NOTE:  SM has no dependencies on other mods.  If installed, Ship manifest is designed specifically to take advantage of:
 	- Blizzy's Toolbar.
 	- Connected Living Space  https://forum.kerbalspaceprogram.com/index.php?showtopic=109972.
-	- Module Manager  http://forum.kerbalspaceprogram.com/threads/55219
-	- DeepFreeze  http://forum.kerbalspaceprogram.com/threads/124720
+	- Module Manager  https://forum.kerbalspaceprogram.com/index.php?showtopic=50533
+	- DeepFreeze  https://forum.kerbalspaceprogram.com/index.php?showtopic=112328
 	- RemoteTech Antennas  https://forum.kerbalspaceprogram.com/index.php?showtopic=139167
-	- KSP-AVC  http://forum.kerbalspaceprogram.com/threads/79745
+	- KSP-AVC  https://forum.kerbalspaceprogram.com/index.php?showtopic=174445
 	- CKAN  https://forum.kerbalspaceprogram.com/index.php?showtopic=197082
 
 --------------------
