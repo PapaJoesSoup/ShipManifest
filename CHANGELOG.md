@@ -5,6 +5,10 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
+
+
+Version 6.0.8.0 - Release 28 Apr 2023 - KSP 1.12.5
+--------------------------------------------------
 - New:  Added horizontal window resizing to all windows.  SM will remember these settings  between saves.
 - Fixed: Correct window scaling issue where other mods were affected by SM when chaning the KSP Scale.
          This was caused by GUI.skin issues as SM was altering the built in skins.
