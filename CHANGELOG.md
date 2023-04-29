@@ -5,9 +5,13 @@ Major features are **bolded**, contributors are *emphasized*.
 
 Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
 --------------------------------------------------
-- Fixed: Correct error with scaling where other mods are affected by SM scaling.  This was caused by GUI.skin issues and the way SM scales the UI.  Now SM scales only SM windows.
-         Issue: Forum post https://forum.kerbalspaceprogram.com/index.php?/topic/56643-112x-ship-manifest-crew-science-resources-v-6070-25-apr-23/&do=findComment&comment=4277051
 - New:  Added horizontal window resizing to all windows.  SM will remember these settings  between saves.
+- Fixed: Correct window scaling issue where other mods were affected by SM when chaning the KSP Scale.
+         This was caused by GUI.skin issues as SM was altering the built in skins.
+         SM now uses a custom skin constructed dynamically from the selected builtin scales, so only SM windows are affected.
+         Issue: Forum post https://forum.kerbalspaceprogram.com/index.php?/topic/56643-112x-ship-manifest-crew-science-resources-v-6070-25-apr-23/&do=findComment&comment=4277051
+- Changed:  adjusted window heights for the Unity skin and the KSP skin.  This makes window resizing more reliable.
+
 
 
 
