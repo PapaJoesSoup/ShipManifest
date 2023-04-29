@@ -259,12 +259,12 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      WindowHeight = 385 * CurrSettings.CurrentUIScale;
-      WindowWidth = 400 * CurrSettings.CurrentUIScale;
+      WindowHeight = CurrSettings.UseUnityStyle ? 385 : 395 * CurrSettings.CurrentUIScale;
+      WindowWidth = 405 * CurrSettings.CurrentUIScale;
       MinHeight = 300 * CurrSettings.CurrentUIScale;
       MinWidth = 385 * CurrSettings.CurrentUIScale;
       ViewerHeight = 300 * CurrSettings.CurrentUIScale;
-      ViewerWidth = 380 * CurrSettings.CurrentUIScale;
+      ViewerWidth = 385 * CurrSettings.CurrentUIScale;
       GuiRuleWidth = 350 * CurrSettings.CurrentUIScale;
       GuiRuleHeight = 10 * CurrSettings.CurrentUIScale;
       guiLineHeight = 20 * CurrSettings.CurrentUIScale;

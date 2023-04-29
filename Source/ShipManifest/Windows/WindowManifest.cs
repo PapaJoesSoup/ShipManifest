@@ -650,7 +650,7 @@ namespace ShipManifest.Windows
 
     internal static void RefreshUIScale()
     {
-      WindowHeight = 370 * CurrSettings.CurrentUIScale;
+      WindowHeight = CurrSettings.UseUnityStyle ? 370 : 380 * CurrSettings.CurrentUIScale;
       WindowWidth = 320 * CurrSettings.CurrentUIScale;
       ViewerHeight = 140 * CurrSettings.CurrentUIScale;
       ViewerWidth = 300 * CurrSettings.CurrentUIScale;
