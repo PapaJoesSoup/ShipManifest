@@ -12,9 +12,6 @@ Version {VERSION} - Release {DATE} - KSP {KSPVERSION}
          Issue: Forum post https://forum.kerbalspaceprogram.com/index.php?/topic/56643-112x-ship-manifest-crew-science-resources-v-6070-25-apr-23/&do=findComment&comment=4277051
 - Changed:  adjusted window heights for the Unity skin and the KSP skin.  This makes window resizing more reliable.
 
-
-
-
 Version 6.0.7.0 - Release 25 Apr 2023 - KSP 1.12.5
 --------------------------------------------------
 - Fixed: Correct error in Manifest window with the vessel name.  Was using a nonlocalized name. Now properly localized.
