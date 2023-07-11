@@ -69,7 +69,7 @@ namespace ShipManifest.Windows
       ToolTipActive = false;
 
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, closeContent)) // "Close Window"
+      if (GUI.Button(rect, closeContent, SMStyle.SMSkin.button)) // "Close Window"
       {
         ShowWindow = false;
         SMSettings.MemStoreTempSettings();

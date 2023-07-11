@@ -372,8 +372,6 @@ namespace ShipManifest
       }
       try
       {
-        GUI.skin = CurrSettings.UseUnityStyle ? null : HighLogic.Skin;
-
         Display();
         SMToolTips.ShowToolTips();
       }
@@ -699,8 +697,8 @@ namespace ShipManifest
           _smButtonStock = ApplicationLauncher.Instance.AddModApplication(
             OnSmButtonClicked,
             OnSmButtonClicked,
-            OnSmIconHover,
-            OnSmIconHover,
+            OnSmIconHoverIn,
+            OnSmIconHoverOut,
             DummyHandler,
             DummyHandler,
             ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
@@ -872,18 +870,20 @@ namespace ShipManifest
 
     }
 
-    internal static void OnSmIconHover()
+    private static void OnSmIconHoverIn()
     {
       if (!PopupSmBtnHover.ShowToolTips)
       {
         PopupSmBtnHover.ShowWindow = false;
         return;
       }
-      PopupSmBtnHover.ShowWindow = !PopupSmBtnHover.ShowWindow;
-      if (PopupSmBtnHover.ShowWindow)
-      {
-        PopupSmBtnHover.Position.y = Event.current.mousePosition.y - 100;
-      }
+      PopupSmBtnHover.ShowWindow = true;
+      PopupSmBtnHover.Position.y = Event.current.mousePosition.y - 100;
+    }
+
+    private static void OnSmIconHoverOut()
+    {
+      PopupSmBtnHover.ShowWindow = false;
     }
 
     internal static void OnSmRosterClicked()
@@ -1014,7 +1014,6 @@ namespace ShipManifest
           if (SmVessel.SelectedResources.Contains(SMConditions.ResourceType.Crew.ToString()))
             SMHighlighter.HighlightClsVessel(false, true);
         }
-
       }
       catch (Exception ex)
       {

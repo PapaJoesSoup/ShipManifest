@@ -239,7 +239,7 @@ namespace ShipManifest.Windows
 
       //"Close Window");
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, SMConditions.IsTransferInProgress() ? noCloseContent : closeContent))
+      if (GUI.Button(rect, SMConditions.IsTransferInProgress() ? noCloseContent : closeContent, SMStyle.SMSkin.button))
       {
         if (BtnCloseWindow()) return;
       }
@@ -344,6 +344,8 @@ namespace ShipManifest.Windows
 
       return false;
     }
+
+    // This section can be separated into files
 
     #region Viewer Selections (Top Half)
 

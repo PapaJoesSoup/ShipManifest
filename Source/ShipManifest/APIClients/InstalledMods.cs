@@ -37,7 +37,7 @@ namespace ShipManifest.APIClients
         string[] fullName = list.Current.FullName.Split(',');
         GUILayout.BeginHorizontal();
         GUILayout.Label(fullName[0], SMStyle.SMSkin.label, GUILayout.Width(GuiWidth * CurrSettings.CurrentUIScale));
-        GUILayout.Label(fullName[1]);
+        GUILayout.Label(fullName[1], SMStyle.SMSkin.label);
         GUILayout.EndHorizontal();
       }
       list.Dispose();

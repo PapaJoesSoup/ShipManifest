@@ -77,7 +77,7 @@ namespace ShipManifest.Windows
 
       // Close Window
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
-      if (GUI.Button(rect, closeContent))
+      if (GUI.Button(rect, closeContent, SMStyle.SMSkin.button))
       {
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)

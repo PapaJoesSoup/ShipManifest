@@ -50,44 +50,42 @@ namespace ShipManifest
     internal static void SetStyles()
     {
       // Set up GUI Styles
-      KSPSkin = HighLogic.Skin;
-      UnitySkin = GUI.skin;
-
+      KSPSkin = Object.Instantiate(HighLogic.Skin);
+      UnitySkin = Object.Instantiate(GUI.skin);
       SMSkin = CurrSettings.UseUnityStyle ? UnitySkin : KSPSkin;
 
-      WindowStyle = new GUIStyle(SMSkin.window);
-
       // Scale skin fonts
-      SMSkin.label.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.textArea.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.textField.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.button.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.toggle.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.box.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalSlider.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalSliderThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.scrollView.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalScrollbarLeftButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.horizontalScrollbarRightButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalScrollbar.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalScrollbarThumb.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalScrollbarUpButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.verticalScrollbarDownButton.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
-      SMSkin.window.fontSize = (int)(12 * CurrSettings.CurrentUIScale);
+      int newFontSize = (int)(12 * CurrSettings.CurrentUIScale);
 
-      PopupStyle = new GUIStyle(HighLogic.Skin.window);
-
+      SMSkin.box.fontSize = newFontSize;
+      SMSkin.button.fontSize = newFontSize;
+      SMSkin.horizontalScrollbar.fontSize = newFontSize;
+      SMSkin.horizontalScrollbarThumb.fontSize = newFontSize;
+      SMSkin.horizontalScrollbarLeftButton.fontSize = newFontSize;
+      SMSkin.horizontalScrollbarRightButton.fontSize = newFontSize;
+      SMSkin.horizontalSlider.fontSize = newFontSize;
+      SMSkin.horizontalSliderThumb.fontSize = newFontSize;
+      SMSkin.label.fontSize = newFontSize;
+      SMSkin.scrollView.fontSize = newFontSize;
+      SMSkin.textArea.fontSize = newFontSize;
+      SMSkin.textField.fontSize = newFontSize;
+      SMSkin.toggle.fontSize = newFontSize;
+      SMSkin.verticalScrollbar.fontSize = newFontSize;
+      SMSkin.verticalScrollbarThumb.fontSize = newFontSize;
+      SMSkin.verticalScrollbarUpButton.fontSize = newFontSize;
+      SMSkin.verticalScrollbarDownButton.fontSize = newFontSize;
+      SMSkin.verticalSlider.fontSize = newFontSize;
+      SMSkin.verticalSliderThumb.fontSize = newFontSize;
+      SMSkin.window.fontSize = newFontSize;
+      
+      WindowStyle = new GUIStyle(SMSkin.window);
+      PopupStyle = new GUIStyle(SMSkin.window);
       IconStyle = new GUIStyle();
 
       ButtonStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.blue},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -101,7 +99,7 @@ namespace ShipManifest
       ButtonToggledStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
+        fontSize = newFontSize,
         padding =
         {
           top = 0,
@@ -119,7 +117,6 @@ namespace ShipManifest
       {
         normal = {textColor = Color.white},
         hover = {textColor = Color.green},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -133,7 +130,6 @@ namespace ShipManifest
       ButtonToggledStyleLeft = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.green},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -149,7 +145,6 @@ namespace ShipManifest
       ButtonSourceStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -164,7 +159,6 @@ namespace ShipManifest
       ButtonToggledSourceStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.SourcePartColor]},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -180,7 +174,6 @@ namespace ShipManifest
       ButtonTargetStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -195,7 +188,6 @@ namespace ShipManifest
       ButtonOptionStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = Color.white},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         fixedHeight = 20 * CurrSettings.CurrentUIScale,
         padding =
         {
@@ -212,7 +204,6 @@ namespace ShipManifest
       ButtonToggledTargetStyle = new GUIStyle(SMSkin.button)
       {
         normal = {textColor = SMSettings.Colors[CurrSettings.TargetPartColor]},
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         padding =
         {
           top = 0,
@@ -285,7 +276,6 @@ namespace ShipManifest
 
       LabelStyleBold = new GUIStyle(SMSkin.label)
       {
-        fontSize = (int)(12 * CurrSettings.CurrentUIScale),
         fontStyle = FontStyle.Bold
       };
 
