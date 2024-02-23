@@ -358,6 +358,16 @@ namespace ShipManifest
         if (_smSettingsBlizzy != null)
           _smSettingsBlizzy.Destroy();
       }
+
+      // Ensure no leftover memory leak
+      try
+      {
+        GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGuiAppLauncherDestroyed);
+    }
+      catch (Exception)
+      {
+        // Do nothing
+      }
     }
 
     // ReSharper disable once InconsistentNaming
